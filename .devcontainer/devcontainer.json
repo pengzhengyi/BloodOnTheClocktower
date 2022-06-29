@@ -24,7 +24,9 @@
 				"eamodio.gitlens",
 				"oderwat.indent-rainbow",
 				"ms-toolsai.jupyter",
-				"davidanson.vscode-markdownlint"
+				"davidanson.vscode-markdownlint",
+				"octref.vetur",
+				"WakaTime.vscode-wakatime"
 			]
 		}
 	},
