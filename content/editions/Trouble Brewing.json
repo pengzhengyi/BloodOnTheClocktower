@@ -1,0 +1,31 @@
+{
+    "characters": {
+        "demons": ["Imp"],
+        "minions": ["Poisoner", "Spy", "Scarlet Woman", "Baron"],
+        "outsiders": ["Butler", "Drunk", "Recluse", "Saint"],
+        "townsfolk": [
+            "Washerwoman",
+            "Librarian",
+            "Investigator",
+            "Chef",
+            "Empath",
+            "Fortune Teller",
+            "Undertaker",
+            "Monk",
+            "Ravenkeeper",
+            "Virgin",
+            "Slayer",
+            "Soldier",
+            "Mayor"
+        ]
+    },
+    "description": "Trouble Brewing has a little bit of everything. Some characters passively receive information, some need to take action to learn who is who, while some simply want to bait the Demon into attacking them. Both good and evil can gain the upper hand by making well-timed sacrifices. Trouble Brewing is a relatively straightforward Demon-hunt, but evil has a number of dastardly misinformation tricks up their sleeves, so the good players best question what they think they know if they hope to survive.\nBeginner. Recommended for players and Storytellers new to Blood on the Clocktower or to social deception games.\nGood players will need to figure out who is good and who is evil by using logic and intuition. Some players may want to reveal which character they are and share their information immediately (such as the Chef or Investigator), while others may want to lie about their identity so that the Imp avoids attacking them (such as the Undertaker or Fortune Teller). Some may lie about who they are so that the Imp does attack them (such as the Ravenkeeper or Soldier)!\nOther good characters gain information by doing something and noticing the effect. Sacrificing one\u2019s life by nominating a Virgin, attempting to kill the Imp as a Slayer and noticing what happens, or deliberately killing good players so that the Undertaker can confirm which character they were\u2014these are all ways to sacrifice life and power to gain information and achieve victory.\nEvil players will need to pretend to be good characters and do so well, giving false information to confuse the good team if necessary. With only true information, the good team will usually find out who is evil with enough time to spare. But with even a little believable falsehood in the air, evil has a chance. The Poisoner and Spy, if they pay attention, can cause huge confusion in the good team\u2019s ranks by using their abilities sneakily. Evil will also need to decide when to make sacrifices. Will the Scarlet Woman kill the Imp to save their team? Will the Imp kill themself to turn a more trustworthy player into the Demon? Will the evil team vote to execute a suspicious Minion in order to look like honorable members of the town? Or will the Baron give obviously false information to make it look like a Poisoner is in the game? Causing confusion about which Minions are in play can be the difference between victory and defeat.",
+    "difficulty": "Beginner",
+    "guide": {
+        "evil players": "Evil players will need to pretend to be good characters and do so well, giving false information to confuse the good team if necessary. With only true information, the good team will usually find out who is evil with enough time to spare. But with even a little believable falsehood in the air, evil has a chance. The Poisoner and Spy, if they pay attention, can cause huge confusion in the good team\u2019s ranks by using their abilities sneakily. Evil will also need to decide when to make sacrifices. Will the Scarlet Woman kill the Imp to save their team? Will the Imp kill themself to turn a more trustworthy player into the Demon? Will the evil team vote to execute a suspicious Minion in order to look like honorable members of the town? Or will the Baron give obviously false information to make it look like a Poisoner is in the game? Causing confusion about which Minions are in play can be the difference between victory and defeat.",
+        "good players": "Good players will need to figure out who is good and who is evil by using logic and intuition. Some players may want to reveal which character they are and share their information immediately (such as the Chef or Investigator), while others may want to lie about their identity so that the Imp avoids attacking them (such as the Undertaker or Fortune Teller). Some may lie about who they are so that the Imp does attack them (such as the Ravenkeeper or Soldier)!\nOther good characters gain information by doing something and noticing the effect. Sacrificing one\u2019s life by nominating a Virgin, attempting to kill the Imp as a Slayer and noticing what happens, or deliberately killing good players so that the Undertaker can confirm which character they were\u2014these are all ways to sacrifice life and power to gain information and achieve victory."
+    },
+    "name": "Trouble Brewing",
+    "synopsis": "Clouds roll in over Ravenswood Bluff, engulfing this sleepy town and its superstitious inhabitants in foreboding shadow. Freshly-washed clothes dance eerily on lines strung between cottages. Chimneys cough plumes of smoke into the air. Exotic scents waft through cracks in windows and under doors, as hidden cauldrons lay bubbling. An unusually warm Autumn breeze wraps around vine-covered walls and whispers ominously to those brave enough to walk the cobbled streets.\nAnxious mothers call their children home from play, as thunder begins to clap on the horizon. If you listen more closely, however, noises stranger still can be heard echoing from the neighbouring forest. Under the watchful eye of a looming monastery, silhouetted figures skip from doorway to doorway. Those who can read the signs know there is...\nTrouble Brewing.",
+    "url": "https://wiki.bloodontheclocktower.com/Trouble_Brewing"
+}
