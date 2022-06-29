@@ -1,0 +1,61 @@
+{
+    "characters": {
+        "demons": [
+            "Al-Hadikhia",
+            "Legion",
+            "Leviathan",
+            "Lil' Monsta",
+            "Lleech",
+            "Riot"
+        ],
+        "fabled": ["Storm Catcher"],
+        "minions": [
+            "Boomdandy",
+            "Fearmonger",
+            "Goblin",
+            "Marionette",
+            "Mezepheles",
+            "Psychopath",
+            "Widow"
+        ],
+        "outsiders": [
+            "Acrobat",
+            "Damsel",
+            "Golem",
+            "Heretic",
+            "Politician",
+            "Puzzlemaster",
+            "Snitch"
+        ],
+        "townsfolk": [
+            "Alchemist",
+            "Amnesiac",
+            "Atheist",
+            "Balloonist",
+            "Bounty Hunter",
+            "Cannibal",
+            "Choirboy",
+            "Cult Leader",
+            "Engineer",
+            "Farmer",
+            "Fisherman",
+            "General",
+            "Huntsman",
+            "King",
+            "Lycanthrope",
+            "Magician",
+            "Nightwatchman",
+            "Noble",
+            "Pixie",
+            "Poppy Grower",
+            "Preacher"
+        ],
+        "travellers": ["Gangster"]
+    },
+    "description": "Experimental characters are characters which do not yet have a home script. At some point in the future, these may be released as part of official expansion scripts. For now, you are encouraged to experiment with them in your own scripts.\nRecommended for players and Storytellers who have experienced many games of Blood on the Clocktower.",
+    "difficulty": "Recommended for players and Storytellers who have experienced many games of Blood on the Clocktower",
+    "guide": {},
+    "name": "Experimental Characters",
+    "synopsis": "Experimental characters are characters which do not yet have a home script. At some point in the future, these may be released as part of official expansion scripts. For now, you are encouraged to experiment with them in your own scripts.\nExperimental Characters.",
+    "url": "https://wiki.bloodontheclocktower.com/Experimental_Characters"
+}
