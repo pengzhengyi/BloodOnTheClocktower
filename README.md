@@ -1,5 +1,22 @@
 # BloodOnTheClocktower
 
+## Acknowledgements and Copyrights
+
+This project inheriting some of bra1n's work in [Blood on the Clocktower Grimoire & Town Square](https://github.com/bra1n/townsquare).
+The following work has been leveraged:
+
+- Assets
+
+### Acknowledgements and Copyrights from [Blood on the Clocktower Grimoire & Town Square](https://github.com/bra1n/townsquare)
+
+> - Blood on the Clocktower is a trademark of Steven Medway and Th- e Pandemonium Institute
+> - Night reminders and other auxiliary text written by Ben Finney
+> - Iconography by Font Awesome
+> - Background image copyright and permission granted by Ryan Ma- loney
+> - Webfonts by Google Fonts and Online Web Fonts
+> - All other images and icons are copyright to their respective ow- ners
+> - This project and its website are provided free of charge and not affiliated with The Pandemonium Institute in any way.
+
 ## Build Setup
 
 ```bash
