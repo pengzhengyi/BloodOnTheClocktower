@@ -1,0 +1,17 @@
+{
+    "ability": "Name a good character. If in play, they can only die by execution, but evil players learn which player it is.",
+    "about": "The Storm Catcher allows the Storyteller to build a game focused on a particular good character.",
+    "edition": "experimental characters",
+    "gameplay": [
+        "The Storyteller has built a script based on the General, so says that \u201cthe Storm Catcher favours the General\u201d. The General is in play. At night, the Imp and the Godfather both attack the General, who does not die. After 5 days of information and discussion, the town decides to execute the General. They die.",
+        "The Storyteller wants a game based around the Empath\u2019s information, so says that \u201cThe Storm Catcher favours the Empath\u201d. There is no Empath in play. Because the Poisoner learns this, they choose to bluff as the Empath."
+    ],
+    "id": "storm catcher",
+    "image": "assets/icons/storm catcher.png",
+    "name": "Storm Catcher",
+    "soliloquy": "At dawn, the temple\u2019s long shadow creeps to the fountain. At dusk, the obelisk blocks the red glare, cooling warm water under the archway. All lines converge here. A storm is coming, and this, this pebbled and lush and holy place between the apple trees, is the eye.",
+    "team": "fabled",
+    "tips": {
+        "Explanation": "The Storm Catcher is a Fabled that works especially well with custom scripts, allowing you to play a game \"based\" around a particular character without that character's presence becoming easy to metagame. This good character is protected from death at night by the Storyteller's favour, giving them some survivability. To counter this powerful boon, the evil team will always be aware of who the player is so that they can work to undermine and execute them as soon as possible.\nNaming a character with Storm Catcher does not mean you have to put that character in - this will open it up as a free bluff for the evil team instead, since they will know nobody in play has that power.\nUse the Storm Catcher to make a character feel special - if you've built your entire game around interesting interactions with the Slayer for example, it can be a bummer to lose your Slayer day 2 to a lucky Demon hit. By giving a character your protection, you not only open up the number of strategies available to that player (good OR evil), but also ensure that the group will give that character special consideration in their deliberations.\nNote that Storm Catcher only works for good characters - unfortunately, evil characters will have to carry themselves on charm alone."
+    }
+}

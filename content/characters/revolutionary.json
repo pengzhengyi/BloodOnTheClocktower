@@ -1,0 +1,17 @@
+{
+    "ability": "2 neighboring players are known to be the same alignment. Once per game, 1 of them registers falsely.",
+    "about": "The Revolutionary helps disadvantaged players participate.",
+    "edition": "fabled",
+    "gameplay": [
+        "Mathew is deaf. He teams up with Davo, via the Revolutionary. Mathew draws the Poisoner, and Davo draws the Imp. They can scheme in private, using sign language, so that Mathew can still participate.",
+        "Hannah is 12 years old. She is keen to play, but does not understand many of the intricacies of how the characters work. She gets the Ravenkeeper and teams up with her father, who is the Fortune Teller."
+    ],
+    "id": "revolutionary",
+    "image": "assets/icons/revolutionary.png",
+    "name": "Revolutionary",
+    "soliloquy": "United we feigned.\n\nDivided, we stalled.",
+    "team": "Fabled",
+    "tips": {
+        "Explanation": "If a player is unable to understand the rules of the game, is deaf, unable to communicate, or otherwise impaired in some way, they may still participate by teaming up with a player that they trust. These two players are the same alignment, and sit next to each other, so can whisper to each other throughout the game. The experienced player can help the disadvantaged player in whatever way is needed, talking on their behalf, or suggesting what to do.\nThe Revolutionary is also useful for couples or good friends who wish to play, but are uncomfortable with lying or mistrusting each other, even in a game setting.\nOne of the Revolutionary players registers as a different character and/or alignment, once per game."
+    }
+}
