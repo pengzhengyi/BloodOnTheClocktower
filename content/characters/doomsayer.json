@@ -1,0 +1,17 @@
+{
+    "ability": "If 4 or more players live, each living player may publicly choose (once per game) that a player of their own alignment dies.",
+    "about": "The Doomsayer speeds up large games that are going too slowly.",
+    "edition": "fabled",
+    "gameplay": [
+        "The Monk uses the Doomsayer ability, and the Washerwoman dies. Later that day, the Poisoner uses the Doomsayer ability, and the Baron dies.",
+        "An evil Thief uses the Doomsayer ability, and the Scarlet Woman dies. Later, the Spy uses the Doomsayer ability, and the good Gunslinger dies. Later, the Demon uses the Doomsayer ability, and the Spy dies."
+    ],
+    "id": "doomsayer",
+    "image": "assets/icons/doomsayer.png",
+    "name": "Doomsayer",
+    "soliloquy": "\u201cAnd on the Seventh Day, there shall be a great flood and a pestilence upon the People of the Village of the Ravens! The dead shall rise and the living shall repent! O Woe! O Unholy day! Only by great sacrifice shall they prevail! So sayeth the Sages of Nostros and so sayeth I.",
+    "team": "Fabled",
+    "tips": {
+        "Explanation": "The Doomsayer allows players to sacrifice their allies in order to gain information, which shortens the game. Only living players may use the Doomsayer power, and may do so only once per game. It is their responsibility to remember to not use it again.\nIf a player says something like \"I use the Doomsayer Power\", then it is your choice as a Storyteller which player to kill, but you must kill a living ally of the player that used the Doomsayer power. So, if a good player uses the power, then a good player dies. If an evil player uses the power, then an evil player dies.\nObviously, you won't want to kill the Demon this way, unless the game can continue afterwards for some reason, such as a Scarlet Woman being in play.\nOnce 3 players are left alive, the Doomsayer ability may no longer be used."
+    }
+}

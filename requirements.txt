@@ -1,0 +1,6 @@
+beautifulsoup4
+ipywidgets
+requests
+rich
+tqdm
+jupyter

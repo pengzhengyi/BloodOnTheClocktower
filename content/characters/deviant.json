@@ -1,0 +1,18 @@
+{
+    "ability": "If you were funny today, you can not be exiled.",
+    "about": "The Deviant can avoid being Exiled - as long as the Deviant player has been amusing today.",
+    "edition": "travellers",
+    "gameplay": [
+        "The evil Deviant cracks a few jokes, and gets a few laughs, but the players nevertheless decide to exile them. Even though there are enough votes, the Storyteller decides to keep the Deviant alive.",
+        "On the third day, the Deviant was slightly funny, and cannot be exiled. On the fourth day, the Deviant was not very funny, and is successfully exiled."
+    ],
+    "id": "deviant",
+    "image": "assets/icons/deviant.png",
+    "name": "Deviant",
+    "soliloquy": "Twas the lady's quip, forsooth.",
+    "team": "Sects & Violets",
+    "tips": {
+        "Tips & Tricks (if you are evil)": "Oh man. If you are hoping that this wiki entry will teach you how to be funny, you are in trouble. See if you can get a giggle. Do your best, and use your words to lighten the mood - even setting a good vibe might be enough to avoid dying. Above all, relax, be yourself, and be ok with not being funny, should it pan out that way. Sometimes we all fall flat. Good luck\u00a0:)\nIf you are the Deviant, but find it too much of a challenge to be funny on call, talk to the Storyteller. Together, you may determine different criteria for whether the Deviant is exiled. Instead of \u201cbeing funny\u201d, you could \u201ccreate a positive mood\u201d or \u201cbe helpful to others\u201d instead. The Deviant is not a serious character, and its purpose is to provide an avenue for laughter, lightheartedness, and fun, so talk to the Storyteller about adjusting the Deviant criteria to your needs and talents.\nSome personal favorite comedy routines for people in need of inspiration: Sean Baby, Billy Connolly, and Rowan Atkinson.",
+        "Tips & Tricks (if you are good)": "Oh man. If you are hoping that this wiki entry will teach you how to be funny, you are in trouble. See if you can get a giggle. Do your best, and use your words to lighten the mood - even setting a good vibe might be enough to avoid dying. Above all, relax, be yourself, and be ok with not being funny, should it pan out that way. Sometimes we all fall flat. Good luck\u00a0:)\nIf you are the Deviant, but find it too much of a challenge to be funny on call, talk to the Storyteller. Together, you may determine different criteria for whether the Deviant is exiled. Instead of \u201cbeing funny\u201d, you could \u201ccreate a positive mood\u201d or \u201cbe helpful to others\u201d instead. The Deviant is not a serious character, and its purpose is to provide an avenue for laughter, lightheartedness, and fun, so talk to the Storyteller about adjusting the Deviant criteria to your needs and talents.\nSome personal favorite comedy routines for people in need of inspiration:  Steve Wright, Larry Miller, and Jonathan Burns."
+    }
+}
