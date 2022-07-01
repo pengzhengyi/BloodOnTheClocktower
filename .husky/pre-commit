@@ -2,6 +2,12 @@
 . "$(dirname "$0")/_/husky.sh"
 . "$(dirname "$0")/common.sh"
 
+if ! cmp -s .gitignore .prettierignore; then
+  cp .gitignore .prettierignore
+  echo "Content not match between gitignore and prettierignore, overwrite prettierignore with gitignore"
+  exit 1
+fi
+
 yarn lintfix
 yarn lint-staged
 pre-commit run
