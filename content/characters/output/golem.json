@@ -1,0 +1,24 @@
+{
+    "ability": "You may only nominate once per game. When you do, if the nominee is not the Demon, they die.",
+    "about": "The Golem kills the player they nominate.",
+    "edition": "experimental characters",
+    "firstNight": 0,
+    "firstNightReminder": "",
+    "gameplay": [
+        "The Golem nominates the Poppy Grower. The Poppy Grower dies. The Golem may not nominate again this game.",
+        "The Golem nominates the Recluse. The Recluse registers as the Demon. Nothing happens, and the Storyteller begins counting votes for the Recluse to be executed. The Golem may not nominate again this game."
+    ],
+    "id": "golem",
+    "image": "assets/icons/golem.png",
+    "name": "Golem",
+    "otherNight": 0,
+    "otherNightReminder": "",
+    "reminders": ["Can not nominate"],
+    "setup": false,
+    "soliloquy": "Golem help? Golem smash! Golem help.",
+    "team": "outsiders",
+    "tips": {
+        "Bluffing as the Golem": "Bluffing as the Golem is tricky. Most of the time, a real Golem will cause a death when they nominate. You will need to have a ready-made excuse as to why the player you nominated didn't die. Either you are drunk or poisoned (unlikely) or the player you chose is the Demon (also unlikely).\nNominate players that are extremely suspicious, and look like the Demon.\nIf you are a Minion, nominate earlier in the game, and expect to die as a result. When you nominate a player and they don't die, it is likely that the good team will kill both you and the player you nominated, and the Demon will kill two players over those two resulting nights. Killing four players is a useful way to get to the final day, but you will need to sacrifice yourself to do it.\nIf you are the Demon, wait until late in the game to nominate a player. With fewer players alive, the chance of you seemingly nominating the real Demon is increased, and the good team is more likely to believe that you are the Golem, and not execute you. Even if you can convince the good team to execute the nominated player and execute you tomorrow, you may be able to make sure that tomorrow never comes if you are a Demon that kills multiple times at night, like the Shabaloth, Po or Al-Hadikhia.",
+        "Tips & Tricks": "If you want to prove that you are the Golem, nominate a player that you know is not the Demon. That player will die, and the good team now has faith that you are the Golem. This strategy has comes with a significant drawback though - the loss of the nominating power of two good players. Before nominating this way, ask yourself \"Is it worth it?\"\nIf you want to find out whether a player is the Demon or not, nominate them. If they don't die, you will know that they are the Demon. You may have a difficult time convincing the good team that you are the Golem, because your nomination will be indistinguishable from the nomination of an evil player, but YOU will know the truth. That is significant.\nIf you want to remove a Minion from the game, wait patiently and only nominate when you think you have found out who a Minion is. Minions can still die from your ability, and this can be extraordinarily helpful. Unlike other Outsiders, the Golem's ability can be used entirely to help the good team.\nIf you have nominated already, pay attention to how many players are still alive. Also keep in mind how many evil players may still be alive. If the game gets to the point where only three players are alive, including you, and both the other players are evil, the good team won't be able to win because there is nobody able to nominate the Demon. Similarly, if there are four players alive, including you, and the only other good player nominates a non-Demon player, the good team will not be able to win. It isn't very detrimental to not be able to nominate early in the game, but it can be a significant hinderance on the final day.\nIf you can, save your ability for the final day. If there are only two other players alive, you have a fifty percent chance of picking the Demon, and learning who the Demon is. If you accidentally choose a non-Demon player and lose the game, at least the game was lost due to a good player acting with a fifty percent chance of winning, and not an evil team outvoting the good team. A good player deciding the fate of the game, is generally better than leaving things to a democratic vote.\nConsider not nominating at all. Whilst this is less fun (boo!), sometimes it is best to keep players alive (yay!)."
+    }
+}
