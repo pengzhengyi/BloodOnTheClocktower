@@ -1,7 +1,7 @@
 repos:
   # Basic built in into pre-commit linters (validate json, xml, yaml and toml syntax, ensure no merge conflicts and no trailing whitespaces)
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.3.0
     hooks:
       - id: check-added-large-files
         stages: [commit]
@@ -47,7 +47,7 @@ repos:
 
   # Autoformats python code to a single standard
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.6.0
     hooks:
       - id: black
         stages: [commit]
@@ -80,14 +80,14 @@ repos:
   # Push hooks (runs on push because developers may commit incomplete changes)
   # Python files linter, see .pylintrc for configuration
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.12.2
+    rev: v2.14.4
     hooks:
       - id: pylint
         stages: [push]
 
   # Python security linter
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.2
+    rev: 1.7.4
     hooks:
       - id: bandit
         stages: [push]
