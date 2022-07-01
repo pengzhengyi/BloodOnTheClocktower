@@ -1,0 +1,25 @@
+{
+    "ability": "You have the ability of the recently killed executee. If they are evil, you are poisoned until a good player dies by execution.",
+    "about": "The Cannibal gains the abilities of executed players, if they\u2019re good.",
+    "edition": "experimental characters",
+    "firstNight": 0,
+    "firstNightReminder": "",
+    "gameplay": [
+        "The Clockmaker is executed and dies. That night, the Cannibal learns a \u201c2\u201d because the Demon and Minion are two steps apart.",
+        "It is the third night and the Widow was executed today. Because the Widow was bluffing as the Fortune Teller, the Cannibal is prompted to choose 2 players, but they learn a \u201cno\u201d after choosing the Demon because they don\u2019t actually have the Fortune Teller's (or Widow\u2019s) ability, because they are poisoned.",
+        "It is the fourth night and the Mutant was executed today. The Cannibal doesn\u2019t learn anything tonight, because a real Mutant would not wake."
+    ],
+    "id": "cannibal",
+    "image": "assets/icons/cannibal.png",
+    "name": "Cannibal",
+    "otherNight": 0,
+    "otherNightReminder": "",
+    "reminders": ["Poisoned", "Died today"],
+    "setup": false,
+    "soliloquy": "I don\u2019t like clowns. They taste funny.",
+    "team": "townsfolk",
+    "tips": {
+        "Bluffing as the Cannibal": "Try to get people executed! It\u2019s what a real Cannibal would do, and it\u2019s a great excuse to go after Townsfolk. Even if the town later discovers they killed someone useful on your suggestion, they may still hold hope you can recoup such a loss with cannibalism, a hope you would be more than happy to fill with a lie.\nIf you want to accuse an executee of being evil, consider acting like your power didn\u2019t work after you ate them. Evil players poison the Cannibal when eaten, giving you lots of bluffing possibilities no matter what you say.\nBe ready to fake a new ability every time someone is executed, that may mean interviewing executees before they die or conspiring with your allies. If you claim to eat someone who gets information every night, but don\u2019t claim to have gotten information the night of their execution, you might be in a pickle. Unless, of course, you say such an absence of information was merely due to the fact that they were evil and poisoned you! But that mileage may vary.\n...This entry is under construction. More Tips & Tricks and Bluffing as the Cannibal strategy coming soon!",
+        "Tips & Tricks": "Execute people! While it is not advantageous to execute good players, your ability reduces the sting of this by quite a lot. Even if the town executes a Townsfolk by accident, the fact that you can still pick up their ability should help the good team significantly.\nKeep a special eye out for players claiming to be Townsfolk with once-per-game abilities. You can eat such Townsfolk, use their once-per-game power, and keep chewing on more Townsfolk as the game goes on.\nRemember you're not told which ability you have at any time! You may be able to figure it out based on things happening at night - being woken up and asked to choose two players means you're probably the Fortune Teller or the Chambermaid for example, but you can't necessarily be sure which.\nBe sure to talk to executees before they die if you can, in the hopes that you can learn what exact ability you\u2019re going to be picking up from them. If their ability is something that can only be used during the day, for example a Slayer, you may miss the opportunity to use such an ability if you don\u2019t know you have it.\nAlternatively, don\u2019t talk to the executed and then approach them the following day and describe what you experienced in the night, thus confirming to them that you are the Cannibal. This will help you build a circle of trust amongst the executed dead.\nDon\u2019t forget that evil players might give you fake abilities when executed. Your Storyteller will generally still try to make you think you have the ability the evil player claimed they had."
+    }
+}

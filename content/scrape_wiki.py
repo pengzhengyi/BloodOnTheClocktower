@@ -44,25 +44,50 @@ def guarded_execute(action: Callable[P, T]) -> Callable[P, Optional[T]]:
     return wrapper
 
 
-def _get_root_dir() -> str:
+def create_dir(action: Callable[P, str]) -> Callable[P, str]:
+    """Create a directory at specified path"""
+
+    @wraps(action)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> str:
+        dirpath = action(*args, **kwargs)
+        if not os.path.isdir(dirpath):
+            os.makedirs(dirpath, exist_ok=True)
+        return dirpath
+
+    return wrapper
+
+
+def get_root_dir() -> str:
+    """Get root dir -- where last segment is BloodOnTheClocktower"""
     dirpath = os.getcwd()
     while os.path.basename(dirpath) != "BloodOnTheClocktower":
         dirpath = os.path.dirname(dirpath)
     return dirpath
 
 
+@create_dir
 def _get_content_dir() -> str:
-    return os.path.join(_get_root_dir(), "content")
+    return os.path.join(get_root_dir(), "content")
 
 
+@create_dir
 def _get_edition_dir() -> str:
     return os.path.join(_get_content_dir(), "editions")
 
 
-def _get_character_dir() -> str:
-    return os.path.join(_get_content_dir(), "characters", "raw")
+@create_dir
+def get_characters_dir() -> str:
+    """Get characters directory path"""
+    return os.path.join(_get_content_dir(), "characters")
 
 
+@create_dir
+def get_raw_characters_dir() -> str:
+    """Get wiki-scraped characters directory path"""
+    return os.path.join(get_characters_dir(), "raw")
+
+
+@create_dir
 def _get_game_information_dir() -> str:
     return os.path.join(_get_content_dir(), "game-information")
 
@@ -378,7 +403,8 @@ def _scrape_game_information(game_information_page_link: str) -> tuple[str, dict
     return title, section_to_text
 
 
-def _write_json(filepath: str, data: Any) -> None:
+def write_json(filepath: str, data: Any) -> None:
+    """Write data as JSON format to specified filepath"""
     if data is None:
         return
 
@@ -395,7 +421,7 @@ def write_editions(edition_folder: str) -> None:
         if data is None:
             continue
         filepath = os.path.join(edition_folder, f'{data["name"]}.json')
-        _write_json(filepath, data)
+        write_json(filepath, data)
 
 
 def write_characters(characters_folder: str) -> None:
@@ -410,7 +436,7 @@ def write_characters(characters_folder: str) -> None:
         if data is None:
             continue
         filepath = os.path.join(characters_folder, f'{data["id"]}.json')
-        _write_json(filepath, data)
+        write_json(filepath, data)
 
 
 def write_game_information(game_information_folder: str) -> None:
@@ -420,17 +446,18 @@ def write_game_information(game_information_folder: str) -> None:
 
     glossary_data = _scrape_glossary(glossary_page_link)
     glossary_filepath = os.path.join(game_information_folder, "glossary.json")
-    _write_json(glossary_filepath, glossary_data)
+    write_json(glossary_filepath, glossary_data)
 
     for game_information_page_link in game_information_page_link_iterator:
         if (scraped := _scrape_game_information(game_information_page_link)) is None:
             continue
         title, section_to_text = scraped
         filepath = os.path.join(game_information_folder, f"{title}.json")
-        _write_json(filepath, section_to_text)
+        write_json(filepath, section_to_text)
 
 
 def main() -> None:
+    """Parse the command line arguments and scrape wiki accordingly"""
     parser = argparse.ArgumentParser(
         description="Scrape Blood On The Clocktower wiki for various information"
     )
@@ -458,7 +485,7 @@ def main() -> None:
     if args.all or args.edition:
         write_editions(edition_folder=_get_edition_dir())
     if args.all or args.character:
-        write_characters(characters_folder=_get_character_dir())
+        write_characters(characters_folder=get_raw_characters_dir())
     if args.all or args.general:
         write_game_information(game_information_folder=_get_game_information_dir())
 

@@ -56,11 +56,11 @@ For example:
 
 ## How to scrape
 
-Wiki scraping is defined in `content/.scrape_wiki.py`.
+Wiki scraping is defined in `content/scrape_wiki.py`.
 
 ```bash
-$ python .scrape_wiki.py -h
-usage: .scrape_wiki.py [-h] [-e] [-c] [-g] [-a]
+$ python -m "content.scrape_wiki" -h
+usage: scrape_wiki.py [-h] [-e] [-c] [-g] [-a]
 
 Scrape Blood On The Clocktower wiki for various information
 
@@ -75,6 +75,11 @@ options:
 
 For example,
 
-- `python .scrape_wiki.py -c` scrape characters information.
-- `python .scrape_wiki.py -a` scrape everything.
-- `python .scrape_wiki.py -e -g` scrape editions and general information.
+- `python "content.scrape_wiki" -c` scrape characters information.
+- `python "content.scrape_wiki" -a` scrape everything.
+- `python "content.scrape_wiki" -e -g` scrape editions and general information.
+
+## How to Enrich
+
+Wiki enrich is defined in `content/enrich_characters.py`.
+It can be run `python -m "content.enrich_characters"`.

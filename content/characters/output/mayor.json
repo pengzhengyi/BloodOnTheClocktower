@@ -1,0 +1,25 @@
+{
+    "ability": "If only 3 players live & no execution occurs, your team wins. If you die at night, another player might die instead.",
+    "about": "The Mayor can win by peaceful means on the final day.",
+    "edition": "trouble brewing",
+    "firstNight": 0,
+    "firstNightReminder": "",
+    "gameplay": [
+        "The  Imp attacks the Mayor. The Storyteller chooses that the Ravenkeeper dies instead.",
+        "There are three players alive. There are no nominations for execution today. Good wins.",
+        "There are five players alive, including two Travellers. Both Travellers are exiled, and the vote is tied between the remaining players. Because a tied vote means neither player is executed, good wins."
+    ],
+    "id": "mayor",
+    "image": "assets/icons/mayor.png",
+    "name": "Mayor",
+    "otherNight": 0,
+    "otherNightReminder": "",
+    "reminders": [],
+    "setup": false,
+    "soliloquy": "We must put our differences aside, and cease this senseless killing. We are all taxpayers after all. Well, most of us.",
+    "team": "townsfolk",
+    "tips": {
+        "Bluffing as the Mayor": "When bluffing as the Mayor, there are a few things you should keep in mind:\nThe Mayor has a good reason to survive at night, which you can use to explain your longevity as other players die. This makes it a great bluff for a Demon in particular.\nCome out to a few players in private early on in the game, so that when you eventually reveal you have some backup that you're not just coming out with this claim out of nowhere.\nThe Mayor is a fantastic fallback if another bluff doesn't work out. Coming out on the final day as the Mayor who was \"in hiding\" can alleviate suspicion that you may have come under if your Fortune Teller information wasn't adding up.\nDeliberately setting up a kill of a character that isn't 'optimal' can be used as evidence for a Mayor being in play. For example, you can target a Recluse, or a Washerwoman who has already given their information; both are normally low priority for the Demon, and so you can argue that this was a redirected kill from your ability.\nAs a good player, bluffing as the Mayor can get the Demon to target you, since they will either suspect you are a more powerful character bluffing as the Mayor to survive, or they just want to confirm the existence of a Mayor overall.\nGood players are more likely to risk winning with the Mayor if they have no better leads. Coordinate with your evil team to keep confusion high so that on the final day, good does not feel like they have a clear path to victory.\nIf you are nominated on the final day, don't despair! Unlike a regular bluff where you must beat the votes against you, a Mayor can call for the town to tie the vote instead, since that will cause no execution, allowing the Mayor ability to activate normally.",
+        "Tips & Tricks": "Your power activates on the final day, when just three players are alive. You may not know who the Demon is, but you can definitely win by not executing. Do whatever you can to convince the group that you are the Mayor. Everything. If the good team believes you, they will either not nominate anybody, or will deliberately tie votes so that no execution occurs.\nIt is often best not to reveal that you are the Mayor until late in the game. If you reveal early, the Demon may spend night after night trying to kill you, and the Storyteller may let that attempt succeed. Or, secretly tell one or two players that you are the Mayor early in the game, and the rest of the group on the final day, so that you are more likely to be believed.\nWhen a character that's an unlikely target for the Demon to pick dies at night, such as the Butler, this may be an indication that you were attacked instead. When convincing other players that you are the Mayor, you can use this as evidence.\nOnce the Demon attacks you and somebody else dies, they will know for sure that you are the Mayor. At the very beginning of each morning, if a particular player looks surprised and confused, they are likely to be the Demon!\nIf you intend to use your ability to win the game by not executing, do everything you can to make sure you are not actually the Drunk. Spend the game listening to other players, and verifying that any Outsiders are actually Outsiders. If you think a Drunk is in play, you will need to figure out who it is, because if it is you, and you don't execute on the final day, evil wins. Similarly, if the only other players alive are the Imp and the Poisoner, then you will certainly be poisoned. You will need to make sure that the Poisoner is dead before using your Mayor ability."
+    }
+}
