@@ -7,8 +7,8 @@
         "The Devil's Advocate protects the Zombuul. The Zombuul is executed but remains alive, so their life token is not flipped. The next day, the Zombuul is executed again and registers as dead.",
         "The Devil's Advocate protects the Grandmother. The Grandmother is executed but remains alive. Later, the Devil's Advocate protects the Tinker. The Tinker is executed, but the Storyteller kills the Tinker anyway, due to the Tinker ability. Later, the Devil's Advocate protects the Moonchild, and the Judge forces the execution to succeed\u2014the execution succeeds, but the Moonchild remains alive."
     ],
-    "id": "devil's advocate",
-    "image": "assets/icons/devil's advocate.png",
+    "id": "devilsadvocate",
+    "image": "assets/icons/devilsadvocate.png",
     "name": "Devil's Advocate",
     "soliloquy": "My client, should the objection be overruled, pleads innocent by virtue of the prosecution's non-observance of statute 27.B\u2014incorrect or misleading conjugation of a verb. The fact that nine of the jury died last night is simply prima face, which is, as Wills vs Thule set precedent for, further reason to acquit.",
     "team": "minions",

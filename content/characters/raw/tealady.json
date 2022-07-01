@@ -6,8 +6,8 @@
         "The Tea Lady starts the game neighbouring the Mastermind and the good Goon. The Mastermind is executed and dies. Now, the Tea Lady's alive neighbours are the good Goon and the Courtier. The Demon attacks the Courtier, but the Courtier remains alive. Later, the Goon turns evil, and the Demon attacks the Courtier again. This time, the Courtier dies.",
         "The Tea Lady's alive neighbours are a good Matron and a good Judge. The Matron is exiled but remains alive."
     ],
-    "id": "tea lady",
-    "image": "assets/icons/tea lady.png",
+    "id": "tealady",
+    "image": "assets/icons/tealady.png",
     "name": "Tea Lady",
     "soliloquy": "If you are cold, tea will warm you. If you are too heated, tea will cool you. If you are depressed, tea will cheer you. If you are excited, tea will calm you.",
     "team": "townsfolk",

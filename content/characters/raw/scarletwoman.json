@@ -7,8 +7,8 @@
         "There are five players alive: the Imp, the Scarlet Woman, the Baron, and two Townsfolk. The Imp is executed. The Scarlet Woman becomes the Imp, and the game continues.",
         "Brianna is the Scarlet Woman. The Fortune Teller chooses Brianna and Alex, and learns a \"no.\u201d Later, the Imp dies, so Brianna becomes the Imp. The Fortune Teller chooses Brianna and Alex again, and learns a \"yes.\u201d"
     ],
-    "id": "scarlet woman",
-    "image": "assets/icons/scarlet woman.png",
+    "id": "scarletwoman",
+    "image": "assets/icons/scarletwoman.png",
     "name": "Scarlet Woman",
     "soliloquy": "You have shown me the secrets of the Council of the Purple Flame. We have lain together in fire and in lust and in beastly commune, and I am forever your servant. But tonight, my dear, I am your master.",
     "team": "minions",

@@ -7,8 +7,8 @@
         "Today, four players nominated. Two of them were Minions. Many players voted, but there was no execution. That night, the Town Crier learns a \u201cyes.\u201d",
         "A Minion called for the exile of a Traveller, who was exiled. That night, the Town Crier learns a \u201cno.\u201d (Exiles are never affected by character abilities.)"
     ],
-    "id": "town crier",
-    "image": "assets/icons/town crier.png",
+    "id": "towncrier",
+    "image": "assets/icons/towncrier.png",
     "name": "Town Crier",
     "soliloquy": "Hear ye! Hear ye! Witchcraft in the labyrinth! Genius savant reveals all! Town in danger! Hear Ye!",
     "team": "townsfolk",

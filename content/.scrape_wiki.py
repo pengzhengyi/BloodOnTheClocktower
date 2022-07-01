@@ -60,7 +60,7 @@ def _get_edition_dir() -> str:
 
 
 def _get_character_dir() -> str:
-    return os.path.join(_get_content_dir(), "characters")
+    return os.path.join(_get_content_dir(), "characters", "raw")
 
 
 def _get_game_information_dir() -> str:
@@ -261,12 +261,16 @@ def _get_h1_text(soup: BeautifulSoup) -> str:
     return _get_text(soup.h1)
 
 
+def _convert_to_character_id(character_name: str) -> str:
+    return "".join(c.lower() for c in character_name if c.isalpha())
+
+
 @guarded_execute
 def _scrape_character_page(character_page_link: str) -> dict[str, Any]:
     soup = _get_page_soup(character_page_link)
 
     name = _get_h1_text(soup)
-    character_id = name.lower()
+    character_id = _convert_to_character_id(name)
 
     appears_in_element = soup.find(id="Appears_in").parent
 
@@ -447,14 +451,15 @@ def main() -> None:
         action="store_true",
         help="Whether to scrape information about game information in general",
     )
+    parser.add_argument("-a", "--all", action="store_true", help="Scrape everything")
 
     args = parser.parse_args()
 
-    if args.edition:
+    if args.all or args.edition:
         write_editions(edition_folder=_get_edition_dir())
-    if args.character:
+    if args.all or args.character:
         write_characters(characters_folder=_get_character_dir())
-    if args.general:
+    if args.all or args.general:
         write_game_information(game_information_folder=_get_game_information_dir())
 
 

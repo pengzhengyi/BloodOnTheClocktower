@@ -7,8 +7,8 @@
         "The Poppy Grower is executed, and dies. That night, the Shabaloth learns which players are the Minions. The Godfather and the Baron wake, make eye contact, and learn which player is the Shabaloth.",
         "The Poppy Grower is the Drunk. On the 1st night, the evil players learn who each other are, as normal. On the fourth night, the Demon kills the Poppy Grower. The Demons and Minions do not wake to learn who each other are again because the Poppy Grower is the Drunk."
     ],
-    "id": "poppy grower",
-    "image": "assets/icons/poppy grower.png",
+    "id": "poppygrower",
+    "image": "assets/icons/poppygrower.png",
     "name": "Poppy Grower",
     "soliloquy": "In the hidden groves of the deep forest, the black poppy dwells. To see its revelry is to be enchanted. To smell its thick aroma is to be lost forever, a slave to the gods of light and dark.",
     "team": "townsfolk",

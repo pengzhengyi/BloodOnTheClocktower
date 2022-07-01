@@ -6,8 +6,8 @@
         "The Al-Hadikhia chooses Evin, Lachlan, and Sarah. Evin chooses to die. Lachlan chooses to die. Sarah chooses to live. In the morning, Evin and Lachlan are dead, and Sarah is alive.",
         "The Al-Hadikhia chooses Alex, Lewis, and Doug, who is dead. Alex chooses life. Lewis chooses life. Doug chooses life, so is now alive. Since all players are now alive, all three players die."
     ],
-    "id": "al-hadikhia",
-    "image": "assets/icons/al-hadikhia.png",
+    "id": "alhadikhia",
+    "image": "assets/icons/alhadikhia.png",
     "name": "Al-Hadikhia",
     "soliloquy": "\u201cAlsukut min dhahab.\u201d",
     "team": "demons",

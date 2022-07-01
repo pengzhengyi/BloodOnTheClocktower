@@ -8,8 +8,8 @@
         "The Pit-Hag turns the Flowergirl into the Evil Twin. Now, there is a good Evil Twin, so the Evil Twin and an evil player are woken to learn each other's character.",
         "During the final night, the Pit-Hag turns the Oracle into a good No Dashii. The Storyteller kills the evil Demon only, so that only one Demon is alive during the final day."
     ],
-    "id": "pit hag",
-    "image": "assets/icons/pit hag.png",
+    "id": "pithag",
+    "image": "assets/icons/pithag.png",
     "name": "Pit Hag",
     "soliloquy": "Round about the cauldron go; In the poison'd entrails throw; Toad, that under cold stone; Days and nights has thirty-one; Sweated venom sleeping got; Boil thou first in the charmed pot.",
     "team": "minions",

@@ -7,8 +7,8 @@
         "The Bone Collector chooses the dead Witch. The Witch wakes and curses the Clockmaker. The Clockmaker nominates the following day, and dies.",
         "At night, the Bone Collector chooses the dead Butcher. The following day, after an execution has occurred, the Storyteller prompts the Butcher to nominate again."
     ],
-    "id": "bone collector",
-    "image": "assets/icons/bone collector.png",
+    "id": "bonecollector",
+    "image": "assets/icons/bonecollector.png",
     "name": "Bone Collector",
     "soliloquy": "I collect many things. Hair. Teeth. Clothes. Fragments of poems. The dreams of lost lovers. My secret arts are not for you to know but my fee is a mere pittance. Bring me the blood of a noblewoman who died of heartbreak under a full moon, and you shall have your answers.",
     "team": "Sects & Violets",

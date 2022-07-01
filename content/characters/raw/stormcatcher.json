@@ -6,8 +6,8 @@
         "The Storyteller has built a script based on the General, so says that \u201cthe Storm Catcher favours the General\u201d. The General is in play. At night, the Imp and the Godfather both attack the General, who does not die. After 5 days of information and discussion, the town decides to execute the General. They die.",
         "The Storyteller wants a game based around the Empath\u2019s information, so says that \u201cThe Storm Catcher favours the Empath\u201d. There is no Empath in play. Because the Poisoner learns this, they choose to bluff as the Empath."
     ],
-    "id": "storm catcher",
-    "image": "assets/icons/storm catcher.png",
+    "id": "stormcatcher",
+    "image": "assets/icons/stormcatcher.png",
     "name": "Storm Catcher",
     "soliloquy": "At dawn, the temple\u2019s long shadow creeps to the fountain. At dusk, the obelisk blocks the red glare, cooling warm water under the archway. All lines converge here. A storm is coming, and this, this pebbled and lush and holy place between the apple trees, is the eye.",
     "team": "fabled",

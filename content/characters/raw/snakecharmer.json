@@ -7,8 +7,8 @@
         "The Snake Charmer chooses a player who is the Vigormortis. The Snake Charmer immediately becomes the evil Vigormortis, and the Vigormortis becomes the good Snake Charmer and gets poisoned.",
         "The Pit-Hag turns themself into the Snake Charmer. Then, the Snake Charmer chooses a player who is the Fang Gu. The Snake Charmer becomes the Fang Gu, while the Fang Gu becomes the Snake Charmer and gets poisoned. Both remain evil."
     ],
-    "id": "snake charmer",
-    "image": "assets/icons/snake charmer.png",
+    "id": "snakecharmer",
+    "image": "assets/icons/snakecharmer.png",
     "name": "Snake Charmer",
     "soliloquy": "Effendi... I am but a humble man, but my pipe is golden and a single tune will tame the wildest djinn, Inshallah. They say that greed hangs more men than rope. But not I, Effendi... not I.",
     "team": "townsfolk",

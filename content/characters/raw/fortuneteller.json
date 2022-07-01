@@ -8,8 +8,8 @@
         "The Fortune Teller chooses an alive Butler and a dead Imp, and learns a 'yes'.",
         "The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'."
     ],
-    "id": "fortune teller",
-    "image": "assets/icons/fortune teller.png",
+    "id": "fortuneteller",
+    "image": "assets/icons/fortuneteller.png",
     "name": "Fortune Teller",
     "soliloquy": "I sense great evil in your soul! But... that could just be your perfume. I am allergic to Elderberry.",
     "team": "townsfolk",

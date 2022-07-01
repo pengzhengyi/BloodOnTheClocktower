@@ -6,8 +6,8 @@
         "At the start of the game, the No Dashii neighbours a Town Crier and a Snake Charmer. They are both poisoned. A few days later, they are both dead, and the closest alive neighbours to the No Dashii are an unpoisoned Clockmaker and an unpoisoned Barber.",
         "Clockwise from the No Dashii sits a Philosopher, a Mathematician, then a Sage. Anticlockwise from the No Dashii sits a Witch, a Mutant, then a Seamstress. The Philosopher and the Seamstress are poisoned."
     ],
-    "id": "no dashii",
-    "image": "assets/icons/no dashii.png",
+    "id": "nodashii",
+    "image": "assets/icons/nodashii.png",
     "name": "No Dashii",
     "soliloquy": "By the sins of Arnoch, I feel thy laden stench. By the curs-ed sun and her foul legion of tiny grinning gods, I corrupt thee. By the blessed night and the hidden depths of the horrid and unholy sea, I end thy squalid life upon this plane.",
     "team": "demons",

@@ -5,8 +5,8 @@
     "gameplay": [
         "The Storyteller is attempting to explain the voting rules to a few new players. The group is loud and is not listening to the Storyteller\u2019s requests for silence, so the Storyteller declares that the Hell's Librarian is in play. Two players continue to loudly talk, even though they know the possible penalty. The Storyteller decides that one dies and the other loses their vote for today. All players are silent whilst the rules are explained."
     ],
-    "id": "hell's librarian",
-    "image": "assets/icons/hell's librarian.png",
+    "id": "hellslibrarian",
+    "image": "assets/icons/hellslibrarian.png",
     "name": "Hell's Librarian",
     "soliloquy": "\u201cShhhhhh. Please be quiet. It is best not to disturb the Librarian. I've heard it has a temper.",
     "team": "Fabled",

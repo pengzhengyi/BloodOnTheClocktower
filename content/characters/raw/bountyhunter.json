@@ -6,8 +6,8 @@
         "On the first night, the Bounty Hunter learns that Edd is evil. Edd is the King who has been turned evil by the Bounty Hunter. The next day, the King dies. The following night, the Bounty Hunter learns that Abdallah is evil. Abdallah is the Goblin.",
         "On the first night, the Bounty Hunter learns that Evin is evil. Three days later, Evin dies. That night, the Bounty Hunter learns Marianna is evil. Marianna is a Minion. Three nights later, the Demon kills Marianna and the Bounty Hunter learns that Alex is evil. Alex is the Demon. The Tea Lady, who was made evil by the Bounty Hunter, is still alive."
     ],
-    "id": "bounty hunter",
-    "image": "assets/icons/bounty hunter.png",
+    "id": "bountyhunter",
+    "image": "assets/icons/bountyhunter.png",
     "name": "Bounty Hunter",
     "soliloquy": "Alone, I walk these streets, paved with the sick stench of corruption. Its thickness worms its way into my nostrils, unbidden, burning with revulsion. And anticipation. The illness of this wretched place grows each night. And I... I am the cure. ",
     "team": "townsfolk",

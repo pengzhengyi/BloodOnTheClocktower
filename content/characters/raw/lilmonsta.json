@@ -5,8 +5,8 @@
     "gameplay": [
         "The Poisoner and the Widow wake. They point at each other, then point at themselves, then eventually both point at the Widow, who receives Lil\u2019 Monsta\u2019s token. The next night, they both choose that the Poisoner babysits Lil\u2019 Monsta instead."
     ],
-    "id": "lil' monsta",
-    "image": "assets/icons/lil' monsta.png",
+    "id": "lilmonsta",
+    "image": "assets/icons/lilmonsta.png",
     "name": "Lil' Monsta",
     "soliloquy": "Step 1: Be cute. Step 2: World domination. Step 3: Bweakfast.",
     "team": "demons",

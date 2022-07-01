@@ -5,8 +5,8 @@
     "gameplay": [
         "The Fang Gu attacks the Artist, who dies. The next night, the Fang Gu attacks the Sweetheart, who becomes the Fang Gu while the old Fang Gu dies. The Sweetheart does not make a player drunk, because they did not die. The next night, the new Fang Gu attacks the Klutz, who dies."
     ],
-    "id": "fang gu",
-    "image": "assets/icons/fang gu.png",
+    "id": "fanggu",
+    "image": "assets/icons/fanggu.png",
     "name": "Fang Gu",
     "soliloquy": "Your walls and your weapons are but smoke in dreams.",
     "team": "demons",

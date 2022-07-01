@@ -8,8 +8,8 @@
         "The Good Twin and the Evil Twin are both loudly claiming to be the Artist. Both players approach the Storyteller to ask a question in private. The good players, confused, execute the Demon. The game continues, with no death during the night from now on.",
         "The Pit-Hag turns a good player into the Evil Twin, who remains good. The group executes the good-aligned Evil Twin. Evil wins."
     ],
-    "id": "evil twin",
-    "image": "assets/icons/evil twin.png",
+    "id": "eviltwin",
+    "image": "assets/icons/eviltwin.png",
     "name": "Evil Twin",
     "soliloquy": "I'm not Sara! I'm Clara! SHE is Sara! Sara is the evil one! Not me!",
     "team": "minions",
