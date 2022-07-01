@@ -1,0 +1,3 @@
+[bandit]
+recursive: true
+exclude: node_modules,.nuxt
