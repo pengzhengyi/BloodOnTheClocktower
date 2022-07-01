@@ -1,10 +1,13 @@
+import argparse
 import json
 import logging
 import os
 from collections import defaultdict
-from functools import wraps
+from contextlib import suppress
+from functools import partial, wraps
 from itertools import chain
-from typing import Any, Callable, Iterable, Optional, TypeVar
+from operator import eq
+from typing import Any, Callable, Iterable, Iterator, Optional, ParamSpec, TypeVar
 from urllib.parse import urljoin
 
 import requests
@@ -24,13 +27,14 @@ logging.basicConfig(
 console = Console()
 
 T = TypeVar("T")
+P = ParamSpec("P")
 
 
-def guarded_execute(action: Callable[..., T]) -> Callable[..., Optional[T]]:
+def guarded_execute(action: Callable[P, T]) -> Callable[P, Optional[T]]:
     """Execute a function while catch and log any exception"""
 
     @wraps(action)
-    def wrapper(*args: Any, **kwargs: Any) -> Optional[T]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[T]:
         try:
             return action(*args, **kwargs)
         except Exception:
@@ -59,6 +63,10 @@ def _get_character_dir() -> str:
     return os.path.join(_get_content_dir(), "characters")
 
 
+def _get_game_information_dir() -> str:
+    return os.path.join(_get_content_dir(), "game-information")
+
+
 def _resolve_wiki_page_from_relative_url(url: str) -> str:
     return urljoin(MAIN_PAGE_URL, url)
 
@@ -72,7 +80,7 @@ MAIN_PAGE_URL = "https://wiki.bloodontheclocktower.com/Main_Page"
 
 def _get_page_soup(url: str) -> BeautifulSoup:
     main_page = requests.get(url).text
-    return BeautifulSoup(main_page)
+    return BeautifulSoup(main_page, features="html.parser")
 
 
 def _get_main_page_soup() -> BeautifulSoup:
@@ -175,11 +183,26 @@ def _get_character_type_links() -> Iterable[str]:
     return map(_resolve_wiki_page_from_href, character_type_hrefs)
 
 
+def _get_game_information_page_links() -> Iterator[str]:
+    soup = _get_main_page_soup()
+    game_information_sidebar_list_item = soup.find(id="p-Game_Information").parent
+    characters_sidebar_list_item = soup.find(id="p-Characters").parent
+
+    game_information_list_items = _get_page_section_elements(
+        soup,
+        get_section_start=lambda soup: game_information_sidebar_list_item,
+        is_section_element=lambda element: element.name == "li",
+        is_another_section=partial(eq, characters_sidebar_list_item),
+    )
+    for game_information_list_item in game_information_list_items:
+        yield _resolve_wiki_page_from_href(game_information_list_item.find("a"))
+
+
 @guarded_execute
 def _scrape_edition_page(url: str) -> dict[str, Any]:
     soup = _get_page_soup(url)
 
-    name = _get_text(soup.h1)
+    name = _get_h1_text(soup)
 
     synopsis_title = soup.find(id="Synopsis")
     synopsis_div = next(parent for parent in synopsis_title.parents if parent.name == "div")
@@ -234,11 +257,15 @@ def _get_character_links(character_type_page_link: str) -> Iterable[str]:
     return map(_resolve_wiki_page_from_href, character_hrefs)
 
 
+def _get_h1_text(soup: BeautifulSoup) -> str:
+    return _get_text(soup.h1)
+
+
 @guarded_execute
 def _scrape_character_page(character_page_link: str) -> dict[str, Any]:
     soup = _get_page_soup(character_page_link)
 
-    name = _get_text(soup.h1)
+    name = _get_h1_text(soup)
     character_id = name.lower()
 
     appears_in_element = soup.find(id="Appears_in").parent
@@ -312,7 +339,45 @@ def _scrape_character_page(character_page_link: str) -> dict[str, Any]:
     return data
 
 
+@guarded_execute
+def _scrape_glossary(glossary_page_link: str) -> dict[str, str]:
+    soup = _get_page_soup(glossary_page_link)
+
+    glossary_paragraphs = soup.select("#content p")
+    glossary: dict[str, str] = dict()
+
+    for glossary_paragraph in glossary_paragraphs:
+        paragraph_text = _get_text(glossary_paragraph)
+        with suppress(ValueError):
+            separator_index = paragraph_text.index(":")
+            glossary[paragraph_text[:separator_index].strip()] = paragraph_text[
+                separator_index + 1 :
+            ].strip()
+
+    return glossary
+
+
+@guarded_execute
+def _scrape_game_information(game_information_page_link: str) -> tuple[str, dict[str, str]]:
+    soup = _get_page_soup(game_information_page_link)
+    title = _get_h1_text(soup)
+    section_to_elements = _get_page_sections(
+        soup,
+        get_section_start=lambda soup: soup.select_one("#toc + h2"),
+        is_section_element=lambda element: element.name != "h2",
+        is_another_section=lambda element: element.name == "h2",
+    )
+    section_to_text = {
+        _get_text(tip_section): _join_text(tip_section_elements)
+        for tip_section, tip_section_elements in section_to_elements.items()
+    }
+    return title, section_to_text
+
+
 def _write_json(filepath: str, data: Any) -> None:
+    if data is None:
+        return
+
     with open(filepath, "w", encoding="utf-8") as file_writer:
         json.dump(data, file_writer, indent=4, sort_keys=True)
 
@@ -342,3 +407,56 @@ def write_characters(characters_folder: str) -> None:
             continue
         filepath = os.path.join(characters_folder, f'{data["id"]}.json')
         _write_json(filepath, data)
+
+
+def write_game_information(game_information_folder: str) -> None:
+    """Write scraped information about game information into the content folder."""
+    game_information_page_link_iterator = _get_game_information_page_links()
+    glossary_page_link = next(game_information_page_link_iterator)
+
+    glossary_data = _scrape_glossary(glossary_page_link)
+    glossary_filepath = os.path.join(game_information_folder, "glossary.json")
+    _write_json(glossary_filepath, glossary_data)
+
+    for game_information_page_link in game_information_page_link_iterator:
+        if (scraped := _scrape_game_information(game_information_page_link)) is None:
+            continue
+        title, section_to_text = scraped
+        filepath = os.path.join(game_information_folder, f"{title}.json")
+        _write_json(filepath, section_to_text)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Scrape Blood On The Clocktower wiki for various information"
+    )
+
+    parser.add_argument(
+        "-e", "--edition", action="store_true", help="Whether to scrape information about editions"
+    )
+    parser.add_argument(
+        "-c",
+        "--character",
+        action="store_true",
+        help="Whether to scrape information about characters",
+    )
+    parser.add_argument(
+        "-g",
+        "--general",
+        "--game-information",
+        action="store_true",
+        help="Whether to scrape information about game information in general",
+    )
+
+    args = parser.parse_args()
+
+    if args.edition:
+        write_editions(edition_folder=_get_edition_dir())
+    if args.character:
+        write_characters(characters_folder=_get_character_dir())
+    if args.general:
+        write_game_information(game_information_folder=_get_game_information_dir())
+
+
+if __name__ == "__main__":
+    main()
