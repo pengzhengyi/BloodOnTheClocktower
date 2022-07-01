@@ -12,6 +12,32 @@
         }
     },
 
+    "settings": {
+        "[markdown]": {
+            "files.trimTrailingWhitespace": false,
+            "editor.wordWrap": "on"
+        },
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true,
+        "python.formatting.blackArgs": ["--line-length=99"],
+        "python.formatting.provider": "black",
+        "python.linting.banditArgs": ["--ini", ".bandit"],
+        "python.pythonPath": "/python",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": false,
+        "python.linting.maxNumberOfProblems": 1000,
+        "python.linting.mypyEnabled": true,
+        "python.linting.mypyPath": "mypy",
+        "python.linting.pylintEnabled": true,
+        "python.linting.pylintPath": "pylint",
+        "python.testing.nosetestsEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestPath": "pytest",
+        "python.testing.unittestEnabled": false,
+        "python.linting.banditEnabled": true,
+        "python.linting.banditPath": "bandit"
+    },
+
     // Configure tool-specific properties.
     "customizations": {
         // Configure properties specific to VS Code.
@@ -24,6 +50,8 @@
                 "eamodio.gitlens",
                 "oderwat.indent-rainbow",
                 "ms-toolsai.jupyter",
+                "ms-python.vscode-pylance",
+                "ms-python.python",
                 "davidanson.vscode-markdownlint",
                 "octref.vetur",
                 "WakaTime.vscode-wakatime",
@@ -38,7 +66,7 @@
     // "forwardPorts": [],
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    // "postCreateCommand": "yarn install",
+    "postCreateCommand": "yarn install && pre-commit autoupdate",
 
     // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "node",
