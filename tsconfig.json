@@ -19,7 +19,9 @@
             "@nuxt/types",
             "@nuxtjs/axios",
             "@nuxt/content",
-            "@types/node"
+            "@types/node",
+            "@types/jest",
+            "@pinia/nuxt"
         ]
     },
     "exclude": ["node_modules", ".nuxt", "dist"]
