@@ -1,10 +1,10 @@
-import { clockwise } from '~/common/common';
+import { clockwise, counterclockwise } from '~/game/common';
 
 describe('test clockwise', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
 
-    test('start index is -1', () => {
-        expect(Array.from(clockwise(elements, -1))).toEqual(elements);
+    test('start index is -5', () => {
+        expect(Array.from(clockwise(elements, -5))).toEqual(elements);
     });
 
     test('start index is 0', () => {
@@ -27,7 +27,52 @@ describe('test clockwise', () => {
         ]);
     });
 
-    test('start index is 3', () => {
-        expect(Array.from(clockwise(elements, 3))).toEqual(elements);
+    test('start index is 7', () => {
+        expect(Array.from(clockwise(elements, 7))).toEqual(elements);
+    });
+});
+
+describe('test counterclockwise', () => {
+    const elements = ['Alice', 'Bob', 'Peter'];
+
+    test('start index is -10', () => {
+        expect(Array.from(counterclockwise(elements, -10))).toEqual([
+            'Peter',
+            'Bob',
+            'Alice',
+        ]);
+    });
+
+    test('start index is 0', () => {
+        expect(Array.from(counterclockwise(elements, 0))).toEqual([
+            'Alice',
+            'Peter',
+            'Bob',
+        ]);
+    });
+
+    test('start index is 1', () => {
+        expect(Array.from(counterclockwise(elements, 1))).toEqual([
+            'Bob',
+
+            'Alice',
+            'Peter',
+        ]);
+    });
+
+    test('start index is 2', () => {
+        expect(Array.from(counterclockwise(elements, 2))).toEqual([
+            'Peter',
+            'Bob',
+            'Alice',
+        ]);
+    });
+
+    test('start index is 5', () => {
+        expect(Array.from(counterclockwise(elements, 3))).toEqual([
+            'Peter',
+            'Bob',
+            'Alice',
+        ]);
     });
 });

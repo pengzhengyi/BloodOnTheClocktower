@@ -21,7 +21,9 @@
             "@nuxt/content",
             "@types/node",
             "@types/jest",
-            "@pinia/nuxt"
+            "@pinia/nuxt",
+            "@nuxtjs/dayjs",
+            "dayjs/plugin/localizedFormat"
         ]
     },
     "exclude": ["node_modules", ".nuxt", "dist"]

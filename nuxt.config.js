@@ -45,6 +45,7 @@ export default {
     '@nuxtjs/pwa',
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
+    '@nuxtjs/dayjs',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -58,6 +59,13 @@ export default {
     manifest: {
       lang: 'en',
     },
+  },
+
+  dayjs: {
+    locales: ['en', 'ja'],
+    defaultLocale: 'en',
+    defaultTimeZone: 'Asia/Tokyo',
+    plugins: ['localizedFormat'],
   },
 
   // Content module configuration: https://go.nuxtjs.dev/config-content

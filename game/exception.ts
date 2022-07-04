@@ -1,7 +1,10 @@
+import { Dayjs } from 'dayjs';
 import { Nomination } from './nomination';
 import { Vote } from './vote';
 import { RoleData } from './types';
 import { Player } from './player';
+import { Seat } from './seat';
+import { Meaning } from './clocktower';
 
 export class GameError extends Error {}
 
@@ -44,7 +47,7 @@ export class IncompleteCharacterRoleData extends RecoverableGameError {
 
 export class NominatorNominatedBefore extends RecoverableGameError {
     static description =
-        'nomination failed because the nominator has already nominated in past nominations';
+        'Nomination failed because the nominator has already nominated in past nominations';
 
     constructor(
         public failedNomination: Nomination,
@@ -61,7 +64,7 @@ export class NominatorNominatedBefore extends RecoverableGameError {
 
 export class NominatedNominatedBefore extends RecoverableGameError {
     static description =
-        'nomination failed because the nominated player has already been nominated in past nominations';
+        'Nomination failed because the nominated player has already been nominated in past nominations';
 
     constructor(
         public failedNomination: Nomination,
@@ -83,5 +86,41 @@ export class DeadPlayerCannotNominate extends RecoverableGameError {
         super(DeadPlayerCannotNominate.description);
 
         this.player = player;
+    }
+}
+
+export class NumberOfSeatNotPositive extends RecoverableGameError {
+    static description = 'The number of seats must be a positive number';
+
+    constructor(public numSeats: number) {
+        super(NumberOfSeatNotPositive.description);
+
+        this.numSeats = numSeats;
+    }
+}
+
+export class UnexpectedEmptySeat extends RecoverableGameError {
+    static description = 'Encountered an empty seat unexpected';
+
+    constructor(public emptySeat: Seat) {
+        super(UnexpectedEmptySeat.description);
+
+        this.emptySeat = emptySeat;
+    }
+}
+
+export class PastMomentRewrite extends RecoverableGameError {
+    static description = "Attempt to rewrite a past event's moment";
+
+    constructor(
+        public meaning: Meaning,
+        public recordedTimestamp: Dayjs,
+        public newTimestamp: Dayjs
+    ) {
+        super(PastMomentRewrite.description);
+
+        this.meaning = meaning;
+        this.recordedTimestamp = recordedTimestamp;
+        this.newTimestamp = newTimestamp;
     }
 }

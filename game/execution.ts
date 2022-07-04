@@ -12,14 +12,17 @@ export class Execution {
     executed?: Player = undefined;
     readonly nominations: Array<Nomination> = [];
 
-    static getPlayerToExecute(
-        nominations: IterableIterator<Nomination>,
-        numAlivePlayer: number
-    ): Player | undefined {
+    /**
+     * {@link `glossory["About to die"]`}
+     * @return The player who has enough votes to be executed and more votes than any other player today.
+     *
+     * @param numAlivePlayer Number of alive players in game.
+     */
+    getPlayerAboutToDie(numAlivePlayer: number): Player | undefined {
         let highestNumVotes = 0;
-        let playerToExecute: Player | undefined;
+        let playerAboutToDie: Player | undefined;
 
-        for (const nomination of nominations) {
+        for (const nomination of this.nominations) {
             try {
                 const hasEnoughVoteToExecute =
                     nomination.vote?.hasEnoughVoteToExecute(numAlivePlayer);
@@ -32,9 +35,9 @@ export class Execution {
 
                 if (numVotes > highestNumVotes) {
                     highestNumVotes = numVotes;
-                    playerToExecute = nomination.nominated;
+                    playerAboutToDie = nomination.nominated;
                 } else if (numVotes === highestNumVotes) {
-                    playerToExecute = undefined;
+                    playerAboutToDie = undefined;
                 }
             } catch (error) {
                 if (error instanceof NoVotesWhenCountingVote) {
@@ -45,7 +48,7 @@ export class Execution {
             }
         }
 
-        return playerToExecute;
+        return playerAboutToDie;
     }
 
     getPastNomination(

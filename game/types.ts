@@ -2,8 +2,14 @@ import { Player } from './player';
 
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
+export const TAUTOLOGY = () => true;
 
+export type Action = () => void;
 export enum RoleDataKeyName {
+    /**
+     * {@link `glossory["Ability"]`}
+     * The special power or penalty of a character, printed on its character token, the character sheet for the chosen edition, and the character almanac for the chosen edition. The definitive text of the ability is printed in the “How to Run” section of the character almanac. Characters have no ability when dead, drunk, or poisoned.
+     */
     ABILITY = 'ability',
     ABOUT = 'about',
     EDITION = 'edition',
@@ -41,4 +47,9 @@ export interface RoleData {
     [RoleDataKeyName.TEAM]: string;
     [RoleDataKeyName.TIPS]: Record<string, string>;
     [RoleDataKeyName.CUSTOM_PROPERTIES]: Record<string, any>;
+}
+
+export enum Direction {
+    Clockwise,
+    Counterclockwise,
 }

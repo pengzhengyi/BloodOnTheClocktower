@@ -1,4 +1,7 @@
 import { Player } from './player';
+import { UnexpectedEmptySeat } from './exception';
+import { Predicate } from './types';
+import { GameUI } from '~/interaction/gameui';
 
 export class Seat {
     player?: Player;
@@ -26,3 +29,14 @@ export class Seat {
         return playerOut;
     }
 }
+
+export const filterSeatWithAlivePlayer: Predicate<Seat> = (seat) => {
+    if (seat.sat) {
+        return seat.player!.alive;
+    } else {
+        // require user manual intervention
+        GameUI.handle(new UnexpectedEmptySeat(seat));
+
+        return false;
+    }
+};

@@ -3,6 +3,10 @@ import { RoleDataKeyName, RoleData } from './types';
 
 export interface Character extends Partial<RoleData> {}
 
+/**
+ * {@link `glossory["Character"]`}
+ * The role that a player plays, such as the Butler, as listed on the character sheet and character almanac for the chosen edition. Characters may be in play or not in play.
+ */
 // eslint-disable-next-line no-redeclare
 export class Character {
     static REQUIRED_KEYNAMES = [

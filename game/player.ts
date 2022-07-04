@@ -10,6 +10,10 @@ enum NegativeState {
     Mad = 1 << 3,
 }
 
+/**
+ * {@link `glossory["alignment"]`}
+ * The team that a player is currently on. Alignment is either good or evil. If a player changes alignment, their character stays the same. If a player changes character, their alignment stays the same. Players know their own alignment.
+ */
 enum Alignment {
     Good,
     Evil,
@@ -28,10 +32,18 @@ export class Player {
         return (this.state & NegativeState.Poisoned) === NegativeState.Poisoned;
     }
 
+    /**
+     * {@link `glossory["Alive"]`}
+     * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
+     */
     get alive(): boolean {
         return !this.dead;
     }
 
+    /**
+     * {@link `glossory["Dead"]`}
+     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
+     */
     get dead(): boolean {
         return (this.state & NegativeState.Dead) === NegativeState.Dead;
     }
