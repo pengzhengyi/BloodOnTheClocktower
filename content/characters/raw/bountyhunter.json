@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing 1 evil player. If the player you know dies, you learn another evil player tonight. [1 Townsfolk is evil]",
     "about": "The Bounty Hunter learns all the evil players. One. Player. At. A. Time.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "On the first night, the Bounty Hunter learns that Edd is evil. Edd is the King who has been turned evil by the Bounty Hunter. The next day, the King dies. The following night, the Bounty Hunter learns that Abdallah is evil. Abdallah is the Goblin.",
         "On the first night, the Bounty Hunter learns that Evin is evil. Three days later, Evin dies. That night, the Bounty Hunter learns Marianna is evil. Marianna is a Minion. Three nights later, the Demon kills Marianna and the Bounty Hunter learns that Alex is evil. Alex is the Demon. The Tea Lady, who was made evil by the Bounty Hunter, is still alive."

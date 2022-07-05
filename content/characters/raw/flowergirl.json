@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, you learn if a Demon voted today.",
     "about": "The Flowergirl knows if the Demon voted or not.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "gameplay": [
         "There was one nomination today. Lots of players voted, the player was executed, but the Demon did not vote. That night, the Flowergirl learns that the Demon did not vote today.",
         "There were three nominations today. The Demon voted during the second nomination. Nobody was executed. That night, the Flowergirl learns that the Demon voted today.",

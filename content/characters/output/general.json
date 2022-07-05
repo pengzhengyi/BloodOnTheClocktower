@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn which alignment the Storyteller believes is winning: good, evil, or neither.",
     "about": "The General knows who is winning.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 49,
     "firstNightReminder": "Show the General thumbs up for good winning, thumbs down for evil winning or thumb to the side for neither.",
     "gameplay": [

@@ -1,7 +1,7 @@
 {
     "ability": "There might be 1 extra or 1 fewer Outsider in play.",
     "about": "The Sentinel keeps the number of Outsiders in a game mysterious. (For Script games only)",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "There are seven players in this game. There are no characters on the character list that add Outsiders. The Demon bluffs as the Saint. A Sentinel is in play, so the good players are not sure if there is actually a Saint or not.",
         "There are nine players in this game. Even though a Baron is on the character list, the good players know no Baron is in play (because the Witch just killed a player), so there should be just two Outsiders in play. However, the Outsiders cannot be trusted because a Sentinel is in play. Indeed, there is one less Outsider than normal in this game, and the Witch is bluffing as the Butler."
@@ -10,7 +10,7 @@
     "image": "assets/icons/sentinel.png",
     "name": "Sentinel",
     "soliloquy": "Name, please.\nPapers, please.\n\nWeapons, please.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "The official character lists are carefully constructed so that the number of Outsiders is never completely known. This means that evil players can safely bluff as Outsiders. Some of the games you create using the Script will not have this luxury. If, for one reason or another, the number of Outsiders in any particular game will be certain, add a Sentinel. This will confuse matters and help the evil team either bluff as Outsiders or make existing Outsiders look suspicious.\nGames with a Sentinel in play might have 1 more Outsider than normal. They may have 1 less. They may have the normal amount. It is up to you."
     }

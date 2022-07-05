@@ -1,7 +1,7 @@
 {
     "ability": "You are safe from the Demon.",
     "about": "The Soldier can not be killed by the Demon.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Imp attacks the Soldier. The Soldier does not die, so nobody dies that night.",
         "The Poisoner  poisons the Soldier, then the Imp attacks the Soldier. The Soldier dies, since they have no ability.",

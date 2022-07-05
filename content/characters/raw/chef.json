@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing how many pairs of evil players there are.",
     "about": "The Chef knows if evil players are sitting next to each other.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "No evil players are sitting next to each other. The Chef learns a '0'.",
         "The Imp is sitting next to the Baron. Across the circle, the Poisoner is sitting next to the Scarlet Woman. The Chef learns a '2'.",

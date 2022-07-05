@@ -1,7 +1,7 @@
 {
     "ability": "Something bad might happen to whoever talks when the Storyteller has asked for silence.",
     "about": "Hell\u2019s Librarian allows a softly-spoken Storyteller to be heard when needed.",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "The Storyteller is attempting to explain the voting rules to a few new players. The group is loud and is not listening to the Storyteller\u2019s requests for silence, so the Storyteller declares that the Hell's Librarian is in play. Two players continue to loudly talk, even though they know the possible penalty. The Storyteller decides that one dies and the other loses their vote for today. All players are silent whilst the rules are explained."
     ],
@@ -9,7 +9,7 @@
     "image": "assets/icons/hellslibrarian.png",
     "name": "Hell's Librarian",
     "soliloquy": "\u201cShhhhhh. Please be quiet. It is best not to disturb the Librarian. I've heard it has a temper.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "The Hell's Librarian is useful when you find it difficult to get the group\u2019s attention. Maybe you need to explain a game rule? Or get attention for a crucial final day vote? It can also be used to prevent players talking about their characters before the game begins or narrating what they are doing at night. Players instinctively stay quieter during the pre-game period and at night, so you may never need it.\nIt is best to give the players fair warning before you bring the hammer down. Like the Angel, the threat of a mysterious penalty is more important than the actual penalty. The purpose of this character is to make games that run smoothly, not to punish minor infringements.\nLike the Angel, the \"something bad\" that might happen is up to you. However, it is recommended to either make the penalty that the player dies, that the player loses their ability for a day, or that the player may not vote for a day. A light penalty works much better than a severe one."
     }

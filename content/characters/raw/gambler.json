@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, choose a player & guess their character: if you guess wrong, you die.",
     "about": "The Gambler can guess who is who...but pays the ultimate price if they guess wrong.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "The Gambler points to the Minstrel player, then to the Minstrel icon. This guess is correct, so the Gambler remains alive, but is killed by the Demon tonight anyway.",
         "The Devil's Advocate is bluffing as the Pacifist. That night, the Gambler points to the Devil's Advocate player, then to the Pacifist icon. This guess is wrong, so the Gambler dies."

@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a player: they learn who you are.",
     "about": "The Nightwatchman is known by one player.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 46,
     "firstNightReminder": "The Nightwatchman may point to a player. Wake that player, show the 'This character selected you' card and the Nightwatchman token, then point to the Nightwatchman player.",
     "gameplay": [

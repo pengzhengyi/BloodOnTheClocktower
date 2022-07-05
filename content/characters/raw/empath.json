@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn how many of your 2 alive neighbours are evil.",
     "about": "The Empath keeps learning if their living neighbours are good or evil.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Empath neighbours two good players\u2014a Soldier and a Monk . The Empath learns a '0'.",
         "The next day, the Soldier is executed. That night, the Monk is killed by the Imp. The Empath now detects the players sitting next to the Soldier and the Monk, which are a Librarian and an evil Gunslinger. The Empath now learns a '1'.",

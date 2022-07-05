@@ -1,7 +1,7 @@
 {
     "ability": "If you die at night, an alive good player becomes a Farmer.",
     "about": "The Farmer creates more farmers.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "Julian is the Farmer. The Demon kills him at night. Evin is the Fearmonger, and Sarah is the Alchemist. Sarah becomes the Farmer that night. Evin could not become the Farmer, because he is evil.",
         "On the 2nd night, the Farmer dies. The Choirboy becomes the Farmer. On the 3rd night, the new Farmer dies, and the Heretic becomes a Farmer. There is now no Heretic and no Choirboy in play, and three Farmers in play, two of which are dead."

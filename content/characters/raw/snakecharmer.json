@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose an alive player: a chosen Demon swaps characters & alignments with you & is then poisoned.",
     "about": "The Snake Charmer learns player after player that is not the Demon... but becomes the Demon if they get either too greedy or too bold.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "gameplay": [
         "The Snake Charmer chooses a player who is the Pit-Hag, so nothing happens. The Snake Charmer simply goes to sleep. The next night, the Snake Charmer chooses themself, so nothing happens.",
         "The Snake Charmer chooses a player who is the Vigormortis. The Snake Charmer immediately becomes the evil Vigormortis, and the Vigormortis becomes the good Snake Charmer and gets poisoned.",

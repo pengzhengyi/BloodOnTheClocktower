@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn how many players' abilities worked abnormally (since dawn) due to another character's ability.",
     "about": "The Mathematician knows how many things have gone wrong since dawn today.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "gameplay": [
         "The poisoned Oracle learns that two dead players are evil, when three dead players are actually evil. All other character abilities work normally. Later that night, the Mathematician learns a \"1.\u201d",
         "The poisoned Snake Charmer chooses a Townsfolk player, and nothing happens. The drunk Juggler gets correct information. The Savant learns two pieces of true information. Later that night, the Mathematician learns a \"1\" because the Snake Charmer and Juggler's abilities worked as normal, whilst one of the Savant's facts was true when it should have been false.",

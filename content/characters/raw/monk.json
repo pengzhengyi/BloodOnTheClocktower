@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, choose a player (not yourself): they are safe from the Demon tonight.",
     "about": "The Monk protects other players from the Demon.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Monk protects the Fortune Teller. The Imp attacks the Fortune Teller. No deaths occur tonight.",
         "The Monk protects the Mayor, and the Imp attacks the Mayor. The Mayor's \"another player dies\" ability does not trigger, because the Mayor is safe from the Imp. Nobody dies tonight.",

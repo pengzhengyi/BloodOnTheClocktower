@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing 1 in-play Townsfolk. If you were mad that you were this character, you gain their ability when they die.",
     "about": "The Pixie pretends to be the same character as someone else.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "Amy is the Pixie, and knows that the Washerwoman is in play. For three days, Amy claims that the Washerwoman player is lying, because she is the Washerwoman. The Washerwoman is executed. That night, Amy gains the Washerwoman ability, and learns that one of two people is the Monk.",
         "Doug is the Drunk Pixie. He learns that the Lycanthrope is in play. There is no Lycanthrope in play, but a Minion bluffs as the Lycanthrope. The Minion dies. The Storyteller wakes Doug and Doug chooses a player to \u201cattack\u201d each night, but they do not die because Doug does not have the Lycanthrope ability.",

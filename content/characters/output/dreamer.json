@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose a player (not yourself or Travellers): you learn 1 good & 1 evil character, 1 of which is correct.",
     "about": "The Dreamer learns player's characters, but is not sure if their information is entirely correct.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "firstNight": 41,
     "firstNightReminder": "The Dreamer points to a player. Show 1 good and 1 evil character token; one of these is correct.",
     "gameplay": [

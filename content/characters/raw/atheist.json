@@ -1,7 +1,7 @@
 {
     "ability": "The Storyteller can break the game rules, and if executed, good wins, even if you are dead. [No evil characters]",
     "about": "The Atheist knows that all players are good and that there is no such thing as Demons.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "There are three Outsiders in play, when there should be two. The players execute the Storyteller. Good wins.",
         "The Investigator learns that either the Grandmother or the Seamstress is the Boomdandy. The Sweetheart nominates, and dies, even though there is no Witch in play. The Slayer uses their ability on the Gossip, who dies."

@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn 1 player of each character type, until there are no more types to learn. [+1 Outsider]",
     "about": "The Balloonist knows a Townsfolk, an Outsider, a Minion, and a Demon, but gets them confused.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "On the first night, the Balloonist learns Lewis (i.e. the Storyteller points to Lewis). On the second night, the Balloonist learns Doug. On the third night, the Balloonist learns Lachlan. On the fourth night, the Balloonist learns Marianna.",
         "Ben is the Balloonist. On the first night, Ben learns Sarah. On the second night, Ben learns Abdallah. On the third night, Ben dies, so does not learn any more players. Sarah is claiming to be the Monk and Abdallah is claiming to be the Goblin. Ben assumes that he has learnt one Townsfolk player and one Minion player, but he is incorrect - Sarah is the Lunatic and Abdallah is the Leviathan. Ben has actually learnt an Outsider player and a Demon player."

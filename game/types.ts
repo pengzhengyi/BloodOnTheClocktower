@@ -1,10 +1,12 @@
+import { Alignment } from './alignment';
 import { Player } from './player';
 
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
 export const TAUTOLOGY = () => true;
 
-export type Action = () => void;
+export type Action<T = undefined> = (() => void) | ((value: T) => void);
+
 export enum RoleDataKeyName {
     /**
      * {@link `glossory["Ability"]`}
@@ -52,4 +54,8 @@ export interface RoleData {
 export enum Direction {
     Clockwise,
     Counterclockwise,
+}
+
+export interface WithStartsAsAlignment {
+    readonly alignmentStartsAs: Alignment;
 }

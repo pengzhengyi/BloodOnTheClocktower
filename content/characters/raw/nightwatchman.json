@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a player: they learn who you are.",
     "about": "The Nightwatchman is known by one player.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "Lachlan is the Nightwatchman. He chooses Abdallah. Abdallah learns that Lachlan is the Nightwatchman.",
         "Marianna is the drunk Nightwatchman. She chooses Amy. Amy does not wake, and does not learn that Marianna is the Nightwatchman, because the Nightwatchman has no ability.",

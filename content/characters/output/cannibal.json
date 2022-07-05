@@ -1,7 +1,7 @@
 {
     "ability": "You have the ability of the recently killed executee. If they are evil, you are poisoned until a good player dies by execution.",
     "about": "The Cannibal gains the abilities of executed players, if they\u2019re good.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

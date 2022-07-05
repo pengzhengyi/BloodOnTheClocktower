@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, choose a player & guess their character: if you guess wrong, you die.",
     "about": "The Gambler can guess who is who...but pays the ultimate price if they guess wrong.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

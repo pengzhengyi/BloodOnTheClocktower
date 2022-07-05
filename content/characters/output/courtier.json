@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a character: they are drunk for 3 nights & 3 days.",
     "about": "The Courtier gets a character drunk, without knowing which player it is.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "firstNight": 19,
     "firstNightReminder": "The Courtier either shows a 'no' head signal, or points to a character on the sheet. If the Courtier used their ability: If that character is in play, that player is drunk.",
     "gameplay": [

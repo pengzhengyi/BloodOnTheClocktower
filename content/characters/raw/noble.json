@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing 3 players, 1 and only 1 of which is evil.",
     "about": "The Noble learns that one of three players is evil.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "The Noble is shown Marianna, Alex, and Abdallah. Marianna and Abdallah are good, and Alex is evil.",
         "The Noble learns Doug, Lachlan and Ben. Doug is the Chambermaid. Lachlan is the Barber. Ben is the Recluse, who has registered as evil to the Noble.",

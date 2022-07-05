@@ -1,10 +1,11 @@
 import { Dayjs } from 'dayjs';
-import { Nomination } from './nomination';
+import { Nomination as Exile } from './nomination';
 import { Vote } from './vote';
 import { RoleData } from './types';
 import { Player } from './player';
 import { Seat } from './seat';
 import { Meaning } from './clocktower';
+import { Character } from './character';
 
 export class GameError extends Error {}
 
@@ -13,17 +14,27 @@ export class RecoverableGameError extends GameError {}
 export class NoVoteInNomination extends RecoverableGameError {
     static description = 'Nomination does not have a finished vote';
 
-    constructor(public nomination: Nomination) {
+    constructor(public nomination: Exile) {
         super(NoVoteInNomination.description);
 
         this.nomination = nomination;
     }
 }
 
+export class NoVoteInExile extends RecoverableGameError {
+    static description = 'Exile does not have a finished vote';
+
+    constructor(public exile: Exile) {
+        super(NoVoteInExile.description);
+
+        this.exile = exile;
+    }
+}
+
 export class NoVotesWhenCountingVote extends RecoverableGameError {
     static description = 'Cannot determine who voted when counting votes';
 
-    constructor(public vote: Vote, public nomination?: Nomination) {
+    constructor(public vote: Vote, public nomination?: Exile) {
         super(NoVotesWhenCountingVote.description);
 
         this.vote = vote;
@@ -50,8 +61,8 @@ export class NominatorNominatedBefore extends RecoverableGameError {
         'Nomination failed because the nominator has already nominated in past nominations';
 
     constructor(
-        public failedNomination: Nomination,
-        public pastNomination: Nomination,
+        public failedNomination: Exile,
+        public pastNomination: Exile,
         public nominator: Player
     ) {
         super(NominatorNominatedBefore.description);
@@ -67,8 +78,8 @@ export class NominatedNominatedBefore extends RecoverableGameError {
         'Nomination failed because the nominated player has already been nominated in past nominations';
 
     constructor(
-        public failedNomination: Nomination,
-        public pastNomination: Nomination,
+        public failedNomination: Exile,
+        public pastNomination: Exile,
         public nominated: Player
     ) {
         super(NominatedNominatedBefore.description);
@@ -122,5 +133,26 @@ export class PastMomentRewrite extends RecoverableGameError {
         this.meaning = meaning;
         this.recordedTimestamp = recordedTimestamp;
         this.newTimestamp = newTimestamp;
+    }
+}
+
+export class ExileNonTraveller extends RecoverableGameError {
+    static description = 'Cannot exile an non-traveller';
+
+    constructor(public nominator: Player, public nominated: Player) {
+        super(ExileNonTraveller.description);
+
+        this.nominator = nominator;
+        this.nominated = nominated;
+    }
+}
+
+export class CannotDetermineCharacterType extends RecoverableGameError {
+    static description = 'Cannot determine character type of a character';
+
+    constructor(public character: Character) {
+        super(ExileNonTraveller.description);
+
+        this.character = character;
     }
 }

@@ -1,7 +1,7 @@
 {
     "ability": "The 1st time you are nominated, if the nominator is a Townsfolk, they are executed immediately.",
     "about": "The Virgin may inadvertently execute their accuser, confirming which players are Townsfolk in the process.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Washerwoman nominates the Virgin. The Washerwoman is immediately executed and the day ends.",
         "The Drunk, who thinks they are the Chef, nominates the Virgin. The Drunk remains alive, and the Virgin loses their ability. Players may now vote on whether or not to execute the Virgin. (This happens because the Drunk is not a Townsfolk.)",

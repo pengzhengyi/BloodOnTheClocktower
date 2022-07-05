@@ -1,22 +1,28 @@
 import { Character } from './character';
 import { Nomination } from './nomination';
 import { DeadPlayerCannotNominate } from './exception';
+import { Alignment } from './alignment';
+import { Demon, Traveller } from './charactertype';
 import { GameUI } from '~/interaction/gameui';
+
 enum NegativeState {
     None = 0,
+    /**
+     * {@link `glossory["Dead"]`}
+     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
+     */
     Dead = 1,
+    /**
+     * {@link `glossory["Drunk"]`}
+     *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
+     */
     Drunk = 1 << 1,
     Poisoned = 1 << 2,
+    /**
+     * {@link `glossory["Mad"]`}
+     * A player who is “mad” about something is trying to convince the group that something is true. Some players are instructed to be mad about something - if the Storyteller thinks that a player has not put effort to convince the group of the thing they are mad about, then a penalty may apply. Some players are instructed to not be mad about something - if the Storyteller thinks that a player has tried to convince the group of that thing, then a penalty may apply.
+     */
     Mad = 1 << 3,
-}
-
-/**
- * {@link `glossory["alignment"]`}
- * The team that a player is currently on. Alignment is either good or evil. If a player changes alignment, their character stays the same. If a player changes character, their alignment stays the same. Players know their own alignment.
- */
-enum Alignment {
-    Good,
-    Evil,
 }
 
 export class Player {
@@ -24,6 +30,10 @@ export class Player {
     state: number = NegativeState.None;
     readonly canSupportExile: boolean = true;
 
+    /**
+     * {@link `glossory["Healthy"]`}
+     * Not poisoned.
+     */
     get healthy(): boolean {
         return !this.poisoned;
     }
@@ -52,6 +62,10 @@ export class Player {
         return !this.drunk;
     }
 
+    /**
+     * {@link `glossory["Drunk"]`}
+     *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
+     */
     get drunk(): boolean {
         return (this.state & NegativeState.Drunk) === NegativeState.Drunk;
     }
@@ -72,6 +86,22 @@ export class Player {
         return this.alive || this.hasVoteToken;
     }
 
+    get isTraveller(): boolean {
+        return Object.is(this.character.characterType, Traveller);
+    }
+
+    /**
+     * {@link `glossory["Demon, The"]`}
+     * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
+     */
+    get isTheDemon(): boolean {
+        return this.alive && Object.is(this.character.characterType, Demon);
+    }
+
+    get isAliveNontraveller(): boolean {
+        return this.alive && !this.isTraveller;
+    }
+
     constructor(public character: Character, public alignment: Alignment) {
         this.character = character;
         this.alignment = alignment;
@@ -81,7 +111,7 @@ export class Player {
         return this.alignment === other.alignment;
     }
 
-    *getAllies(players: IterableIterator<Player>): IterableIterator<Player> {
+    *getAllies(players: Iterable<Player>): Iterable<Player> {
         for (const other of players) {
             if (!Object.is(this, other) && this.isAlly(other)) {
                 yield other;
@@ -97,8 +127,10 @@ export class Player {
         return new Nomination(this, nominated);
     }
 
-    collectVote(): boolean {
-        if (this.canVote && GameUI.hasRaisedHandForVote(this)) {
+    collectVote(forExile: boolean): boolean {
+        const shouldCheckHandRaised =
+            (forExile && this.canSupportExile) || this.canVote;
+        if (shouldCheckHandRaised && GameUI.hasRaisedHandForVote(this)) {
             if (this.dead) {
                 this.hasVoteToken = false;
             }
@@ -109,3 +141,6 @@ export class Player {
         return false;
     }
 }
+
+export interface MinionPlayer extends Player {}
+export interface DemonPlayer extends Player {}

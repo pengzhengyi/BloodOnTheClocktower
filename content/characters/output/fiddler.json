@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, the Demon secretly chooses an opposing player: all players choose which of these 2 players win.",
     "about": "The Fiddler decides a winner if the game must end due to time constraints, or to a stalemate. Evil wins on ties.",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "The game begins but will need to end in 45 minutes due to a freak lightning storm approaching the neighbourhood, so the Storyteller adds the Fiddler. After 40 minutes, the Fiddler activates. The players choose the good player to win, so good wins.",
         "There are just four players left alive. Each day, nobody nominates. Each night, the Demon chooses a dead player to kill. Since this could go on indefinitely, the Storyteller adds the Fiddler so that the game can end."
@@ -10,7 +10,7 @@
     "image": "assets/icons/fiddler.png",
     "name": "Fiddler",
     "soliloquy": "\u201cI'll wager mi lyef ye cannae best me in a fiddle contest, ye boss-eyed snook! We'll go out on the lash, get the pub jammers an' have a right craic. I'll be layin' ma boots into ya come mornin' ye rumbly muppet.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "Some games will not have enough time to complete. Maybe the venue you are playing at needs to close. Maybe some players need to leave unexpectedly and the game can not continue without them. Maybe the Townsfolk refuse to kill during the day, and the Demon refuses to kill at night.\nThe Fiddler can be activated by you at any time. To do so, all players close their eyes while the Demon selects a living good player to challenge to a fiddle contest. Then, after a minute or two, all players will choose (by raising a hand) which of these 2 players wins. The game is then over, and the winning player's entire team wins too."
     }

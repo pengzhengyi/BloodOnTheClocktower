@@ -1,7 +1,7 @@
 {
     "ability": "Each night, if the dead outnumber the living, you learn 1 alive character. The Demon knows who you are.",
     "about": "The King learns which characters are still alive.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "Amy is the King. There are 12 players alive, and one dead player. On the second night, she learns nothing. On the third night, she learns nothing. On the fourth day, there are 7 dead players and 6 alive players. On the fourth night, Amy learns that the Snitch is alive. On the fifth night, she learns that the Witch is alive.",
         "The Demon knows that Julian is the King. Evin is claiming to be the Choirboy, but is the Butler. The Demon takes a risk and kills Julian. If Evin was actually the Choirboy, he would have learnt which player was the Demon."

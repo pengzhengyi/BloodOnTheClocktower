@@ -1,7 +1,7 @@
 {
     "ability": "The Demon may choose not to attack & must do this at least once per game. Evil players get normal starting info.",
     "about": "The Toymaker makes Teensyville games (5 to 6 player games) longer and more exciting.",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "On the second night, when five players are alive, the Imp chooses not to attack, which allows it to act during the final night. On the third night, when four players are alive, it kills a player.",
         "On the second night, the Imp kills a player. On the third night, when just three players are alive, the Imp cannot attack because it is the final night."
@@ -10,7 +10,7 @@
     "image": "assets/icons/toymaker.png",
     "name": "Toymaker",
     "soliloquy": "\u201cIt buzzes! It walks down stairs! It keeps you warm at night! It tastes like sugar! The kiddies love it! Introducing... the brand new... Warm'o-buzzy-wuzzy-walk'a'bot-thingy-contraption! Fun for all ages!",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "If you created a character list using the Teensyville option in The Script character list creator tool, then you may want to use the Toymaker. Games set in Teensyville have only 6 Townsfolk, 2 Outsiders, 2 Minions and 1 Demon on the list, and specifically cater to 5 or 6 players.\nWith the Toymaker in-play, the Demon learns 3 not-in-play characters at the start of the game, and the Minion(s) and Demon learn who each other are. Once per game, the Demon must voluntarily choose to attack nobody tonight. If the Demon has not yet done this, and the Demon is about wake to attack a player (and this would end the game), then do not wake the Demon \u2013 they are forced to attack nobody tonight."
     }

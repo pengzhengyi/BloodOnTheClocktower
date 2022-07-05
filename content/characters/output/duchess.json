@@ -1,7 +1,7 @@
 {
     "ability": "Each day, 3 players may choose to visit you. At night*, each visitor learns how many visitors are evil, but 1 gets false info.",
     "about": "The Duchess adds information to a game that has little information for the good players to go on. (For Script games only)",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "The Soldier, Pacifist, and Sage visit the Duchess. The Soldier and Pacifist learn a \"0.\u201d The Sage learns a \"1.\u201d",
         "The Mutant, Butler, and Po visit the Duchess. The Mutant learns a \"1,\u201d the Butler learns a \"2,\" and the Po learns a \"1.\u201d",
@@ -11,7 +11,7 @@
     "image": "assets/icons/duchess.png",
     "name": "Duchess",
     "soliloquy": "\u201cWe shall entertain between the hours of 6 and 7 precisely. Tea at 6:15. Scones at 6:45. Do not be late. Formal wear applies, as always.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "Sometimes, you may want to create a character list using the Script tool that has hardly any good characters that gain information directly. Whilst having an abundance of power and a lack of information can be fun for some players, others like something more. The Duchess adds regular information to such a game.\nIt is the responsibility of the players to decide among themselves which players will be the 3 players to visit. If exactly 3 visitors can not be decided upon, then the Duchess does not act tonight.\nEach player that visits the Duchess learns how many visitors are evil, including themselves. However, 1 visitor will definitely get false information - it is your choice whom. Players that visit the Duchess still get to use their character ability normally. The Duchess does not make their character ability give false information."
     }

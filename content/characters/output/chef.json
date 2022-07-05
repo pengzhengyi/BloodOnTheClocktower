@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing how many pairs of evil players there are.",
     "about": "The Chef knows if evil players are sitting next to each other.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "firstNight": 35,
     "firstNightReminder": "Show the finger signal (0, 1, 2, \u2026) for the number of pairs of neighbouring evil players.",
     "gameplay": [

@@ -1,7 +1,7 @@
 {
     "ability": "Each night, if the dead outnumber the living, you learn 1 alive character. The Demon knows who you are.",
     "about": "The King learns which characters are still alive.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 9,
     "firstNightReminder": "Wake the Demon, show them the 'This character selected you' card, show the King token and point to the King player.",
     "gameplay": [

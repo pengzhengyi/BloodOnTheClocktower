@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a living player: the Damsel, if chosen, becomes a not-in-play Townsfolk. [+the Damsel]",
     "about": "The Huntsman saves the Damsel before the Minions find her\u2026 hopefully.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "The Huntsman is woken on the 1st night, but does not use their ability. On the second night, the Huntsman chooses the Damsel player. The Damsel becomes the Undertaker and learns which player died today.",
         "The Huntsman chooses Lachlan. Lachlan is the General, so nothing happens. The Huntsman is no longer woken at night."

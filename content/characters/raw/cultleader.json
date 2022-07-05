@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you become the alignment of an alive neighbour. If all good players choose to join your cult, your team wins.",
     "about": "The Cult Leader convinces others to join their cult to end the game. But which team will win?",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "The Cult Leader neighbours the Farmer and the Magician. On the first night, the Cult Leader remains good. The Magician is executed, and dies, and the Cult Leader's living neighbours are now the Farmer and the Marionette. The Storyteller decides to make the Cult Leader evil. The next night, even though the Cult Leader's living neighbours are still the Farmer and the Marionette, the Storyteller decides to make the Cult Leader good again.",
         "The Cult Leader is evil. The Cult Leader requests that all players join their cult. All evil players put their hand up to join, but only half the good players put their hand up to join. Nothing happens. That night, the Cult Leader turns good. The following day, the Cult Leader requests that all players join their cult. No evil players put their hand up to join, but all the good players put their hand up to join. The game ends and good wins, because the Cult Leader is good."

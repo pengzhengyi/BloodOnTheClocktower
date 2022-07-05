@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose an alive player: either you or they are drunk until dusk. You can't die.",
     "about": "The Sailor is either drunk, or getting somebody else drunk. While the Sailor is sober, they can't die.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "The Sailor chooses the Exorcist, and the Storyteller decides that the Exorcist is drunk. That night, the Sailor is attacked by the Shabaloth. The Sailor remains alive. The next day, the Sailor is executed but remains alive.",
         "During the day, the Gossip made a public statement they thought was false, but was actually true. That night, the Gossip ability kills a player. The Sailor has made themself drunk, and the Storyteller decides that the Sailor dies.",

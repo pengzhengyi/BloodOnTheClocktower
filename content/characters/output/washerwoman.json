@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing that 1 of 2 players is a particular Townsfolk.",
     "about": "The Washerwoman learns that a particular Townsfolk character is in play, but not exactly which player it is.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "firstNight": 32,
     "firstNightReminder": "Show the character token of a Townsfolk in play. Point to two players, one of which is that character.",
     "gameplay": [

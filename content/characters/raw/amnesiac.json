@@ -1,7 +1,7 @@
 {
     "ability": "You do not know what your ability is. Each day, privately guess what it is: you learn how accurate you are.",
     "about": "The Amnesiac doesn\u2019t know their own ability.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "Each night, the Amnesiac wakes and is prompted to point at two players. The Storyteller shakes their head on the first night, and nods on the second. The Amnesiac guesses \u201cAm I learning if both players are Minions?\u201d The Storyteller says \u201cHot\u201d because their ability is that they detect if either of the two players are a Minion.",
         "Each night, the Amnesiac learns a number. The Amnesiac is learning how many of their living neighbours are Townsfolk.",

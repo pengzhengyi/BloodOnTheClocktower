@@ -1,7 +1,7 @@
 {
     "ability": "Use the Djinn's special rule. All players know what it is.",
     "about": "The Djinn fixes jinxes. (For Script games only)",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "The Chambermaid and the Mathematician are Jinxed. The Storyteller declares that the Djinn special rule is in effect: \u201cThe Chambermaid learns if the Mathematician wakes tonight or not, even though the Chambermaid wakes first.\u201d Neither character is actually in play.",
         "The Soldier and the Leviathan are Jinxed. The Storyteller declares that the Djinn special rule is in effect: \u201cIf the Leviathan nominates and executes the Soldier, the Soldier does not die.\" Later in the game, the Leviathan nominates the Soldier and the Soldier is executed, but does not die."
@@ -10,7 +10,7 @@
     "image": "assets/icons/djinn.png",
     "name": "Djinn",
     "soliloquy": "\u0646\u062d\u0646 \u0644\u0633\u0646\u0627 \u0647\u0646\u0627.\n\u0627\u0646\u062a \u0644\u0633\u062a \u062d\u0642\u064a\u0642\u064a.\n\u0643\u0644 \u0634\u064a\u0621 \u0647\u0648 \u0648\u0647\u0645.\n\n\u0623\u0633\u0626\u0644\u062a\u0643 \u0647\u064a \u062c\u0628\u0644 \u0646\u0627\u0631 \u0641\u064a \u064a\u0648\u0645 \u0635\u0627\u0641\u064d.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Djinn Special Rules": "This section will get updated as more characters are made available.\nThe Djinn special rule allows Jinxed characters to both be on the same script, and even both in play at the same time. If your script has jinxed characters, let your players know the Djinn special rule at the beginning of the game, whether or not Jinxed characters are in play.",
         "Explanation": "When creating character lists using the Script, sometimes you will see a little character symbol under one of the characters you have selected. This means that these 2 characters are Jinxed: they have abilities that clash and use the special rule listed here."

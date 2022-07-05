@@ -1,7 +1,7 @@
 {
     "ability": "If the Demon kills the King, you learn which player is the Demon. [+the King]",
     "about": "The Choirboy learns who the Demon is when the Demon kills the King.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

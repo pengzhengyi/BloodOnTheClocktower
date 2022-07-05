@@ -1,7 +1,7 @@
 {
     "ability": "If the Demon kills the King, you learn which player is the Demon. [+the King]",
     "about": "The Choirboy learns who the Demon is when the Demon kills the King.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "The Imp attacks the Empath. The Empath dies. The next night, the Imp attacks the King, who is protected by the Monk. The King lives. The next night, the Imp attacks the King, who is no longer protected by the Monk. The King dies. The Choirboy is woken by the Storyteller and learns which player is the Imp.",
         "The Shabaloth kills the King. The drunk Choirboy wakes and wrongly learns that the General is the Demon."

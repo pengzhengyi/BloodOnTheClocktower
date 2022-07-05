@@ -1,7 +1,7 @@
 {
     "ability": "If only 3 players live & no execution occurs, your team wins. If you die at night, another player might die instead.",
     "about": "The Mayor can win by peaceful means on the final day.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The  Imp attacks the Mayor. The Storyteller chooses that the Ravenkeeper dies instead.",
         "There are three players alive. There are no nominations for execution today. Good wins.",

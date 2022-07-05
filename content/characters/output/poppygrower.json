@@ -1,7 +1,7 @@
 {
     "ability": "Minions & Demons do not know each other. If you die, they learn who each other are that night.",
     "about": "The Poppy Grower prevents the evil players from learning who each other are.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 4,
     "firstNightReminder": "Do not inform the Demon/Minions who each other are",
     "gameplay": [

@@ -13,16 +13,28 @@ export class Vote {
         return this.votes !== undefined;
     }
 
-    constructor(public readonly nominated: Player) {
+    constructor(
+        public readonly nominated: Player,
+        public readonly forExile: boolean = false
+    ) {
         this.nominated = nominated;
+        this.forExile = forExile;
     }
 
-    hasEnoughVoteToExecute(numAlivePlayer: number): boolean {
+    hasEnoughVote(threshold: number): boolean {
         if (!this.voted) {
             throw new NoVotesWhenCountingVote(this);
         }
 
-        return this.votes?.length! >= Math.floor(numAlivePlayer / 2);
+        return this.votes?.length! >= threshold;
+    }
+
+    hasEnoughVoteToExecute(numAlivePlayer: number): boolean {
+        return this.hasEnoughVote(Math.floor(numAlivePlayer / 2));
+    }
+
+    hasEnoughVoteToExile(numPlayer: number): boolean {
+        return this.hasEnoughVote(Math.floor(numPlayer / 2));
     }
 
     getVoteOrder(players: PlayerOrdering): IterableIterator<Player> {
@@ -32,14 +44,14 @@ export class Vote {
         return clockwise(players, nominatedIndex + 1);
     }
 
-    *collectVotes(players: IterableIterator<Player>): IterableIterator<Player> {
+    *collectVotes(players: Iterable<Player>): IterableIterator<Player> {
         if (this.voted && !new Confirm(Vote.RECOLLECT_VOTE_PROMPT).value) {
             yield* this.votes!;
         }
 
         this.votes = [];
         for (const player of players) {
-            if (player.collectVote()) {
+            if (player.collectVote(this.forExile)) {
                 this.votes.push(player);
                 yield player;
             }

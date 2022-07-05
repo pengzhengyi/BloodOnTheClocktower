@@ -31,6 +31,18 @@ export class GamePhase {
     cycleIndex: number = 0;
     readonly phaseToActions: Map<Phase, Array<Action>> = new Map();
 
+    /**
+     * {@link `glossory["First night"]`}
+     * The night phase that begins the game. Some characters act only during the first night. Some characters act during each night except the first. Players may talk about their characters only after the first night.
+     */
+    get isFirstNight(): boolean {
+        return this.phase === Phase.Night && this.cycleIndex === 0;
+    }
+
+    get isNonfirstNight(): boolean {
+        return this.phase === Phase.Night && this.cycleIndex !== 0;
+    }
+
     transition() {
         let phase = this.phase++;
         if (phase === Phase.__LENGTH__) {

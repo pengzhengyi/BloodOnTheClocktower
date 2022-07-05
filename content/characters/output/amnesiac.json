@@ -1,7 +1,7 @@
 {
     "ability": "You do not know what your ability is. Each day, privately guess what it is: you learn how accurate you are.",
     "about": "The Amnesiac doesn\u2019t know their own ability.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 12,
     "firstNightReminder": "Decide the Amnesiac's entire ability. If the Amnesiac's ability causes them to wake tonight: Wake the Amnesiac and run their ability.",
     "gameplay": [

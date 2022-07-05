@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a character: they are drunk for 3 nights & 3 days.",
     "about": "The Courtier gets a character drunk, without knowing which player it is.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "For four nights, the Courtier wakes but does not use their ability. During the fifth night, they make the Shabaloth drunk. For the next three nights, the Shabaloth acts but cannot kill anybody.",
         "The Courtier uses their ability while drunk. Nothing happens, but they are not woken again.",

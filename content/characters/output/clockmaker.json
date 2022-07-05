@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing how many steps from the Demon to its nearest Minion.",
     "about": "The Clockmaker knows the distance from the Demon to it's nearest Minion, either clockwise or anti-clockwise.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "firstNight": 40,
     "firstNightReminder": "Show the hand signal for the number (1, 2, 3, etc.) of places from Demon to closest Minion.",
     "gameplay": [

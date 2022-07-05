@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, choose 2 players: they can't die tonight, but 1 is drunk until dusk.",
     "about": "The Innkeeper protects people from death at night, but somebody gets drunk in the process.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

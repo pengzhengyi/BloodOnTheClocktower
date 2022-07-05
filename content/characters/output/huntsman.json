@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a living player: the Damsel, if chosen, becomes a not-in-play Townsfolk. [+the Damsel]",
     "about": "The Huntsman saves the Damsel before the Minions find her\u2026 hopefully.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 30,
     "firstNightReminder": "The Huntsman shakes their head 'no' or points to a player. If they point to the Damsel, wake that player, show the 'You are' card and a not-in-play character token.",
     "gameplay": [

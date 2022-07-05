@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night*, choose a dead player: if they are a Townsfolk, they are resurrected.",
     "about": "The Professor can bring someone back from the dead.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "The Professor chooses a dead player who is claiming to be the Tea Lady. The player is actually the Lunatic. Nobody is resurrected.",
         "The Professor resurrects the Grandmother, who learns a good player\u2019s character. At dawn, all players learn the Grandmother player is alive, but not that the player is the Grandmother.",

@@ -1,7 +1,7 @@
 {
     "ability": "For the first 2 minutes of each day, veteran players may not talk.",
     "about": "The Buddhist is for when you have 1 or 2 veterans in a game full of new players.",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "Angelus and Lewis are veterans in a game of mostly new players. To encourage the new players to talk, the Storyteller puts the Buddhist in play. Angelus and Lewis may not talk for the first two minutes each day, after which, they may talk freely.",
         "Brianna is affected by the Buddhist. She is the Minion, and simply listens to what people are saying for the first two minutes, allowing her to bluff as a not-in-play character later on."
@@ -10,7 +10,7 @@
     "image": "assets/icons/buddhist.png",
     "name": "Buddhist",
     "soliloquy": "\u201cYou throw thorns. Falling in my silence, they become flowers.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "When experienced players find themselves in a game full of beginners, it is often the case that they dominate the game due to their enthusiasm and knowledge. Having a Buddhist in play encourages the new players to talk and to learn how to play using their own intelligence.\nPlayers affected by the Buddhist are not allowed to talk at all for the first 2 minutes of each day. They may not whisper in private, and they may not even talk to each other. They simply listen. If no device is available to set a two minute timer, then make your best judgement as to what is 2 minutes, and inform the veterans when you feel that the time is up.\nIt is important for the players to realize that this is NOT a punishment for being talkative. Being talkative is great! Blood on the Clocktower is a talking game, and the more, the merrier. It is just that forcing the veterans to stay silent temporarily each day allows the new players to find their own voices, to come up with their own theories, and to take action on their own. It is about fun for everybody."
     }

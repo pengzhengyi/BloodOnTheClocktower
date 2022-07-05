@@ -1,7 +1,7 @@
 {
     "ability": "If you die at night, you are woken to choose a player: you learn their character.",
     "about": "If the Ravenkeeper dies at night, they get to learn one player's character.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

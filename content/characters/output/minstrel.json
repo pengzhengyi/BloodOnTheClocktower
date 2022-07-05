@@ -1,7 +1,7 @@
 {
     "ability": "When a Minion dies by execution, all other players (except Travellers) are drunk until dusk tomorrow.",
     "about": "The Minstrel makes everybody drunk if a Minion dies.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

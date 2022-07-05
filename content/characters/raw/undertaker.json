@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, you learn which character died by execution today.",
     "about": "The Undertaker learns which character was executed today.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Mayor is executed today. That night, the Undertaker is shown the Mayor token.",
         "The Drunk, who thinks they are the Virgin, is executed today. At night, the Undertaker is shown the Drunk token, because the Undertaker learns a player's true character, as opposed to the one they believe they are.",

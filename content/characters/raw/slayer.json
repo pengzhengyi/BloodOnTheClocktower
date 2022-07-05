@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, during the day, publicly choose a player: if they are the Demon, they die.",
     "about": "The Slayer can kill the Demon by guessing who they are.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Slayer chooses the Imp. The Imp dies, and good wins!",
         "The Slayer chooses the Recluse. The Storyteller decides that the Recluse registers as the Imp, so the Recluse dies, but the game continues.",

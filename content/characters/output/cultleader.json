@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you become the alignment of an alive neighbour. If all good players choose to join your cult, your team wins.",
     "about": "The Cult Leader convinces others to join their cult to end the game. But which team will win?",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 47,
     "firstNightReminder": "If the cult leader changed alignment, show them the thumbs up good signal of the thumbs down evil signal accordingly.",
     "gameplay": [

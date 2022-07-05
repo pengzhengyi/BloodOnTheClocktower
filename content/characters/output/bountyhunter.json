@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing 1 evil player. If the player you know dies, you learn another evil player tonight. [1 Townsfolk is evil]",
     "about": "The Bounty Hunter learns all the evil players. One. Player. At. A. Time.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 45,
     "firstNightReminder": "Point to 1 evil player. Wake the townsfolk who is evil and show them the 'You are' card and the thumbs down evil sign.",
     "gameplay": [

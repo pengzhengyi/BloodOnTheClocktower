@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose a player: a Minion, if chosen, learns this. All chosen Minions have no ability.",
     "about": "The Preacher removes the Minion abilities of selected players.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 14,
     "firstNightReminder": "The Preacher chooses a player. If a Minion is chosen, wake the Minion and show the 'This character selected you' card and then the Preacher token.",
     "gameplay": [

@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn how many players' abilities worked abnormally (since dawn) due to another character's ability.",
     "about": "The Mathematician knows how many things have gone wrong since dawn today.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "firstNight": 51,
     "firstNightReminder": "Show the hand signal for the number (0, 1, 2, etc.) of players whose ability malfunctioned due to other abilities.",
     "gameplay": [

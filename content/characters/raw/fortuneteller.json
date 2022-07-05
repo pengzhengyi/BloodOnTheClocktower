@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you.",
     "about": "The Fortune Teller detects who the Demon is, but sometimes thinks good players are Demons.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "gameplay": [
         "The Fortune Teller chooses the Monk and the Undertaker, and learns a 'no'.",
         "The Fortune Teller chooses the Imp and the Empath, and learns a 'yes'.",

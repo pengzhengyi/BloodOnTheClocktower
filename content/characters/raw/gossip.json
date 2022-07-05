@@ -1,7 +1,7 @@
 {
     "ability": "Each day, you may make a public statement. Tonight, if it was true, a player dies.",
     "about": "The Gossip deliberately speaks lies, in the hope of uncovering the truth.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "During the day, the Gossip says, \"I am the Gossip. My public statement is: The Demon is wearing a hat.\" The Demon is not wearing a hat. That night, nobody dies due to the Gossip\u2019s ability.",
         "The Gossip neighbours a good Traveller and the Pacifist. During the day, the drunk Gossip says, \"Both my neighbours are good.\" At dusk, the drunk Gossip becomes sober. That night, the Chambermaid dies.",

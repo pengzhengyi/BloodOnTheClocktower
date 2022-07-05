@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn 1 player of each character type, until there are no more types to learn. [+1 Outsider]",
     "about": "The Balloonist knows a Townsfolk, an Outsider, a Minion, and a Demon, but gets them confused.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 44,
     "firstNightReminder": "Choose a character type. Point to a player whose character is of that type. Place the Balloonist's Seen reminder next to that character.",
     "gameplay": [

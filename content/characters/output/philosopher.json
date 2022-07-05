@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a good character: gain that ability. If this character is in play, they are drunk.",
     "about": "The Philosopher has no ability until they decide which character they want to emulate.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "firstNight": 2,
     "firstNightReminder": "The Philosopher either shows a 'no' head signal, or points to a good character on their sheet. If they chose a character: Swap the out-of-play character token with the Philosopher token. Or, if the character is in play, place the drunk marker by that player and the Not the Philosopher token by the Philosopher.",
     "gameplay": [

@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, choose an alive player. If good, they die, but they are the only player that can die tonight.",
     "about": "The Lycanthrope roams the night, killing the innocent, whilst the Demon cowers indoors.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [

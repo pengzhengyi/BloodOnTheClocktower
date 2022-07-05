@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose an alive player: a chosen Demon swaps characters & alignments with you & is then poisoned.",
     "about": "The Snake Charmer learns player after player that is not the Demon... but becomes the Demon if they get either too greedy or too bold.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "firstNight": 20,
     "firstNightReminder": "The Snake Charmer points to a player. If that player is the Demon: swap the Demon and Snake Charmer character and alignments. Wake each player to inform them of their new role and alignment. The new Snake Charmer is poisoned.",
     "gameplay": [

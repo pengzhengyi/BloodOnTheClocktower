@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose 2 alive players (not yourself): you learn how many woke tonight due to their ability.",
     "about": "The Chambermaid learns who woke up at night.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "The Chambermaid chooses the Exorcist and the Innkeeper, and learns a \"2.\" The next night, the Exorcist chooses the Shabaloth, which will wake the Shabaloth. Later, Chambermaid chooses the Shabaloth and the Fool. Since the Shabaloth only woke due to the Exorcist ability, the Chambermaid learns a \"0\".",
         "It is the second night. The Chambermaid chooses the Grandmother and the evil Goon, and learns a \"2.\" Only the Goon will wake tonight, but the Chambermaid is drunk.",

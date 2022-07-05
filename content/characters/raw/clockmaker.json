@@ -1,7 +1,7 @@
 {
     "ability": "You start knowing how many steps from the Demon to its nearest Minion.",
     "about": "The Clockmaker knows the distance from the Demon to it's nearest Minion, either clockwise or anti-clockwise.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "gameplay": [
         "The Fang Gu is sitting next to the Pit-Hag. During the first night, the Clockmaker learns a \"1.\u201d",
         "Clockwise from the No Dashii sits the Dreamer, the Snake Charmer, then the Evil Twin. Counterclockwise from the No Dashii sits the Mutant, the Sweetheart, the Philosopher, the Sage, then the Witch. Because the Witch is five steps away from the Demon, and the Evil Twin is three steps away from the Demon, the Clockmaker learns a \"3\u201d during the first night.",

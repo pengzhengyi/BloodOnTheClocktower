@@ -1,7 +1,7 @@
 {
     "ability": "Something bad might happen to whoever is most responsible for the death of a new player.",
     "about": "The Angel is for when you have 1 or 2 new players in a game full of veteran players.",
-    "edition": "fabled",
+    "edition": "Fabled",
     "gameplay": [
         "The Angel protects Sarah. The Demon attacks and kills her. As punishment, the Demon cannot attack on the next night.",
         "Ben is the Demon and is protected by the Angel. The players do not execute him until the final day, at which point they may execute him without penalty."
@@ -10,7 +10,7 @@
     "image": "assets/icons/angel.png",
     "name": "Angel",
     "soliloquy": "\u201cLet those who are without sin dare to raise their hand to my chosen, for I shall strike such fools down with the fury and righteousness of a thousand storms.",
-    "team": "Fabled",
+    "team": "fabled",
     "tips": {
         "Explanation": "Being the only new player in a group can sometimes be overwhelming. Being protected by the Angel encourages all players to keep the new players alive for as long as possible, which means new players have more fun and contribute to the game more.\nAll players know who is protected by the Angel, but not their alignment or character.  Whoever is the single player most responsible for killing a protected player, suffers some consequence. For example, if the Demon kills a protected player, the Demon suffers a penalty. If a protected player is executed, it will probably be whoever nominated them that suffers a penalty.\nThe \"something bad\" that happens is up to you. However, it is recommended to either make the penalty that the player dies, that the player loses their ability for a day, or that the player may not vote for a day. A light penalty works much better than a severe one.\nThe Angel does not need to be in-play unless the new players want it to be."
     }

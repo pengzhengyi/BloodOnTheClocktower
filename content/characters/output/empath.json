@@ -1,7 +1,7 @@
 {
     "ability": "Each night, you learn how many of your 2 alive neighbours are evil.",
     "about": "The Empath keeps learning if their living neighbours are good or evil.",
-    "edition": "trouble brewing",
+    "edition": "Trouble Brewing",
     "firstNight": 36,
     "firstNightReminder": "Show the finger signal (0, 1, 2) for the number of evil alive neighbours of the Empath.",
     "gameplay": [

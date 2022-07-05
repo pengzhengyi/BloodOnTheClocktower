@@ -75,9 +75,9 @@ options:
 
 For example,
 
-- `python "content.scrape_wiki" -c` scrape characters information.
-- `python "content.scrape_wiki" -a` scrape everything.
-- `python "content.scrape_wiki" -e -g` scrape editions and general information.
+- `python -m "content.scrape_wiki" -c` scrape characters information.
+- `python -m "content.scrape_wiki" -a` scrape everything.
+- `python -m "content.scrape_wiki" -e -g` scrape editions and general information.
 
 ## How to Enrich
 

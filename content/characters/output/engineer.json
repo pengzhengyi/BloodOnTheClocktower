@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose which Minions or which Demon is in play.",
     "about": "The Engineer manufactures the threat that the town faces.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "firstNight": 13,
     "firstNightReminder": "The Engineer shows a 'no' head signal, or points to a Demon or points to the relevant number of Minions. If the Engineer chose characters, replace the Demon or Minions with the choices, then wake the relevant players and show them the You are card and the relevant character tokens.",
     "gameplay": [

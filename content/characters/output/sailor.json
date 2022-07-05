@@ -1,7 +1,7 @@
 {
     "ability": "Each night, choose an alive player: either you or they are drunk until dusk. You can't die.",
     "about": "The Sailor is either drunk, or getting somebody else drunk. While the Sailor is sober, they can't die.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "firstNight": 10,
     "firstNightReminder": "The Sailor points to a living player. Either the Sailor, or the chosen player, is drunk.",
     "gameplay": [

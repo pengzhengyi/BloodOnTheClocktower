@@ -299,22 +299,23 @@ def _scrape_character_page(character_page_link: str) -> dict[str, Any]:
 
     appears_in_element = soup.find(id="Appears_in").parent
 
-    categories_div = soup.find(id="categories")
-    categories_hrefs = categories_div.find_all(
-        "a", title=lambda title: title.startswith("Category")
-    )
-    if (num_categories := len(categories_hrefs)) >= 1:
-        edition_href = categories_hrefs[0]
-        edition = _get_text(edition_href, lower=True)
-    else:
-        logging.error("Cannot infer edition and character type from categories for %s", name)
+    # categories_div = soup.find(id="categories")
+    # categories_hrefs = categories_div.find_all(
+    #     "a", title=lambda title: title.startswith("Category")
+    # )
+    # if (num_categories := len(categories_hrefs)) == 1:
+    #     character_type_href = categories_hrefs[0]
+    #     character_type = _get_text(edition_href, lower=True)
+    # else:
+    #     logging.error("Cannot infer edition and character type from categories for %s", name)
 
-    if num_categories >= 2:
-        character_type_href = categories_hrefs[1]
-        character_type = _get_text(character_type_href, lower=True)
-    else:
-        # infer where it appears
-        character_type = appears_in_element.find_next_sibling("div").find("a")["title"]
+    # if num_categories >= 2:
+    #     character_type_href = categories_hrefs[1]
+    #     character_type = _get_text(character_type_href, lower=True)
+    # else:
+    #     # infer where it appears
+    edition = appears_in_element.find_next_sibling("div").find("a")["title"]
+    character_type = _get_text(soup.find("a", title="Character Types"), lower=True)
 
     character_text_elements = _get_page_section_elements(
         soup,

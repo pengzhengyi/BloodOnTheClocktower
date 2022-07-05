@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night*, choose a player: they die, even if for some reason they could not.",
     "about": "The Assassin kills who the Demon cannot.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "firstNight": 0,
     "firstNightReminder": "",
     "gameplay": [
@@ -18,7 +18,7 @@
     "reminders": ["Dead", "No ability"],
     "setup": false,
     "soliloquy": "...",
-    "team": "minions",
+    "team": "minion",
     "tips": {
         "Fighting the Assassin": "You can't! The Assassin has the opportunity to kill any player of their choice, and that player can not do anything to prevent that death from occurring. The Innkeeper can't protect them, nor can the Tea Lady, and the Fool, Sailor, and even the Goon will die at the Assassin's hand. As a good player, the best that you can do to combat the Assassin is to notice when the Assassin made a kill and to pick up the pieces afterwards. The good news is that the Assassin can only kill one player per game, unlike the Godfather which can often kill multiple players.",
         "Tips & Tricks": "Few minions hold the power you have. Absolute control over life and death. No protection will keep players safe from your machinations (unless you get drunk, anyway. Don't do that). Enjoy the terror you wield over the good team, and strike into their heart at the worst possible moment!\nKill players that your demon cannot get to. Is that Exorcist blocking your demon from acting? Not anymore. Is that Pacifist under the protection of a Innkeeper? Child's play. A smug Sailor causing you problems? Make this night their last. Nothing stops your blade, so you might as well take full advantage and go after the players that think they are untouchable.\nKill to confuse death count and mask the type of demon that is in play. If the players suspect a Zombuul, you can kill on a night the demon cannot, which will confuse things (especially since your ability can mimic the kill of a venomous Pukka). Another useful example is to cover for a charging Po - the good team won't see the extra deaths coming, making it extra devastating when unleashed.\nCoordinate with your demon on who they would like you to kill. This is especially true of hungry demons like the Shabaloth and the Po who can kill multiple times per night, but it's worth discussing nearly always to avoid doubling up with them. Your extra kill is powerful, and it'll be a real bummer to 'lose' it because you and the demon both went after the same target. Communication, in this case, doesn't kill effectively.\nIf you don't know who to kill, or if you feel like being particularly tricky, you can kill yourself (or kill a fellow evil player) of a night time, to make that evil player look like a good player. Since it is rare for an evil player to die at night, the good team will usually assume that any player that dies at night is good, trusting that player's information and basing their future strategy on that assumption. This is particularly damaging if you can undercut a good player's ability in the process - for example, if you know that an Innkeeper is protecting you at night, and you kill yourself, not only will you look good in the morning, but the Innkeeper will look like they are lying about protecting you."

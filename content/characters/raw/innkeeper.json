@@ -1,7 +1,7 @@
 {
     "ability": "Each night*, choose 2 players: they can't die tonight, but 1 is drunk until dusk.",
     "about": "The Innkeeper protects people from death at night, but somebody gets drunk in the process.",
-    "edition": "bad moon rising",
+    "edition": "Bad Moon Rising",
     "gameplay": [
         "The Innkeeper protects the Fool and the Chambermaid. The Storyteller chooses that the Fool becomes drunk. Tomorrow, when the Fool is executed, they die, even though they hadn\u2019t used their ability yet.",
         "The Innkeeper protects the Assassin and the Po. The Storyteller chooses that the Assassin becomes drunk. Later that night, the Assassin uses their ability, but nothing happens.",

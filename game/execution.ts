@@ -8,6 +8,10 @@ import {
 } from './exception';
 import { Predicate } from './types';
 
+/**
+ * {@link `glossory["Execution"]`}
+ * The group decision to kill a player other than a Traveller during the day. There is a maximum of one execution per day, but there may be none. A nominated player is executed if they got votes equal to at least half the number of alive players, and more votes than any other nominated player.
+ */
 export class Execution {
     executed?: Player = undefined;
     readonly nominations: Array<Nomination> = [];

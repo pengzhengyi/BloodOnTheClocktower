@@ -1,7 +1,7 @@
 {
     "ability": "Once per game, at night, choose a good character: gain that ability. If this character is in play, they are drunk.",
     "about": "The Philosopher has no ability until they decide which character they want to emulate.",
-    "edition": "sects & violets",
+    "edition": "Sects & Violets",
     "gameplay": [
         "During the first night, the Philosopher chooses to gain the Dreamer's ability. They gain the Dreamer's ability from now on and act when the Dreamer normally acts.",
         "During the third night, the Philosopher chooses to gain the Clockmaker's ability. That night, they learn the distance from the Demon to their nearest Minion.",

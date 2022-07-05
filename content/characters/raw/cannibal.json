@@ -1,7 +1,7 @@
 {
     "ability": "You have the ability of the recently killed executee. If they are evil, you are poisoned until a good player dies by execution.",
     "about": "The Cannibal gains the abilities of executed players, if they\u2019re good.",
-    "edition": "experimental characters",
+    "edition": "Experimental Characters",
     "gameplay": [
         "The Clockmaker is executed and dies. That night, the Cannibal learns a \u201c2\u201d because the Demon and Minion are two steps apart.",
         "It is the third night and the Widow was executed today. Because the Widow was bluffing as the Fortune Teller, the Cannibal is prompted to choose 2 players, but they learn a \u201cno\u201d after choosing the Demon because they don\u2019t actually have the Fortune Teller's (or Widow\u2019s) ability, because they are poisoned.",
