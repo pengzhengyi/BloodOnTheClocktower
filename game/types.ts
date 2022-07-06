@@ -59,3 +59,11 @@ export enum Direction {
 export interface WithStartsAsAlignment {
     readonly alignmentStartsAs: Alignment;
 }
+
+export type ScriptCharacter = Record<RoleDataKeyName.ID, string>;
+
+/**
+ * {@link `glossory["Script"]`}
+ * A collection of characters, created via the Script Tool, that can be printed to make character sheets.
+ */
+export type Script = Array<ScriptCharacter>;

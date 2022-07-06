@@ -1,6 +1,10 @@
 import { Alignment } from './alignment';
 import { RoleData, RoleDataKeyName, WithStartsAsAlignment } from './types';
 
+/**
+ * {@link `glossory["Type"]`}
+ * A class of character—Townsfolk, Outsider, Minion, Demon, Traveller, or Fabled.
+ */
 export abstract class CharacterType {
     protected static CHARACTER_TYPE_REGEX: RegExp;
 

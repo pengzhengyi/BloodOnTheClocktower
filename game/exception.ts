@@ -156,3 +156,13 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
         this.character = character;
     }
 }
+
+export class NoCharacterMatchingId extends RecoverableGameError {
+    static description = 'Cannot find a character with matching id';
+
+    constructor(public id: string) {
+        super(NoCharacterMatchingId.description);
+
+        this.id = id;
+    }
+}

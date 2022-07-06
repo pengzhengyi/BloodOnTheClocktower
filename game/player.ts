@@ -12,12 +12,19 @@ enum NegativeState {
      * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
      */
     Dead = 1,
+
     /**
      * {@link `glossory["Drunk"]`}
-     *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
+     * A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
      */
     Drunk = 1 << 1,
+
+    /**
+     * {@link `glossory["Poisoned"]`}
+     * A poisoned player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Poisoned players do not know they are poisoned. See Drunk.
+     */
     Poisoned = 1 << 2,
+
     /**
      * {@link `glossory["Mad"]`}
      * A player who is “mad” about something is trying to convince the group that something is true. Some players are instructed to be mad about something - if the Storyteller thinks that a player has not put effort to convince the group of the thing they are mad about, then a penalty may apply. Some players are instructed to not be mad about something - if the Storyteller thinks that a player has tried to convince the group of that thing, then a penalty may apply.
@@ -25,8 +32,23 @@ enum NegativeState {
     Mad = 1 << 3,
 }
 
+/**
+ * {@link `glossory["Player"]`}
+ * Any person who has an in-play character, not including the Storyteller.
+ */
+
 export class Player {
+    isWake: boolean = false;
+    /**
+     * {@link `glossory["Vote token"]`}
+     * The round white circular token that is put on a player’s life token when they die. When this dead player votes, they remove their vote token and cannot vote for the rest of the game.
+     */
     hasVoteToken: boolean = true;
+
+    /**
+     * {@link `glossory["State"]`}
+     * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
+     */
     state: number = NegativeState.None;
     readonly canSupportExile: boolean = true;
 
@@ -58,6 +80,18 @@ export class Player {
         return (this.state & NegativeState.Dead) === NegativeState.Dead;
     }
 
+    /**
+     * {@link `glossory["Shroud"]`}
+     * The black and grey banner-shaped token used in the Grimoire to indicate that a player is dead.
+     */
+    get hasShroud(): boolean {
+        return this.dead;
+    }
+
+    /**
+     * {@link `glossory["Sober"]`}
+     * Not drunk.
+     */
     get sober(): boolean {
         return !this.drunk;
     }
@@ -102,8 +136,13 @@ export class Player {
         return this.alive && !this.isTraveller;
     }
 
-    constructor(public character: Character, public alignment: Alignment) {
+    constructor(
+        public character: Character,
+        public perceivedCharacter: Character,
+        public alignment: Alignment
+    ) {
         this.character = character;
+        this.perceivedCharacter = perceivedCharacter;
         this.alignment = alignment;
     }
 
@@ -111,12 +150,23 @@ export class Player {
         return this.alignment === other.alignment;
     }
 
-    *getAllies(players: Iterable<Player>): Iterable<Player> {
+    *getAllies(players: Iterable<Player>): IterableIterator<Player> {
         for (const other of players) {
             if (!Object.is(this, other) && this.isAlly(other)) {
                 yield other;
             }
         }
+    }
+
+    /**
+     * {@link `glossory["Team"]`}
+     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
+     *
+     * @param players Players to find teammates in.
+     */
+    *getTeam(players: Iterable<Player>): IterableIterator<Player> {
+        yield this;
+        yield* this.getAllies(players);
     }
 
     nominate(nominated: Player): Nomination {

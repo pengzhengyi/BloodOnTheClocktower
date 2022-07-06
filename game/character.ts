@@ -2,8 +2,9 @@ import { CharacterType } from './charactertype';
 import {
     CannotDetermineCharacterType,
     IncompleteCharacterRoleData,
+    NoCharacterMatchingId,
 } from './exception';
-import { RoleDataKeyName, RoleData } from './types';
+import { RoleDataKeyName, RoleData, ScriptCharacter } from './types';
 
 export interface Character extends Partial<RoleData> {}
 
@@ -21,6 +22,12 @@ export abstract class Character {
 
     readonly characterType: CharacterType;
 
+    static load(id: string): Character {
+        // TODO load asynchronously
+
+        throw new NoCharacterMatchingId(id);
+    }
+
     constructor(roleData: Partial<RoleData>) {
         this.checkForRequiredKeyNames(roleData);
 
@@ -31,6 +38,10 @@ export abstract class Character {
             throw new CannotDetermineCharacterType(this);
         }
         this.characterType = characterType;
+    }
+
+    save(): ScriptCharacter {
+        return { [RoleDataKeyName.ID]: this[RoleDataKeyName.ID]! };
     }
 
     private checkForRequiredKeyNames(roleData: Partial<RoleData>) {
