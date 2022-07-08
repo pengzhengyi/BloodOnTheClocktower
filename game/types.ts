@@ -6,6 +6,7 @@ export type Predicate<T> = (value: T) => boolean;
 export const TAUTOLOGY = () => true;
 
 export type Action<T = undefined> = (() => void) | ((value: T) => void);
+export type Transform<T1, T2 = T1> = (value: T1) => T2;
 
 export enum RoleDataKeyName {
     /**

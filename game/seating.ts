@@ -67,6 +67,57 @@ export class Seating {
         return neighbors.next().value;
     }
 
+    getNearestSeat(
+        seat: Seat,
+        condition: Predicate<Seat>
+    ): [number, Seat] | undefined {
+        const clockwiseIterator = this.iterateSeats(
+            seat,
+            Direction.Clockwise,
+            condition
+        );
+        const counterclockwiseIterator = this.iterateSeats(
+            seat,
+            Direction.Counterclockwise,
+            condition
+        );
+
+        let isClockwiseIterated;
+        let isCounterclockwiseIterated;
+        let clockwiseSeat;
+        let counterclockwiseSeat;
+        let clockwiseDistance = 0;
+        let counterclockwiseDistance = 0;
+
+        while (true) {
+            ({ done: isClockwiseIterated, value: clockwiseSeat } =
+                clockwiseIterator.next());
+            if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
+                return undefined;
+            }
+            if (isClockwiseIterated) {
+                return undefined;
+            }
+            clockwiseDistance++;
+            if (condition(clockwiseSeat)) {
+                return [clockwiseDistance, clockwiseSeat];
+            }
+
+            ({ done: isCounterclockwiseIterated, value: counterclockwiseSeat } =
+                counterclockwiseIterator.next());
+            if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
+                return undefined;
+            }
+            if (isCounterclockwiseIterated) {
+                return undefined;
+            }
+            counterclockwiseDistance++;
+            if (condition(counterclockwiseSeat)) {
+                return [counterclockwiseDistance, counterclockwiseSeat];
+            }
+        }
+    }
+
     *getPlayers(skipEmptySeats: boolean): IterableIterator<Player | undefined> {
         for (const seat of this.seats) {
             if (seat.sat) {
