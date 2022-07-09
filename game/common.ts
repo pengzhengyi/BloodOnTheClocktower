@@ -35,3 +35,24 @@ export function* counterclockwise<T>(
         yield elements[index];
     }
 }
+
+export function parsePromiseSettledResults<T, E = typeof Error>(
+    results: Array<PromiseSettledResult<T>>,
+    errorHandler?: (errors: Array<E>, values: Array<T>) => void
+): Array<T> {
+    const values = [];
+    const errors = [];
+    for (const result of results) {
+        if (result.status === 'fulfilled') {
+            values.push(result.value);
+        } else {
+            errors.push(result.reason);
+        }
+    }
+
+    if (errors.length > 0 && errorHandler !== undefined) {
+        errorHandler(errors, values);
+    }
+
+    return values;
+}

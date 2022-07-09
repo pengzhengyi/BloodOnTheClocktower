@@ -2,20 +2,22 @@ import { Character } from './character';
 import { RoleData } from './types';
 
 export abstract class CharacterLoader {
-    static load(id: string): typeof Character {
-        const character = this.loadCharacter(id);
-        const roleData = this.loadCharacterRoleData(id);
+    static async load(id: string): Promise<typeof Character> {
+        const character = this.loadCharacterClass();
+        const roleData = await this.loadCharacterRoleData(id);
         character.load(roleData);
         return character;
     }
 
-    protected static loadCharacter(id: string): typeof Character {
-        // TODO
-        throw new Error('Method not implemented.', id);
+    protected static loadCharacterClass(): typeof Character {
+        return class extends Character {};
     }
 
-    protected static loadCharacterRoleData(id: string): Partial<RoleData> {
+    protected static async loadCharacterRoleData(
+        id: string
+    ): Promise<Partial<RoleData>> {
         // TODO
-        throw new Error('Method not implemented.', id);
+        const error = await new Error('Method not implemented.', id);
+        throw error;
     }
 }

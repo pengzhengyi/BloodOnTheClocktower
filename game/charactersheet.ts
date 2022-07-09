@@ -8,12 +8,11 @@ import { NoCharacterMatchingId } from './exception';
  * The cardboard sheets that list all of the possible characters and their abilities for the chosen edition.
  */
 export class CharacterSheet {
-    static readonly ALL_CHARACTERS: Map<string, typeof Character> = new LazyMap(
-        CharacterLoader.load
-    );
+    static readonly ALL_CHARACTERS: Map<string, Promise<typeof Character>> =
+        new LazyMap(CharacterLoader.load);
 
-    static find(id: string): typeof Character {
-        const character = this.ALL_CHARACTERS.get(id);
+    static async find(id: string) {
+        const character = await this.ALL_CHARACTERS.get(id);
 
         if (character === undefined) {
             throw new NoCharacterMatchingId(id);

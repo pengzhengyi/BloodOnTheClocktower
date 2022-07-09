@@ -10,8 +10,31 @@ import { StoryTeller } from './storyteller';
 import { Grimoire } from './grimoire';
 
 export class BaseError extends Error {
-    from(error: BaseError): this {
+    from(error: Error): this {
         this.cause = error;
+        return this;
+    }
+
+    aggregate<E extends Error = BaseError>(errors: Iterable<E>): this {
+        if (this.cause instanceof AggregateError) {
+            this.cause.aggregate(errors);
+        } else {
+            this.cause = new AggregateError<E>().aggregate(errors);
+        }
+
+        return this;
+    }
+}
+
+export class AggregateError<E extends Error = BaseError> extends Error {
+    readonly errors: Array<E> = [];
+
+    get cause(): Error | undefined {
+        return this.errors[0];
+    }
+
+    aggregate(errors: Iterable<E>) {
+        this.errors.push(...errors);
         return this;
     }
 }
@@ -164,6 +187,26 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
 
         this.character = character;
         this.type = type;
+    }
+}
+
+export class CharacterLoadFailures<
+    E extends Error = GameError
+> extends RecoverableGameError {
+    static description = 'Fail to load some characters';
+
+    get failures() {
+        return (this.cause! as AggregateError<E>).errors;
+    }
+
+    constructor(
+        failures: Iterable<E>,
+        readonly loadedCharacters: Array<typeof Character>
+    ) {
+        super(CharacterLoadFailures.description);
+
+        this.aggregate(failures);
+        this.loadedCharacters = loadedCharacters;
     }
 }
 
