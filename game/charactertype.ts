@@ -2,7 +2,7 @@ import { Alignment } from './alignment';
 import { NoMatchingCharacterType } from './exception';
 
 /**
- * {@link `glossory["Type"]`}
+ * {@link `glossary["Type"]`}
  * A class of character—Townsfolk, Outsider, Minion, Demon, Traveller, or Fabled.
  */
 export abstract class CharacterType {
@@ -30,7 +30,7 @@ export abstract class CharacterType {
 }
 
 /**
- * {@link `glossory["Minion"]`}
+ * {@link `glossary["Minion"]`}
  * A type of character that begins evil. Minions have abilities that help the evil team. There are usually 1 to 3 Minions per game. The Traveller sheet lists the number of Minions in the current game.
  */
 export abstract class Minion extends CharacterType {
@@ -38,7 +38,7 @@ export abstract class Minion extends CharacterType {
 }
 
 /**
- * {@link `glossory["Demon"]`}
+ * {@link `glossary["Demon"]`}
  * A type of character that begins evil. If the Demon dies, the good team wins. Demons usually kill players at night and have some other ability that harms the good team.
  */
 export abstract class Demon extends CharacterType {
@@ -46,7 +46,7 @@ export abstract class Demon extends CharacterType {
 }
 
 /**
- * {@link `glossory["Townsfolk"]`}
+ * {@link `glossary["Townsfolk"]`}
  * A type of good character. Townsfolk have abilities that help the good team. Usually, most in-play characters are Townsfolk. The Traveller sheet lists the number of Townsfolk in the current game.
  */
 export abstract class Townsfolk extends CharacterType {
@@ -54,7 +54,7 @@ export abstract class Townsfolk extends CharacterType {
 }
 
 /**
- * {@link `glossory["Outsider"]`}
+ * {@link `glossary["Outsider"]`}
  * A type of character that begins good. Outsiders have abilities that are unhelpful to the good team. The Traveller sheet lists how many Outsiders are in the current game.
  */
 export abstract class Outsider extends CharacterType {
@@ -62,13 +62,13 @@ export abstract class Outsider extends CharacterType {
 }
 
 /**
- * {@link `glossory["Traveller"]`}
+ * {@link `glossary["Traveller"]`}
  * A type of character for players who are late to join or who expect to leave early. The player chooses their character, and the Storyteller chooses their alignment. Travellers have great power, but may be exiled by the group.
  */
 export abstract class Traveller extends CharacterType {}
 
 /**
- * {@link `glossory["Fabled"]`}
+ * {@link `glossary["Fabled"]`}
  * A type of character for the Storyteller. Fabled characters are neutral, chosen by the Storyteller publicly, and usually make the game fairer in strange situations.
  */
 export abstract class Fabled extends CharacterType {}

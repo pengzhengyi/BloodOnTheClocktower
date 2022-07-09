@@ -2,23 +2,23 @@ import { Action } from './types';
 
 enum Phase {
     /**
-     * {@link `glossory["Night"]`}
+     * {@link `glossary["Night"]`}
      * The game phase in which players close their eyes, and certain characters wake to act or receive information. The game begins with the night phase. Each day is followed by a night. Each night is followed by a day.
      */
     Night = 0,
     /**
-     * {@link `glossory["Dawn"]`}
+     * {@link `glossary["Dawn"]`}
      * The end of a night, just before the next day begins. Characters that act “at dawn” act after almost all other characters.
      */
     Dawn,
 
     /**
-     * {@link `glossory["Day"]`}
+     * {@link `glossary["Day"]`}
      * The game phase in which players have their eyes open, talk with each other, and vote for an execution. Each day is followed by a night. Each night is followed by a day.
      */
     Day,
     /**
-     * {@link `glossory["Dusk"]`}
+     * {@link `glossary["Dusk"]`}
      * The start of a night, just after the players close their eyes. Characters that act “at dusk” act before almost all other characters. Abilities that last “until dusk” end as soon as the players go to sleep.
      */
     Dusk,
@@ -32,7 +32,7 @@ export class GamePhase {
     readonly phaseToActions: Map<Phase, Array<Action>> = new Map();
 
     /**
-     * {@link `glossory["First night"]`}
+     * {@link `glossary["First night"]`}
      * The night phase that begins the game. Some characters act only during the first night. Some characters act during each night except the first. Players may talk about their characters only after the first night.
      */
     get isFirstNight(): boolean {

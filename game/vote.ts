@@ -5,7 +5,7 @@ import { PlayerOrdering } from './types';
 import { Confirm } from '~/interaction/confirm';
 
 /**
- * {@link `glossory["Vote"]`}
+ * {@link `glossary["Vote"]`}
  * Raising a hand when the Storyteller is counting the number of players in favor of an execution. Players may vote per day. A dead player may only vote once for the rest of the game. The votes are tallied clockwise, ending with the nominated player. The exile process, though similar, is not a vote. See Exile.
  */
 export class Vote {

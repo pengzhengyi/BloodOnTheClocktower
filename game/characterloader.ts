@@ -1,11 +1,25 @@
 import { Character } from './character';
 import { RoleData } from './types';
+import { NoCharacterMatchingId } from './exception';
+import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
 
 export abstract class CharacterLoader {
-    static async load(id: string): Promise<typeof Character> {
+    static load(id: string): typeof Character {
+        const character = ID_TO_CHARACTER.get(id);
+        if (character === undefined) {
+            throw new NoCharacterMatchingId(id);
+        }
+        return character;
+    }
+
+    static async loadAsync(id: string): Promise<typeof Character> {
+        const roleData = await this.loadCharacterRoleDataAsync(id);
+        return this.loadWithRoleData(roleData);
+    }
+
+    protected static loadWithRoleData(roleData: Partial<RoleData>) {
         const character = this.loadCharacterClass();
-        const roleData = await this.loadCharacterRoleData(id);
-        character.load(roleData);
+        character.initialize(roleData);
         return character;
     }
 
@@ -13,7 +27,7 @@ export abstract class CharacterLoader {
         return class extends Character {};
     }
 
-    protected static async loadCharacterRoleData(
+    protected static async loadCharacterRoleDataAsync(
         id: string
     ): Promise<Partial<RoleData>> {
         // TODO

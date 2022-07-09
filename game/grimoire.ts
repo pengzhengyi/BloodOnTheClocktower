@@ -3,7 +3,7 @@ import { Player } from './player';
 import { Players } from './players';
 
 /**
- * {@link `glossory["Grimoire"]`}
+ * {@link `glossary["Grimoire"]`}
  * The box that stores the Clocktower pieces, held and updated by the Storyteller. Players cannot look in the Grimoire. The Grimoire shows the actual states of all the characters, such as who is alive or dead, who is poisoned, who is acting at night, etc.
  */
 export class Grimoire {
@@ -19,7 +19,7 @@ export class Grimoire {
     }
 
     /**
-     * {@link `glossory["In play"]`}
+     * {@link `glossary["In play"]`}
      * A character that exists in the current game, either alive or dead.
      * @param character A character to check.
      */

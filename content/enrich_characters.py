@@ -6,7 +6,8 @@ from collections import defaultdict
 from functools import partial
 from glob import iglob
 from itertools import chain
-from typing import Any, Iterable, Optional
+from pathlib import Path
+from typing import Any, Iterable, List, Optional, Tuple
 
 from rich.logging import RichHandler
 from tqdm import tqdm
@@ -93,11 +94,64 @@ def _enrich(character_enrichments: Iterable[CharacterEnrichment]) -> Iterable[Ch
     return definitions.values()
 
 
+def _write_typescript(
+    typescript_filepath: str, definition: CharacterDefinition
+) -> Tuple[str, str]:
+    if definition is None:
+        return
+
+    path = Path(typescript_filepath)
+    relative_json_filepath = f"./{path.with_suffix('.json').name}"
+
+    character_id: str = definition["id"]
+    character_name = character_id.capitalize()
+    with open(typescript_filepath, "w", encoding="utf-8") as file_writer:
+        file_writer.write(
+            f"""import roleData from "{relative_json_filepath}";
+import {{ Character }} from "~/game/character";
+
+export class {character_name} extends Character {{
+}}
+
+{character_name}.initialize(roleData);"""
+        )
+
+    return (
+        f'import {{ {character_name} }} from "./{path.stem}";',
+        f'ID_TO_CHARACTER.set("{character_id}", {character_name});',
+    )
+
+
+def _write_typescript_export(filepath: str, imports: List[Tuple[str, str]]) -> None:
+    with open(filepath, "w", encoding="utf-8") as file_writer:
+        import_statements, mapset_statements = zip(*imports)
+        file_writer.writelines(
+            import_statement + os.linesep for import_statement in import_statements
+        )
+        file_writer.write(
+            'import { Character } from "~/game/character";' + os.linesep + os.linesep
+        )
+
+        file_writer.write(
+            "export const ID_TO_CHARACTER: Map<string, typeof Character> = new Map();" + os.linesep
+        )
+        file_writer.writelines(
+            mapset_statement + os.linesep for mapset_statement in mapset_statements
+        )
+
+
 def _write_enrichment(definitions: Iterable[CharacterDefinition], output_dirpath: str) -> None:
+    imports: List[Tuple[str, str]] = []
+
     for definition in tqdm(definitions):
         character_id = definition["id"]
-        filepath = os.path.join(output_dirpath, f"{character_id}.json")
-        write_json(filepath, definition)
+        json_filepath = os.path.join(output_dirpath, f"{character_id}.json")
+        typescript_filepath = os.path.join(output_dirpath, f"{character_id}.ts")
+        write_json(json_filepath, definition)
+        imports.append(_write_typescript(typescript_filepath, definition))
+
+    typescript_export_filepath = os.path.join(output_dirpath, "characters.ts")
+    _write_typescript_export(typescript_export_filepath, imports)
 
 
 def enrich() -> None:

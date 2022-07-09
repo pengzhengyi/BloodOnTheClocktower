@@ -9,7 +9,7 @@ import {
 import { Predicate } from './types';
 
 /**
- * {@link `glossory["Execution"]`}
+ * {@link `glossary["Execution"]`}
  * The group decision to kill a player other than a Traveller during the day. There is a maximum of one execution per day, but there may be none. A nominated player is executed if they got votes equal to at least half the number of alive players, and more votes than any other nominated player.
  */
 export class Execution {
@@ -17,7 +17,7 @@ export class Execution {
     readonly nominations: Array<Nomination> = [];
 
     /**
-     * {@link `glossory["About to die"]`}
+     * {@link `glossary["About to die"]`}
      * @return The player who has enough votes to be executed and more votes than any other player today.
      *
      * @param numAlivePlayer Number of alive players in game.

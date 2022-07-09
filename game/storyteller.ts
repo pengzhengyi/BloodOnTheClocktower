@@ -4,7 +4,7 @@ import { Player } from './player';
 import { Action } from './types';
 
 /**
- * {@link `glossory["Storyteller"]`}
+ * {@link `glossary["Storyteller"]`}
  * The person who runs the game. The Storyteller keeps the Grimoire, follows the rules of the game, and makes the final decision on what happens when a situation needs adjudication.
  */
 export class StoryTeller {
@@ -34,7 +34,7 @@ export class StoryTeller {
     }
 
     /**
-     * {@link `glossory["Wake"]`}
+     * {@link `glossary["Wake"]`}
      * A player opening their eyes at night. The Storyteller wakes a player by tapping twice on the knee or shoulder, and wakes all players by saying “eyes open, everybody” at dawn.
      */
     wake(

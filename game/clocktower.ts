@@ -13,7 +13,7 @@ export class Toll {
 export type Meaning = any;
 
 /**
- * {@link `glossory["Clocktower"]`}
+ * {@link `glossary["Clocktower"]`}
  * Blood on the Clocktower, the world’s greatest bluffing game!
  */
 export class Clocktower {

@@ -10,7 +10,7 @@ export type Loader<K, V> = (key: K) => V;
 
 export enum RoleDataKeyName {
     /**
-     * {@link `glossory["Ability"]`}
+     * {@link `glossary["Ability"]`}
      * The special power or penalty of a character, printed on its character token, the character sheet for the chosen edition, and the character almanac for the chosen edition. The definitive text of the ability is printed in the “How to Run” section of the character almanac. Characters have no ability when dead, drunk, or poisoned.
      */
     ABILITY = 'ability',
@@ -60,7 +60,7 @@ export enum Direction {
 export type ScriptCharacter = Record<RoleDataKeyName.ID, string>;
 
 /**
- * {@link `glossory["Script"]`}
+ * {@link `glossary["Script"]`}
  * A collection of characters, created via the Script Tool, that can be printed to make character sheets.
  */
 export type Script = Array<ScriptCharacter>;
