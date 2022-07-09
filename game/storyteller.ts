@@ -1,3 +1,4 @@
+import { BlankGrimoire } from './exception';
 import { Grimoire } from './grimoire';
 import { Player } from './player';
 import { Action } from './types';
@@ -10,7 +11,15 @@ export class StoryTeller {
     static DEFAULT_WAKE_REASON =
         'Player is awaken to act or receive information';
 
-    protected grimoire?: Grimoire;
+    protected _grimoire?: Grimoire;
+
+    get grimoire(): Grimoire {
+        if (this._grimoire === undefined) {
+            throw new BlankGrimoire(this, this._grimoire);
+        }
+
+        return this.grimoire;
+    }
 
     interact(player: Player, action: Action<Player>, reason?: string) {
         if (reason === undefined) {
@@ -21,7 +30,7 @@ export class StoryTeller {
     }
 
     initializeGrimoire(players: Iterable<Player>) {
-        this.grimoire = new Grimoire(players);
+        this._grimoire = new Grimoire(players);
     }
 
     /**

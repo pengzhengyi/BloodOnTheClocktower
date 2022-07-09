@@ -6,15 +6,24 @@ import { Player } from './player';
 import { Seat } from './seat';
 import { Meaning } from './clocktower';
 import { Character } from './character';
+import { StoryTeller } from './storyteller';
+import { Grimoire } from './grimoire';
 
-export class GameError extends Error {}
+export class BaseError extends Error {
+    from(error: BaseError): this {
+        this.cause = error;
+        return this;
+    }
+}
+
+export class GameError extends BaseError {}
 
 export class RecoverableGameError extends GameError {}
 
 export class NoVoteInNomination extends RecoverableGameError {
     static description = 'Nomination does not have a finished vote';
 
-    constructor(public nomination: Exile) {
+    constructor(readonly nomination: Exile) {
         super(NoVoteInNomination.description);
 
         this.nomination = nomination;
@@ -24,7 +33,7 @@ export class NoVoteInNomination extends RecoverableGameError {
 export class NoVoteInExile extends RecoverableGameError {
     static description = 'Exile does not have a finished vote';
 
-    constructor(public exile: Exile) {
+    constructor(readonly exile: Exile) {
         super(NoVoteInExile.description);
 
         this.exile = exile;
@@ -34,7 +43,7 @@ export class NoVoteInExile extends RecoverableGameError {
 export class NoVotesWhenCountingVote extends RecoverableGameError {
     static description = 'Cannot determine who voted when counting votes';
 
-    constructor(public vote: Vote, public nomination?: Exile) {
+    constructor(readonly vote: Vote, public nomination?: Exile) {
         super(NoVotesWhenCountingVote.description);
 
         this.vote = vote;
@@ -46,8 +55,8 @@ export class IncompleteCharacterRoleData extends RecoverableGameError {
     static description = 'Role data is missing required key(s)';
 
     constructor(
-        public roleData: Partial<RoleData>,
-        public missingKeyName: string
+        readonly roleData: Partial<RoleData>,
+        readonly missingKeyName: string
     ) {
         super(IncompleteCharacterRoleData.description);
 
@@ -61,9 +70,9 @@ export class NominatorNominatedBefore extends RecoverableGameError {
         'Nomination failed because the nominator has already nominated in past nominations';
 
     constructor(
-        public failedNomination: Exile,
-        public pastNomination: Exile,
-        public nominator: Player
+        readonly failedNomination: Exile,
+        readonly pastNomination: Exile,
+        readonly nominator: Player
     ) {
         super(NominatorNominatedBefore.description);
 
@@ -78,9 +87,9 @@ export class NominatedNominatedBefore extends RecoverableGameError {
         'Nomination failed because the nominated player has already been nominated in past nominations';
 
     constructor(
-        public failedNomination: Exile,
-        public pastNomination: Exile,
-        public nominated: Player
+        readonly failedNomination: Exile,
+        readonly pastNomination: Exile,
+        readonly nominated: Player
     ) {
         super(NominatedNominatedBefore.description);
 
@@ -93,7 +102,7 @@ export class NominatedNominatedBefore extends RecoverableGameError {
 export class DeadPlayerCannotNominate extends RecoverableGameError {
     static description = 'Dead player cannot nominate';
 
-    constructor(public player: Player) {
+    constructor(readonly player: Player) {
         super(DeadPlayerCannotNominate.description);
 
         this.player = player;
@@ -103,7 +112,7 @@ export class DeadPlayerCannotNominate extends RecoverableGameError {
 export class NumberOfSeatNotPositive extends RecoverableGameError {
     static description = 'The number of seats must be a positive number';
 
-    constructor(public numSeats: number) {
+    constructor(readonly numSeats: number) {
         super(NumberOfSeatNotPositive.description);
 
         this.numSeats = numSeats;
@@ -113,7 +122,7 @@ export class NumberOfSeatNotPositive extends RecoverableGameError {
 export class UnexpectedEmptySeat extends RecoverableGameError {
     static description = 'Encountered an empty seat unexpected';
 
-    constructor(public emptySeat: Seat) {
+    constructor(readonly emptySeat: Seat) {
         super(UnexpectedEmptySeat.description);
 
         this.emptySeat = emptySeat;
@@ -124,9 +133,9 @@ export class PastMomentRewrite extends RecoverableGameError {
     static description = "Attempt to rewrite a past event's moment";
 
     constructor(
-        public meaning: Meaning,
-        public recordedTimestamp: Dayjs,
-        public newTimestamp: Dayjs
+        readonly meaning: Meaning,
+        readonly recordedTimestamp: Dayjs,
+        readonly newTimestamp: Dayjs
     ) {
         super(PastMomentRewrite.description);
 
@@ -150,19 +159,44 @@ export class ExileNonTraveller extends RecoverableGameError {
 export class CannotDetermineCharacterType extends RecoverableGameError {
     static description = 'Cannot determine character type of a character';
 
-    constructor(public character: Character) {
-        super(ExileNonTraveller.description);
+    constructor(readonly character: typeof Character, readonly type?: string) {
+        super(CannotDetermineCharacterType.description);
 
         this.character = character;
+        this.type = type;
     }
 }
 
 export class NoCharacterMatchingId extends RecoverableGameError {
     static description = 'Cannot find a character with matching id';
 
-    constructor(public id: string) {
+    constructor(readonly id?: string) {
         super(NoCharacterMatchingId.description);
 
         this.id = id;
+    }
+}
+
+export class NoMatchingCharacterType extends RecoverableGameError {
+    static description = 'Cannot find a character type matching the name';
+
+    constructor(readonly type?: string) {
+        super(NoMatchingCharacterType.description);
+
+        this.type = type;
+    }
+}
+
+export class BlankGrimoire extends RecoverableGameError {
+    static description = 'Grimoire is not initialized';
+
+    constructor(
+        readonly storyteller: StoryTeller,
+        readonly grimoire?: Grimoire
+    ) {
+        super(BlankGrimoire.description);
+
+        this.storyteller = storyteller;
+        this.grimoire = grimoire;
     }
 }

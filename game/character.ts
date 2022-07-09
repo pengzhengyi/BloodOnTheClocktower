@@ -1,12 +1,20 @@
-import { CharacterType } from './charactertype';
+import {
+    CharacterType,
+    Demon,
+    Fabled,
+    Minion,
+    Outsider,
+    Townsfolk,
+    Traveller,
+} from './charactertype';
 import {
     CannotDetermineCharacterType,
     IncompleteCharacterRoleData,
-    NoCharacterMatchingId,
+    NoMatchingCharacterType,
 } from './exception';
 import { RoleDataKeyName, RoleData, ScriptCharacter } from './types';
 
-export interface Character extends Partial<RoleData> {}
+// export interface Character extends Partial<RoleData> {}
 
 /**
  * {@link `glossory["Character"]`}
@@ -20,32 +28,65 @@ export abstract class Character {
         RoleDataKeyName.ABILITY,
     ];
 
-    readonly characterType: CharacterType;
+    static characterType: CharacterType;
 
-    static load(id: string): Character {
-        // TODO load asynchronously
+    static roleData: Partial<RoleData>;
 
-        throw new NoCharacterMatchingId(id);
+    static get isMinion() {
+        return this.isCharacterType(Minion);
     }
 
-    constructor(roleData: Partial<RoleData>) {
+    static get isDemon() {
+        return this.isCharacterType(Demon);
+    }
+
+    static get isTownsfolk() {
+        return this.isCharacterType(Townsfolk);
+    }
+
+    static get isOutsider() {
+        return this.isCharacterType(Outsider);
+    }
+
+    static get isTraveller() {
+        return this.isCharacterType(Traveller);
+    }
+
+    static get isFabled() {
+        return this.isCharacterType(Fabled);
+    }
+
+    static load(roleData: Partial<RoleData>) {
         this.checkForRequiredKeyNames(roleData);
+        this.roleData = roleData;
+        this.setCharacterType(roleData);
+    }
 
-        Object.assign(this, roleData);
+    static save(): ScriptCharacter {
+        return { [RoleDataKeyName.ID]: this.roleData[RoleDataKeyName.ID]! };
+    }
 
-        const characterType = CharacterType.of(this);
-        if (characterType === undefined) {
-            throw new CannotDetermineCharacterType(this);
+    static isCharacterType(characterType: CharacterType): boolean {
+        return Object.is(this.characterType, characterType);
+    }
+
+    protected static setCharacterType(roleData: Partial<RoleData>) {
+        const type = roleData[RoleDataKeyName.TEAM];
+
+        try {
+            const characterType = CharacterType.from(type);
+            this.characterType = characterType;
+        } catch (error) {
+            if (error instanceof NoMatchingCharacterType) {
+                throw new CannotDetermineCharacterType(this, type).from(error);
+            } else {
+                throw error;
+            }
         }
-        this.characterType = characterType;
     }
 
-    save(): ScriptCharacter {
-        return { [RoleDataKeyName.ID]: this[RoleDataKeyName.ID]! };
-    }
-
-    private checkForRequiredKeyNames(roleData: Partial<RoleData>) {
-        for (const requiredKeyName of Character.REQUIRED_KEYNAMES) {
+    protected static checkForRequiredKeyNames(roleData: Partial<RoleData>) {
+        for (const requiredKeyName of this.REQUIRED_KEYNAMES) {
             if (roleData[requiredKeyName] === undefined) {
                 throw new IncompleteCharacterRoleData(
                     roleData,

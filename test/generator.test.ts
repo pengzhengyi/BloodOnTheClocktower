@@ -1,4 +1,4 @@
-import { Generator } from '~/game/common';
+import { Generator } from '~/game/collections';
 
 describe('test Generator', () => {
     const elements = ['Alice', 'Bob', 'Peter'];

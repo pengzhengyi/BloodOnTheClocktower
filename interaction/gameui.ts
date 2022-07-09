@@ -8,6 +8,7 @@ export abstract class GameUI {
     }
 
     static handle(exception: RecoverableGameError) {
+        // TODO
         throw new Error('Method not implemented.', exception);
     }
 }

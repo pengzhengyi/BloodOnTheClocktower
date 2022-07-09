@@ -1,5 +1,6 @@
 import { Character } from './character';
 import { Player } from './player';
+import { Players } from './players';
 
 /**
  * {@link `glossory["Grimoire"]`}
@@ -9,8 +10,8 @@ export class Grimoire {
     private _players: Array<Player> = [];
     charactersInPlay: Set<Character> = new Set();
 
-    get players(): Array<Player> {
-        return this._players;
+    get players(): Players {
+        return new Players(this._players);
     }
 
     constructor(players: Iterable<Player>) {

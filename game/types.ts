@@ -1,4 +1,3 @@
-import { Alignment } from './alignment';
 import { Player } from './player';
 
 export type PlayerOrdering = Array<Player>;
@@ -7,6 +6,7 @@ export const TAUTOLOGY = () => true;
 
 export type Action<T = undefined> = (() => void) | ((value: T) => void);
 export type Transform<T1, T2 = T1> = (value: T1) => T2;
+export type Loader<K, V> = (key: K) => V;
 
 export enum RoleDataKeyName {
     /**
@@ -55,10 +55,6 @@ export interface RoleData {
 export enum Direction {
     Clockwise,
     Counterclockwise,
-}
-
-export interface WithStartsAsAlignment {
-    readonly alignmentStartsAs: Alignment;
 }
 
 export type ScriptCharacter = Record<RoleDataKeyName.ID, string>;

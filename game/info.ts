@@ -1,5 +1,5 @@
 import { Character } from './character';
-import { MinionPlayer, DemonPlayer } from './player';
+import { MinionPlayer, DemonPlayer, Player } from './player';
 
 /**
  * {@link `glossory["Demon Info"]`}
@@ -17,4 +17,11 @@ export interface DemonInfo {
 export interface MinionInfo {
     minions: Array<MinionPlayer>;
     demon: Array<DemonPlayer>;
+}
+
+export abstract class Info {
+    constructor(readonly receiver: Player, readonly isTrue: boolean) {
+        this.receiver = receiver;
+        this.isTrue = isTrue;
+    }
 }

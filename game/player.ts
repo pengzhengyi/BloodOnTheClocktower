@@ -2,7 +2,7 @@ import { Character } from './character';
 import { Nomination } from './nomination';
 import { DeadPlayerCannotNominate } from './exception';
 import { Alignment } from './alignment';
-import { Demon, Traveller } from './charactertype';
+import { CharacterType, Demon, Traveller } from './charactertype';
 import { GameUI } from '~/interaction/gameui';
 
 enum NegativeState {
@@ -121,7 +121,7 @@ export class Player {
     }
 
     get isTraveller(): boolean {
-        return Object.is(this.character.characterType, Traveller);
+        return Object.is(this.characterType, Traveller);
     }
 
     /**
@@ -129,20 +129,22 @@ export class Player {
      * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
      */
     get isTheDemon(): boolean {
-        return this.alive && Object.is(this.character.characterType, Demon);
+        return this.alive && Object.is(this.characterType, Demon);
     }
 
     get isAliveNontraveller(): boolean {
         return this.alive && !this.isTraveller;
     }
 
+    get characterType(): CharacterType {
+        return this.character.characterType;
+    }
+
     constructor(
-        public character: Character,
-        public perceivedCharacter: Character,
+        public character: typeof Character,
         public alignment: Alignment
     ) {
         this.character = character;
-        this.perceivedCharacter = perceivedCharacter;
         this.alignment = alignment;
     }
 
