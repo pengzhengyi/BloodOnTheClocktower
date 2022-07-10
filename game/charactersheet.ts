@@ -1,6 +1,7 @@
 import { Character } from './character';
 import { CharacterLoader } from './characterloader';
 import { Generator, LazyMap } from './collections';
+import { parsePromiseSettledResults } from './common';
 import {
     CharacterLoadFailures,
     GameError,
@@ -24,6 +25,9 @@ export class CharacterSheet {
 
     static find(id: string) {
         const character = this.ALL_CHARACTERS.get(id);
+        if (character === undefined) {
+            throw new NoCharacterMatchingId(id);
+        }
         return this._find(id, character);
     }
 
@@ -31,6 +35,9 @@ export class CharacterSheet {
         const character =
             this.ALL_CHARACTERS.get(id) ||
             (await this.ALL_CHARACTERS_ASYNC.get(id));
+        if (character === undefined) {
+            throw new NoCharacterMatchingId(id);
+        }
         return this._find(id, character);
     }
 
@@ -39,13 +46,24 @@ export class CharacterSheet {
             Generator.once(characterIds).map((id) => CharacterSheet.find(id))
         );
 
-        if (characters.length === 0) {
-            const innerError = new GameError(
-                'No character id is provided when initializing character sheet'
-            );
-            throw new CharacterLoadFailures([innerError], []);
-        }
+        return new this(characters);
+    }
 
+    static async fromAsync(
+        characterIds: Iterable<string>
+    ): Promise<CharacterSheet> {
+        const characterPromises = new Generator(characterIds).map(
+            (characterId) => this.findAsync(characterId)
+        );
+        const characterSettledResults = await Promise.allSettled(
+            characterPromises
+        );
+        const characters = parsePromiseSettledResults<
+            typeof Character,
+            GameError
+        >(characterSettledResults, (errors, values) => {
+            throw new CharacterLoadFailures(errors, values);
+        });
         return new this(characters);
     }
 
@@ -58,6 +76,13 @@ export class CharacterSheet {
     }
 
     constructor(readonly characters: Array<typeof Character>) {
+        if (characters.length === 0) {
+            const innerError = new GameError(
+                'No character id is provided when initializing character sheet'
+            );
+            throw new CharacterLoadFailures([innerError], []);
+        }
+
         this.characters = characters;
     }
 

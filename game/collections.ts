@@ -1,4 +1,11 @@
-import { Factory, Loader, Predicate, Prioritization, Transform } from './types';
+import {
+    Factory,
+    Loader,
+    Predicate,
+    Prioritization,
+    Task,
+    Transform,
+} from './types';
 
 export class LazyMap<K, V> extends Map<K, V> {
     constructor(readonly loader: Loader<K, V>) {
@@ -104,6 +111,22 @@ export class Generator<T> implements Iterable<T> {
             for (const element of iterable) {
                 yield element;
             }
+        }
+    }
+
+    static every<T>(predicate: Predicate<T>, iterable: Iterable<T>): boolean {
+        for (const element of iterable) {
+            if (!predicate(element)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static forEach<T>(action: Task<T>, iterable: Iterable<T>): void {
+        for (const element of iterable) {
+            action(element);
         }
     }
 
@@ -390,5 +413,13 @@ export class Generator<T> implements Iterable<T> {
 
     groupBy<T2 = T>(getGroup?: Transform<T, T2>): Map<T2, Array<T>> {
         return Generator.groupBy(this, getGroup);
+    }
+
+    forEach(action: Task<T>): void {
+        Generator.forEach(action, this);
+    }
+
+    every(predicate: Predicate<T>): boolean {
+        return Generator.every(predicate, this);
     }
 }
