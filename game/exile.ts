@@ -7,11 +7,11 @@ export type ExileState = NominationState;
 
 export class Exile extends Nomination {
     constructor(public nominator: Player, nominated: Player) {
+        super(nominator, nominated);
+
         if (!nominated.isTraveller) {
             throw new ExileNonTraveller(nominator, nominated);
         }
-
-        super(nominator, nominated);
     }
 
     protected createVote(): Vote {

@@ -10,6 +10,8 @@ import { StoryTeller } from './storyteller';
 import { Grimoire } from './grimoire';
 
 export class BaseError extends Error {
+    declare cause?: Error;
+
     from(error: Error): this {
         this.cause = error;
         return this;
@@ -187,6 +189,17 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
 
         this.character = character;
         this.type = type;
+    }
+}
+
+export class CharacterLoadFailure extends RecoverableGameError {
+    static description = 'Fail to load a character';
+
+    constructor(readonly id: string, readonly reason: any) {
+        super(CharacterLoadFailure.description);
+
+        this.id = id;
+        this.from(reason);
     }
 }
 

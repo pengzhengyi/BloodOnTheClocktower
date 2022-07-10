@@ -1,7 +1,7 @@
 import { BlankGrimoire } from './exception';
 import { Grimoire } from './grimoire';
 import { Player } from './player';
-import { Action } from './types';
+import { Task } from './types';
 
 /**
  * {@link `glossary["Storyteller"]`}
@@ -21,7 +21,7 @@ export class StoryTeller {
         return this.grimoire;
     }
 
-    interact(player: Player, action: Action<Player>, reason?: string) {
+    interact(player: Player, action: Task<Player>, reason?: string) {
         if (reason === undefined) {
             reason = action.toString();
         }
@@ -39,7 +39,7 @@ export class StoryTeller {
      */
     wake(
         player: Player,
-        action: Action<Player>,
+        action: Task<Player>,
         reason: string = StoryTeller.DEFAULT_WAKE_REASON
     ) {
         player.isWake = true;

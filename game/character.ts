@@ -28,7 +28,7 @@ export abstract class Character {
         RoleDataKeyName.ABILITY,
     ];
 
-    static characterType: CharacterType;
+    static characterType: typeof CharacterType;
 
     static roleData: Partial<RoleData>;
 
@@ -66,7 +66,7 @@ export abstract class Character {
         return { [RoleDataKeyName.ID]: this.roleData[RoleDataKeyName.ID]! };
     }
 
-    static isCharacterType(characterType: CharacterType): boolean {
+    static isCharacterType(characterType: typeof CharacterType): boolean {
         return Object.is(this.characterType, characterType);
     }
 

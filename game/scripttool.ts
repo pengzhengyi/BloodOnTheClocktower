@@ -60,6 +60,6 @@ export abstract class ScriptTool {
             throw new NoCharacterMatchingId(id);
         }
 
-        return await CharacterSheet.find(id);
+        return await CharacterSheet.findAsync(id);
     }
 }

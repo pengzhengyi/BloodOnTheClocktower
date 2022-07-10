@@ -4,9 +4,11 @@ export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
 export const TAUTOLOGY = () => true;
 
-export type Action<T = undefined> = (() => void) | ((value: T) => void);
+export type Action = () => void;
+export type Task<T = undefined> = (value: T) => void;
 export type Transform<T1, T2 = T1> = (value: T1) => T2;
 export type Loader<K, V> = (key: K) => V | undefined;
+export type Factory<V> = () => V;
 
 export enum RoleDataKeyName {
     /**
@@ -56,6 +58,14 @@ export enum Direction {
     Clockwise,
     Counterclockwise,
 }
+
+export interface Allocation<T> {
+    key: T;
+    desiredNumber?: number;
+    isStrictUpperbound?: boolean;
+}
+
+export type Prioritization<T> = Iterable<Allocation<T>>;
 
 export type ScriptCharacter = Record<RoleDataKeyName.ID, string>;
 

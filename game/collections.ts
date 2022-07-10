@@ -1,4 +1,56 @@
-import { Loader, Predicate, Transform } from './types';
+import { Factory, Loader, Predicate, Prioritization, Transform } from './types';
+
+export class LazyMap<K, V> extends Map<K, V> {
+    constructor(readonly loader: Loader<K, V>) {
+        super();
+        this.loader = loader;
+    }
+
+    get(key: K) {
+        if (!super.has(key)) {
+            const value = this.loader(key);
+            if (value !== undefined) {
+                super.set(key, value);
+            }
+            return value;
+        }
+
+        return super.get(key);
+    }
+}
+
+export class DefaultDict<K, V, Vs = Array<V>> extends Map<K, Vs> {
+    static withArray<K, V>(): DefaultDict<K, V, Array<V>> {
+        return new this<K, V, Array<V>>(
+            () => [],
+            (value, elements) => elements.push(value)
+        );
+    }
+
+    constructor(
+        readonly defaultFactory: Factory<Vs>,
+        readonly insert: (value: V, values: Vs) => void
+    ) {
+        super();
+        this.defaultFactory = defaultFactory;
+        this.insert = insert;
+    }
+
+    get(key: K) {
+        let values = super.get(key);
+
+        if (values === undefined) {
+            values = this.defaultFactory();
+            super.set(key, values);
+        }
+
+        return values;
+    }
+
+    add(key: K, value: V) {
+        this.insert(value, this.get(key));
+    }
+}
 
 export class Generator<T> implements Iterable<T> {
     static *filter<T>(
@@ -16,6 +68,8 @@ export class Generator<T> implements Iterable<T> {
         for (const element of iterable) {
             if (n-- > 0) {
                 yield element;
+            } else {
+                return;
             }
         }
     }
@@ -51,6 +105,123 @@ export class Generator<T> implements Iterable<T> {
                 yield element;
             }
         }
+    }
+
+    static groupBy<T1, T2 = T1>(
+        iterable: Iterable<T1>,
+        getGroup?: Transform<T1, T2>
+    ): Map<T2, Array<T1>> {
+        if (getGroup === undefined) {
+            getGroup = (element) => element as unknown as T2;
+        }
+
+        const groupToElements = DefaultDict.withArray<T2, T1>();
+
+        for (const element of iterable) {
+            const group = getGroup(element);
+            groupToElements.add(group, element);
+        }
+
+        return groupToElements;
+    }
+
+    static *prioritize<T1, T2 = T1>(
+        iterable: Iterable<T1>,
+        prioritization: Prioritization<T2>,
+        key?: Transform<T1, T2>
+    ): Iterable<T1> {
+        if (key === undefined) {
+            key = (element) => element as unknown as T2;
+        }
+
+        const pastKeys: Set<T2> = new Set();
+        const iterator = prioritization[Symbol.iterator]();
+        let {
+            done,
+            value: {
+                key: pKey = undefined,
+                desiredNumber = Number.POSITIVE_INFINITY,
+                isStrictUpperbound = false,
+            } = {},
+        } = iterator.next();
+
+        const unmatchedKeyToElements = DefaultDict.withArray<T2, T1>();
+
+        for (const element of iterable) {
+            if (done) {
+                return;
+            }
+
+            const elementKey = key(element);
+            if (elementKey === pKey) {
+                yield element;
+                if (--desiredNumber === 0) {
+                    if (!isStrictUpperbound) {
+                        // for strict upperbound, element of this key is no longer needed
+                        pastKeys.add(pKey);
+                    }
+
+                    // find next key that has not been fulfilled yet (combining history)
+                    do {
+                        ({
+                            done,
+                            value: {
+                                key: pKey = undefined,
+                                desiredNumber = Number.POSITIVE_INFINITY,
+                                isStrictUpperbound = false,
+                            } = {},
+                        } = iterator.next());
+                        const elementsMatchingKey =
+                            unmatchedKeyToElements.get(pKey);
+                        if (
+                            elementsMatchingKey !== undefined &&
+                            elementsMatchingKey.length > 0
+                        ) {
+                            // empty existing elements of this key first
+                            const numElementToTake = isStrictUpperbound
+                                ? Math.min(
+                                      elementsMatchingKey.length,
+                                      desiredNumber
+                                  )
+                                : elementsMatchingKey.length;
+                            yield* new Generator(
+                                elementsMatchingKey,
+                                [],
+                                false
+                            ).limit(numElementToTake);
+                            desiredNumber -= numElementToTake;
+                        }
+                    } while (desiredNumber <= 0);
+                }
+            } else if (pastKeys.has(elementKey)) {
+                yield element;
+            } else {
+                unmatchedKeyToElements.add(elementKey, element);
+            }
+        }
+
+        do {
+            const elementsMatchingKey = unmatchedKeyToElements.get(pKey);
+            if (
+                elementsMatchingKey !== undefined &&
+                elementsMatchingKey.length > 0
+            ) {
+                const numElementToTake = isStrictUpperbound
+                    ? Math.min(elementsMatchingKey.length, desiredNumber)
+                    : elementsMatchingKey.length;
+                yield* new Generator(elementsMatchingKey, [], false).limit(
+                    numElementToTake
+                );
+            }
+            ({
+                done,
+                value: {
+                    key: pKey = undefined,
+                    desiredNumber = Number.POSITIVE_INFINITY,
+                    isStrictUpperbound = false,
+                } = {},
+            } = iterator.next());
+        } while (!done);
     }
 
     static combinations<T>(
@@ -141,7 +312,7 @@ export class Generator<T> implements Iterable<T> {
 
     transform(transform: Transform<Iterable<T>>) {
         if (this.supportMultipleIterations && this.cached !== undefined) {
-            // result already iterated, create new generator instead
+            // result already iterated once, operate on cache instead
             this.iterable = this.cached;
             this.cached = undefined;
             this.transforms = [];
@@ -196,26 +367,20 @@ export class Generator<T> implements Iterable<T> {
         return this.become((iterable) => Generator.combinations(k, iterable));
     }
 
+    prioritize<T2 = T>(
+        prioritization: Prioritization<T2>,
+        key?: Transform<T, T2>
+    ) {
+        return this.transform((iterable) =>
+            Generator.prioritize(iterable, prioritization, key)
+        );
+    }
+
     take(n?: number): undefined | T | Array<T> {
         return Generator.take(n, this);
     }
-}
 
-export class LazyMap<K, V> extends Map<K, V> {
-    constructor(readonly loader: Loader<K, V>) {
-        super();
-        this.loader = loader;
-    }
-
-    get(key: K) {
-        if (!super.has(key)) {
-            const value = this.loader(key);
-            if (value !== undefined) {
-                super.set(key, value);
-            }
-            return value;
-        }
-
-        return super.get(key);
+    groupBy<T2 = T>(getGroup?: Transform<T, T2>): Map<T2, Array<T>> {
+        return Generator.groupBy(this, getGroup);
     }
 }

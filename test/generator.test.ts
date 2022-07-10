@@ -1,3 +1,6 @@
+import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
+import { Fanggu } from '~/content/characters/output/fanggu';
+import { Demon, Minion, Outsider, Townsfolk } from '~/game/charactertype';
 import { Generator } from '~/game/collections';
 
 describe('test Generator', () => {
@@ -66,5 +69,52 @@ describe('test Generator', () => {
                 ['c', 'd'],
             ].sort()
         );
+    });
+
+    test('prioritize with characters', () => {
+        const generator = new Generator(ID_TO_CHARACTER.values());
+        const characters = Array.from(
+            generator.prioritize(
+                [
+                    {
+                        key: Townsfolk,
+                        desiredNumber: 6,
+                        isStrictUpperbound: true,
+                    },
+                    {
+                        key: Outsider,
+                        desiredNumber: 2,
+                        isStrictUpperbound: true,
+                    },
+                    { key: Minion, desiredNumber: 2, isStrictUpperbound: true },
+                    { key: Demon, desiredNumber: 1, isStrictUpperbound: true },
+                ],
+                (character) => character.characterType
+            )
+        );
+
+        expect(characters.length).toBe(6 + 2 + 2 + 1);
+
+        const characterTypeToCharacters = Generator.groupBy(
+            characters,
+            (character) => character.characterType
+        );
+
+        expect(characterTypeToCharacters.get(Townsfolk)?.length).toBe(6);
+        expect(characterTypeToCharacters.get(Outsider)?.length).toBe(2);
+        expect(characterTypeToCharacters.get(Minion)?.length).toBe(2);
+        expect(characterTypeToCharacters.get(Demon)?.length).toBe(1);
+    });
+
+    test('Get Demons', () => {
+        const generator = new Generator(ID_TO_CHARACTER.values());
+        const characters = Array.from(
+            generator.prioritize(
+                [{ key: Demon }],
+                (character) => character.characterType
+            )
+        );
+        expect(characters.length).toBeGreaterThan(0);
+        expect(characters).toContain(Fanggu);
     });
 });

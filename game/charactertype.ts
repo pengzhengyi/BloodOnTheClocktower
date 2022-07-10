@@ -78,6 +78,7 @@ const CHARACTER_TYPES: Array<typeof CharacterType> = [
     Demon,
     Townsfolk,
     Outsider,
+    Traveller,
     Fabled,
 ];
 const TEAM_CHARACTER_TYPES = new Map(
