@@ -1,7 +1,12 @@
 import { Character } from './character';
 import { CharacterLoader } from './characterloader';
-import { LazyMap } from './collections';
-import { NoCharacterMatchingId } from './exception';
+import { Generator, LazyMap } from './collections';
+import {
+    CharacterLoadFailures,
+    GameError,
+    NoCharacterMatchingId,
+} from './exception';
+import { EditionData, EditionKeyName } from './types';
 
 /**
  * {@link `glossary["Character sheet"]`}
@@ -29,6 +34,21 @@ export class CharacterSheet {
         return this._find(id, character);
     }
 
+    static from(characterIds: Iterable<string>): CharacterSheet {
+        const characters = Array.from(
+            Generator.once(characterIds).map((id) => CharacterSheet.find(id))
+        );
+
+        if (characters.length === 0) {
+            const innerError = new GameError(
+                'No character id is provided when initializing character sheet'
+            );
+            throw new CharacterLoadFailures([innerError], []);
+        }
+
+        return new this(characters);
+    }
+
     protected static _find(id: string, character?: typeof Character) {
         if (character === undefined) {
             throw new NoCharacterMatchingId(id);
@@ -39,5 +59,23 @@ export class CharacterSheet {
 
     constructor(readonly characters: Array<typeof Character>) {
         this.characters = characters;
+    }
+
+    toObject(): EditionData[EditionKeyName.CHARACTERS] {
+        const characterTypeToCharacters = Generator.groupBy(
+            this.characters,
+            (character) => character.characterType
+        );
+
+        const characterTypeAndCharacters: Iterable<[string, Array<string>]> =
+            Generator.map(
+                ([characterType, characters]) => [
+                    characterType.id,
+                    characters.map((character) => character.id),
+                ],
+                characterTypeToCharacters
+            );
+
+        return Object.fromEntries(characterTypeAndCharacters);
     }
 }

@@ -28,6 +28,7 @@
         "Grimoire",
         "hrefs",
         "isort",
+        "KEYNAMES",
         "linebreak",
         "lintfix",
         "markdownlint",

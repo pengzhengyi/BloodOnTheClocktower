@@ -274,6 +274,14 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static once<T>(iterable: Iterable<T>): Generator<T> {
+        return new this(iterable, [], false);
+    }
+
+    static empty<T>(): Generator<T> {
+        return new this<T>([], [], false);
+    }
+
     protected cached?: Array<T>;
 
     *[Symbol.iterator]() {

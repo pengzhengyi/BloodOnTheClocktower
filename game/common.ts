@@ -56,3 +56,13 @@ export function parsePromiseSettledResults<T, E = typeof Error>(
 
     return values;
 }
+
+const regex = /[^a-z]/g;
+
+export function onlyLetters(s: string) {
+    return s.replace(regex, '');
+}
+
+export function lowercaseLetters(s: string) {
+    return s.toLowerCase().replace(regex, '');
+}

@@ -3,15 +3,15 @@ import { clockwise, counterclockwise } from '~/game/common';
 describe('test clockwise', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
 
-    test('start index is -5', () => {
+    test.concurrent('start index is -5', () => {
         expect(Array.from(clockwise(elements, -5))).toEqual(elements);
     });
 
-    test('start index is 0', () => {
+    test.concurrent('start index is 0', () => {
         expect(Array.from(clockwise(elements, 0))).toEqual(elements);
     });
 
-    test('start index is 1', () => {
+    test.concurrent('start index is 1', () => {
         expect(Array.from(clockwise(elements, 1))).toEqual([
             'Bob',
             'Peter',
@@ -19,7 +19,7 @@ describe('test clockwise', () => {
         ]);
     });
 
-    test('start index is 2', () => {
+    test.concurrent('start index is 2', () => {
         expect(Array.from(clockwise(elements, 2))).toEqual([
             'Peter',
             'Alice',
@@ -27,7 +27,7 @@ describe('test clockwise', () => {
         ]);
     });
 
-    test('start index is 7', () => {
+    test.concurrent('start index is 7', () => {
         expect(Array.from(clockwise(elements, 7))).toEqual(elements);
     });
 });
@@ -35,7 +35,7 @@ describe('test clockwise', () => {
 describe('test counterclockwise', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
 
-    test('start index is -10', () => {
+    test.concurrent('start index is -10', () => {
         expect(Array.from(counterclockwise(elements, -10))).toEqual([
             'Peter',
             'Bob',
@@ -43,7 +43,7 @@ describe('test counterclockwise', () => {
         ]);
     });
 
-    test('start index is 0', () => {
+    test.concurrent('start index is 0', () => {
         expect(Array.from(counterclockwise(elements, 0))).toEqual([
             'Alice',
             'Peter',
@@ -51,7 +51,7 @@ describe('test counterclockwise', () => {
         ]);
     });
 
-    test('start index is 1', () => {
+    test.concurrent('start index is 1', () => {
         expect(Array.from(counterclockwise(elements, 1))).toEqual([
             'Bob',
 
@@ -60,7 +60,7 @@ describe('test counterclockwise', () => {
         ]);
     });
 
-    test('start index is 2', () => {
+    test.concurrent('start index is 2', () => {
         expect(Array.from(counterclockwise(elements, 2))).toEqual([
             'Peter',
             'Bob',
@@ -68,7 +68,7 @@ describe('test counterclockwise', () => {
         ]);
     });
 
-    test('start index is 5', () => {
+    test.concurrent('start index is 5', () => {
         expect(Array.from(counterclockwise(elements, 3))).toEqual([
             'Peter',
             'Bob',

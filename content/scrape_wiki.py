@@ -7,6 +7,7 @@ from contextlib import suppress
 from functools import partial, wraps
 from itertools import chain
 from operator import eq
+from pathlib import Path
 from typing import Any, Callable, Iterable, Iterator, Optional, ParamSpec, TypeVar
 from urllib.parse import urljoin
 
@@ -413,16 +414,64 @@ def write_json(filepath: str, data: Any) -> None:
         json.dump(data, file_writer, indent=4, sort_keys=True)
 
 
+def _write_edition_typescript(edition_folder: str, data: dict[str, Any]) -> tuple[str, str]:
+    raw_name: str = data["name"]
+    name = "".join(c for c in raw_name if c.isalpha())
+    typescript_filepath = os.path.join(edition_folder, f"{name}.ts")
+
+    path = Path(typescript_filepath)
+    relative_json_filepath = f"./{path.with_suffix('.json').name}"
+
+    with open(typescript_filepath, "w", encoding="utf-8") as file_writer:
+        file_writer.write(
+            f"""import editionData from "{relative_json_filepath}";
+import {{ Edition }} from "~/game/edition";
+
+export class {name} extends Edition {{
+}}
+
+{name}.initialize(editionData);"""
+        )
+
+    return (
+        f'import {{ {name} }} from "./{path.stem}";',
+        f'NAME_TO_EDITION.set("{name}", {name});',
+    )
+
+
+def _write_editions_typescript(edition_folder: str, statements: list[tuple[str, str]]) -> None:
+    filepath = os.path.join(edition_folder, "editions.ts")
+    with open(filepath, "w", encoding="utf-8") as file_writer:
+        import_statements, mapset_statements = zip(*statements)
+        file_writer.writelines(
+            import_statement + os.linesep for import_statement in import_statements
+        )
+        file_writer.write('import { Edition } from "~/game/edition";' + os.linesep + os.linesep)
+
+        file_writer.write(
+            "export const NAME_TO_EDITION: Map<string, typeof Edition> = new Map();" + os.linesep
+        )
+        file_writer.writelines(
+            mapset_statement + os.linesep for mapset_statement in mapset_statements
+        )
+
+
 def write_editions(edition_folder: str) -> None:
     """Write scraped information about editions into the content folder."""
     edition_links = _get_edition_links()
+    statements: list[tuple[str, str]] = []
 
     for edition_link in tqdm(edition_links):
         data = _scrape_edition_page(edition_link)
         if data is None:
             continue
-        filepath = os.path.join(edition_folder, f'{data["name"]}.json')
+        raw_name: str = data["name"]
+        name = "".join(c for c in raw_name if c.isalpha())
+        filepath = os.path.join(edition_folder, f"{name}.json")
         write_json(filepath, data)
+        statements.append(_write_edition_typescript(edition_folder, data))
+
+    _write_editions_typescript(edition_folder, statements)
 
 
 def write_characters(characters_folder: str) -> None:

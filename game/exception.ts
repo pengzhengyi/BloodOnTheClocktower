@@ -90,6 +90,20 @@ export class IncompleteCharacterRoleData extends RecoverableGameError {
     }
 }
 
+export class IncompleteEditionData extends RecoverableGameError {
+    static description = 'Edition data is missing required key(s)';
+
+    constructor(
+        readonly editionData: Partial<RoleData>,
+        readonly missingKeyName: string
+    ) {
+        super(IncompleteCharacterRoleData.description);
+
+        this.editionData = editionData;
+        this.missingKeyName = missingKeyName;
+    }
+}
+
 export class NominatorNominatedBefore extends RecoverableGameError {
     static description =
         'Nomination failed because the nominator has already nominated in past nominations';
@@ -199,6 +213,17 @@ export class CharacterLoadFailure extends RecoverableGameError {
         super(CharacterLoadFailure.description);
 
         this.id = id;
+        this.from(reason);
+    }
+}
+
+export class EditionLoadFailure extends RecoverableGameError {
+    static description = 'Fail to load a edition';
+
+    constructor(readonly editionName: string, readonly reason: any) {
+        super(EditionLoadFailure.description);
+
+        this.editionName = editionName;
         this.from(reason);
     }
 }

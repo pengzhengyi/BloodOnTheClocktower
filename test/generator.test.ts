@@ -6,13 +6,13 @@ import { Generator } from '~/game/collections';
 describe('test Generator', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
 
-    test('isNot', () => {
+    test.concurrent('isNot', () => {
         expect(
             new Generator(elements).isNot('Alice').isNot('Peter').take(1)
         ).toEqual('Bob');
     });
 
-    test('filter by string length', () => {
+    test.concurrent('filter by string length', () => {
         expect(
             new Generator(elements)
                 .filter((element) => element.length > 3)
@@ -20,7 +20,7 @@ describe('test Generator', () => {
         ).toEqual(['Alice', 'Peter']);
     });
 
-    test('map to different type', () => {
+    test.concurrent('map to different type', () => {
         expect(
             new Generator(elements)
                 .map((element) => [element.length, element])
@@ -29,7 +29,7 @@ describe('test Generator', () => {
         ).toEqual([5, 'Alice']);
     });
 
-    test('multiple iterations', () => {
+    test.concurrent('multiple iterations', () => {
         const iterable = new Generator(elements).isNot('Peter');
         expect(Array.from(iterable)).toEqual(['Alice', 'Bob']);
         expect(Array.from(iterable)).toEqual(['Alice', 'Bob']);
@@ -38,7 +38,7 @@ describe('test Generator', () => {
         expect(iterable.isNot('Alice').take()).toEqual(['Bob']);
     });
 
-    test('simple combinations', () => {
+    test.concurrent('simple combinations', () => {
         expect(Array.from(Generator.combinations(1, elements))).toEqual([
             ['Alice'],
             ['Bob'],
@@ -58,7 +58,7 @@ describe('test Generator', () => {
         );
     });
 
-    test('more combinations', () => {
+    test.concurrent('more combinations', () => {
         expect(new Generator('abcd').combinations(2).take()!.sort()).toEqual(
             [
                 ['a', 'b'],
@@ -71,7 +71,7 @@ describe('test Generator', () => {
         );
     });
 
-    test('prioritize with characters', () => {
+    test.concurrent('prioritize with characters', () => {
         const generator = new Generator(ID_TO_CHARACTER.values());
         const characters = Array.from(
             generator.prioritize(
@@ -106,7 +106,7 @@ describe('test Generator', () => {
         expect(characterTypeToCharacters.get(Demon)?.length).toBe(1);
     });
 
-    test('Get Demons', () => {
+    test.concurrent('Get Demons', () => {
         const generator = new Generator(ID_TO_CHARACTER.values());
         const characters = Array.from(
             generator.prioritize(

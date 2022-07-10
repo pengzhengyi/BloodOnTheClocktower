@@ -7,6 +7,7 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
+import { lowercaseLetters } from './common';
 import {
     CannotDetermineCharacterType,
     IncompleteCharacterRoleData,
@@ -31,6 +32,14 @@ export abstract class Character {
     static characterType: typeof CharacterType;
 
     static roleData: Partial<RoleData>;
+
+    static nameToId(name: string) {
+        return lowercaseLetters(name);
+    }
+
+    static get id() {
+        return this.roleData[RoleDataKeyName.ID]!;
+    }
 
     static get isMinion() {
         return this.isCharacterType(Minion);
@@ -62,8 +71,8 @@ export abstract class Character {
         this.setCharacterType(roleData);
     }
 
-    static save(): ScriptCharacter {
-        return { [RoleDataKeyName.ID]: this.roleData[RoleDataKeyName.ID]! };
+    static toObject(): ScriptCharacter {
+        return { [RoleDataKeyName.ID]: this.id };
     }
 
     static isCharacterType(characterType: typeof CharacterType): boolean {

@@ -54,6 +54,28 @@ export interface RoleData {
     [RoleDataKeyName.CUSTOM_PROPERTIES]: Record<string, any>;
 }
 
+export enum EditionKeyName {
+    CHARACTERS = 'characters',
+    DESCRIPTION = 'description',
+    DIFFICULTY = 'difficulty',
+    GUIDE = 'guide',
+    NAME = 'name',
+    SYNOPSIS = 'synopsis',
+    URL = 'url',
+    CUSTOM_PROPERTIES = 'custom_properties',
+}
+
+export interface EditionData {
+    [EditionKeyName.CHARACTERS]: Record<string, Array<string>>;
+    [EditionKeyName.DESCRIPTION]: string;
+    [EditionKeyName.DIFFICULTY]: string;
+    [EditionKeyName.GUIDE]: Record<string, string>;
+    [EditionKeyName.NAME]: string;
+    [EditionKeyName.SYNOPSIS]: string;
+    [EditionKeyName.URL]: string;
+    [RoleDataKeyName.CUSTOM_PROPERTIES]: Record<string, string>;
+}
+
 export enum Direction {
     Clockwise,
     Counterclockwise,

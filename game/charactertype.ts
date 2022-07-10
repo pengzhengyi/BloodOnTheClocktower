@@ -6,6 +6,10 @@ import { NoMatchingCharacterType } from './exception';
  * A class of character—Townsfolk, Outsider, Minion, Demon, Traveller, or Fabled.
  */
 export abstract class CharacterType {
+    static get id() {
+        return this.name.toLowerCase();
+    }
+
     static includes(type?: string): boolean {
         if (type === undefined) {
             return false;
@@ -82,8 +86,5 @@ const CHARACTER_TYPES: Array<typeof CharacterType> = [
     Fabled,
 ];
 const TEAM_CHARACTER_TYPES = new Map(
-    CHARACTER_TYPES.map((characterType) => [
-        characterType.name.toLowerCase(),
-        characterType,
-    ])
+    CHARACTER_TYPES.map((characterType) => [characterType.id, characterType])
 );

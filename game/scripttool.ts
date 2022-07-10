@@ -44,7 +44,9 @@ export abstract class ScriptTool {
     }
 
     static save(characterSheet: CharacterSheet): Script {
-        return characterSheet.characters.map((character) => character.save());
+        return characterSheet.characters.map((character) =>
+            character.toObject()
+        );
     }
 
     static getCharacterById(id?: string) {
