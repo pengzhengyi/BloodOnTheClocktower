@@ -209,7 +209,7 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
 export class CharacterLoadFailure extends RecoverableGameError {
     static description = 'Fail to load a character';
 
-    constructor(readonly id: string, readonly reason: any) {
+    constructor(readonly id: string, readonly reason: Error) {
         super(CharacterLoadFailure.description);
 
         this.id = id;
@@ -220,7 +220,7 @@ export class CharacterLoadFailure extends RecoverableGameError {
 export class EditionLoadFailure extends RecoverableGameError {
     static description = 'Fail to load a edition';
 
-    constructor(readonly editionName: string, readonly reason: any) {
+    constructor(readonly editionName: string, readonly reason: Error) {
         super(EditionLoadFailure.description);
 
         this.editionName = editionName;
@@ -233,8 +233,10 @@ export class CharacterLoadFailures<
 > extends RecoverableGameError {
     static description = 'Fail to load some characters';
 
+    declare cause: AggregateError<E>;
+
     get failures() {
-        return (this.cause! as AggregateError<E>).errors;
+        return this.cause.errors;
     }
 
     constructor(

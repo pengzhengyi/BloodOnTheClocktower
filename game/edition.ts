@@ -5,15 +5,18 @@ import { Generator } from './collections';
 import { Character } from './character';
 import { onlyLetters } from './common';
 
+export enum EditionName {
+    TroubleBrewing = 'Trouble Brewing',
+    SectsViolets = 'Sects & Violets',
+    BadMoonRising = 'Bad Moon Rising',
+    ExperimentalCharacters = 'Experimental Characters',
+}
+
 /**
  * {@link `glossary["Edition"]`}
  * A scenario of Clocktower that contains a set of tokens, character sheets, and a character almanac. For example, Trouble Brewing. Each edition has a unifying theme, strategy, and tone.
  */
 export abstract class Edition {
-    // TroubleBrewing = "Trouble Brewing",
-    // SectsViolets  = "Sects & Violets",
-    // BadMoonRising = "Bad Moon Rising"
-
     static REQUIRED_KEYNAMES = [EditionKeyName.CHARACTERS];
 
     static editionData: Partial<EditionData>;
@@ -21,7 +24,13 @@ export abstract class Edition {
     static get characterSheet(): CharacterSheet {
         if (this._characterSheet === undefined) {
             const characterTypeToCharacters =
-                this.editionData[EditionKeyName.CHARACTERS]!;
+                this.editionData[EditionKeyName.CHARACTERS];
+            if (characterTypeToCharacters === undefined) {
+                throw new IncompleteEditionData(
+                    this.editionData,
+                    EditionKeyName.CHARACTERS
+                );
+            }
             const characters = Generator.empty<string>();
 
             for (const key in characterTypeToCharacters) {

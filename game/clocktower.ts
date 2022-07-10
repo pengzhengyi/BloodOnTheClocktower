@@ -10,7 +10,7 @@ export class Toll {
     }
 }
 
-export type Meaning = any;
+export type Meaning = unknown;
 
 /**
  * {@link `glossary["Clocktower"]`}
@@ -32,13 +32,15 @@ export class Clocktower {
     }
 
     record(meaning?: Meaning) {
+        const momentWithSameMeaning = this.moments.get(meaning);
+
         if (
-            this.moments.has(meaning) &&
+            momentWithSameMeaning !== undefined &&
             !new Confirm(`Overwrite recorded timestamp for ${meaning}?`).ask()
         ) {
             throw new PastMomentRewrite(
                 meaning,
-                this.moments.get(meaning)!.when,
+                momentWithSameMeaning.when,
                 dayjs()
             );
         }

@@ -28,7 +28,7 @@ enum Phase {
 
 export class GamePhase {
     phase: Phase = Phase.Night;
-    cycleIndex: number = 0;
+    cycleIndex = 0;
     readonly phaseToActions: Map<Phase, Array<Action>> = new Map();
 
     /**

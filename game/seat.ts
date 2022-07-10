@@ -11,15 +11,23 @@ export class Seat {
     }
 
     get sat(): boolean {
-        return this.player !== undefined;
+        return this.isOccupied();
     }
 
-    trySit(player: Player): boolean {
-        if (this.player === undefined) {
+    isOccupied(): this is { player: Player } {
+        return !this.isEmpty();
+    }
+
+    isEmpty() {
+        return this.player === undefined;
+    }
+
+    trySit(player: Player): this is { player: Player } {
+        if (this.isOccupied()) {
+            return false;
+        } else {
             this.player = player;
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -31,8 +39,8 @@ export class Seat {
 }
 
 export const filterSeatWithAlivePlayer: Predicate<Seat> = (seat) => {
-    if (seat.sat) {
-        return seat.player!.alive;
+    if (seat.isOccupied()) {
+        return seat.player.alive;
     } else {
         // require user manual intervention
         GameUI.handle(new UnexpectedEmptySeat(seat));

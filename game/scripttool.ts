@@ -1,6 +1,46 @@
 import { RoleDataKeyName, Script } from './types';
 import { CharacterSheet } from './charactersheet';
 import { Character } from './character';
+import { EditionName } from './edition';
+
+export interface ScriptConstraints {
+    // filter by edition
+    editions: Array<string>;
+    // filter by type
+    townsfolk: number;
+    outsider: number;
+    minion: number;
+    demon: number;
+    traveller: number;
+    fabled: Array<string>;
+    // ids of character must appear
+    includes: Array<string>;
+    // ids of character should not appear
+    excludes: Array<string>;
+}
+export abstract class ScriptConstraints {
+    static default(): ScriptConstraints {
+        return {
+            editions: [
+                EditionName.TroubleBrewing,
+                EditionName.SectsViolets,
+                EditionName.BadMoonRising,
+            ],
+            townsfolk: 13,
+            outsider: 4,
+            minion: 4,
+            demon: 4,
+            traveller: 0,
+            fabled: [],
+            includes: [],
+            excludes: [],
+        };
+    }
+
+    static new(constraints: Partial<ScriptConstraints>): ScriptConstraints {
+        return Object.assign(this.default(), constraints);
+    }
+}
 
 /**
  * {@link `glossary["Script Tool"]`}
@@ -23,9 +63,7 @@ export abstract class ScriptTool {
         );
     }
 
-    static save(characterSheet: CharacterSheet): Script {
-        return characterSheet.characters.map((character) =>
-            character.toObject()
-        );
-    }
+    // static randomize(constraints: ScriptConstraints): CharacterSheet {
+    //      TODO
+    // }
 }

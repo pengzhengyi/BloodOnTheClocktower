@@ -15,7 +15,7 @@ import {
 } from './exception';
 import { RoleDataKeyName, RoleData, ScriptCharacter } from './types';
 
-// export interface Character extends Partial<RoleData> {}
+export interface Character extends Partial<RoleData> {}
 
 /**
  * {@link `glossary["Character"]`}
@@ -38,7 +38,14 @@ export abstract class Character {
     }
 
     static get id() {
-        return this.roleData[RoleDataKeyName.ID]!;
+        const id = this.roleData[RoleDataKeyName.ID];
+        if (id === undefined) {
+            throw new IncompleteCharacterRoleData(
+                this.roleData,
+                RoleDataKeyName.ID
+            );
+        }
+        return id;
     }
 
     static get isMinion() {

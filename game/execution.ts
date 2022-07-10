@@ -28,14 +28,20 @@ export class Execution {
 
         for (const nomination of this.nominations) {
             try {
-                const hasEnoughVoteToExecute =
-                    nomination.vote?.hasEnoughVoteToExecute(numAlivePlayer);
-
-                if (hasEnoughVoteToExecute === undefined) {
+                const vote = nomination.vote;
+                if (vote === undefined) {
                     throw new NoVoteInNomination(nomination);
                 }
 
-                const numVotes = nomination.vote?.votes?.length!;
+                if (vote.votes === undefined) {
+                    throw new NoVotesWhenCountingVote(vote);
+                }
+
+                if (!vote.hasEnoughVoteToExecute(numAlivePlayer)) {
+                    continue;
+                }
+
+                const numVotes = vote.votes.length;
 
                 if (numVotes > highestNumVotes) {
                     highestNumVotes = numVotes;

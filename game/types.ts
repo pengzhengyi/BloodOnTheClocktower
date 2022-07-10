@@ -51,7 +51,7 @@ export interface RoleData {
     [RoleDataKeyName.SOLILOQUY]: string;
     [RoleDataKeyName.TEAM]: string;
     [RoleDataKeyName.TIPS]: Record<string, string>;
-    [RoleDataKeyName.CUSTOM_PROPERTIES]: Record<string, any>;
+    [RoleDataKeyName.CUSTOM_PROPERTIES]: Record<string, unknown>;
 }
 
 export enum EditionKeyName {

@@ -120,8 +120,8 @@ export class Seating {
 
     *getPlayers(skipEmptySeats: boolean): IterableIterator<Player | undefined> {
         for (const seat of this.seats) {
-            if (seat.sat) {
-                yield seat.player!;
+            if (seat.isOccupied()) {
+                yield seat.player;
             } else if (!skipEmptySeats) {
                 yield undefined;
             }

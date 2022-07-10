@@ -59,7 +59,9 @@ describe('test Generator', () => {
     });
 
     test.concurrent('more combinations', () => {
-        expect(new Generator('abcd').combinations(2).take()!.sort()).toEqual(
+        expect(
+            Array.from(new Generator('abcd').combinations(2)).sort()
+        ).toEqual(
             [
                 ['a', 'b'],
                 ['a', 'c'],

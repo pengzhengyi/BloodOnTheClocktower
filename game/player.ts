@@ -2,7 +2,7 @@ import { Character } from './character';
 import { Nomination } from './nomination';
 import { DeadPlayerCannotNominate } from './exception';
 import { Alignment } from './alignment';
-import { CharacterType, Demon, Traveller } from './charactertype';
+import { CharacterType, Demon, Minion, Traveller } from './charactertype';
 import { GameUI } from '~/interaction/gameui';
 
 enum NegativeState {
@@ -38,12 +38,12 @@ enum NegativeState {
  */
 
 export class Player {
-    isWake: boolean = false;
+    isWake = false;
     /**
      * {@link `glossary["Vote token"]`}
      * The round white circular token that is put on a player’s life token when they die. When this dead player votes, they remove their vote token and cannot vote for the rest of the game.
      */
-    hasVoteToken: boolean = true;
+    hasVoteToken = true;
 
     /**
      * {@link `glossary["State"]`}
@@ -194,5 +194,9 @@ export class Player {
     }
 }
 
-export interface MinionPlayer extends Player {}
-export interface DemonPlayer extends Player {}
+export type MinionPlayer = Player & {
+    characterType: Minion;
+};
+export type DemonPlayer = Player & {
+    characterType: Demon;
+};

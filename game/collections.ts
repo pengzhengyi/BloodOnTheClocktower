@@ -106,7 +106,7 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
-    static *chain<T = any>(...iterables: Array<Iterable<T>>): Iterable<T> {
+    static *chain<T = unknown>(...iterables: Array<Iterable<T>>): Iterable<T> {
         for (const iterable of iterables) {
             for (const element of iterable) {
                 yield element;
@@ -321,7 +321,7 @@ export class Generator<T> implements Iterable<T> {
 
             for (const element of iterable) {
                 if (supportMultipleIterations) {
-                    this.cached!.push(element);
+                    this.cached?.push(element);
                 }
 
                 yield element;
@@ -354,7 +354,7 @@ export class Generator<T> implements Iterable<T> {
     }
 
     become<T2>(transform: Transform<Iterable<T>, Iterable<T2>>): Generator<T2> {
-        // @ts-ignore
+        // @ts-ignore: force type conversion here instead of creating a new instance
         return this.transform(transform);
     }
 

@@ -14,8 +14,8 @@ export class Vote {
 
     votes?: Array<Player>;
 
-    get voted(): boolean {
-        return this.votes !== undefined;
+    get voted() {
+        return this.hasVoted();
     }
 
     constructor(
@@ -26,12 +26,16 @@ export class Vote {
         this.forExile = forExile;
     }
 
+    hasVoted(): this is { votes: Array<Player> } {
+        return this.votes !== undefined;
+    }
+
     hasEnoughVote(threshold: number): boolean {
-        if (!this.voted) {
+        if (this.hasVoted()) {
+            return this.votes.length >= threshold;
+        } else {
             throw new NoVotesWhenCountingVote(this);
         }
-
-        return this.votes?.length! >= threshold;
     }
 
     hasEnoughVoteToExecute(numAlivePlayer: number): boolean {
@@ -50,8 +54,8 @@ export class Vote {
     }
 
     *collectVotes(players: Iterable<Player>): IterableIterator<Player> {
-        if (this.voted && !new Confirm(Vote.RECOLLECT_VOTE_PROMPT).value) {
-            yield* this.votes!;
+        if (this.hasVoted() && !new Confirm(Vote.RECOLLECT_VOTE_PROMPT).value) {
+            yield* this.votes;
         }
 
         this.votes = [];

@@ -27,12 +27,15 @@ export class Nomination {
         this.nominated = nominated;
     }
 
-    startVote(players: Iterable<Player>): Iterable<Player> {
-        if (this.state === NominationState.NotStarted) {
-            this.vote = this.createVote();
-        }
+    hasVoteStarted(): this is { vote: Vote } {
+        return this.state !== NominationState.NotStarted;
+    }
 
-        return this.vote?.collectVotes(players)!;
+    startVote(players: Iterable<Player>): Iterable<Player> {
+        const vote: Vote = this.hasVoteStarted()
+            ? this.vote
+            : (this.vote = this.createVote());
+        return vote.collectVotes(players);
     }
 
     protected createVote(): Vote {
