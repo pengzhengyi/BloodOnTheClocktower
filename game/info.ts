@@ -1,7 +1,7 @@
 import { Character } from './character';
-import { Washerwoman } from './characters';
 import { Townsfolk } from './charactertype';
 import { MinionPlayer, DemonPlayer, Player } from './player';
+import { Washerwoman } from '~/content/characters/output/washerwoman';
 
 /**
  * {@link `glossary["Demon Info"]`}

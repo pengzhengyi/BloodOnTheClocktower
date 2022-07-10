@@ -207,11 +207,15 @@ export class LazyMap<K, V> extends Map<K, V> {
         this.loader = loader;
     }
 
-    get(key: K): V {
+    get(key: K) {
         if (!super.has(key)) {
-            this.loader(key);
+            const value = this.loader(key);
+            if (value !== undefined) {
+                super.set(key, value);
+            }
+            return value;
         }
 
-        return super.get(key)!;
+        return super.get(key);
     }
 }

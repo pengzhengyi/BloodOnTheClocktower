@@ -12,20 +12,8 @@ export class CharacterSheet {
         CharacterLoader.load
     );
 
-    static readonly ALL_CHARACTERS_ASYNC: Map<
-        string,
-        Promise<typeof Character>
-    > = new LazyMap(CharacterLoader.loadAsync);
-
     static find(id: string) {
         const character = this.ALL_CHARACTERS.get(id);
-        return this._find(id, character);
-    }
-
-    static async findAsync(id: string) {
-        const character =
-            this.ALL_CHARACTERS.get(id) ||
-            (await this.ALL_CHARACTERS_ASYNC.get(id));
         return this._find(id, character);
     }
 
