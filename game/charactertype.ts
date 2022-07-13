@@ -77,11 +77,11 @@ export abstract class Traveller extends CharacterType {}
  */
 export abstract class Fabled extends CharacterType {}
 
-const CHARACTER_TYPES: Array<typeof CharacterType> = [
-    Minion,
-    Demon,
+export const CHARACTER_TYPES: Array<typeof CharacterType> = [
     Townsfolk,
     Outsider,
+    Minion,
+    Demon,
     Traveller,
     Fabled,
 ];

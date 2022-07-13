@@ -4,6 +4,7 @@ import { CharacterSheet } from './charactersheet';
 import { Generator } from './collections';
 import { Character } from './character';
 import { onlyLetters } from './common';
+import { CharacterType } from './charactertype';
 
 export enum EditionName {
     TroubleBrewing = 'Trouble Brewing',
@@ -40,23 +41,55 @@ export abstract class Edition {
                 }
             }
 
-            this._characterSheet = CharacterSheet.from(
-                characters.map(Character.nameToId)
-            );
+            this._characterSheet = CharacterSheet.from(characters);
         }
 
         return this._characterSheet;
     }
 
+    static get characters(): Array<typeof Character> {
+        return this.characterSheet.characters;
+    }
+
+    static get minion(): Array<typeof Character> {
+        return this.characterSheet.minion;
+    }
+
+    static get demon(): Array<typeof Character> {
+        return this.characterSheet.demon;
+    }
+
+    static get townsfolk(): Array<typeof Character> {
+        return this.characterSheet.townsfolk;
+    }
+
+    static get outsider(): Array<typeof Character> {
+        return this.characterSheet.outsider;
+    }
+
+    static get traveller(): Array<typeof Character> {
+        return this.characterSheet.traveller;
+    }
+
+    static get fabled(): Array<typeof Character> {
+        return this.characterSheet.fabled;
+    }
+
     private static _characterSheet?: CharacterSheet;
 
-    static nameToId(name: string) {
+    static getCanonicalName(name: string) {
         return onlyLetters(name);
     }
 
     static initialize(editionData: Partial<EditionData>) {
         this.checkForRequiredKeyNames(editionData);
         this.editionData = editionData;
+    }
+
+    static getCharactersByType(
+        characterType: typeof CharacterType
+    ): Array<typeof Character> {
+        return this.characterSheet.getCharactersByType(characterType);
     }
 
     protected static checkForRequiredKeyNames(

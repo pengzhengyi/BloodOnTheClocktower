@@ -33,7 +33,7 @@ export abstract class Character {
 
     static roleData: Partial<RoleData>;
 
-    static nameToId(name: string) {
+    static getCanonicalId(name: string) {
         return lowercaseLetters(name);
     }
 

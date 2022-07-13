@@ -8,6 +8,8 @@ import { Meaning } from './clocktower';
 import { Character } from './character';
 import { StoryTeller } from './storyteller';
 import { Grimoire } from './grimoire';
+import { NumberOfCharacters, ScriptConstraints } from './scripttool';
+import { CharacterType } from './charactertype';
 
 export class BaseError extends Error {
     declare cause?: Error;
@@ -217,6 +219,16 @@ export class CharacterLoadFailure extends RecoverableGameError {
     }
 }
 
+export class NoEditionMatchingName extends RecoverableGameError {
+    static description = 'Cannot find a edition  with matching name';
+
+    constructor(readonly editionName?: string) {
+        super(NoEditionMatchingName.description);
+
+        this.editionName = editionName;
+    }
+}
+
 export class EditionLoadFailure extends RecoverableGameError {
     static description = 'Fail to load a edition';
 
@@ -281,5 +293,58 @@ export class BlankGrimoire extends RecoverableGameError {
 
         this.storyteller = storyteller;
         this.grimoire = grimoire;
+    }
+}
+
+export class InvalidScriptConstraints extends RecoverableGameError {
+    static description = 'Some script constraints are invalid';
+
+    constructor(
+        readonly constraints: Partial<ScriptConstraints>,
+        reason?: Error,
+        details = ''
+    ) {
+        super(InvalidScriptConstraints.description + details);
+
+        this.constraints = constraints;
+
+        if (reason !== undefined) {
+            this.from(reason);
+        }
+    }
+}
+
+export class CharacterSheetCreationFailure extends RecoverableGameError {
+    static description =
+        'Cannot initialize character sheet from provided arguments';
+
+    constructor(
+        readonly characters?: Iterable<typeof Character>,
+        readonly characterTypes?: Map<
+            typeof CharacterType,
+            Array<typeof Character>
+        >
+    ) {
+        super(CharacterSheetCreationFailure.description);
+
+        this.characters = characters;
+        this.characterTypes = characterTypes;
+    }
+}
+
+export class NegativeNumberForCharacterTypeInScriptConstraint extends InvalidScriptConstraints {
+    static description =
+        'The number of character for any character type must not be negative';
+
+    constructor(
+        readonly constraints: NumberOfCharacters,
+        readonly characterType: CharacterType,
+        readonly requiredNumber: number
+    ) {
+        super(constraints);
+        this.message =
+            NegativeNumberForCharacterTypeInScriptConstraint.description;
+        this.characterType = characterType;
+        this.requiredNumber = requiredNumber;
     }
 }

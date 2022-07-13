@@ -71,6 +71,47 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static *exclude<T>(
+        iterable: Iterable<T>,
+        excluded: Iterable<T>
+    ): Iterable<T> {
+        let elementsToExclude: Set<T>;
+        let done: boolean | undefined;
+        let value: T | undefined;
+        const iterator = excluded[Symbol.iterator]();
+
+        if (excluded instanceof Set) {
+            // short circuit for Set
+            elementsToExclude = excluded;
+            done = true;
+        } else {
+            ({ done, value } = iterator.next());
+            elementsToExclude = new Set();
+        }
+
+        for (const element of iterable) {
+            if (elementsToExclude.has(element)) {
+                continue;
+            }
+
+            if (!done) {
+                do {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    elementsToExclude.add(value!);
+                    if (element === value) {
+                        break;
+                    } else {
+                        ({ done, value } = iterator.next());
+                    }
+                } while (!done);
+            }
+
+            if (done) {
+                yield element;
+            }
+        }
+    }
+
     static *limit<T>(n: number, iterable: Iterable<T>): Iterable<T> {
         for (const element of iterable) {
             if (n-- > 0) {
@@ -90,6 +131,115 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static *enumerate<T>(
+        iterable: Iterable<T>,
+        start = 0
+    ): Iterable<[number, T]> {
+        for (const element of iterable) {
+            yield [start++, element];
+        }
+    }
+
+    static *pair<T1, T2>(
+        iterable: Iterable<T1>,
+        otherIterable: Iterable<T2>
+    ): Iterable<[T1, T2]> {
+        const iterator = otherIterable[Symbol.iterator]();
+        for (const element of iterable) {
+            const { done, value } = iterator.next();
+            if (done) {
+                return;
+            }
+
+            yield [element, value];
+        }
+    }
+
+    static *zip<T>(iterables: Iterable<Iterable<T>>): Iterable<Array<T>> {
+        const iterators = Generator.cache(iterables).map((iterable) =>
+            iterable[Symbol.iterator]()
+        );
+        while (true) {
+            const values = [];
+            for (const { done, value } of Generator.map(
+                (iterator) => iterator.next(),
+                iterators
+            )) {
+                if (done) {
+                    return;
+                }
+                values.push(value);
+            }
+            yield values;
+        }
+    }
+
+    static *product<T>(iterables: Iterable<Iterable<T>>): Iterable<Array<T>> {
+        let partialProducts: Array<Array<T>> = [];
+        const iterators: Array<Iterator<T>> = [];
+
+        const currentProduct: Array<T> = [];
+
+        let iterator: Iterator<T>;
+        for (const iterable of iterables) {
+            iterator = iterable[Symbol.iterator]();
+            iterators.push(iterator);
+            const iteratorResult = iterator.next();
+            if (iteratorResult.done) {
+                return;
+            }
+            currentProduct.push(iteratorResult.value);
+        }
+
+        const numIterators = iterators.length;
+        if (numIterators === 0) {
+            return;
+        }
+
+        yield currentProduct;
+
+        for (
+            let iteratorIndex = numIterators - 1, atLastIterator = true;
+            iteratorIndex >= 0;
+            iteratorIndex--, atLastIterator = false
+        ) {
+            const iterator = iterators[iteratorIndex];
+            const newPartialProducts: Array<Array<T>> = [];
+
+            if (atLastIterator) {
+                newPartialProducts.push(currentProduct.slice(-1));
+            } else {
+                const value = currentProduct[iteratorIndex];
+                for (const partialProduct of partialProducts) {
+                    newPartialProducts.push([value, ...partialProduct]);
+                }
+            }
+
+            while (true) {
+                const { done, value } = iterator.next();
+                if (done) {
+                    break;
+                }
+
+                const newProduct = currentProduct.slice(0, iteratorIndex);
+                if (atLastIterator) {
+                    newProduct.push(value);
+                    newPartialProducts.push([value]);
+                    yield newProduct;
+                } else {
+                    newProduct.push(value);
+
+                    for (const partialProduct of partialProducts) {
+                        newPartialProducts.push([value, ...partialProduct]);
+                        yield [...newProduct, ...partialProduct];
+                    }
+                }
+            }
+
+            partialProducts = newPartialProducts;
+        }
+    }
+
     static *cartesian_product<T1, T2>(
         iterable1: Iterable<T1>,
         iterable2: Iterable<T2>
@@ -106,7 +256,13 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
-    static *chain<T = unknown>(...iterables: Array<Iterable<T>>): Iterable<T> {
+    static chain<T = unknown>(...iterables: Array<Iterable<T>>): Iterable<T> {
+        return this.chain_from_iterable(iterables);
+    }
+
+    static *chain_from_iterable<T = unknown>(
+        iterables: Iterable<Iterable<T>>
+    ): Iterable<T> {
         for (const iterable of iterables) {
             for (const element of iterable) {
                 yield element;
@@ -305,7 +461,11 @@ export class Generator<T> implements Iterable<T> {
         return new this<T>([], [], false);
     }
 
-    protected cached?: Array<T>;
+    static cache<T>(iterable: Iterable<T>) {
+        return new this(iterable, [], true);
+    }
+
+    cached?: Array<T>;
 
     *[Symbol.iterator]() {
         const supportMultipleIterations = this.supportMultipleIterations;
@@ -370,8 +530,35 @@ export class Generator<T> implements Iterable<T> {
         return this.filter((_element) => !Object.is(element, _element));
     }
 
+    exclude(excluded: Iterable<T>) {
+        return this.transform((iterable) =>
+            Generator.exclude(iterable, excluded)
+        );
+    }
+
     map<T2 = T>(transform: Transform<T, T2>) {
         return this.become((iterable) => Generator.map(transform, iterable));
+    }
+
+    enumerate(start = 0) {
+        return this.become((iterable) => Generator.enumerate(iterable, start));
+    }
+
+    pair<T2>(otherIterable: Iterable<T2>) {
+        return this.become((iterable) =>
+            Generator.pair(iterable, otherIterable)
+        );
+    }
+
+    zip<T2 = T>(iterables: Iterable<Iterable<T2>>) {
+        return this.become((iterable) =>
+            Generator.zip<T | T2>(
+                (function* () {
+                    yield iterable;
+                    yield* iterables;
+                })()
+            )
+        );
     }
 
     cartesian_product<T2>(otherIterable: Iterable<T2>) {
@@ -380,11 +567,33 @@ export class Generator<T> implements Iterable<T> {
         );
     }
 
-    product = this.cartesian_product;
+    product<T2 = T>(
+        iterables: Iterable<Iterable<T2>>
+    ): Iterable<Array<T2 | T>> {
+        return this.become((iterable) =>
+            Generator.product<T2 | T>(
+                (function* () {
+                    yield iterable;
+                    yield* iterables;
+                })()
+            )
+        );
+    }
 
     chain<T2 = T>(...iterables: Array<Iterable<T2>>) {
         return this.become((iterable) =>
             Generator.chain<T | T2>(iterable, ...iterables)
+        );
+    }
+
+    chain_from_iterable<T2 = T>(iterables: Iterable<Iterable<T2>>) {
+        return this.become((iterable) =>
+            Generator.chain_from_iterable<T | T2>(
+                (function* () {
+                    yield iterable;
+                    yield* iterables;
+                })()
+            )
         );
     }
 
@@ -423,3 +632,7 @@ export class Generator<T> implements Iterable<T> {
         return Generator.every(predicate, this);
     }
 }
+
+export type CachingGenerator<T> = Generator<T> & {
+    supportMultipleIterations: true;
+};

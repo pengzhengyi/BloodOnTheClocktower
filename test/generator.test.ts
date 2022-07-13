@@ -12,6 +12,31 @@ describe('test Generator', () => {
         ).toEqual('Bob');
     });
 
+    test.concurrent('enumerate', () => {
+        expect(new Generator(elements).enumerate(1).take(1)).toEqual([
+            1,
+            'Alice',
+        ]);
+    });
+
+    test.concurrent('pair', () => {
+        expect(
+            new Generator(elements)
+                .pair(['Female', 'Male', 'Male'])
+                .is(([_, sex]) => sex === 'Female')
+                .every(([name, _]) => name === 'Alice')
+        ).toBeTruthy();
+    });
+
+    test.concurrent('zip', () => {
+        expect(
+            Generator.every(
+                (elements) => elements.length === 3,
+                Generator.zip<string>([elements, elements, elements])
+            )
+        ).toBeTruthy();
+    });
+
     test.concurrent('filter by string length', () => {
         expect(
             new Generator(elements)
@@ -27,6 +52,12 @@ describe('test Generator', () => {
                 .filter((element) => element[0] > 3)
                 .take(1)
         ).toEqual([5, 'Alice']);
+    });
+
+    test.concurrent('exclude', () => {
+        expect(
+            Generator.once(elements).exclude(['Alice', 'Bob']).take(1)
+        ).toEqual('Peter');
     });
 
     test.concurrent('multiple iterations', () => {
@@ -71,6 +102,33 @@ describe('test Generator', () => {
                 ['c', 'd'],
             ].sort()
         );
+    });
+
+    test.concurrent('cartesian product of three sets', () => {
+        const products = new Set(
+            Generator.product<string>(['012', 'abc', 'xyz'])
+        );
+        expect(products.size).toBe(3 * 3 * 3);
+        expect(products).toContainEqual(['1', 'c', 'z']);
+        expect(products).toContainEqual(['0', 'a', 'x']);
+        expect(products).toContainEqual(['2', 'b', 'z']);
+    });
+
+    test.concurrent('cartesian product of sets with unequal length', () => {
+        const products = new Set(
+            Generator.product<string | boolean | number>([
+                [0, 1],
+                ['boolean'],
+                [true, false],
+            ])
+        );
+        expect(products.size).toBe(2 * 1 * 2);
+        expect(products).toContainEqual([0, 'boolean', false]);
+    });
+
+    test.concurrent('cartesian product when one set has zero length', () => {
+        const products = new Set(Generator.product<string>([elements, []]));
+        expect(products.size).toBe(0);
     });
 
     test.concurrent('prioritize with characters', () => {

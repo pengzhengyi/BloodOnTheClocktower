@@ -57,7 +57,7 @@ export function parsePromiseSettledResults<T, E = typeof Error>(
     return values;
 }
 
-const regex = /[^a-z]/g;
+const regex = /[^a-z]/gi;
 
 export function onlyLetters(s: string) {
     return s.replace(regex, '');

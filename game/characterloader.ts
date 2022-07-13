@@ -1,12 +1,20 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Character } from './character';
-import { CharacterLoadFailure } from './exception';
+import { CharacterLoadFailure, NoCharacterMatchingId } from './exception';
 import { RoleData } from './types';
 import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
 
 export abstract class CharacterLoader {
-    static load(id: string): typeof Character | undefined {
-        return ID_TO_CHARACTER.get(id);
+    static load(id: string): typeof Character {
+        const character = this.tryLoad(id);
+        if (character === undefined) {
+            throw new NoCharacterMatchingId(id);
+        }
+        return character;
+    }
+
+    static tryLoad(id: string): typeof Character | undefined {
+        return ID_TO_CHARACTER.get(Character.getCanonicalId(id));
     }
 
     static async loadAsync(id: string): Promise<typeof Character> {

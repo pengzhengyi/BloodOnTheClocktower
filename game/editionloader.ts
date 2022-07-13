@@ -1,12 +1,20 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Edition } from './edition';
 import { EditionData } from './types';
-import { EditionLoadFailure } from './exception';
+import { EditionLoadFailure, NoEditionMatchingName } from './exception';
 import { NAME_TO_EDITION } from '~/content/editions/editions';
 
 export abstract class EditionLoader {
-    static load(editionName: string): typeof Edition | undefined {
-        return NAME_TO_EDITION.get(editionName);
+    static load(editionName: string): typeof Edition {
+        const edition = this.tryLoad(editionName);
+        if (edition === undefined) {
+            throw new NoEditionMatchingName(editionName);
+        }
+        return edition;
+    }
+
+    static tryLoad(editionName: string): typeof Edition | undefined {
+        return NAME_TO_EDITION.get(Edition.getCanonicalName(editionName));
     }
 
     static async loadAsync(editionName: string): Promise<typeof Edition> {
