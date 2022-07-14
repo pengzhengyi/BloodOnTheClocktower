@@ -12,6 +12,17 @@ describe('test Generator', () => {
         ).toEqual('Bob');
     });
 
+    test.concurrent('replace', () => {
+        expect(
+            new Generator(elements)
+                .replace(
+                    (element) => element === 'Alice',
+                    (_) => 'Alice Hopper'
+                )
+                .take(1)
+        ).toEqual('Alice Hopper');
+    });
+
     test.concurrent('enumerate', () => {
         expect(new Generator(elements).enumerate(1).take(1)).toEqual([
             1,

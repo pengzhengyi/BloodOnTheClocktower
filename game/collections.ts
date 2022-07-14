@@ -155,6 +155,20 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static *replace<T>(
+        iterable: Iterable<T>,
+        isMatch: Predicate<T>,
+        replacerFunction: Transform<T>
+    ): Iterable<T> {
+        for (const element of iterable) {
+            if (isMatch(element)) {
+                yield replacerFunction(element);
+            } else {
+                yield element;
+            }
+        }
+    }
+
     static *zip<T>(iterables: Iterable<Iterable<T>>): Iterable<Array<T>> {
         const iterators = Generator.cache(iterables).map((iterable) =>
             iterable[Symbol.iterator]()
@@ -528,6 +542,12 @@ export class Generator<T> implements Iterable<T> {
 
     isNot(element: T) {
         return this.filter((_element) => !Object.is(element, _element));
+    }
+
+    replace(isMatch: Predicate<T>, replacerFunction: Transform<T>) {
+        return this.transform((iterable) =>
+            Generator.replace(iterable, isMatch, replacerFunction)
+        );
     }
 
     exclude(excluded: Iterable<T>) {

@@ -364,3 +364,16 @@ export class NegativeNumberForCharacterTypeInScriptConstraint extends InvalidScr
         this.requiredNumber = requiredNumber;
     }
 }
+
+export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
+    static description = 'The spy should only register as good or evil';
+
+    constructor(
+        readonly characterToRegisterAs: typeof Character,
+        readonly alignmentToRegisterAs?: Alignment
+    ) {
+        super(IncorrectAlignmentForSpyToRegisterAs.description);
+        this.characterToRegisterAs = characterToRegisterAs;
+        this.alignmentToRegisterAs = alignmentToRegisterAs;
+    }
+}

@@ -2,20 +2,20 @@ import { Players } from './players';
 import { CharacterSheet } from './charactersheet';
 import { Player } from './player';
 
+type UnderlyingPlayers = Array<Player>;
+
 export class GameInfo {
-    private readonly _players;
+    private _players: UnderlyingPlayers;
 
     get players(): Players {
         return new Players(this._players, [], false);
     }
 
-    constructor(players: Array<Player>, characterSheet: CharacterSheet) {
+    constructor(
+        players: UnderlyingPlayers,
+        public characterSheet: CharacterSheet
+    ) {
         this._players = players;
         this.characterSheet = characterSheet;
     }
-}
-
-export interface GameInfo {
-    players: Players;
-    characterSheet: CharacterSheet;
 }

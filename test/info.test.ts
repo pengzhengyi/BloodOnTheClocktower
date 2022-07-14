@@ -5,6 +5,9 @@ import { WasherwomanInfo, WasherwomanInfoHelper } from '~/game/info';
 import { Player } from '~/game/player';
 import { GameInfo } from '~/game/gameinfo';
 import { CharacterSheet } from '~/game/charactersheet';
+import { SpyInfluence } from '~/game/influence';
+import { GameUI } from '~/interaction/gameui';
+import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 
 describe('True Washerwoman info', () => {
     let washerwomanPlayer: Player;
@@ -63,10 +66,9 @@ describe('True Washerwoman info', () => {
     });
 
     /**
-     * TODO spy implementation needed before this test can work
      * {@link `washerwoman["gameplay"][2]`}
      */
-    test.skip('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', () => {
+    test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', () => {
         const Marianna = playerFromDescription('Marianna is the Spy');
         const Sarah = playerFromDescription('Sarah is the Scarlet Woman');
 
@@ -75,12 +77,22 @@ describe('True Washerwoman info', () => {
             mock<CharacterSheet>()
         );
 
-        const candidates = infoHelper.candidates(gameInfo).take();
+        const influence = new SpyInfluence(Marianna);
+        const gameUIStorytellerChooseMock = jest
+            .spyOn(GameUI, 'storytellerChoose')
+            .mockImplementation(() => Ravenkeeper);
+
+        const influencedGameInfo = influence.apply(gameInfo, {
+            unbiasedGameInfo: gameInfo,
+        });
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+
+        const candidates = infoHelper.candidates(influencedGameInfo).take();
 
         expect(candidates).toHaveLength(1);
         for (const candidate of candidates as Array<WasherwomanInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Marianna, Sarah]);
-            expect(candidate.character).toBe(Marianna.character);
+            expect(candidate.players).toHaveLength(2);
+            expect(candidate.character).toBe(Ravenkeeper);
         }
     });
 });

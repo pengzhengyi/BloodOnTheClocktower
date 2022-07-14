@@ -48,22 +48,22 @@ export class WasherwomanInfoHelper extends InfoHelper<WasherwomanInfo> {
     declare receiver: Player & { character: typeof Washerwoman };
 
     trueInfoCandidates(gameInfo: GameInfo) {
-        const townsfolkCandidates = gameInfo.players
+        const washerwomanInfoCandidates = gameInfo.players
             .isNot(this.receiver)
-            .isTownsfolk();
-        const washerwomanInfoCandidates = townsfolkCandidates.map((player) =>
-            Generator.once([player])
-                .cartesian_product(
-                    gameInfo.players.exclude([this.receiver, player])
-                )
-                .map(
-                    (players) =>
-                        ({
-                            players,
-                            character: player.character,
-                        } as WasherwomanInfo)
-                )
-        );
+            .isTownsfolk()
+            .map((player) =>
+                Generator.once([player])
+                    .cartesian_product(
+                        gameInfo.players.exclude([this.receiver, player])
+                    )
+                    .map(
+                        (players) =>
+                            ({
+                                players,
+                                character: player.character,
+                            } as WasherwomanInfo)
+                    )
+            );
 
         return Generator.once(
             Generator.chain_from_iterable<WasherwomanInfo>(

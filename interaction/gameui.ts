@@ -12,4 +12,14 @@ export abstract class GameUI {
         // TODO
         throw new Error('Method not implemented.');
     }
+
+    static choose<T>(player: Player, options: Iterable<T>): T {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
+
+    static storytellerChoose<T>(options: Iterable<T>, reason?: string): T {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
 }
