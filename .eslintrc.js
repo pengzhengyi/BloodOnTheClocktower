@@ -25,5 +25,14 @@ module.exports = {
       'error',
       { 'ts-ignore': 'allow-with-description' },
     ],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      },
+    ],
   },
 };

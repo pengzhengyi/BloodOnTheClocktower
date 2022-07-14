@@ -10,6 +10,7 @@ import { StoryTeller } from './storyteller';
 import { Grimoire } from './grimoire';
 import { NumberOfCharacters, ScriptConstraints } from './scripttool';
 import { CharacterType } from './charactertype';
+import { Alignment } from './alignment';
 
 export class BaseError extends Error {
     declare cause?: Error;
@@ -137,6 +138,21 @@ export class NominatedNominatedBefore extends RecoverableGameError {
         this.failedNomination = failedNomination;
         this.pastNomination = pastNomination;
         this.nominated = nominated;
+    }
+}
+
+export class PlayerHasUnclearAlignment extends RecoverableGameError {
+    static description =
+        'Player does not have a clear alignment as alignment is neither specified nor inferrable';
+
+    constructor(
+        readonly player: Player,
+        readonly specifiedAlignment?: Alignment
+    ) {
+        super(PlayerHasUnclearAlignment.description);
+
+        this.player = player;
+        this.specifiedAlignment = specifiedAlignment;
     }
 }
 

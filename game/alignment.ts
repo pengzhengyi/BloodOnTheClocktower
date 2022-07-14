@@ -13,4 +13,6 @@ export enum Alignment {
      * The evil alignment. Minions and Demons (red characters) start as evil. Evil wins when just 2 players are alive, not including Travellers.
      */
     Evil,
+    /** Fabled characters are neutral */
+    Neutral,
 }

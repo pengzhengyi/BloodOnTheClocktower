@@ -1,6 +1,7 @@
 import { Character } from './character';
-import { Townsfolk } from './charactertype';
 import { MinionPlayer, DemonPlayer, Player } from './player';
+import { Generator } from './collections';
+import { GameInfo } from './gameinfo';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 
 /**
@@ -21,27 +22,65 @@ export interface MinionInfo {
     demon: Array<DemonPlayer>;
 }
 
-export abstract class Info {
+export abstract class InfoHelper<T> {
     constructor(readonly receiver: Player, readonly isTrue: boolean) {
         this.receiver = receiver;
         this.isTrue = isTrue;
     }
+
+    abstract trueInfoCandidates(gameInfo: GameInfo): Generator<T>;
+    abstract falseInfoCandidates(gameInfo: GameInfo): Generator<T>;
+
+    candidates(gameInfo: GameInfo): Generator<T> {
+        return this.isTrue
+            ? this.trueInfoCandidates(gameInfo)
+            : this.falseInfoCandidates(gameInfo);
+    }
 }
 
-export class WasherwomanInfo extends Info {
-    constructor(
-        readonly receiver: Player & { character: typeof Washerwoman },
-        readonly isTrue: boolean,
-        readonly players: [
-            Player & { characterType: typeof Townsfolk },
-            Player
-        ],
-        readonly character: typeof Character & {
-            characterType: typeof Townsfolk;
-        }
-    ) {
-        super(receiver, isTrue);
-        this.players = players;
-        this.character = character;
+export interface WasherwomanInfo {
+    players: [Player, Player];
+
+    character: typeof Character;
+}
+
+export class WasherwomanInfoHelper extends InfoHelper<WasherwomanInfo> {
+    declare receiver: Player & { character: typeof Washerwoman };
+
+    trueInfoCandidates(gameInfo: GameInfo) {
+        const townsfolkCandidates = gameInfo.players
+            .isNot(this.receiver)
+            .isTownsfolk();
+        const washerwomanInfoCandidates = townsfolkCandidates.map((player) =>
+            Generator.once([player])
+                .cartesian_product(
+                    gameInfo.players.exclude([this.receiver, player])
+                )
+                .map(
+                    (players) =>
+                        ({
+                            players,
+                            character: player.character,
+                        } as WasherwomanInfo)
+                )
+        );
+
+        return Generator.once(
+            Generator.chain_from_iterable<WasherwomanInfo>(
+                washerwomanInfoCandidates
+            )
+        );
+    }
+
+    falseInfoCandidates(gameInfo: GameInfo) {
+        const playersCandidates = gameInfo.players
+            .isNot(this.receiver)
+            .combinations(2);
+        return playersCandidates
+            .cartesian_product(gameInfo.characterSheet.townsfolk)
+            .map(
+                ([players, character]) =>
+                    ({ players, character } as WasherwomanInfo)
+            );
     }
 }

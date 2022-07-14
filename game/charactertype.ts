@@ -6,6 +6,8 @@ import { NoMatchingCharacterType } from './exception';
  * A class of character—Townsfolk, Outsider, Minion, Demon, Traveller, or Fabled.
  */
 export abstract class CharacterType {
+    static defaultAlignment?: Alignment;
+
     static get id() {
         return this.name.toLowerCase();
     }
@@ -75,7 +77,9 @@ export abstract class Traveller extends CharacterType {}
  * {@link `glossary["Fabled"]`}
  * A type of character for the Storyteller. Fabled characters are neutral, chosen by the Storyteller publicly, and usually make the game fairer in strange situations.
  */
-export abstract class Fabled extends CharacterType {}
+export abstract class Fabled extends CharacterType {
+    static defaultAlignment = Alignment.Neutral;
+}
 
 export const CHARACTER_TYPES: Array<typeof CharacterType> = [
     Townsfolk,

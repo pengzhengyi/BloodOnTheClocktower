@@ -18,4 +18,5 @@ module.exports = {
   ],
   testEnvironment: 'jsdom',
   testTimeout: 500,
+  setupFilesAfterEnv: ['jest-extended/all'],
 };

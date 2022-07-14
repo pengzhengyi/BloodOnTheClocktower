@@ -1,6 +1,9 @@
 import { Character } from './character';
 import { Nomination } from './nomination';
-import { DeadPlayerCannotNominate } from './exception';
+import {
+    DeadPlayerCannotNominate,
+    PlayerHasUnclearAlignment,
+} from './exception';
 import { Alignment } from './alignment';
 import { CharacterType, Demon, Minion, Traveller } from './charactertype';
 import { GameUI } from '~/interaction/gameui';
@@ -38,6 +41,8 @@ enum NegativeState {
  */
 
 export class Player {
+    declare alignment: Alignment;
+
     isWake = false;
     /**
      * {@link `glossary["Vote token"]`}
@@ -136,16 +141,18 @@ export class Player {
         return this.alive && !this.isTraveller;
     }
 
-    get characterType(): CharacterType {
+    get characterType(): typeof CharacterType {
         return this.character.characterType;
     }
 
     constructor(
+        public username: string,
         public character: typeof Character,
-        public alignment: Alignment
+        alignment?: Alignment
     ) {
+        this.username = username;
         this.character = character;
-        this.alignment = alignment;
+        this.initializeAlignment(alignment);
     }
 
     isAlly(other: Player) {
@@ -191,6 +198,20 @@ export class Player {
         }
 
         return false;
+    }
+
+    protected initializeAlignment(alignment?: Alignment) {
+        if (alignment === undefined) {
+            const alignment = this.characterType.defaultAlignment;
+
+            if (alignment === undefined) {
+                throw new PlayerHasUnclearAlignment(this, alignment);
+            }
+
+            this.alignment = alignment;
+        } else {
+            this.alignment = alignment;
+        }
     }
 }
 
