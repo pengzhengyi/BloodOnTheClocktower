@@ -17,4 +17,5 @@ module.exports = {
     '<rootDir>/game/**/*.ts',
   ],
   testEnvironment: 'jsdom',
+  testTimeout: 500,
 };
