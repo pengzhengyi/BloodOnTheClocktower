@@ -1,8 +1,11 @@
 import { Character } from './character';
+import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import { MinionPlayer, DemonPlayer, Player } from './player';
 import { Generator } from './collections';
 import { GameInfo } from './gameinfo';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
+import { Librarian } from '~/content/characters/output/librarian';
+import { Investigator } from '~/content/characters/output/investigator';
 
 /**
  * {@link `glossary["Demon Info"]`}
@@ -22,7 +25,7 @@ export interface MinionInfo {
     demon: Array<DemonPlayer>;
 }
 
-export abstract class InfoHelper<T> {
+export abstract class InfoProvider<T> {
     constructor(readonly receiver: Player, readonly isTrue: boolean) {
         this.receiver = receiver;
         this.isTrue = isTrue;
@@ -38,19 +41,23 @@ export abstract class InfoHelper<T> {
     }
 }
 
-export interface WasherwomanInfo {
+interface OneCharacterForTwoPlayers {
     players: [Player, Player];
-
     character: typeof Character;
 }
 
-export class WasherwomanInfoHelper extends InfoHelper<WasherwomanInfo> {
-    declare receiver: Player & { character: typeof Washerwoman };
+abstract class OneCharacterForTwoPlayersInfoProvider<
+    TInfo extends Partial<OneCharacterForTwoPlayers>,
+    TCharacter
+> extends InfoProvider<TInfo> {
+    declare receiver: Player & { character: TCharacter };
+
+    protected abstract expectedCharacterType: typeof CharacterType;
 
     trueInfoCandidates(gameInfo: GameInfo) {
-        const washerwomanInfoCandidates = gameInfo.players
+        const infoCandidates = gameInfo.players
             .isNot(this.receiver)
-            .isTownsfolk()
+            .isCharacterType(this.expectedCharacterType)
             .map((player) =>
                 Generator.once([player])
                     .cartesian_product(
@@ -61,14 +68,12 @@ export class WasherwomanInfoHelper extends InfoHelper<WasherwomanInfo> {
                             ({
                                 players,
                                 character: player.character,
-                            } as WasherwomanInfo)
+                            } as TInfo)
                     )
             );
 
         return Generator.once(
-            Generator.chain_from_iterable<WasherwomanInfo>(
-                washerwomanInfoCandidates
-            )
+            Generator.chain_from_iterable<TInfo>(infoCandidates)
         );
     }
 
@@ -77,10 +82,60 @@ export class WasherwomanInfoHelper extends InfoHelper<WasherwomanInfo> {
             .isNot(this.receiver)
             .combinations(2);
         return playersCandidates
-            .cartesian_product(gameInfo.characterSheet.townsfolk)
-            .map(
-                ([players, character]) =>
-                    ({ players, character } as WasherwomanInfo)
-            );
+            .cartesian_product(
+                gameInfo.characterSheet.getCharactersByType(
+                    this.expectedCharacterType
+                )
+            )
+            .map(([players, character]) => ({ players, character } as TInfo));
     }
+}
+
+export interface WasherwomanInfo extends OneCharacterForTwoPlayers {}
+
+export class WasherwomanInfoProvider extends OneCharacterForTwoPlayersInfoProvider<
+    WasherwomanInfo,
+    typeof Washerwoman
+> {
+    protected expectedCharacterType: typeof CharacterType = Townsfolk;
+}
+
+export interface LibrarianInfo extends Partial<OneCharacterForTwoPlayers> {
+    hasOutsider: boolean;
+    players?: [Player, Player];
+    character?: typeof Character;
+}
+
+export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider<
+    LibrarianInfo,
+    typeof Librarian
+> {
+    static readonly falseLibrarianInfo: LibrarianInfo = { hasOutsider: false };
+
+    protected expectedCharacterType: typeof CharacterType = Outsider;
+
+    trueInfoCandidates(gameInfo: GameInfo) {
+        return super
+            .trueInfoCandidates(gameInfo)
+            .map((librarianInfo) => {
+                librarianInfo.hasOutsider = true;
+                return librarianInfo;
+            })
+            .orElse(LibrarianInfoProvider.falseLibrarianInfo);
+    }
+
+    falseInfoCandidates(gameInfo: GameInfo) {
+        return super
+            .falseInfoCandidates(gameInfo)
+            .orElse(LibrarianInfoProvider.falseLibrarianInfo);
+    }
+}
+
+export interface InvestigatorInfo extends OneCharacterForTwoPlayers {}
+
+export class InvestigatorInfoProvider extends OneCharacterForTwoPlayersInfoProvider<
+    InvestigatorInfo,
+    typeof Investigator
+> {
+    protected expectedCharacterType: typeof CharacterType = Minion;
 }

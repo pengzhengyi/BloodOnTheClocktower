@@ -131,12 +131,32 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static count<T>(iterable: Iterable<T>): number {
+        let numElement = 0;
+        for (const _ of iterable) {
+            numElement++;
+        }
+        return numElement;
+    }
+
     static *enumerate<T>(
         iterable: Iterable<T>,
         start = 0
     ): Iterable<[number, T]> {
         for (const element of iterable) {
             yield [start++, element];
+        }
+    }
+
+    static *orElse<T>(iterable: Iterable<T>, defaultValue: T): Iterable<T> {
+        let hasElement = false;
+        for (const element of iterable) {
+            hasElement = true;
+            yield element;
+        }
+
+        if (!hasElement) {
+            yield defaultValue;
         }
     }
 
@@ -292,6 +312,16 @@ export class Generator<T> implements Iterable<T> {
         }
 
         return true;
+    }
+
+    static any<T>(predicate: Predicate<T>, iterable: Iterable<T>): boolean {
+        for (const element of iterable) {
+            if (predicate(element)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static forEach<T>(action: Task<T>, iterable: Iterable<T>): void {
@@ -564,6 +594,12 @@ export class Generator<T> implements Iterable<T> {
         return this.become((iterable) => Generator.enumerate(iterable, start));
     }
 
+    orElse(defaultValue: T) {
+        return this.transform((iterable) =>
+            Generator.orElse(iterable, defaultValue)
+        );
+    }
+
     pair<T2>(otherIterable: Iterable<T2>) {
         return this.become((iterable) =>
             Generator.pair(iterable, otherIterable)
@@ -640,6 +676,10 @@ export class Generator<T> implements Iterable<T> {
         return Generator.take(n, this);
     }
 
+    count(): number {
+        return Generator.count(this);
+    }
+
     groupBy<T2 = T>(getGroup?: Transform<T, T2>): Map<T2, Array<T>> {
         return Generator.groupBy(this, getGroup);
     }
@@ -650,6 +690,10 @@ export class Generator<T> implements Iterable<T> {
 
     every(predicate: Predicate<T>): boolean {
         return Generator.every(predicate, this);
+    }
+
+    any(predicate: Predicate<T>): boolean {
+        return Generator.any(predicate, this);
     }
 }
 

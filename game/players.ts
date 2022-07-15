@@ -1,3 +1,4 @@
+import { CharacterType } from './charactertype';
 import { Generator } from './collections';
 import { Player } from './player';
 
@@ -20,5 +21,11 @@ export class Players extends Generator<Player> {
 
     isFabled() {
         return this.filter((player) => player.character.isFabled);
+    }
+
+    isCharacterType(characterType: typeof CharacterType) {
+        return this.filter((player) =>
+            player.character.isCharacterType(characterType)
+        );
     }
 }
