@@ -53,14 +53,19 @@ export class Vote {
         return clockwise(players, nominatedIndex + 1);
     }
 
-    *collectVotes(players: Iterable<Player>): IterableIterator<Player> {
-        if (this.hasVoted() && !new Confirm(Vote.RECOLLECT_VOTE_PROMPT).value) {
-            yield* this.votes;
+    async *collectVotes(players: Iterable<Player>) {
+        if (this.hasVoted()) {
+            const shouldVoteAgain = await new Confirm(
+                Vote.RECOLLECT_VOTE_PROMPT
+            ).getValue();
+            if (!shouldVoteAgain) {
+                yield* this.votes;
+            }
         }
 
         this.votes = [];
         for (const player of players) {
-            if (player.collectVote(this.forExile)) {
+            if (await player.collectVote(this.forExile)) {
                 this.votes.push(player);
                 yield player;
             }

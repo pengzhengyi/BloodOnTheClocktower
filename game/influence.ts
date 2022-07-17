@@ -23,17 +23,23 @@ export abstract class Influence {
     abstract apply(
         gameInfo: GameInfo,
         context: InfluenceApplyContext
-    ): GameInfo;
+    ): Promise<GameInfo>;
 }
 
 export class Influences extends Influence {
     declare source: Array<Influence>;
 
-    apply(gameInfo: GameInfo, context: InfluenceApplyContext): GameInfo {
-        return this.source.reduce(
-            (gameInfo, influence) => influence.apply(gameInfo, context),
-            gameInfo
-        );
+    async apply(
+        gameInfo: GameInfo,
+        context: InfluenceApplyContext
+    ): Promise<GameInfo> {
+        let influencedGameInfo: GameInfo = gameInfo;
+
+        for (const influence of this.source) {
+            influencedGameInfo = await influence.apply(gameInfo, context);
+        }
+
+        return influencedGameInfo;
     }
 }
 
@@ -41,11 +47,11 @@ export abstract class RegisterAsInfluence extends Influence {
     declare static originalCharacter: typeof Character;
     declare static registerAsAlignment: Alignment.Good | Alignment.Evil;
 
-    static getRegisteredAs(
+    static async getRegisteredAs(
         characterSheet: CharacterSheet,
         reason?: string
-    ): [typeof Character, Alignment] {
-        const characterToRegisterAs = this.getRegisterAsCharacter(
+    ): Promise<[typeof Character, Alignment]> {
+        const characterToRegisterAs = await this.getRegisterAsCharacter(
             characterSheet,
             reason
         );
@@ -101,17 +107,23 @@ export abstract class RegisterAsInfluence extends Influence {
     protected static getRegisterAsCharacter(
         characterSheet: CharacterSheet,
         reason?: string
-    ): typeof Character {
+    ): Promise<typeof Character> {
         const options = this.getRegisterAsCharacterOptions(characterSheet);
 
         return GameUI.storytellerChoose(options, reason);
     }
 
-    apply(gameInfo: GameInfo, context: InfluenceApplyContext): GameInfo {
+    async apply(
+        gameInfo: GameInfo,
+        context: InfluenceApplyContext
+    ): Promise<GameInfo> {
         const thisClass = this.constructor as typeof RegisterAsInfluence;
 
         const [characterToRegisterAs, alignmentToRegisterAs] =
-            thisClass.getRegisteredAs(gameInfo.characterSheet, context.reason);
+            await thisClass.getRegisteredAs(
+                gameInfo.characterSheet,
+                context.reason
+            );
 
         const playersAfterReplacement = Array.from(
             gameInfo.players.replace(

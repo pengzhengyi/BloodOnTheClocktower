@@ -31,7 +31,7 @@ export class Nomination {
         return this.state !== NominationState.NotStarted;
     }
 
-    startVote(players: Iterable<Player>): Iterable<Player> {
+    startVote(players: Iterable<Player>) {
         const vote: Vote = this.hasVoteStarted()
             ? this.vote
             : (this.vote = this.createVote());

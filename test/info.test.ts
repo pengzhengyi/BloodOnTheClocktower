@@ -24,12 +24,15 @@ import { Baron } from '~/content/characters/output/baron';
 import { Spy } from '~/content/characters/output/spy';
 import { Poisoner } from '~/content/characters/output/poisoner';
 
-function generateInfoCandidates<T>(
+async function generateInfoCandidates<T>(
     playerDescriptions: Array<string>,
     players: Array<Player>,
     infoProvider: InfoProvider<T>,
-    gameInfoTransform?: (gameInfo: GameInfo, allPlayers: Player[]) => GameInfo
-): [T | T[] | undefined, Array<Player>] {
+    gameInfoTransform?: (
+        gameInfo: GameInfo,
+        allPlayers: Player[]
+    ) => Promise<GameInfo>
+): Promise<[T | T[] | undefined, Array<Player>]> {
     const playerFromDescriptions = playerDescriptions.map(
         playerFromDescription
     );
@@ -39,7 +42,7 @@ function generateInfoCandidates<T>(
     let gameInfo = new GameInfo(allPlayers, mock<CharacterSheet>());
 
     if (gameInfoTransform !== undefined) {
-        gameInfo = gameInfoTransform(gameInfo, allPlayers);
+        gameInfo = await gameInfoTransform(gameInfo, allPlayers);
     }
 
     return [infoProvider.candidates(gameInfo).take(), allPlayers];
@@ -59,8 +62,8 @@ describe('True Washerwoman info', () => {
     /**
      * {@link `washerwoman["gameplay"][0]`}
      */
-    test('Evin is the Chef, and Amy is the Ravenkeeper. The Washerwoman learns that either Evin or Amy is the Chef.', () => {
-        const [candidates, [Evin, Amy, _]] = generateInfoCandidates(
+    test('Evin is the Chef, and Amy is the Ravenkeeper. The Washerwoman learns that either Evin or Amy is the Chef.', async () => {
+        const [candidates, [Evin, Amy, _]] = await generateInfoCandidates(
             ['Evin is the Chef', 'Amy is the Ravenkeeper'],
             [washerwomanPlayer],
             infoProvider
@@ -79,8 +82,8 @@ describe('True Washerwoman info', () => {
     /**
      * {@link `washerwoman["gameplay"][1]`}
      */
-    test('Julian is the Imp, and Alex is the Virgin. The Washerwoman learns that either Julian or Alex is the Virgin.', () => {
-        const [candidates, [Julian, Alex, _]] = generateInfoCandidates(
+    test('Julian is the Imp, and Alex is the Virgin. The Washerwoman learns that either Julian or Alex is the Virgin.', async () => {
+        const [candidates, [Julian, Alex, _]] = await generateInfoCandidates(
             ['Julian is the Imp', 'Alex is the Virgin'],
             [washerwomanPlayer],
             infoProvider
@@ -96,23 +99,24 @@ describe('True Washerwoman info', () => {
     /**
      * {@link `washerwoman["gameplay"][2]`}
      */
-    test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', () => {
+    test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', async () => {
         const gameUIStorytellerChooseMock = jest
             .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(() => Ravenkeeper);
+            .mockImplementation(async () => await Ravenkeeper);
 
-        const [candidates, [_Marianna, _Sarah, _]] = generateInfoCandidates(
-            ['Marianna is the Spy', 'Sarah is the Scarlet Woman'],
-            [washerwomanPlayer],
-            infoProvider,
-            (gameInfo, [Marianna, _Sarah, _]) => {
-                const influence = new SpyInfluence(Marianna);
+        const [candidates, [_Marianna, _Sarah, _]] =
+            await generateInfoCandidates(
+                ['Marianna is the Spy', 'Sarah is the Scarlet Woman'],
+                [washerwomanPlayer],
+                infoProvider,
+                async (gameInfo, [Marianna, _Sarah, _]) => {
+                    const influence = new SpyInfluence(Marianna);
 
-                return influence.apply(gameInfo, {
-                    unbiasedGameInfo: gameInfo,
-                });
-            }
-        );
+                    return await influence.apply(gameInfo, {
+                        unbiasedGameInfo: gameInfo,
+                    });
+                }
+            );
 
         expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
 
@@ -139,8 +143,8 @@ describe('True Librarian info', () => {
     /**
      * {@link `librarian["gameplay"][0]`}
      */
-    test('Benjamin is the Saint, and Filip is the Baron. The Librarian learns that either Benjamin or Filip is the Saint.', () => {
-        const [candidates, [Benjamin, Filip, _]] = generateInfoCandidates(
+    test('Benjamin is the Saint, and Filip is the Baron. The Librarian learns that either Benjamin or Filip is the Saint.', async () => {
+        const [candidates, [Benjamin, Filip, _]] = await generateInfoCandidates(
             ['Benjamin is the Saint', 'Filip is the Baron'],
             [librarianPlayer],
             infoProvider
@@ -156,8 +160,8 @@ describe('True Librarian info', () => {
     /**
      * {@link `librarian["gameplay"][1]`}
      */
-    test("There are no Outsiders in this game. The Librarian learns a '0'.", () => {
-        const [candidates, _] = generateInfoCandidates(
+    test("There are no Outsiders in this game. The Librarian learns a '0'.", async () => {
+        const [candidates, _] = await generateInfoCandidates(
             [],
             [librarianPlayer],
             infoProvider
@@ -172,12 +176,13 @@ describe('True Librarian info', () => {
     /**
      * {@link `librarian["gameplay"][2]`}
      */
-    test('Abdallah is the Drunk, who thinks they are the Monk, and Douglas is the Undertaker. The Librarian learns that either Abdallah or Douglas is the Drunk. (This happens because the Librarian learns the true character. The Drunk is Abdallah’s true character, not the Monk.)', () => {
-        const [candidates, [Abdallah, Douglas, _]] = generateInfoCandidates(
-            ['Abdallah is the Drunk', 'Douglas is the Undertaker'],
-            [librarianPlayer],
-            infoProvider
-        );
+    test('Abdallah is the Drunk, who thinks they are the Monk, and Douglas is the Undertaker. The Librarian learns that either Abdallah or Douglas is the Drunk. (This happens because the Librarian learns the true character. The Drunk is Abdallah’s true character, not the Monk.)', async () => {
+        const [candidates, [Abdallah, Douglas, _]] =
+            await generateInfoCandidates(
+                ['Abdallah is the Drunk', 'Douglas is the Undertaker'],
+                [librarianPlayer],
+                infoProvider
+            );
 
         expect(candidates).toHaveLength(1);
         for (const candidate of candidates as Array<LibrarianInfo>) {
@@ -201,8 +206,8 @@ describe('True Investigator info', () => {
     /**
      * {@link `investigator["gameplay"][0]`}
      */
-    test('Amy is the Baron, and Julian is the Mayor. The Investigator learns that either Amy or Julian is the Baron.', () => {
-        const [candidates, [Amy, Julian, _]] = generateInfoCandidates(
+    test('Amy is the Baron, and Julian is the Mayor. The Investigator learns that either Amy or Julian is the Baron.', async () => {
+        const [candidates, [Amy, Julian, _]] = await generateInfoCandidates(
             ['Amy is the Baron', 'Julian is the Mayor'],
             [investigatorPlayer],
             infoProvider
@@ -218,19 +223,19 @@ describe('True Investigator info', () => {
     /**
      * {@link `investigator["gameplay"][1]`}
      */
-    test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', () => {
+    test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', async () => {
         const gameUIStorytellerChooseMock = jest
             .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(() => Spy);
+            .mockImplementation(async () => await Spy);
 
-        const [candidates, [Angelus, Lewis, _]] = generateInfoCandidates(
+        const [candidates, [Angelus, Lewis, _]] = await generateInfoCandidates(
             ['Angelus is the Spy', 'Lewis is the Poisoner'],
             [investigatorPlayer],
             infoProvider,
-            (gameInfo, [Angelus, _Lewis, _]) => {
+            async (gameInfo, [Angelus, _Lewis, _]) => {
                 const influence = new SpyInfluence(Angelus);
 
-                return influence.apply(gameInfo, {
+                return await influence.apply(gameInfo, {
                     unbiasedGameInfo: gameInfo,
                 });
             }
@@ -248,23 +253,24 @@ describe('True Investigator info', () => {
     /**
      * {@link `investigator["gameplay"][2]`}
      */
-    test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', () => {
+    test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
         const gameUIStorytellerChooseMock = jest
             .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(() => Poisoner);
+            .mockImplementation(async () => await Poisoner);
 
-        const [candidates, [Brianna, Marianna, _]] = generateInfoCandidates(
-            ['Brianna is the Recluse', 'Marianna is the Imp'],
-            [investigatorPlayer],
-            infoProvider,
-            (gameInfo, [Brianna, _Marianna, _]) => {
-                const influence = new RecluseInfluence(Brianna);
+        const [candidates, [Brianna, Marianna, _]] =
+            await generateInfoCandidates(
+                ['Brianna is the Recluse', 'Marianna is the Imp'],
+                [investigatorPlayer],
+                infoProvider,
+                async (gameInfo, [Brianna, _Marianna, _]) => {
+                    const influence = new RecluseInfluence(Brianna);
 
-                return influence.apply(gameInfo, {
-                    unbiasedGameInfo: gameInfo,
-                });
-            }
-        );
+                    return await influence.apply(gameInfo, {
+                        unbiasedGameInfo: gameInfo,
+                    });
+                }
+            );
 
         expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
 
@@ -292,8 +298,8 @@ describe('True Chef info', () => {
     /**
      * {@link `chef["gameplay"][0]`}
      */
-    test("No evil players are sitting next to each other. The Chef learns a '0'.", () => {
-        const [candidates, _] = generateInfoCandidates(
+    test("No evil players are sitting next to each other. The Chef learns a '0'.", async () => {
+        const [candidates, _] = await generateInfoCandidates(
             ['Julian is the Mayor'],
             [chefPlayer],
             infoProvider
@@ -308,8 +314,8 @@ describe('True Chef info', () => {
     /**
      * {@link `chef["gameplay"][1]`}
      */
-    test("The Imp is sitting next to the Baron. Across the circle, the Poisoner is sitting next to the Scarlet Woman. The Chef learns a '2'.", () => {
-        const [candidates, _] = generateInfoCandidates(
+    test("The Imp is sitting next to the Baron. Across the circle, the Poisoner is sitting next to the Scarlet Woman. The Chef learns a '2'.", async () => {
+        const [candidates, _] = await generateInfoCandidates(
             [
                 `${faker.name.firstName()} is the Imp`,
                 `${faker.name.firstName()} is the Baron`,
@@ -330,12 +336,12 @@ describe('True Chef info', () => {
     /**
      * {@link `chef["gameplay"][2]`}
      */
-    test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", () => {
+    test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", async () => {
         const gameUIStorytellerChooseMock = jest
             .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(() => Poisoner);
+            .mockImplementation(async () => await Poisoner);
 
-        const [candidates, _] = generateInfoCandidates(
+        const [candidates, _] = await generateInfoCandidates(
             [
                 `${faker.name.firstName()} is the Imp`,
                 `${faker.name.firstName()} is the evil Scapegoat`,

@@ -197,10 +197,13 @@ export class Player {
         return new Nomination(this, nominated);
     }
 
-    collectVote(forExile: boolean): boolean {
+    async collectVote(forExile: boolean): Promise<boolean> {
         const shouldCheckHandRaised =
             (forExile && this.canSupportExile) || this.canVote;
-        if (shouldCheckHandRaised && GameUI.hasRaisedHandForVote(this)) {
+        if (
+            shouldCheckHandRaised &&
+            (await GameUI.hasRaisedHandForVote(this))
+        ) {
             if (this.dead) {
                 this.hasVoteToken = false;
             }

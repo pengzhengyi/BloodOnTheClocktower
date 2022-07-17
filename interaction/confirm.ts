@@ -1,9 +1,9 @@
 abstract class BaseConfirm {
     private _value?: boolean;
 
-    get value(): boolean {
+    async getValue(): Promise<boolean> {
         if (this._value === undefined) {
-            this._value = this.ask();
+            this._value = await this.ask();
         }
 
         return this._value;
@@ -13,11 +13,11 @@ abstract class BaseConfirm {
         this.prompt = prompt;
     }
 
-    abstract ask(): boolean;
+    abstract ask(): Promise<boolean>;
 }
 
 export class Confirm extends BaseConfirm {
-    ask(): boolean {
+    ask(): Promise<boolean> {
         // TODO
         throw new Error('Method not implemented.');
     }
