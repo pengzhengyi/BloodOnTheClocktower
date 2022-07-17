@@ -8,7 +8,7 @@ export class Seating {
     public readonly seats: Array<Seat>;
 
     get allSat(): boolean {
-        return this.seats.every((seat) => seat.sat);
+        return this.seats.every((seat) => seat.isOccupied);
     }
 
     protected static *createSeats(numSeats: number): IterableIterator<Seat> {
@@ -118,17 +118,13 @@ export class Seating {
         }
     }
 
-    *getPlayers(skipEmptySeats: boolean): IterableIterator<Player | undefined> {
-        for (const seat of this.seats) {
-            if (seat.isOccupied()) {
-                yield seat.player;
-            } else if (!skipEmptySeats) {
-                yield undefined;
-            }
-        }
-    }
-
     findSeatByPlayer(player: Player): Seat | undefined {
-        return this.seats.find((seat) => Object.is(seat.player, player));
+        const seatNum = player.seatNumber;
+
+        if (seatNum === undefined) {
+            return undefined;
+        }
+
+        return this.seats[seatNum];
     }
 }

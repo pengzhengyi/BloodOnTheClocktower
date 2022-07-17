@@ -3,6 +3,7 @@ import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import { MinionPlayer, DemonPlayer, Player } from './player';
 import { Generator } from './collections';
 import { GameInfo } from './gameinfo';
+import { Players } from './players';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
@@ -110,7 +111,9 @@ export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider
     LibrarianInfo,
     typeof Librarian
 > {
-    static readonly falseLibrarianInfo: LibrarianInfo = { hasOutsider: false };
+    static readonly noOutsiderLibrarianInfo: LibrarianInfo = {
+        hasOutsider: false,
+    };
 
     protected expectedCharacterType: typeof CharacterType = Outsider;
 
@@ -121,13 +124,13 @@ export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider
                 librarianInfo.hasOutsider = true;
                 return librarianInfo;
             })
-            .orElse(LibrarianInfoProvider.falseLibrarianInfo);
+            .orElse(LibrarianInfoProvider.noOutsiderLibrarianInfo);
     }
 
     falseInfoCandidates(gameInfo: GameInfo) {
         return super
             .falseInfoCandidates(gameInfo)
-            .orElse(LibrarianInfoProvider.falseLibrarianInfo);
+            .orElse(LibrarianInfoProvider.noOutsiderLibrarianInfo);
     }
 }
 
@@ -138,4 +141,40 @@ export class InvestigatorInfoProvider extends OneCharacterForTwoPlayersInfoProvi
     typeof Investigator
 > {
     protected expectedCharacterType: typeof CharacterType = Minion;
+}
+
+export interface ChefInfo {
+    numPairEvilPlayers: number;
+}
+
+export class ChefInfoProvider extends InfoProvider<ChefInfo> {
+    trueInfoCandidates(gameInfo: GameInfo) {
+        const numPairEvilPlayers = Generator.reduce(
+            (numEvilNeighbors, neighbor) =>
+                numEvilNeighbors + (Players.allEvil(neighbor) ? 1 : 0),
+            0,
+            gameInfo.players.getNeighbors()
+        );
+
+        return Generator.once([
+            {
+                numPairEvilPlayers,
+            },
+        ]);
+    }
+
+    falseInfoCandidates(gameInfo: GameInfo) {
+        const numEvilPlayers = Generator.reduce(
+            (numEvilPlayers, player) =>
+                numEvilPlayers + (player.isEvil ? 1 : 0),
+            0,
+            gameInfo.players
+        );
+        return Generator.once(
+            Generator.map(
+                (numPairEvilPlayers) => ({ numPairEvilPlayers }),
+                Generator.range(0, numEvilPlayers)
+            )
+        );
+    }
 }

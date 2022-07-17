@@ -55,6 +55,9 @@ export class Player {
      * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
      */
     state: number = NegativeState.None;
+
+    seatNumber?: number;
+
     readonly canSupportExile: boolean = true;
 
     /**
@@ -143,6 +146,14 @@ export class Player {
 
     get characterType(): typeof CharacterType {
         return this.character.characterType;
+    }
+
+    get isGood(): boolean {
+        return this.alignment === Alignment.Good;
+    }
+
+    get isEvil(): boolean {
+        return this.alignment === Alignment.Evil;
     }
 
     constructor(

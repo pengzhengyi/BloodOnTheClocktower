@@ -7,6 +7,7 @@ export const TAUTOLOGY = () => true;
 export type Action = () => void;
 export type Task<T = undefined> = (value: T) => void;
 export type Transform<T1, T2 = T1> = (value: T1) => T2;
+export type Reducer<T1, T2> = (previousValue: T1, currentValue: T2) => T1;
 export type Loader<K, V> = (key: K) => V | undefined;
 export type Factory<V> = () => V;
 
@@ -96,3 +97,8 @@ export type ScriptCharacter = Record<RoleDataKeyName.ID, string>;
  * A collection of characters, created via the Script Tool, that can be printed to make character sheets.
  */
 export type Script = Array<ScriptCharacter>;
+
+/**
+ * Two players, where one player is sitting one seat clockwise and counterclockwise from the other player.
+ */
+export type Neighbor = [Player, Player];

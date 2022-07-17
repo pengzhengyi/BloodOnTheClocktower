@@ -186,6 +186,16 @@ export class UnexpectedEmptySeat extends RecoverableGameError {
     }
 }
 
+export class PlayerNotSat extends RecoverableGameError {
+    static description = 'Encountered a player without a seat unexpected';
+
+    constructor(readonly player: Player) {
+        super(PlayerNotSat.description);
+
+        this.player = player;
+    }
+}
+
 export class PastMomentRewrite extends RecoverableGameError {
     static description = "Attempt to rewrite a past event's moment";
 

@@ -3,6 +3,7 @@ import {
     Loader,
     Predicate,
     Prioritization,
+    Reducer,
     Task,
     Transform,
 } from './types';
@@ -60,6 +61,17 @@ export class DefaultDict<K, V, Vs = Array<V>> extends Map<K, Vs> {
 }
 
 export class Generator<T> implements Iterable<T> {
+    static *range(start: number, stop?: number, step = 1) {
+        if (stop === undefined) {
+            stop = start;
+            start = 0;
+        }
+
+        for (let i = start; i < stop; i += step) {
+            yield i;
+        }
+    }
+
     static *filter<T>(
         predicate: Predicate<T>,
         iterable: Iterable<T>
@@ -129,6 +141,18 @@ export class Generator<T> implements Iterable<T> {
         for (const element of iterable) {
             yield transform(element);
         }
+    }
+
+    static reduce<T1, T2>(
+        reducer: Reducer<T1, T2>,
+        initialValue: T1,
+        iterable: Iterable<T2>
+    ): T1 {
+        let reducedValue: T1 = initialValue;
+        for (const element of iterable) {
+            reducedValue = reducer(reducedValue, element);
+        }
+        return reducedValue;
     }
 
     static count<T>(iterable: Iterable<T>): number {
@@ -694,6 +718,10 @@ export class Generator<T> implements Iterable<T> {
 
     any(predicate: Predicate<T>): boolean {
         return Generator.any(predicate, this);
+    }
+
+    reduce<T1>(reducer: Reducer<T1, T>, initialValue: T1): T1 {
+        return Generator.reduce(reducer, initialValue, this);
     }
 }
 
