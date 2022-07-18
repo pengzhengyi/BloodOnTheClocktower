@@ -1,4 +1,12 @@
-import { Character } from './character';
+import 'reflect-metadata';
+import {
+    Expose,
+    Exclude,
+    Transform,
+    Type,
+    instanceToPlain,
+} from 'class-transformer';
+import { Character, CharactersToIDs } from './character';
 import { CharacterLoader } from './characterloader';
 import {
     CharacterType,
@@ -22,6 +30,7 @@ import {
  * {@link `glossary["Character sheet"]`}
  * The cardboard sheets that list all of the possible characters and their abilities for the chosen edition.
  */
+@Exclude()
 export class CharacterSheet {
     static find(id: string) {
         const character = CharacterLoader.load(id);
@@ -79,6 +88,9 @@ export class CharacterSheet {
         return character;
     }
 
+    @Expose({ groups: ['compact'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     declare characters: Array<typeof Character>;
 
     declare characterTypeToCharacters: Map<
@@ -86,26 +98,44 @@ export class CharacterSheet {
         Array<typeof Character>
     >;
 
+    @Expose({ groups: ['primary'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     get minion(): Array<typeof Character> {
         return this.getCharactersByType(Minion);
     }
 
+    @Expose({ groups: ['primary'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     get demon(): Array<typeof Character> {
         return this.getCharactersByType(Demon);
     }
 
+    @Expose({ groups: ['primary'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     get townsfolk(): Array<typeof Character> {
         return this.getCharactersByType(Townsfolk);
     }
 
+    @Expose({ groups: ['primary'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     get outsider(): Array<typeof Character> {
         return this.getCharactersByType(Outsider);
     }
 
+    @Expose({ groups: ['primary'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     get traveller(): Array<typeof Character> {
         return this.getCharactersByType(Traveller);
     }
 
+    @Expose({ groups: ['primary'], toPlainOnly: true })
+    @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
+    @Type(() => String)
     get fabled(): Array<typeof Character> {
         return this.getCharactersByType(Fabled);
     }
@@ -134,19 +164,7 @@ export class CharacterSheet {
     }
 
     toJSON() {
-        const characterTypeToCharacters = Generator.groupBy(
-            this.characters,
-            (character) => character.characterType
-        );
-
-        const characterTypeAndCharacters: Iterable<
-            [string, Array<typeof Character>]
-        > = Generator.map(
-            ([characterType, characters]) => [characterType.id, characters],
-            characterTypeToCharacters
-        );
-
-        return Object.fromEntries(characterTypeAndCharacters);
+        return instanceToPlain(this, { groups: ['primary'] });
     }
 
     getCharactersByType(

@@ -116,3 +116,7 @@ export abstract class Character {
         }
     }
 }
+
+export const CharacterToID = (character: typeof Character) => character.id;
+export const CharactersToIDs = (characters: Array<typeof Character>) =>
+    characters.map(CharacterToID);

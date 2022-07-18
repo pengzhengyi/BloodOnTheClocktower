@@ -10,7 +10,7 @@ module.exports = {
     'plugin:nuxt/recommended',
     'prettier',
   ],
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'unused-imports'],
   // add your custom rules here
   rules: {
     'no-redeclare': 'off',
@@ -27,12 +27,15 @@ module.exports = {
       { 'ts-ignore': 'allow-with-description' },
     ],
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': [
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
       'error',
       {
-        argsIgnorePattern: '^_',
+        vars: 'all',
         varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
       },
     ],
   },

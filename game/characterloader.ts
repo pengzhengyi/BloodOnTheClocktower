@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Character } from './character';
 import { CharacterLoadFailure, NoCharacterMatchingId } from './exception';
-import { RoleData } from './types';
+import type { RoleData } from './types';
 import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
 
 export abstract class CharacterLoader {

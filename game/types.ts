@@ -1,4 +1,4 @@
-import { Player } from './player';
+import type { Player } from './player';
 
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
@@ -103,3 +103,5 @@ export type Script = Array<ScriptCharacter>;
  * Two players, where one player is sitting one seat clockwise and counterclockwise from the other player.
  */
 export type Neighbor = [Player, Player];
+
+export type AnyObject = Record<string, any>;

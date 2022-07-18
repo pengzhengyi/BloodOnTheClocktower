@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
 import { Character } from './character';
 import { Nomination } from './nomination';
@@ -40,7 +42,7 @@ enum NegativeState {
  * {@link `glossary["Player"]`}
  * Any person who has an in-play character, not including the Storyteller.
  */
-
+@Exclude()
 export class Player {
     static async init(
         username: string,
@@ -57,9 +59,19 @@ export class Player {
         return player;
     }
 
+    @Expose({ toPlainOnly: true })
     declare alignment: Alignment;
 
+    @Expose({ toPlainOnly: true })
+    readonly id: string;
+
+    @Expose({ toPlainOnly: true })
+    username: string;
+
+    character: typeof Character;
+
     isWake = false;
+
     /**
      * {@link `glossary["Vote token"]`}
      * The round white circular token that is put on a player’s life token when they die. When this dead player votes, they remove their vote token and cannot vote for the rest of the game.
@@ -172,10 +184,15 @@ export class Player {
         return this.alignment === Alignment.Evil;
     }
 
+    @Expose({ name: 'character', toPlainOnly: true })
+    protected characterId(): string {
+        return this.character.id;
+    }
+
     protected constructor(
-        public readonly id: string,
-        public username: string,
-        public character: typeof Character
+        id: string,
+        username: string,
+        character: typeof Character
     ) {
         this.id = id;
         this.username = username;
@@ -203,6 +220,10 @@ export class Player {
     *getTeam(players: Iterable<Player>): IterableIterator<Player> {
         yield this;
         yield* this.getAllies(players);
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
     }
 
     async nominate(nominated: Player): Promise<Nomination | undefined> {
