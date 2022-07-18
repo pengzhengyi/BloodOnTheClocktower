@@ -5,8 +5,9 @@ export class Seat {
 
     player?: Player;
 
-    constructor(public readonly position: number) {
+    constructor(public readonly position: number, player?: Player) {
         this.position = position;
+        this.player = player;
     }
 
     get isOccupied() {
@@ -17,16 +18,18 @@ export class Seat {
         return this._isEmpty;
     }
 
-    trySit(): boolean {
+    trySit(player: Player): boolean {
         if (this.isOccupied) {
             return false;
         } else {
             this._isEmpty = false;
+            this.player = player;
             return true;
         }
     }
 
-    sit() {
-        this._isEmpty = true;
+    sit(player: Player) {
+        this.player = player;
+        this._isEmpty = false;
     }
 }

@@ -1,22 +1,35 @@
 import { Generator } from './collections';
 import { clockwise, counterclockwise } from './common';
-import { NumberOfSeatNotPositive } from './exception';
+import { NumberOfSeatNotPositive, PlayerNotSat } from './exception';
 import { Player } from './player';
 import { Seat } from './seat';
 import { Direction, Predicate, TAUTOLOGY } from './types';
 
 export class Seating {
-    // static async from(players: Iterable<Player>) {
-    //     const seats = [];
+    static async from(players: Iterable<Player>) {
+        const seats: Array<Seat> = [];
 
-    //     for (const player of players) {
-    //         await new PlayerNotSat(player).throwWhen(error => error.player.seatNumber === undefined);
-    //         const seatNumber = player.seatNumber!;
+        for (const player of players) {
+            await new PlayerNotSat(player).throwWhen(
+                (error) => error.player.seatNumber === undefined
+            );
+            const seatNumber = player.seatNumber!;
 
-    //         // const seat = seats[seatNumber] = new Sea
-    //     }
+            seats[seatNumber] = new Seat(seatNumber, player);
+        }
 
-    // }
+        for (
+            let seatPosition = 0;
+            seatPosition < seats.length;
+            seatPosition++
+        ) {
+            if (seats[seatPosition] === undefined) {
+                seats[seatPosition] = new Seat(seatPosition);
+            }
+        }
+
+        return new this(seats);
+    }
 
     static async init(numSeats: number) {
         const seats = await this.createSeats(numSeats);

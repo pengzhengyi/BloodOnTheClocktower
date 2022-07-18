@@ -226,6 +226,14 @@ export class Player {
         return instanceToPlain(this);
     }
 
+    valueOf() {
+        return this.id;
+    }
+
+    equals(player: Player): boolean {
+        return this.id === player.id;
+    }
+
     async nominate(nominated: Player): Promise<Nomination | undefined> {
         if (!this.canNominate) {
             const error = new DeadPlayerCannotNominate(this);
