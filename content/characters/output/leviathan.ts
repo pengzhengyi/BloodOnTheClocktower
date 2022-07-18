@@ -1,6 +1,6 @@
 import roleData from './leviathan.json';
 import { Character } from '~/game/character';
 
-export class Leviathan extends Character {}
+export abstract class Leviathan extends Character {}
 
 Leviathan.initialize(roleData);

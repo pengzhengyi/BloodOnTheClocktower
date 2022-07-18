@@ -6,6 +6,7 @@ export const TAUTOLOGY = () => true;
 
 export type Action = () => void;
 export type Task<T = undefined> = (value: T) => void;
+export type AsyncTask<T = undefined> = (value: T) => Promise<void>;
 export type Transform<T1, T2 = T1> = (value: T1) => T2;
 export type Reducer<T1, T2> = (previousValue: T1, currentValue: T2) => T1;
 export type Loader<K, V> = (key: K) => V | undefined;

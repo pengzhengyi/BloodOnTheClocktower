@@ -32,10 +32,23 @@ export abstract class InfoProvider<T> {
         this.isTrue = isTrue;
     }
 
-    abstract trueInfoCandidates(gameInfo: GameInfo): Generator<T>;
-    abstract falseInfoCandidates(gameInfo: GameInfo): Generator<T>;
+    async trueInfoCandidates(gameInfo: GameInfo) {
+        return await this._trueInfoCandidates(gameInfo);
+    }
 
-    candidates(gameInfo: GameInfo): Generator<T> {
+    async falseInfoCandidates(gameInfo: GameInfo) {
+        return await this._falseInfoCandidates(gameInfo);
+    }
+
+    protected _trueInfoCandidates(_gameInfo: GameInfo): Generator<T> {
+        throw new Error('Method not implemented.');
+    }
+
+    protected _falseInfoCandidates(_gameInfo: GameInfo): Generator<T> {
+        throw new Error('Method not implemented.');
+    }
+
+    candidates(gameInfo: GameInfo): Promise<Generator<T>> {
         return this.isTrue
             ? this.trueInfoCandidates(gameInfo)
             : this.falseInfoCandidates(gameInfo);
@@ -55,7 +68,7 @@ abstract class OneCharacterForTwoPlayersInfoProvider<
 
     protected abstract expectedCharacterType: typeof CharacterType;
 
-    trueInfoCandidates(gameInfo: GameInfo) {
+    protected _trueInfoCandidates(gameInfo: GameInfo) {
         const infoCandidates = gameInfo.players
             .isNot(this.receiver)
             .isCharacterType(this.expectedCharacterType)
@@ -78,7 +91,7 @@ abstract class OneCharacterForTwoPlayersInfoProvider<
         );
     }
 
-    falseInfoCandidates(gameInfo: GameInfo) {
+    protected _falseInfoCandidates(gameInfo: GameInfo) {
         const playersCandidates = gameInfo.players
             .isNot(this.receiver)
             .combinations(2);
@@ -117,9 +130,9 @@ export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider
 
     protected expectedCharacterType: typeof CharacterType = Outsider;
 
-    trueInfoCandidates(gameInfo: GameInfo) {
+    _trueInfoCandidates(gameInfo: GameInfo) {
         return super
-            .trueInfoCandidates(gameInfo)
+            ._trueInfoCandidates(gameInfo)
             .map((librarianInfo) => {
                 librarianInfo.hasOutsider = true;
                 return librarianInfo;
@@ -127,9 +140,9 @@ export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider
             .orElse(LibrarianInfoProvider.noOutsiderLibrarianInfo);
     }
 
-    falseInfoCandidates(gameInfo: GameInfo) {
+    _falseInfoCandidates(gameInfo: GameInfo) {
         return super
-            .falseInfoCandidates(gameInfo)
+            ._falseInfoCandidates(gameInfo)
             .orElse(LibrarianInfoProvider.noOutsiderLibrarianInfo);
     }
 }
@@ -148,13 +161,14 @@ export interface ChefInfo {
 }
 
 export class ChefInfoProvider extends InfoProvider<ChefInfo> {
-    trueInfoCandidates(gameInfo: GameInfo) {
-        const numPairEvilPlayers = Generator.reduce(
-            (numEvilNeighbors, neighbor) =>
-                numEvilNeighbors + (Players.allEvil(neighbor) ? 1 : 0),
-            0,
-            gameInfo.players.getNeighbors()
-        );
+    async trueInfoCandidates(gameInfo: GameInfo) {
+        let numPairEvilPlayers = 0;
+
+        for await (const neighbor of gameInfo.players.getNeighbors()) {
+            if (Players.allEvil(neighbor)) {
+                numPairEvilPlayers++;
+            }
+        }
 
         return Generator.once([
             {
@@ -163,7 +177,7 @@ export class ChefInfoProvider extends InfoProvider<ChefInfo> {
         ]);
     }
 
-    falseInfoCandidates(gameInfo: GameInfo) {
+    _falseInfoCandidates(gameInfo: GameInfo) {
         const numEvilPlayers = Generator.reduce(
             (numEvilPlayers, player) =>
                 numEvilPlayers + (player.isEvil ? 1 : 0),

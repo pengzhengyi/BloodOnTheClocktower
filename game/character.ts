@@ -78,8 +78,12 @@ export abstract class Character {
         this.setCharacterType(roleData);
     }
 
-    static toObject(): ScriptCharacter {
-        return { [RoleDataKeyName.ID]: this.id };
+    static toJSON(): string {
+        return this.id;
+    }
+
+    static toScriptCharacter(): ScriptCharacter {
+        return { [RoleDataKeyName.ID]: this.toJSON() };
     }
 
     static isCharacterType(characterType: typeof CharacterType): boolean {
@@ -90,7 +94,7 @@ export abstract class Character {
         const type = roleData[RoleDataKeyName.TEAM];
 
         try {
-            const characterType = CharacterType.from(type);
+            const characterType = CharacterType.unsafeFrom(type);
             this.characterType = characterType;
         } catch (error) {
             if (error instanceof NoMatchingCharacterType) {

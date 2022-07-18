@@ -33,8 +33,8 @@ async function generateInfoCandidates<T>(
         allPlayers: Player[]
     ) => Promise<GameInfo>
 ): Promise<[T | T[] | undefined, Array<Player>]> {
-    const playerFromDescriptions = playerDescriptions.map(
-        playerFromDescription
+    const playerFromDescriptions = await Promise.all(
+        playerDescriptions.map(playerFromDescription)
     );
     const allPlayers = playerFromDescriptions.concat(players);
     allPlayers.forEach((player, index) => (player.seatNumber = index));
@@ -45,15 +45,16 @@ async function generateInfoCandidates<T>(
         gameInfo = await gameInfoTransform(gameInfo, allPlayers);
     }
 
-    return [infoProvider.candidates(gameInfo).take(), allPlayers];
+    const candidates = await infoProvider.candidates(gameInfo);
+    return [candidates.take(), allPlayers];
 }
 
 describe('True Washerwoman info', () => {
     let washerwomanPlayer: Player;
     let infoProvider: WasherwomanInfoProvider;
 
-    beforeAll(() => {
-        washerwomanPlayer = playerFromDescription(
+    beforeAll(async () => {
+        washerwomanPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Washerwoman`
         );
         infoProvider = new WasherwomanInfoProvider(washerwomanPlayer, true);
@@ -133,8 +134,8 @@ describe('True Librarian info', () => {
     let librarianPlayer: Player;
     let infoProvider: LibrarianInfoProvider;
 
-    beforeAll(() => {
-        librarianPlayer = playerFromDescription(
+    beforeAll(async () => {
+        librarianPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Librarian`
         );
         infoProvider = new LibrarianInfoProvider(librarianPlayer, true);
@@ -196,8 +197,8 @@ describe('True Investigator info', () => {
     let investigatorPlayer: Player;
     let infoProvider: InvestigatorInfoProvider;
 
-    beforeAll(() => {
-        investigatorPlayer = playerFromDescription(
+    beforeAll(async () => {
+        investigatorPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Investigator`
         );
         infoProvider = new InvestigatorInfoProvider(investigatorPlayer, true);
@@ -288,8 +289,8 @@ describe('True Chef info', () => {
     let chefPlayer: Player;
     let infoProvider: ChefInfoProvider;
 
-    beforeAll(() => {
-        chefPlayer = playerFromDescription(
+    beforeAll(async () => {
+        chefPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Chef`
         );
         infoProvider = new ChefInfoProvider(chefPlayer, true);

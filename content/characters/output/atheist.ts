@@ -1,6 +1,6 @@
 import roleData from './atheist.json';
 import { Character } from '~/game/character';
 
-export class Atheist extends Character {}
+export abstract class Atheist extends Character {}
 
 Atheist.initialize(roleData);

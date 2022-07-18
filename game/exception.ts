@@ -1,16 +1,28 @@
 import { Dayjs } from 'dayjs';
-import { Nomination as Exile } from './nomination';
+import { Nomination } from './nomination';
+import { Exile } from './exile';
 import { Vote } from './vote';
-import { RoleData } from './types';
+import { Predicate, RoleData } from './types';
 import { Player } from './player';
 import { Seat } from './seat';
 import { Meaning } from './clocktower';
 import { Character } from './character';
 import { StoryTeller } from './storyteller';
-import { Grimoire } from './grimoire';
-import { NumberOfCharacters, ScriptConstraints } from './scripttool';
-import { CharacterType } from './charactertype';
+import {
+    NumberOfCharacters,
+    ScriptConstraints,
+    ScriptConstraintsHelper,
+} from './scripttool';
+import {
+    CharacterType,
+    Demon,
+    Minion,
+    Outsider,
+    Townsfolk,
+    Traveller,
+} from './charactertype';
 import { Alignment } from './alignment';
+import { GameUI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
     declare cause?: Error;
@@ -29,6 +41,17 @@ export class BaseError extends Error {
 
         return this;
     }
+
+    throw(): never {
+        // eslint-disable-next-line no-throw-literal
+        throw this;
+    }
+
+    throwWhen(condition: Predicate<this>) {
+        if (condition(this)) {
+            this.throw();
+        }
+    }
 }
 
 export class AggregateError<E extends Error = BaseError> extends Error {
@@ -46,12 +69,37 @@ export class AggregateError<E extends Error = BaseError> extends Error {
 
 export class GameError extends BaseError {}
 
-export class RecoverableGameError extends GameError {}
+export class RecoverableGameError extends GameError {
+    get handled(): boolean {
+        return this.handled_;
+    }
+
+    protected handled_ = false;
+
+    async throwWhen(condition: Predicate<this>) {
+        if (condition(this)) {
+            if (await GameUI.handle(this)) {
+                this.handled_ = true;
+                if (condition(this)) {
+                    this.throw();
+                }
+            } else {
+                this.throw();
+            }
+        }
+    }
+
+    async resolve() {
+        if (await GameUI.handle(this)) {
+            this.handled_ = true;
+        }
+    }
+}
 
 export class NoVoteInNomination extends RecoverableGameError {
     static description = 'Nomination does not have a finished vote';
 
-    constructor(readonly nomination: Exile) {
+    constructor(readonly nomination: Nomination) {
         super(NoVoteInNomination.description);
 
         this.nomination = nomination;
@@ -71,7 +119,7 @@ export class NoVoteInExile extends RecoverableGameError {
 export class NoVotesWhenCountingVote extends RecoverableGameError {
     static description = 'Cannot determine who voted when counting votes';
 
-    constructor(readonly vote: Vote, public nomination?: Exile) {
+    constructor(readonly vote: Vote, public nomination?: Nomination) {
         super(NoVotesWhenCountingVote.description);
 
         this.vote = vote;
@@ -111,9 +159,11 @@ export class NominatorNominatedBefore extends RecoverableGameError {
     static description =
         'Nomination failed because the nominator has already nominated in past nominations';
 
+    forceAllowNomination = false;
+
     constructor(
-        readonly failedNomination: Exile,
-        readonly pastNomination: Exile,
+        readonly failedNomination: Nomination,
+        readonly pastNomination: Nomination,
         readonly nominator: Player
     ) {
         super(NominatorNominatedBefore.description);
@@ -128,9 +178,11 @@ export class NominatedNominatedBefore extends RecoverableGameError {
     static description =
         'Nomination failed because the nominated player has already been nominated in past nominations';
 
+    forceAllowNomination = false;
+
     constructor(
-        readonly failedNomination: Exile,
-        readonly pastNomination: Exile,
+        readonly failedNomination: Nomination,
+        readonly pastNomination: Nomination,
         readonly nominated: Player
     ) {
         super(NominatedNominatedBefore.description);
@@ -159,6 +211,8 @@ export class PlayerHasUnclearAlignment extends RecoverableGameError {
 export class DeadPlayerCannotNominate extends RecoverableGameError {
     static description = 'Dead player cannot nominate';
 
+    forceAllowNomination = false;
+
     constructor(readonly player: Player) {
         super(DeadPlayerCannotNominate.description);
 
@@ -169,10 +223,13 @@ export class DeadPlayerCannotNominate extends RecoverableGameError {
 export class NumberOfSeatNotPositive extends RecoverableGameError {
     static description = 'The number of seats must be a positive number';
 
+    declare correctedNumSeats: number;
+
     constructor(readonly numSeats: number) {
         super(NumberOfSeatNotPositive.description);
 
         this.numSeats = numSeats;
+        this.correctedNumSeats = numSeats;
     }
 }
 
@@ -215,11 +272,10 @@ export class PastMomentRewrite extends RecoverableGameError {
 export class ExileNonTraveller extends RecoverableGameError {
     static description = 'Cannot exile an non-traveller';
 
-    constructor(public nominator: Player, public nominated: Player) {
+    constructor(readonly exile: Exile) {
         super(ExileNonTraveller.description);
 
-        this.nominator = nominator;
-        this.nominated = nominated;
+        this.exile = exile;
     }
 }
 
@@ -301,24 +357,25 @@ export class NoCharacterMatchingId extends RecoverableGameError {
 export class NoMatchingCharacterType extends RecoverableGameError {
     static description = 'Cannot find a character type matching the name';
 
+    declare correctedType: string;
+
     constructor(readonly type?: string) {
         super(NoMatchingCharacterType.description);
 
         this.type = type;
+        if (type !== undefined) {
+            this.correctedType = type;
+        }
     }
 }
 
 export class BlankGrimoire extends RecoverableGameError {
-    static description = 'Grimoire is not initialized';
+    static description = "Storyteller's grimoire is not initialized";
 
-    constructor(
-        readonly storyteller: StoryTeller,
-        readonly grimoire?: Grimoire
-    ) {
+    constructor(readonly storyteller: StoryTeller) {
         super(BlankGrimoire.description);
 
         this.storyteller = storyteller;
-        this.grimoire = grimoire;
     }
 }
 
@@ -358,6 +415,56 @@ export class CharacterSheetCreationFailure extends RecoverableGameError {
     }
 }
 
+export class TooManyMustIncludedCharacters extends InvalidScriptConstraints {
+    static description =
+        'The number of characters must include has exceeded the specified number of character for some character type';
+
+    incorrectCharacterTypes: Array<typeof CharacterType> = [];
+
+    constructor(readonly constraintsHelper: ScriptConstraintsHelper) {
+        super(constraintsHelper.constraints);
+        this.message = TooManyMustIncludedCharacters.description;
+        this.constraintsHelper = constraintsHelper;
+    }
+
+    protected validate(): boolean {
+        this.incorrectCharacterTypes = [];
+        const simplified = this.constraintsHelper.simplify();
+        let result = false;
+
+        if (simplified.townsfolk < 0) {
+            this.incorrectCharacterTypes.push(Townsfolk);
+            result = true;
+        }
+
+        if (simplified.outsider < 0) {
+            this.incorrectCharacterTypes.push(Outsider);
+            result = true;
+        }
+
+        if (simplified.minion < 0) {
+            this.incorrectCharacterTypes.push(Minion);
+            result = true;
+        }
+
+        if (simplified.demon < 0) {
+            this.incorrectCharacterTypes.push(Demon);
+            result = true;
+        }
+
+        if (simplified.traveller < 0) {
+            this.incorrectCharacterTypes.push(Traveller);
+            result = true;
+        }
+
+        return result;
+    }
+
+    validateOrThrow() {
+        return this.throwWhen((error) => error.validate());
+    }
+}
+
 export class NegativeNumberForCharacterTypeInScriptConstraint extends InvalidScriptConstraints {
     static description =
         'The number of character for any character type must not be negative';
@@ -378,6 +485,8 @@ export class NegativeNumberForCharacterTypeInScriptConstraint extends InvalidScr
 export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
     static description = 'The spy should only register as good or evil';
 
+    declare correctedAlignmentToRegisterAs: Alignment;
+
     constructor(
         readonly characterToRegisterAs: typeof Character,
         readonly alignmentToRegisterAs?: Alignment
@@ -385,5 +494,9 @@ export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
         super(IncorrectAlignmentForSpyToRegisterAs.description);
         this.characterToRegisterAs = characterToRegisterAs;
         this.alignmentToRegisterAs = alignmentToRegisterAs;
+
+        if (alignmentToRegisterAs !== undefined) {
+            this.correctedAlignmentToRegisterAs = alignmentToRegisterAs;
+        }
     }
 }

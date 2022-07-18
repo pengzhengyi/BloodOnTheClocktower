@@ -58,17 +58,18 @@ export abstract class RegisterAsInfluence extends Influence {
 
         const alignmentToRegisterAs =
             characterToRegisterAs.characterType.defaultAlignment;
-        if (
-            alignmentToRegisterAs !== Alignment.Good &&
-            alignmentToRegisterAs !== Alignment.Evil
-        ) {
-            throw new IncorrectAlignmentForSpyToRegisterAs(
-                characterToRegisterAs,
-                alignmentToRegisterAs
-            );
-        }
 
-        return [characterToRegisterAs, alignmentToRegisterAs];
+        const error = new IncorrectAlignmentForSpyToRegisterAs(
+            characterToRegisterAs,
+            alignmentToRegisterAs
+        );
+        await error.throwWhen(
+            (error) =>
+                error.correctedAlignmentToRegisterAs !== Alignment.Good &&
+                error.correctedAlignmentToRegisterAs !== Alignment.Evil
+        );
+
+        return [characterToRegisterAs, error.correctedAlignmentToRegisterAs];
     }
 
     static registerAs(

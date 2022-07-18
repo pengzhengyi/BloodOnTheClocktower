@@ -8,6 +8,11 @@ export enum NominationState {
 }
 
 export class Nomination {
+    static async init(nominator: Player, nominated: Player) {
+        const nomination = new this(nominator, nominated);
+        return await nomination;
+    }
+
     vote?: Vote;
 
     get state(): NominationState {
@@ -22,17 +27,21 @@ export class Nomination {
         }
     }
 
-    constructor(public nominator: Player, public nominated: Player) {
+    protected constructor(public nominator: Player, public nominated: Player) {
         this.nominator = nominator;
         this.nominated = nominated;
     }
 
-    hasVoteStarted(): this is { vote: Vote } {
+    isVoteNotStarted(): this is { vote: undefined } {
+        return this.state === NominationState.NotStarted;
+    }
+
+    isVoteStarted(): this is { vote: Vote } {
         return this.state !== NominationState.NotStarted;
     }
 
     startVote(players: Iterable<Player>) {
-        const vote: Vote = this.hasVoteStarted()
+        const vote: Vote = this.isVoteStarted()
             ? this.vote
             : (this.vote = this.createVote());
         return vote.collectVotes(players);

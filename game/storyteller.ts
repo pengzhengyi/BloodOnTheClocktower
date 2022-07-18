@@ -1,7 +1,7 @@
 import { BlankGrimoire } from './exception';
 import { Grimoire } from './grimoire';
 import { Player } from './player';
-import { Task } from './types';
+import { AsyncTask } from './types';
 
 /**
  * {@link `glossary["Storyteller"]`}
@@ -11,40 +11,40 @@ export class StoryTeller {
     static DEFAULT_WAKE_REASON =
         'Player is awaken to act or receive information';
 
-    protected _grimoire?: Grimoire;
+    protected grimoire?: Grimoire;
 
-    get grimoire(): Grimoire {
-        if (this._grimoire === undefined) {
-            throw new BlankGrimoire(this, this._grimoire);
-        }
+    async getGrimoire(): Promise<Grimoire> {
+        await new BlankGrimoire(this).throwWhen(
+            (error) => error.storyteller.grimoire === undefined
+        );
 
-        return this.grimoire;
+        return this.grimoire!;
     }
 
-    interact(player: Player, action: Task<Player>, reason?: string) {
+    async interact(player: Player, action: AsyncTask<Player>, reason?: string) {
         if (reason === undefined) {
             reason = action.toString();
         }
 
-        action(player);
+        await action(player);
     }
 
     initializeGrimoire(players: Iterable<Player>) {
-        this._grimoire = new Grimoire(players);
+        this.grimoire = new Grimoire(players);
     }
 
     /**
      * {@link `glossary["Wake"]`}
      * A player opening their eyes at night. The Storyteller wakes a player by tapping twice on the knee or shoulder, and wakes all players by saying “eyes open, everybody” at dawn.
      */
-    wake(
+    async wake(
         player: Player,
-        action: Task<Player>,
+        action: AsyncTask<Player>,
         reason: string = StoryTeller.DEFAULT_WAKE_REASON
     ) {
         player.isWake = true;
 
-        this.interact(player, action, reason);
+        await this.interact(player, action, reason);
 
         player.isWake = false;
     }

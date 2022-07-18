@@ -17,7 +17,6 @@ import {
     GameError,
     NoCharacterMatchingId,
 } from './exception';
-import { EditionData, EditionKeyName } from './types';
 
 /**
  * {@link `glossary["Character sheet"]`}
@@ -134,20 +133,18 @@ export class CharacterSheet {
         }
     }
 
-    toObject(): EditionData[EditionKeyName.CHARACTERS] {
+    toJSON() {
         const characterTypeToCharacters = Generator.groupBy(
             this.characters,
             (character) => character.characterType
         );
 
-        const characterTypeAndCharacters: Iterable<[string, Array<string>]> =
-            Generator.map(
-                ([characterType, characters]) => [
-                    characterType.id,
-                    characters.map((character) => character.id),
-                ],
-                characterTypeToCharacters
-            );
+        const characterTypeAndCharacters: Iterable<
+            [string, Array<typeof Character>]
+        > = Generator.map(
+            ([characterType, characters]) => [characterType.id, characters],
+            characterTypeToCharacters
+        );
 
         return Object.fromEntries(characterTypeAndCharacters);
     }

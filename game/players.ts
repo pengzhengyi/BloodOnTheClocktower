@@ -2,7 +2,6 @@ import { CharacterType } from './charactertype';
 import { Generator } from './collections';
 import { PlayerNotSat } from './exception';
 import { Player } from './player';
-import { Neighbor } from './types';
 
 export class Players extends Generator<Player> {
     static alGood(iterable: Iterable<Player>): boolean {
@@ -39,16 +38,16 @@ export class Players extends Generator<Player> {
         );
     }
 
-    *getNeighbors(): Iterable<Neighbor> {
+    async *getNeighbors() {
         const reorderedPlayers: Array<Player> = [];
 
         for (const player of this) {
             // distance 1 neighbor
-            const seatNumber = player.seatNumber;
+            await new PlayerNotSat(player).throwWhen(
+                (error) => error.player.seatNumber === undefined
+            );
 
-            if (seatNumber === undefined) {
-                throw new PlayerNotSat(player);
-            }
+            const seatNumber = player.seatNumber!;
 
             reorderedPlayers[seatNumber] = player;
 

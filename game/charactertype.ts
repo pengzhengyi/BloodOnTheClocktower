@@ -20,18 +20,37 @@ export abstract class CharacterType {
         return TEAM_CHARACTER_TYPES.has(type);
     }
 
-    static from(type?: string): typeof CharacterType {
-        if (type === undefined) {
-            throw new NoMatchingCharacterType(type);
+    static unsafeFrom(type?: string): typeof CharacterType {
+        if (type !== undefined) {
+            const characterType = TEAM_CHARACTER_TYPES.get(type);
+            if (characterType !== undefined) {
+                return characterType;
+            }
         }
+
+        throw new NoMatchingCharacterType(type);
+    }
+
+    static async from(type?: string): Promise<typeof CharacterType> {
+        const errorForUndefinedType = new NoMatchingCharacterType(type);
+        await errorForUndefinedType.throwWhen(
+            (error) => error.correctedType === undefined
+        );
 
         // short circuiting with map
-        const characterType = TEAM_CHARACTER_TYPES.get(type);
-        if (characterType === undefined) {
-            throw new NoMatchingCharacterType(type);
-        }
+        const errorForNotFoundType = new NoMatchingCharacterType(
+            errorForUndefinedType.correctedType
+        );
+        await errorForNotFoundType.throwWhen(
+            (error) =>
+                TEAM_CHARACTER_TYPES.get(error.correctedType) === undefined
+        );
 
-        return characterType;
+        return TEAM_CHARACTER_TYPES.get(errorForNotFoundType.correctedType)!;
+    }
+
+    static toJSON(): string {
+        return this.id;
     }
 }
 

@@ -1,3 +1,4 @@
+import { Generator } from './collections';
 import { clockwise, counterclockwise } from './common';
 import { NumberOfSeatNotPositive } from './exception';
 import { Player } from './player';
@@ -5,24 +6,44 @@ import { Seat } from './seat';
 import { Direction, Predicate, TAUTOLOGY } from './types';
 
 export class Seating {
-    public readonly seats: Array<Seat>;
+    // static async from(players: Iterable<Player>) {
+    //     const seats = [];
+
+    //     for (const player of players) {
+    //         await new PlayerNotSat(player).throwWhen(error => error.player.seatNumber === undefined);
+    //         const seatNumber = player.seatNumber!;
+
+    //         // const seat = seats[seatNumber] = new Sea
+    //     }
+
+    // }
+
+    static async init(numSeats: number) {
+        const seats = await this.createSeats(numSeats);
+        return new this(seats);
+    }
+
+    protected static async createSeats(numSeats: number): Promise<Array<Seat>> {
+        if (numSeats <= 0) {
+            const error = new NumberOfSeatNotPositive(numSeats);
+            await error.throwWhen((error) => error.correctedNumSeats <= 0);
+            numSeats = error.correctedNumSeats;
+        }
+
+        return Array.from(
+            Generator.map(
+                (seatNumber) => new Seat(seatNumber),
+                Generator.range(0, numSeats)
+            )
+        );
+    }
 
     get allSat(): boolean {
         return this.seats.every((seat) => seat.isOccupied);
     }
 
-    protected static *createSeats(numSeats: number): IterableIterator<Seat> {
-        if (numSeats <= 0) {
-            throw new NumberOfSeatNotPositive(numSeats);
-        }
-
-        for (let i = 1; i <= numSeats; i++) {
-            yield new Seat(i);
-        }
-    }
-
-    constructor(initialNumSeats: number) {
-        this.seats = Array.from(Seating.createSeats(initialNumSeats));
+    protected constructor(public readonly seats: Array<Seat>) {
+        this.seats = seats;
     }
 
     *iterateSeats(

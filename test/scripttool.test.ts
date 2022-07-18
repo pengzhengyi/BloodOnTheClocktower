@@ -24,9 +24,9 @@ describe('Load Custom Script', () => {
 });
 
 describe('Random CharacterSheet Generation', () => {
-    test.concurrent('Default Generation: Ravenswood Bluff', () => {
+    test.concurrent('Default Generation: Ravenswood Bluff', async () => {
         const constraints = ScriptConstraintsHelper.defaultConstraints();
-        const characterSheets = ScriptTool.candidates(constraints, 5);
+        const characterSheets = await ScriptTool.candidates(constraints, 5);
 
         let lastCharacterSheet;
         for (const characterSheet of characterSheets) {
@@ -52,7 +52,7 @@ describe('Random CharacterSheet Generation', () => {
 
     test.concurrent(
         'Teensyville with must included characters and must excluded characters and a traveller',
-        () => {
+        async () => {
             const constraints = {
                 editions: [EditionName.TroubleBrewing],
                 townsfolk: 6,
@@ -63,7 +63,7 @@ describe('Random CharacterSheet Generation', () => {
                 includes: [Scarletwoman.id, Judge.id],
                 excludes: [Virgin.id],
             };
-            const characterSheets = ScriptTool.candidates(constraints, 3);
+            const characterSheets = await ScriptTool.candidates(constraints, 3);
 
             let lastCharacterSheet;
             for (const characterSheet of characterSheets) {

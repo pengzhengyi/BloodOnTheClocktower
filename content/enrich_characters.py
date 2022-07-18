@@ -110,7 +110,7 @@ def _write_typescript(
             f"""import roleData from "{relative_json_filepath}";
 import {{ Character }} from "~/game/character";
 
-export class {character_name} extends Character {{
+export abstract class {character_name} extends Character {{
 }}
 
 {character_name}.initialize(roleData);"""

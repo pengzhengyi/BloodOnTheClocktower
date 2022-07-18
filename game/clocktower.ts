@@ -31,18 +31,22 @@ export class Clocktower {
         return this.chronology.map((moment) => moment[0]);
     }
 
-    record(meaning?: Meaning) {
+    async record(meaning?: Meaning) {
         const momentWithSameMeaning = this.moments.get(meaning);
 
-        if (
-            momentWithSameMeaning !== undefined &&
-            !new Confirm(`Overwrite recorded timestamp for ${meaning}?`).ask()
-        ) {
-            throw new PastMomentRewrite(
-                meaning,
-                momentWithSameMeaning.when,
-                dayjs()
-            );
+        if (momentWithSameMeaning !== undefined) {
+            if (
+                !(await new Confirm(
+                    `Overwrite recorded timestamp for ${meaning}?`
+                ).ask())
+            ) {
+                await new PastMomentRewrite(
+                    meaning,
+                    momentWithSameMeaning.when,
+                    dayjs()
+                ).resolve();
+                return;
+            }
         }
 
         this.moments.set(meaning, new Toll());

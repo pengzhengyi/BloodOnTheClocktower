@@ -4,7 +4,7 @@ import { Player } from '~/game/player';
 
 const regex = /(.*) is the\s(evil|good|)\s?(.*)/i;
 
-export function playerFromDescription(description: string) {
+export async function playerFromDescription(description: string) {
     const matchResult = description.match(regex);
     if (matchResult === null) {
         throw new Error(`Cannot initialize a player form ${description}`);
@@ -17,5 +17,5 @@ export function playerFromDescription(description: string) {
     } else if (alignmentDescription === 'good') {
         alignment = Alignment.Good;
     }
-    return new Player(username, character, alignment);
+    return await Player.init(username, character, alignment);
 }

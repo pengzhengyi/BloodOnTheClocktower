@@ -16,6 +16,7 @@ import {
 import {
     InvalidScriptConstraints,
     NegativeNumberForCharacterTypeInScriptConstraint,
+    TooManyMustIncludedCharacters,
 } from './exception';
 
 export interface NumberOfCharacters {
@@ -37,35 +38,86 @@ export interface ScriptConstraints extends NumberOfCharacters {
     excludes: Array<string>;
 }
 export class ScriptConstraintsHelper {
-    protected _editions?: Generator<typeof Edition>;
-    get editions() {
-        if (this._editions === undefined) {
-            this._editions = Generator.cache(this.constraints.editions).map(
-                (editionName) => EditionLoader.load(editionName)
-            );
-        }
-        return this._editions;
+    static defaultConstraints(): ScriptConstraints {
+        return {
+            editions: [
+                EditionName.TroubleBrewing,
+                EditionName.SectsViolets,
+                EditionName.BadMoonRising,
+            ],
+            townsfolk: 13,
+            outsider: 4,
+            minion: 4,
+            demon: 4,
+            traveller: 0,
+            fabled: [],
+            includes: [],
+            excludes: [],
+        };
     }
 
-    protected _includes?: Generator<typeof Character>;
-    get includes() {
-        if (this._includes === undefined) {
-            this._includes = Generator.cache(this.constraints.includes).map(
-                (include) => CharacterLoader.load(include)
-            );
-        }
-        return this._includes;
+    static default(): ScriptConstraintsHelper {
+        return new this(this.defaultConstraints());
     }
 
-    protected _excludes?: Generator<typeof Character>;
-    get excludes() {
-        if (this._excludes === undefined) {
-            this._excludes = Generator.cache(this.constraints.excludes).map(
-                (exclude) => CharacterLoader.load(exclude)
-            );
-        }
-        return this._excludes;
+    static async fromDefaults(constraints: Partial<ScriptConstraints>) {
+        const correctedConstraints = Object.assign(
+            this.defaultConstraints(),
+            constraints
+        );
+        return await ScriptConstraintsHelper.init(correctedConstraints);
     }
+
+    static async init(constraints: ScriptConstraints) {
+        const helper = new this(constraints);
+        await helper.validate();
+        return helper;
+    }
+
+    static async validateNumberOfCharacters(constraints: NumberOfCharacters) {
+        await Promise.all([
+            new NegativeNumberForCharacterTypeInScriptConstraint(
+                constraints,
+                Townsfolk,
+                constraints.townsfolk
+            ).throwWhen((error) => error.constraints.townsfolk < 0),
+            new NegativeNumberForCharacterTypeInScriptConstraint(
+                constraints,
+                Outsider,
+                constraints.outsider
+            ).throwWhen((error) => error.constraints.outsider < 0),
+            new NegativeNumberForCharacterTypeInScriptConstraint(
+                constraints,
+                Minion,
+                constraints.minion
+            ).throwWhen((error) => error.constraints.minion < 0),
+            new NegativeNumberForCharacterTypeInScriptConstraint(
+                constraints,
+                Demon,
+                constraints.demon
+            ).throwWhen((error) => error.constraints.demon < 0),
+            new NegativeNumberForCharacterTypeInScriptConstraint(
+                constraints,
+                Traveller,
+                constraints.traveller
+            ).throwWhen((error) => error.constraints.traveller < 0),
+        ]);
+    }
+
+    protected declare editions: Array<typeof Edition>;
+
+    protected declare fabled: Array<typeof Character>;
+
+    protected declare excludes: Array<typeof Character>;
+
+    protected declare includes: Array<typeof Character>;
+
+    protected declare characterTypeToIncludedCharacters: Map<
+        typeof CharacterType,
+        Array<typeof Character>
+    >;
+
+    protected declare simplified: NumberOfCharacters;
 
     protected _excludedCandidateCharacters?: Set<typeof Character>;
     protected get excludedCandidateCharacters() {
@@ -118,155 +170,6 @@ export class ScriptConstraintsHelper {
                 this.getCandidatesByCharacterType(Traveller);
         }
         return this._travellerCandidates;
-    }
-
-    static defaultConstraints(): ScriptConstraints {
-        return {
-            editions: [
-                EditionName.TroubleBrewing,
-                EditionName.SectsViolets,
-                EditionName.BadMoonRising,
-            ],
-            townsfolk: 13,
-            outsider: 4,
-            minion: 4,
-            demon: 4,
-            traveller: 0,
-            fabled: [],
-            includes: [],
-            excludes: [],
-        };
-    }
-
-    static default(): ScriptConstraintsHelper {
-        return new this(this.defaultConstraints());
-    }
-
-    static fromDefaults(constraints: Partial<ScriptConstraints>) {
-        return new this(Object.assign(this.defaultConstraints(), constraints));
-    }
-
-    static validateNumberOfCharacters(constraints: NumberOfCharacters) {
-        if (constraints.townsfolk < 0) {
-            throw new NegativeNumberForCharacterTypeInScriptConstraint(
-                constraints,
-                Townsfolk,
-                constraints.townsfolk
-            );
-        }
-        if (constraints.outsider < 0) {
-            throw new NegativeNumberForCharacterTypeInScriptConstraint(
-                constraints,
-                Outsider,
-                constraints.outsider
-            );
-        }
-        if (constraints.minion < 0) {
-            throw new NegativeNumberForCharacterTypeInScriptConstraint(
-                constraints,
-                Minion,
-                constraints.minion
-            );
-        }
-        if (constraints.demon < 0) {
-            throw new NegativeNumberForCharacterTypeInScriptConstraint(
-                constraints,
-                Demon,
-                constraints.demon
-            );
-        }
-        if (constraints.traveller < 0) {
-            throw new NegativeNumberForCharacterTypeInScriptConstraint(
-                constraints,
-                Traveller,
-                constraints.traveller
-            );
-        }
-    }
-
-    static validate(constraints: ScriptConstraints) {
-        this.validateNumberOfCharacters(constraints);
-
-        if (!Array.isArray(constraints.editions)) {
-            throw new InvalidScriptConstraints(
-                constraints,
-                new Error('Editions in script constraints should be an array')
-            );
-        }
-        if (!Array.isArray(constraints.fabled)) {
-            throw new InvalidScriptConstraints(
-                constraints,
-                new Error(
-                    'Fabled characters in script constraints should be an array'
-                )
-            );
-        }
-        if (!Array.isArray(constraints.includes)) {
-            throw new InvalidScriptConstraints(
-                constraints,
-                new Error(
-                    'Included characters in script constraints should be an array'
-                )
-            );
-        }
-        if (!Array.isArray(constraints.excludes)) {
-            throw new InvalidScriptConstraints(
-                constraints,
-                new Error(
-                    'Excluded characters in script constraints should be an array'
-                )
-            );
-        }
-    }
-
-    protected characterTypeToIncludedCharacters?: Map<
-        typeof CharacterType,
-        Array<typeof Character>
-    >;
-
-    protected _simplified?: NumberOfCharacters;
-    get simplified() {
-        if (this._simplified === undefined) {
-            const characterTypeToIncludedCharacters =
-                (this.characterTypeToIncludedCharacters = Generator.groupBy(
-                    this.includes,
-                    (character) => character.characterType
-                ));
-            this._simplified = {
-                townsfolk:
-                    this.constraints.townsfolk -
-                    (characterTypeToIncludedCharacters.get(Townsfolk)?.length ??
-                        0),
-                outsider:
-                    this.constraints.outsider -
-                    (characterTypeToIncludedCharacters.get(Outsider)?.length ??
-                        0),
-                minion:
-                    this.constraints.minion -
-                    (characterTypeToIncludedCharacters.get(Minion)?.length ??
-                        0),
-                demon:
-                    this.constraints.demon -
-                    (characterTypeToIncludedCharacters.get(Demon)?.length ?? 0),
-                traveller:
-                    this.constraints.traveller -
-                    (characterTypeToIncludedCharacters.get(Traveller)?.length ??
-                        0),
-            };
-
-            try {
-                ScriptConstraintsHelper.validateNumberOfCharacters(
-                    this._simplified
-                );
-            } catch (error) {
-                throw new InvalidScriptConstraints(
-                    this.constraints,
-                    error as Error,
-                    ' because the number of characters must include has exceeded the specified number of character for some character type'
-                );
-            }
-        }
-        return this._simplified;
     }
 
     protected _candidateCharacterSheets?: Generator<CharacterSheet>;
@@ -336,7 +239,7 @@ export class ScriptConstraintsHelper {
 
                 if (this.hasIncludes) {
                     return new CharacterSheet(
-                        Generator.chain(characters, this.includes)
+                        Generator.chain(characters, this.includes, this.fabled)
                     );
                 } else {
                     return new CharacterSheet(characters);
@@ -355,10 +258,113 @@ export class ScriptConstraintsHelper {
         return this.constraints.excludes.length > 0;
     }
 
-    constructor(readonly constraints: ScriptConstraints) {
+    protected constructor(readonly constraints: ScriptConstraints) {
         this.constraints = constraints;
+    }
 
-        ScriptConstraintsHelper.validate(constraints);
+    protected async validate() {
+        await Promise.all([
+            ScriptConstraintsHelper.validateNumberOfCharacters(
+                this.constraints
+            ),
+            this.validateEditions(this.constraints),
+            this.validateFabled(this.constraints),
+            this.validateExcludes(this.constraints),
+            this.validateIncludes(this.constraints),
+        ]);
+    }
+
+    protected async validateEditions(constraints: ScriptConstraints) {
+        new InvalidScriptConstraints(
+            constraints,
+            new Error('Editions in script constraints should be an array')
+        ).throwWhen((error) => !Array.isArray(error.constraints.editions));
+
+        this.editions = await Promise.all(
+            constraints.editions.map((edition) => EditionLoader.load(edition))
+        );
+    }
+
+    protected async validateFabled(constraints: ScriptConstraints) {
+        new InvalidScriptConstraints(
+            constraints,
+            new Error(
+                'Fabled characters in script constraints should be an array'
+            )
+        ).throwWhen((error) => !Array.isArray(error.constraints.fabled));
+
+        for (const character of constraints.fabled) {
+            await CharacterLoader.load(character);
+        }
+        this.fabled = await Promise.all(
+            constraints.fabled.map((character) =>
+                CharacterLoader.load(character)
+            )
+        );
+    }
+
+    protected async validateExcludes(constraints: ScriptConstraints) {
+        new InvalidScriptConstraints(
+            constraints,
+            new Error(
+                'Excluded characters in script constraints should be an array'
+            )
+        ).throwWhen((error) => !Array.isArray(error.constraints.excludes));
+
+        this.excludes = await Promise.all(
+            constraints.excludes.map((character) =>
+                CharacterLoader.load(character)
+            )
+        );
+    }
+
+    protected async validateIncludes(constraints: ScriptConstraints) {
+        new InvalidScriptConstraints(
+            constraints,
+            new Error(
+                'Included characters in script constraints should be an array'
+            )
+        ).throwWhen((error) => !Array.isArray(error.constraints.includes));
+
+        await new TooManyMustIncludedCharacters(this).validateOrThrow();
+        this.includes = await Promise.all(
+            constraints.includes.map((character) =>
+                CharacterLoader.load(character)
+            )
+        );
+    }
+
+    simplify() {
+        this.characterTypeToIncludedCharacters = Generator.groupBy(
+            Generator.map(
+                (include) => CharacterLoader.load(include),
+                this.constraints.includes
+            ),
+            (character) => character.characterType
+        );
+
+        return (this.simplified = {
+            townsfolk:
+                this.constraints.townsfolk -
+                (this.characterTypeToIncludedCharacters.get(Townsfolk)
+                    ?.length ?? 0),
+            outsider:
+                this.constraints.outsider -
+                (this.characterTypeToIncludedCharacters.get(Outsider)?.length ??
+                    0),
+            minion:
+                this.constraints.minion -
+                (this.characterTypeToIncludedCharacters.get(Minion)?.length ??
+                    0),
+            demon:
+                this.constraints.demon -
+                (this.characterTypeToIncludedCharacters.get(Demon)?.length ??
+                    0),
+            traveller:
+                this.constraints.traveller -
+                (this.characterTypeToIncludedCharacters.get(Traveller)
+                    ?.length ?? 0),
+        });
     }
 
     getCandidatesByCharacterType(
@@ -373,7 +379,7 @@ export class ScriptConstraintsHelper {
             )
         );
 
-        if (this.hasExcludes) {
+        if (this.hasExcludes || this.hasIncludes) {
             candidates.exclude(this.excludedCandidateCharacters);
         }
 
@@ -402,11 +408,11 @@ export abstract class ScriptTool {
         );
     }
 
-    static candidates(
+    static async candidates(
         constraints: Partial<ScriptConstraints>,
         numCandidateUpperbound = 1
-    ): Iterable<CharacterSheet> {
-        const solver = ScriptConstraintsHelper.fromDefaults(constraints);
+    ): Promise<Iterable<CharacterSheet>> {
+        const solver = await ScriptConstraintsHelper.fromDefaults(constraints);
         return solver.candidateCharacterSheets.limit(numCandidateUpperbound);
     }
 }

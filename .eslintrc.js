@@ -14,6 +14,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     'no-redeclare': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-redeclare': ['error'],
     '@typescript-eslint/no-empty-interface': [
       'error',

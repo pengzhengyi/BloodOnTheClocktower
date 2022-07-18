@@ -6,24 +6,32 @@ import { Vote } from './vote';
 export type ExileState = NominationState;
 
 export class Exile extends Nomination {
-    constructor(public nominator: Player, nominated: Player) {
-        super(nominator, nominated);
-
-        if (!nominated.isTraveller) {
-            throw new ExileNonTraveller(nominator, nominated);
-        }
+    static async init(nominator: Player, nominated: Player) {
+        const exile = new this(nominator, nominated);
+        await exile.validate();
+        return exile;
     }
 
-    protected createVote(): Vote {
-        return new Vote(this.nominated, true);
+    async validate() {
+        await new ExileNonTraveller(this).throwWhen(
+            (error) => !error.exile.nominated.isTraveller
+        );
     }
 
-    getPlayerAboutToExile(numPlayer: number): Player | undefined {
-        const hasEnoughVoteToExile = this.vote?.hasEnoughVoteToExile(numPlayer);
+    async getPlayerAboutToExile(
+        numPlayer: number
+    ): Promise<Player | undefined> {
+        const hasEnoughVoteToExile = await this.vote?.hasEnoughVoteToExile(
+            numPlayer
+        );
         if (hasEnoughVoteToExile === undefined) {
             throw new NoVoteInExile(this);
         }
 
         return hasEnoughVoteToExile ? this.nominated : undefined;
+    }
+
+    protected createVote(): Vote {
+        return new Vote(this.nominated, true);
     }
 }

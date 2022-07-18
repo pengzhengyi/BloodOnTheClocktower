@@ -30,19 +30,25 @@ export class Vote {
         return this.votes !== undefined;
     }
 
-    hasEnoughVote(threshold: number): boolean {
-        if (this.hasVoted()) {
-            return this.votes.length >= threshold;
-        } else {
-            throw new NoVotesWhenCountingVote(this);
-        }
+    hasNotVoted(): this is { votes: undefined } {
+        return this.votes === undefined;
     }
 
-    hasEnoughVoteToExecute(numAlivePlayer: number): boolean {
+    async hasEnoughVote(threshold: number): Promise<boolean> {
+        if (this.hasNotVoted()) {
+            await new NoVotesWhenCountingVote(this).throwWhen((error) =>
+                error.vote.hasNotVoted()
+            );
+        }
+
+        return (this as { votes: Array<Player> }).votes.length >= threshold;
+    }
+
+    hasEnoughVoteToExecute(numAlivePlayer: number): Promise<boolean> {
         return this.hasEnoughVote(Math.floor(numAlivePlayer / 2));
     }
 
-    hasEnoughVoteToExile(numPlayer: number): boolean {
+    hasEnoughVoteToExile(numPlayer: number): Promise<boolean> {
         return this.hasEnoughVote(Math.floor(numPlayer / 2));
     }
 

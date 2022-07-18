@@ -22,26 +22,28 @@ export class Execution {
      *
      * @param numAlivePlayer Number of alive players in game.
      */
-    getPlayerAboutToDie(numAlivePlayer: number): Player | undefined {
+    async getPlayerAboutToDie(
+        numAlivePlayer: number
+    ): Promise<Player | undefined> {
         let highestNumVotes = 0;
         let playerAboutToDie: Player | undefined;
 
         for (const nomination of this.nominations) {
             try {
                 const vote = nomination.vote;
-                if (vote === undefined) {
-                    throw new NoVoteInNomination(nomination);
-                }
+                await new NoVoteInNomination(nomination).throwWhen((error) =>
+                    error.nomination.isVoteNotStarted()
+                );
 
-                if (vote.votes === undefined) {
-                    throw new NoVotesWhenCountingVote(vote);
-                }
+                await new NoVotesWhenCountingVote(vote!).throwWhen((error) =>
+                    error.vote.hasNotVoted()
+                );
 
-                if (!vote.hasEnoughVoteToExecute(numAlivePlayer)) {
+                if (!(await vote!.hasEnoughVoteToExecute(numAlivePlayer))) {
                     continue;
                 }
 
-                const numVotes = vote.votes.length;
+                const numVotes = vote!.votes!.length;
 
                 if (numVotes > highestNumVotes) {
                     highestNumVotes = numVotes;
@@ -67,36 +69,52 @@ export class Execution {
         return this.nominations.find(predicate);
     }
 
-    addNomination(nomination: Nomination) {
-        this.checkNominatorNotNominatedBefore(nomination);
-        this.checkNominatedNotNominatedBefore(nomination);
+    async addNomination(nomination: Nomination) {
+        const checks = await Promise.all([
+            this.checkNominatorNotNominatedBefore(nomination),
+            this.checkNominatedNotNominatedBefore(nomination),
+        ]);
 
-        this.nominations.push(nomination);
+        if (checks.every((check) => check)) {
+            this.nominations.push(nomination);
+        }
     }
 
-    private checkNominatorNotNominatedBefore(nomination: Nomination) {
+    private async checkNominatorNotNominatedBefore(
+        nomination: Nomination
+    ): Promise<boolean> {
         const pastNomination = this.getPastNomination((pastNomination) =>
             Object.is(pastNomination.nominator, nomination.nominator)
         );
         if (pastNomination !== undefined) {
-            throw new NominatorNominatedBefore(
+            const error = new NominatorNominatedBefore(
                 nomination,
                 pastNomination,
                 nomination.nominator
             );
+            await error.resolve();
+            return error.forceAllowNomination;
         }
+
+        return true;
     }
 
-    private checkNominatedNotNominatedBefore(nomination: Nomination) {
+    private async checkNominatedNotNominatedBefore(
+        nomination: Nomination
+    ): Promise<boolean> {
         const pastNomination = this.getPastNomination((pastNomination) =>
             Object.is(pastNomination.nominated, nomination.nominated)
         );
         if (pastNomination !== undefined) {
-            throw new NominatedNominatedBefore(
+            const error = new NominatedNominatedBefore(
                 nomination,
                 pastNomination,
                 nomination.nominated
             );
+            await error.resolve();
+            return error.forceAllowNomination;
         }
+
+        return true;
     }
 }

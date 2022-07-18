@@ -41,6 +41,16 @@ enum NegativeState {
  */
 
 export class Player {
+    static async init(
+        username: string,
+        character: typeof Character,
+        alignment?: Alignment
+    ) {
+        const player = new this(username, character);
+        await player.initializeAlignment(alignment);
+        return player;
+    }
+
     declare alignment: Alignment;
 
     isWake = false;
@@ -156,14 +166,12 @@ export class Player {
         return this.alignment === Alignment.Evil;
     }
 
-    constructor(
+    protected constructor(
         public username: string,
-        public character: typeof Character,
-        alignment?: Alignment
+        public character: typeof Character
     ) {
         this.username = username;
         this.character = character;
-        this.initializeAlignment(alignment);
     }
 
     isAlly(other: Player) {
@@ -189,12 +197,16 @@ export class Player {
         yield* this.getAllies(players);
     }
 
-    nominate(nominated: Player): Nomination {
+    async nominate(nominated: Player): Promise<Nomination | undefined> {
         if (!this.canNominate) {
-            throw new DeadPlayerCannotNominate(this);
+            const error = new DeadPlayerCannotNominate(this);
+            await error.resolve();
+            if (!error.forceAllowNomination) {
+                return;
+            }
         }
 
-        return new Nomination(this, nominated);
+        return await Nomination.init(this, nominated);
     }
 
     async collectVote(forExile: boolean): Promise<boolean> {
@@ -214,15 +226,17 @@ export class Player {
         return false;
     }
 
-    protected initializeAlignment(alignment?: Alignment) {
+    protected async initializeAlignment(alignment?: Alignment) {
         if (alignment === undefined) {
             const alignment = this.characterType.defaultAlignment;
 
             if (alignment === undefined) {
-                throw new PlayerHasUnclearAlignment(this, alignment);
+                await new PlayerHasUnclearAlignment(this, alignment).throwWhen(
+                    (error) => error.player.alignment === undefined
+                );
+            } else {
+                this.alignment = alignment;
             }
-
-            this.alignment = alignment;
         } else {
             this.alignment = alignment;
         }
