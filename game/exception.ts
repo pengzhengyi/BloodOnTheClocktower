@@ -1,4 +1,5 @@
 import { Dayjs } from 'dayjs';
+import { StackFrame, fromError } from 'stacktrace-js';
 import { Nomination } from './nomination';
 import { Exile } from './exile';
 import { Vote } from './vote';
@@ -27,6 +28,10 @@ import { GameUI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
     declare cause?: Error;
+
+    getStackFrames(): Promise<Array<StackFrame>> {
+        return fromError(this);
+    }
 
     from(error: Error): this {
         this.cause = error;
