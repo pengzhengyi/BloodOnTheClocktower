@@ -21,11 +21,14 @@ export class Exile extends Nomination {
     async getPlayerAboutToExile(
         numPlayer: number
     ): Promise<Player | undefined> {
-        const hasEnoughVoteToExile = await this.vote?.hasEnoughVoteToExile(
+        let hasEnoughVoteToExile = await this.vote?.hasEnoughVoteToExile(
             numPlayer
         );
+
         if (hasEnoughVoteToExile === undefined) {
-            throw new NoVoteInExile(this);
+            const error = new NoVoteInExile(this);
+            await error.resolve();
+            hasEnoughVoteToExile = error.forceAllowExile;
         }
 
         return hasEnoughVoteToExile ? this.nominated : undefined;

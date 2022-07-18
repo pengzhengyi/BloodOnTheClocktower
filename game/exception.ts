@@ -109,6 +109,8 @@ export class NoVoteInNomination extends RecoverableGameError {
 export class NoVoteInExile extends RecoverableGameError {
     static description = 'Exile does not have a finished vote';
 
+    forceAllowExile = false;
+
     constructor(readonly exile: Exile) {
         super(NoVoteInExile.description);
 
@@ -304,10 +306,15 @@ export class CharacterLoadFailure extends RecoverableGameError {
 export class NoEditionMatchingName extends RecoverableGameError {
     static description = 'Cannot find a edition  with matching name';
 
+    declare correctedEditionName: string;
+
     constructor(readonly editionName?: string) {
         super(NoEditionMatchingName.description);
 
         this.editionName = editionName;
+        if (editionName !== undefined) {
+            this.correctedEditionName = editionName;
+        }
     }
 }
 
@@ -347,10 +354,16 @@ export class CharacterLoadFailures<
 export class NoCharacterMatchingId extends RecoverableGameError {
     static description = 'Cannot find a character with matching id';
 
+    declare correctedId: string;
+
     constructor(readonly id?: string) {
         super(NoCharacterMatchingId.description);
 
         this.id = id;
+
+        if (id !== undefined) {
+            this.correctedId = id;
+        }
     }
 }
 

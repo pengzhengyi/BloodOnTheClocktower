@@ -20,7 +20,7 @@ export abstract class CharacterType {
         return TEAM_CHARACTER_TYPES.has(type);
     }
 
-    static unsafeFrom(type?: string): typeof CharacterType {
+    static unsafeFrom(type?: string): typeof CharacterType | undefined {
         if (type !== undefined) {
             const characterType = TEAM_CHARACTER_TYPES.get(type);
             if (characterType !== undefined) {
@@ -28,7 +28,7 @@ export abstract class CharacterType {
             }
         }
 
-        throw new NoMatchingCharacterType(type);
+        return undefined;
     }
 
     static async from(type?: string): Promise<typeof CharacterType> {

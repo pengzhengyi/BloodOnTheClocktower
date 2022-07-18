@@ -11,7 +11,6 @@ import { lowercaseLetters } from './common';
 import {
     CannotDetermineCharacterType,
     IncompleteCharacterRoleData,
-    NoMatchingCharacterType,
 } from './exception';
 import { RoleDataKeyName, RoleData, ScriptCharacter } from './types';
 
@@ -93,15 +92,11 @@ export abstract class Character {
     protected static setCharacterType(roleData: Partial<RoleData>) {
         const type = roleData[RoleDataKeyName.TEAM];
 
-        try {
-            const characterType = CharacterType.unsafeFrom(type);
+        const characterType = CharacterType.unsafeFrom(type);
+        if (characterType === undefined) {
+            throw new CannotDetermineCharacterType(this, type);
+        } else {
             this.characterType = characterType;
-        } catch (error) {
-            if (error instanceof NoMatchingCharacterType) {
-                throw new CannotDetermineCharacterType(this, type).from(error);
-            } else {
-                throw error;
-            }
         }
     }
 

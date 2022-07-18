@@ -281,7 +281,9 @@ export class ScriptConstraintsHelper {
         ).throwWhen((error) => !Array.isArray(error.constraints.editions));
 
         this.editions = await Promise.all(
-            constraints.editions.map((edition) => EditionLoader.load(edition))
+            constraints.editions.map((edition) =>
+                EditionLoader.loadAsync(edition)
+            )
         );
     }
 
@@ -294,11 +296,11 @@ export class ScriptConstraintsHelper {
         ).throwWhen((error) => !Array.isArray(error.constraints.fabled));
 
         for (const character of constraints.fabled) {
-            await CharacterLoader.load(character);
+            await CharacterLoader.loadAsync(character);
         }
         this.fabled = await Promise.all(
             constraints.fabled.map((character) =>
-                CharacterLoader.load(character)
+                CharacterLoader.loadAsync(character)
             )
         );
     }
@@ -313,7 +315,7 @@ export class ScriptConstraintsHelper {
 
         this.excludes = await Promise.all(
             constraints.excludes.map((character) =>
-                CharacterLoader.load(character)
+                CharacterLoader.loadAsync(character)
             )
         );
     }
@@ -329,7 +331,7 @@ export class ScriptConstraintsHelper {
         await new TooManyMustIncludedCharacters(this).validateOrThrow();
         this.includes = await Promise.all(
             constraints.includes.map((character) =>
-                CharacterLoader.load(character)
+                CharacterLoader.loadAsync(character)
             )
         );
     }
@@ -337,7 +339,7 @@ export class ScriptConstraintsHelper {
     simplify() {
         this.characterTypeToIncludedCharacters = Generator.groupBy(
             Generator.map(
-                (include) => CharacterLoader.load(include),
+                (include) => CharacterLoader.tryLoad(include)!,
                 this.constraints.includes
             ),
             (character) => character.characterType

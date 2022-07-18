@@ -33,13 +33,12 @@ import {
 @Exclude()
 export class CharacterSheet {
     static find(id: string) {
-        const character = CharacterLoader.load(id);
+        const character = CharacterLoader.tryLoad(id);
         return this._validateFoundCharacter(id, character);
     }
 
     static async findAsync(id: string) {
-        const character =
-            CharacterLoader.load(id) || (await CharacterLoader.loadAsync(id));
+        const character = await CharacterLoader.loadAsync(id);
         return this._validateFoundCharacter(id, character);
     }
 

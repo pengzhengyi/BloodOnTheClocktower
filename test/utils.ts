@@ -10,7 +10,7 @@ export async function playerFromDescription(description: string) {
         throw new Error(`Cannot initialize a player form ${description}`);
     }
     const [_, username, alignmentDescription, characterName] = matchResult;
-    const character = CharacterLoader.load(characterName);
+    const character = await CharacterLoader.loadAsync(characterName);
     let alignment: Alignment | undefined;
     if (alignmentDescription === 'evil') {
         alignment = Alignment.Evil;

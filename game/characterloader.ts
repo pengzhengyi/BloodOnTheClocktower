@@ -5,21 +5,17 @@ import type { RoleData } from './types';
 import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
 
 export abstract class CharacterLoader {
-    static load(id: string): typeof Character {
-        const character = this.tryLoad(id);
-        if (character === undefined) {
-            throw new NoCharacterMatchingId(id);
-        }
-        return character;
-    }
-
     static tryLoad(id: string): typeof Character | undefined {
         return ID_TO_CHARACTER.get(Character.getCanonicalId(id));
     }
 
     static async loadAsync(id: string): Promise<typeof Character> {
-        const roleData = await this.loadCharacterRoleDataAsync(id);
-        return this.loadWithRoleData(roleData);
+        const error = new NoCharacterMatchingId(id);
+        await error.throwWhen(
+            (error) => this.tryLoad(error.correctedId) === undefined
+        );
+
+        return this.tryLoad(error.correctedId)!;
     }
 
     protected static loadWithRoleData(roleData: Partial<RoleData>) {

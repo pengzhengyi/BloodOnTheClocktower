@@ -5,21 +5,17 @@ import { EditionLoadFailure, NoEditionMatchingName } from './exception';
 import { NAME_TO_EDITION } from '~/content/editions/editions';
 
 export abstract class EditionLoader {
-    static load(editionName: string): typeof Edition {
-        const edition = this.tryLoad(editionName);
-        if (edition === undefined) {
-            throw new NoEditionMatchingName(editionName);
-        }
-        return edition;
-    }
-
     static tryLoad(editionName: string): typeof Edition | undefined {
         return NAME_TO_EDITION.get(Edition.getCanonicalName(editionName));
     }
 
     static async loadAsync(editionName: string): Promise<typeof Edition> {
-        const editionData = await this.loadEditionEditionDataAsync(editionName);
-        return this.loadWithEditionData(editionData);
+        const error = new NoEditionMatchingName(editionName);
+        await error.throwWhen(
+            (error) => this.tryLoad(error.correctedEditionName) === undefined
+        );
+
+        return this.tryLoad(error.correctedEditionName)!;
     }
 
     protected static loadWithEditionData(editionData: Partial<EditionData>) {
