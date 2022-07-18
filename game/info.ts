@@ -50,8 +50,12 @@ export abstract class InfoProvider<T> {
 
     candidates(gameInfo: GameInfo): Promise<Generator<T>> {
         return this.isTrue
-            ? this.trueInfoCandidates(gameInfo)
-            : this.falseInfoCandidates(gameInfo);
+            ? this.trueInfoCandidates(gameInfo).catch((_) =>
+                  Generator<T>.empty()
+              )
+            : this.falseInfoCandidates(gameInfo).catch((_) =>
+                  Generator<T>.empty()
+              );
     }
 }
 

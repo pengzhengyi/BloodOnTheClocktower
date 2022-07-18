@@ -1,11 +1,28 @@
 import { Generator } from './collections';
 import { clockwise, counterclockwise } from './common';
-import { NumberOfSeatNotPositive, PlayerNotSat } from './exception';
+import {
+    NumberOfSeatNotPositive,
+    PlayerNoAliveNeighbors,
+    PlayerNoNeighbors,
+    PlayerNotSat,
+    UnexpectedEmptySeat,
+} from './exception';
 import { Player } from './player';
 import { Seat } from './seat';
 import { Direction, Predicate, TAUTOLOGY } from './types';
 
 export class Seating {
+    static unsafeFrom(players: Iterable<Player>) {
+        const seats: Array<Seat> = [];
+
+        for (const player of players) {
+            const seatNumber = player.seatNumber!;
+            seats[seatNumber] = new Seat(seatNumber, player);
+        }
+
+        return new this(seats);
+    }
+
     static async from(players: Iterable<Player>) {
         const seats: Array<Seat> = [];
 
@@ -77,10 +94,26 @@ export class Seating {
         }
     }
 
-    getNextSeat(
+    async getClockwisePlayer(
         seat: Seat,
         filterSeat: Predicate<Seat> | undefined = undefined
-    ): Seat {
+    ): Promise<Player | undefined> {
+        const nextSeat = this.tryGetNextSeat(seat, filterSeat);
+
+        if (nextSeat !== undefined) {
+            const checkSeatOccupied = new UnexpectedEmptySeat(nextSeat);
+            await checkSeatOccupied.throwWhen(
+                (error) => error.emptySeat.player === undefined
+            );
+        }
+
+        return nextSeat?.player;
+    }
+
+    tryGetNextSeat(
+        seat: Seat,
+        filterSeat: Predicate<Seat> | undefined = undefined
+    ): Seat | undefined {
         const neighbors = this.iterateSeats(
             seat,
             Direction.Clockwise,
@@ -89,10 +122,26 @@ export class Seating {
         return neighbors.next().value;
     }
 
-    getPrevSeat(
+    async getCounterclockwisePlayer(
         seat: Seat,
         filterSeat: Predicate<Seat> | undefined = undefined
-    ): Seat {
+    ): Promise<Player | undefined> {
+        const prevSeat = this.tryGetPrevSeat(seat, filterSeat);
+
+        if (prevSeat !== undefined) {
+            const checkSeatOccupied = new UnexpectedEmptySeat(prevSeat);
+            await checkSeatOccupied.throwWhen(
+                (error) => error.emptySeat.player === undefined
+            );
+        }
+
+        return prevSeat?.player;
+    }
+
+    tryGetPrevSeat(
+        seat: Seat,
+        filterSeat: Predicate<Seat> | undefined = undefined
+    ): Seat | undefined {
         const neighbors = this.iterateSeats(
             seat,
             Direction.Counterclockwise,
@@ -152,7 +201,7 @@ export class Seating {
         }
     }
 
-    findSeatByPlayer(player: Player): Seat | undefined {
+    tryFindSeatByPlayer(player: Player): Seat | undefined {
         const seatNum = player.seatNumber;
 
         if (seatNum === undefined) {
@@ -160,5 +209,57 @@ export class Seating {
         }
 
         return this.seats[seatNum];
+    }
+
+    async findSeatByPlayer(player: Player): Promise<Seat> {
+        const checkPlayerSat = new PlayerNotSat(player);
+        await checkPlayerSat.throwWhen(
+            (error) => this.tryFindSeatByPlayer(error.player) === undefined
+        );
+        return this.tryFindSeatByPlayer(checkPlayerSat.player)!;
+    }
+
+    /**
+     * {@link `glossary["Neighbors"]`}
+     * The two players, whether dead or alive, sitting one seat clockwise and counterclockwise from the player in question.
+     */
+    async getNeighbors(player: Player): Promise<[Player, Player]> {
+        const seat = await this.findSeatByPlayer(player);
+
+        const neighbors = await Promise.all([
+            this.getCounterclockwisePlayer(seat),
+            this.getClockwisePlayer(seat),
+        ]);
+
+        if (neighbors[0] !== undefined && neighbors[1] !== undefined) {
+            return [neighbors[0], neighbors[1]];
+        } else {
+            throw new PlayerNoNeighbors(player, neighbors, this);
+        }
+    }
+
+    /**
+     * {@link `glossary["Alive neighbours:"]`}
+     * The two alive players that are sitting closest—one clockwise, one counterclockwise—to the player in question, not including any dead players sitting between them.
+     */
+    async getAliveNeighbors(player: Player): Promise<[Player, Player]> {
+        const seat = await this.findSeatByPlayer(player);
+
+        const neighbors = await Promise.all([
+            this.getCounterclockwisePlayer(
+                seat,
+                (seat) => seat.player?.alive ?? false
+            ),
+            this.getClockwisePlayer(
+                seat,
+                (seat) => seat.player?.alive ?? false
+            ),
+        ]);
+
+        if (neighbors[0] !== undefined && neighbors[1] !== undefined) {
+            return [neighbors[0], neighbors[1]];
+        } else {
+            throw new PlayerNoAliveNeighbors(player, neighbors, this);
+        }
     }
 }

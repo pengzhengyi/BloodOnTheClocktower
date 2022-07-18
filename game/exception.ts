@@ -22,6 +22,7 @@ import {
     Traveller,
 } from './charactertype';
 import { Alignment } from './alignment';
+import { Seating } from './seating';
 import { GameUI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
@@ -238,6 +239,10 @@ export class NumberOfSeatNotPositive extends RecoverableGameError {
 export class UnexpectedEmptySeat extends RecoverableGameError {
     static description = 'Encountered an empty seat unexpected';
 
+    get satPlayer(): Player | undefined {
+        return this.emptySeat.player;
+    }
+
     constructor(readonly emptySeat: Seat) {
         super(UnexpectedEmptySeat.description);
 
@@ -252,6 +257,37 @@ export class PlayerNotSat extends RecoverableGameError {
         super(PlayerNotSat.description);
 
         this.player = player;
+    }
+}
+
+export class PlayerNoNeighbors extends RecoverableGameError {
+    static description =
+        'Cannot get two players that sitting nearest to the player';
+
+    constructor(
+        readonly player: Player,
+        readonly neighbors: [Player | undefined, Player | undefined],
+        readonly seating: Seating
+    ) {
+        super(PlayerNoNeighbors.description);
+
+        this.player = player;
+        this.neighbors = neighbors;
+        this.seating = seating;
+    }
+}
+
+export class PlayerNoAliveNeighbors extends PlayerNoNeighbors {
+    static description =
+        'Cannot get two alive players that sitting nearest to the player';
+
+    constructor(
+        readonly player: Player,
+        readonly neighbors: [Player | undefined, Player | undefined],
+        readonly seating: Seating
+    ) {
+        super(player, neighbors, seating);
+        this.message = PlayerNoAliveNeighbors.description;
     }
 }
 
