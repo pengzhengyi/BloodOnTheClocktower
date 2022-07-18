@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { Character } from './character';
 import { Nomination } from './nomination';
 import {
@@ -44,9 +45,14 @@ export class Player {
     static async init(
         username: string,
         character: typeof Character,
-        alignment?: Alignment
+        alignment?: Alignment,
+        id?: string
     ) {
-        const player = new this(username, character);
+        if (id === undefined) {
+            id = uuid();
+        }
+
+        const player = new this(id, username, character);
         await player.initializeAlignment(alignment);
         return player;
     }
@@ -167,9 +173,11 @@ export class Player {
     }
 
     protected constructor(
+        public readonly id: string,
         public username: string,
         public character: typeof Character
     ) {
+        this.id = id;
         this.username = username;
         this.character = character;
     }
