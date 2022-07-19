@@ -4,6 +4,8 @@ import { playerFromDescription } from './utils';
 import {
     ChefInfo,
     ChefInfoProvider,
+    EmpathInfo,
+    EmpathInfoProvider,
     InfoProvider,
     InvestigatorInfo,
     InvestigatorInfoProvider,
@@ -360,6 +362,102 @@ describe('True Chef info', () => {
         expect(candidates).toHaveLength(1);
         for (const candidate of candidates as Array<ChefInfo>) {
             expect(candidate.numPairEvilPlayers).toBe(3);
+        }
+    });
+});
+
+describe('True Empath info', () => {
+    let empathPlayer: Player;
+    let infoProvider: EmpathInfoProvider;
+
+    beforeAll(async () => {
+        empathPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Empath`
+        );
+        infoProvider = new EmpathInfoProvider(empathPlayer, true);
+    });
+
+    /**
+     * {@link `empath["gameplay"][0]`}
+     */
+    test("The Empath neighbours two good players—a Soldier and a Monk . The Empath learns a '0'.", async () => {
+        const monk = await playerFromDescription(
+            `${faker.name.firstName()} is the Monk`
+        );
+
+        const [candidates, _] = await generateInfoCandidates(
+            [`${faker.name.firstName()} is the Soldier`],
+            [empathPlayer, monk],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<EmpathInfo>) {
+            expect(candidate.numEvilAliveNeighbors).toEqual(0);
+        }
+    });
+
+    /**
+     * {@link `empath["gameplay"][1]`}
+     */
+    test("The next day, the Soldier is executed. That night, the Monk is killed by the Imp. The Empath now detects the players sitting next to the Soldier and the Monk, which are a Librarian and an evil Gunslinger. The Empath now learns a '1'.", async () => {
+        const gunslinger = await playerFromDescription(
+            `${faker.name.firstName()} is the evil Gunslinger`
+        );
+        const soldier = await playerFromDescription(
+            `${faker.name.firstName()} is the Soldier`
+        );
+        soldier.setDead();
+        const monk = await playerFromDescription(
+            `${faker.name.firstName()} is the Monk`
+        );
+        monk.setDead();
+
+        const [candidates, _] = await generateInfoCandidates(
+            [`${faker.name.firstName()} is the Librarian`],
+            [soldier, empathPlayer, monk, gunslinger],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<EmpathInfo>) {
+            expect(candidate.numEvilAliveNeighbors).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `empath["gameplay"][2]`}
+     */
+    test("There are only three players left alive: the Empath, the Imp, and the Baron. No matter who is seated where, the Empath learns a '2'.", async () => {
+        const gunslinger = await playerFromDescription(
+            `${faker.name.firstName()} is the evil Gunslinger`
+        );
+        gunslinger.setDead();
+        const soldier = await playerFromDescription(
+            `${faker.name.firstName()} is the Soldier`
+        );
+        soldier.setDead();
+        const monk = await playerFromDescription(
+            `${faker.name.firstName()} is the Monk`
+        );
+        monk.setDead();
+        const librarian = await playerFromDescription(
+            `${faker.name.firstName()} is the Librarian`
+        );
+        librarian.setDead();
+        const baron = await playerFromDescription(
+            `${faker.name.firstName()} is the Baron`
+        );
+
+        const [candidates, _] = await generateInfoCandidates(
+            [`${faker.name.firstName()} is the Imp`],
+            [librarian, soldier, empathPlayer, monk, gunslinger, baron],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<EmpathInfo>) {
+            expect(candidate.numEvilAliveNeighbors).toEqual(2);
         }
     });
 });

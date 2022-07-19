@@ -199,6 +199,10 @@ export class Player {
         this.character = character;
     }
 
+    setDead() {
+        this.state += NegativeState.Dead;
+    }
+
     isAlly(other: Player) {
         return this.alignment === other.alignment;
     }

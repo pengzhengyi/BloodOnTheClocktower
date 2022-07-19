@@ -196,3 +196,38 @@ export class ChefInfoProvider extends InfoProvider<ChefInfo> {
         );
     }
 }
+
+/**
+ * {@link `empath["ability"]`}
+ * "Each night, you learn how many of your 2 alive neighbours are evil."
+ */
+export interface EmpathInfo {
+    numEvilAliveNeighbors: 0 | 1 | 2;
+}
+
+export class EmpathInfoProvider extends InfoProvider<EmpathInfo> {
+    async trueInfoCandidates(gameInfo: GameInfo) {
+        const seating = await gameInfo.getSeating();
+        const aliveNeighbors = await seating.getAliveNeighbors(this.receiver);
+        const numEvilAliveNeighbors = Generator.reduce(
+            (count, neighbor) => count + (neighbor.isEvil ? 1 : 0),
+            0,
+            aliveNeighbors
+        );
+
+        return Generator.once([
+            {
+                numEvilAliveNeighbors,
+            } as EmpathInfo,
+        ]);
+    }
+
+    _falseInfoCandidates(_gameInfo: GameInfo) {
+        return Generator.once(
+            [0, 1, 2].map(
+                (numEvilAliveNeighbors) =>
+                    ({ numEvilAliveNeighbors } as EmpathInfo)
+            )
+        );
+    }
+}
