@@ -12,6 +12,25 @@ export class Players extends Generator<Player> {
         return Generator.every((player) => player.isEvil, iterable);
     }
 
+    findById(playerIds: Set<string>) {
+        if (playerIds.size === 0) {
+            return Players.empty() as Players;
+        }
+
+        return this.filter((player) => playerIds.has(player.id));
+    }
+
+    intersect(players: Iterable<Player>) {
+        if (players === undefined) {
+            return Players.empty() as Players;
+        }
+
+        const playerIds = new Set(
+            Generator.map((player) => player.id, players)
+        );
+        return this.findById(playerIds);
+    }
+
     isMinion() {
         return this.filter((player) => player.character.isMinion);
     }

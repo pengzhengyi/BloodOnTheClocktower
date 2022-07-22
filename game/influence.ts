@@ -1,10 +1,11 @@
 import { Alignment } from './alignment';
-import { Character } from './character';
-import { CharacterSheet } from './charactersheet';
+import type { Character } from './character';
+import type { CharacterSheet } from './charactersheet';
 import { Generator } from './collections';
 import { IncorrectAlignmentForSpyToRegisterAs } from './exception';
 import { GameInfo } from './gameinfo';
-import { Player } from './player';
+import { Demon } from './charactertype';
+import type { Player } from './player';
 import { Spy } from '~/content/characters/output/spy';
 import { GameUI } from '~/interaction/gameui';
 import { Recluse } from '~/content/characters/output/recluse';
@@ -20,10 +21,16 @@ export abstract class Influence {
         this.description = description;
     }
 
-    abstract apply(
+    async apply(
         gameInfo: GameInfo,
         context: InfluenceApplyContext
-    ): Promise<GameInfo>;
+    ): Promise<GameInfo> {
+        return await this._apply(gameInfo, context);
+    }
+
+    _apply(_gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
+        throw new Error('Method not implemented.');
+    }
 }
 
 export class Influences extends Influence {
@@ -44,6 +51,7 @@ export class Influences extends Influence {
 }
 
 export abstract class RegisterAsInfluence extends Influence {
+    declare playerToRegister: Player;
     declare static originalCharacter: typeof Character;
     declare static registerAsAlignment: Alignment.Good | Alignment.Evil;
 
@@ -114,6 +122,11 @@ export abstract class RegisterAsInfluence extends Influence {
         return GameUI.storytellerChoose(options, reason);
     }
 
+    constructor(playerToRegister: Player, description: string) {
+        super(playerToRegister, description);
+        this.playerToRegister = playerToRegister;
+    }
+
     async apply(
         gameInfo: GameInfo,
         context: InfluenceApplyContext
@@ -128,8 +141,7 @@ export abstract class RegisterAsInfluence extends Influence {
 
         const playersAfterReplacement = Array.from(
             gameInfo.players.replace(
-                (player) =>
-                    Object.is(player.character, thisClass.originalCharacter),
+                (player) => player.equals(this.playerToRegister),
                 (player) =>
                     thisClass.registerAs(
                         player,
@@ -149,6 +161,36 @@ export abstract class RegisterAsGoodInfluence extends RegisterAsInfluence {
 
 export abstract class RegisterAsEvilInfluence extends RegisterAsInfluence {
     static registerAsAlignment: Alignment.Evil = Alignment.Evil;
+}
+
+export abstract class RegisterAsDemonInfluence extends RegisterAsEvilInfluence {
+    static registerAs(player: Player): Player {
+        return new Proxy(player, {
+            get: function (target, property, receiver) {
+                switch (property) {
+                    case 'characterType':
+                        return Demon;
+                    case 'isDemon':
+                        return true;
+                    default:
+                        return Reflect.get(target, property, receiver);
+                }
+            },
+        });
+    }
+
+    _apply(gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
+        const thisClass = this.constructor as typeof RegisterAsDemonInfluence;
+
+        const playersAfterReplacement = Array.from(
+            gameInfo.players.replace(
+                (player) => player.equals(this.playerToRegister),
+                (player) => thisClass.registerAs(player)
+            )
+        );
+
+        return new GameInfo(playersAfterReplacement, gameInfo.characterSheet);
+    }
 }
 
 export class SpyInfluence extends RegisterAsGoodInfluence {
@@ -174,5 +216,18 @@ export class RecluseInfluence extends RegisterAsGoodInfluence {
 
     constructor(reclusePlayer: Player) {
         super(reclusePlayer, RecluseInfluence.description);
+    }
+}
+
+export class FortuneTellerRedHerringInfluence extends RegisterAsDemonInfluence {
+    static readonly description: string =
+        'There is a good player that registers as a Demon to the Fortune Teller.';
+
+    constructor(fortuneTellerPlayer: Player, playerAsRedHerring: Player) {
+        super(
+            fortuneTellerPlayer,
+            FortuneTellerRedHerringInfluence.description
+        );
+        this.playerToRegister = playerAsRedHerring;
     }
 }

@@ -2,6 +2,7 @@ import { Character } from './character';
 import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import { MinionPlayer, DemonPlayer, Player } from './player';
 import { Generator } from './collections';
+import { FortuneTellerChooseInvalidPlayers } from './exception';
 import { GameInfo } from './gameinfo';
 import { Players } from './players';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
@@ -229,5 +230,73 @@ export class EmpathInfoProvider extends InfoProvider<EmpathInfo> {
                     ({ numEvilAliveNeighbors } as EmpathInfo)
             )
         );
+    }
+}
+
+/**
+ * {@link `fortuneteller["ability"]`}
+ * "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you."
+ */
+export interface FortuneTellerInfo {
+    players?: [Player, Player];
+    hasDemon: boolean;
+}
+
+export class FortuneTellerInfoProvider extends InfoProvider<FortuneTellerInfo> {
+    protected chosenPlayers?: [Player, Player];
+
+    get chosen(): [Player, Player] | undefined {
+        return this.chosenPlayers;
+    }
+
+    static isChoiceValid(players: Array<Player> | undefined): boolean {
+        return Array.isArray(players) && players.length === 2;
+    }
+
+    choose(players: Array<Player> | undefined) {
+        if (FortuneTellerInfoProvider.isChoiceValid(players)) {
+            this.chosenPlayers = players as [Player, Player];
+        } else {
+            throw new FortuneTellerChooseInvalidPlayers(players);
+        }
+    }
+
+    async getChosenPlayers(gameInfo: GameInfo): Promise<Players> {
+        if (this.chosenPlayers?.length !== 2) {
+            const error = new FortuneTellerChooseInvalidPlayers(
+                this.chosenPlayers
+            );
+            await error.resolve();
+            this.chosenPlayers = error.corrected;
+        }
+
+        return gameInfo.players.intersect(this.chosenPlayers);
+    }
+
+    async trueInfoCandidates(gameInfo: GameInfo) {
+        const chosenPlayers = await this.getChosenPlayers(gameInfo);
+
+        return Generator.once([
+            {
+                players: Array.from(chosenPlayers),
+                hasDemon: Generator.any(
+                    (player) => player.isDemon,
+                    chosenPlayers
+                ),
+            } as FortuneTellerInfo,
+        ]);
+    }
+
+    _falseInfoCandidates(_gameInfo: GameInfo) {
+        return Generator.once([
+            {
+                players: this.chosenPlayers,
+                hasDemon: true,
+            } as FortuneTellerInfo,
+            {
+                players: this.chosenPlayers,
+                hasDemon: false,
+            } as FortuneTellerInfo,
+        ]);
     }
 }

@@ -8,7 +8,15 @@ import {
     PlayerHasUnclearAlignment,
 } from './exception';
 import { Alignment } from './alignment';
-import { CharacterType, Demon, Minion, Traveller } from './charactertype';
+import {
+    CharacterType,
+    Demon,
+    Fabled,
+    Minion,
+    Outsider,
+    Townsfolk,
+    Traveller,
+} from './charactertype';
 import { GameUI } from '~/interaction/gameui';
 
 enum NegativeState {
@@ -156,6 +164,26 @@ export class Player {
         return this.alive || this.hasVoteToken;
     }
 
+    get isMinion() {
+        return this.isCharacterType(Minion);
+    }
+
+    get isDemon() {
+        return this.isCharacterType(Demon);
+    }
+
+    get isTownsfolk() {
+        return this.isCharacterType(Townsfolk);
+    }
+
+    get isOutsider() {
+        return this.isCharacterType(Outsider);
+    }
+
+    get isFabled() {
+        return this.isCharacterType(Fabled);
+    }
+
     get isTraveller(): boolean {
         return Object.is(this.characterType, Traveller);
     }
@@ -197,6 +225,10 @@ export class Player {
         this.id = id;
         this.username = username;
         this.character = character;
+    }
+
+    isCharacterType(characterType: typeof CharacterType): boolean {
+        return Object.is(this.characterType, characterType);
     }
 
     setDead() {

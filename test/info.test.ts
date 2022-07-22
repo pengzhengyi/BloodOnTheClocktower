@@ -6,6 +6,8 @@ import {
     ChefInfoProvider,
     EmpathInfo,
     EmpathInfoProvider,
+    FortuneTellerInfo,
+    FortuneTellerInfoProvider,
     InfoProvider,
     InvestigatorInfo,
     InvestigatorInfoProvider,
@@ -17,7 +19,11 @@ import {
 import { Player } from '~/game/player';
 import { GameInfo } from '~/game/gameinfo';
 import { CharacterSheet } from '~/game/charactersheet';
-import { RecluseInfluence, SpyInfluence } from '~/game/influence';
+import {
+    FortuneTellerRedHerringInfluence,
+    RecluseInfluence,
+    SpyInfluence,
+} from '~/game/influence';
 import { GameUI } from '~/interaction/gameui';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Saint } from '~/content/characters/output/saint';
@@ -458,6 +464,131 @@ describe('True Empath info', () => {
         expect(candidates).toHaveLength(1);
         for (const candidate of candidates as Array<EmpathInfo>) {
             expect(candidate.numEvilAliveNeighbors).toEqual(2);
+        }
+    });
+});
+
+describe('True FortuneTeller info', () => {
+    let FortuneTellerPlayer: Player;
+    let infoProvider: FortuneTellerInfoProvider;
+
+    beforeAll(async () => {
+        FortuneTellerPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the FortuneTeller`
+        );
+    });
+
+    beforeEach(() => {
+        infoProvider = new FortuneTellerInfoProvider(FortuneTellerPlayer, true);
+    });
+
+    /**
+     * {@link `FortuneTeller["gameplay"][0]`}
+     */
+    test("The Fortune Teller chooses the Monk and the Undertaker, and learns a 'no'.", async () => {
+        const monk = await playerFromDescription(
+            `${faker.name.firstName()} is the Monk`
+        );
+        const undertaker = await playerFromDescription(
+            `${faker.name.firstName()} is the Undertaker`
+        );
+
+        infoProvider.choose([monk, undertaker]);
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [monk, undertaker, FortuneTellerPlayer],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<FortuneTellerInfo>) {
+            expect(candidate.hasDemon).toBeFalse();
+        }
+    });
+
+    /**
+     * {@link `FortuneTeller["gameplay"][1]`}
+     */
+    test("The Fortune Teller chooses the Imp and the Empath, and learns a 'yes'.", async () => {
+        const imp = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const empath = await playerFromDescription(
+            `${faker.name.firstName()} is the Empath`
+        );
+
+        infoProvider.choose([imp, empath]);
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [imp, empath, FortuneTellerPlayer],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<FortuneTellerInfo>) {
+            expect(candidate.hasDemon).toBeTrue();
+        }
+    });
+
+    /**
+     * {@link `FortuneTeller["gameplay"][2]`}
+     */
+    test("The Fortune Teller chooses an alive Butler and a dead Imp, and learns a 'yes'.", async () => {
+        const imp = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        imp.setDead();
+
+        const butler = await playerFromDescription(
+            `${faker.name.firstName()} is the Butler`
+        );
+
+        infoProvider.choose([imp, butler]);
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [butler, imp, FortuneTellerPlayer],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<FortuneTellerInfo>) {
+            expect(candidate.hasDemon).toBeTrue();
+        }
+    });
+
+    /**
+     * {@link `FortuneTeller["gameplay"][3]`}
+     */
+    test("The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'.", async () => {
+        const saint = await playerFromDescription(
+            `${faker.name.firstName()} is the Saint`
+        );
+        saint.setDead();
+
+        infoProvider.choose([saint, FortuneTellerPlayer]);
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [saint, FortuneTellerPlayer],
+            infoProvider,
+            async (gameInfo, _) => {
+                const influence = new FortuneTellerRedHerringInfluence(
+                    FortuneTellerPlayer,
+                    saint
+                );
+
+                return await influence.apply(gameInfo, {
+                    unbiasedGameInfo: gameInfo,
+                });
+            }
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<FortuneTellerInfo>) {
+            expect(candidate.hasDemon).toBeTrue();
         }
     });
 });

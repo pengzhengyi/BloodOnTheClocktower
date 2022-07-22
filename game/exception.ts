@@ -1,15 +1,15 @@
-import { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import { StackFrame, fromError } from 'stacktrace-js';
-import { Nomination } from './nomination';
-import { Exile } from './exile';
-import { Vote } from './vote';
-import { Predicate, RoleData } from './types';
-import { Player } from './player';
-import { Seat } from './seat';
-import { Meaning } from './clocktower';
-import { Character } from './character';
-import { StoryTeller } from './storyteller';
-import {
+import type { Nomination } from './nomination';
+import type { Exile } from './exile';
+import type { Vote } from './vote';
+import type { Predicate, RoleData } from './types';
+import type { Player } from './player';
+import type { Seat } from './seat';
+import type { Meaning } from './clocktower';
+import type { Character } from './character';
+import type { StoryTeller } from './storyteller';
+import type {
     NumberOfCharacters,
     ScriptConstraints,
     ScriptConstraintsHelper,
@@ -22,8 +22,8 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import { Alignment } from './alignment';
-import { Seating } from './seating';
+import type { Alignment } from './alignment';
+import type { Seating } from './seating';
 import { GameUI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
@@ -552,5 +552,18 @@ export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
         if (alignmentToRegisterAs !== undefined) {
             this.correctedAlignmentToRegisterAs = alignmentToRegisterAs;
         }
+    }
+}
+
+export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
+    static description =
+        'The fortune teller has not chosen two players to detect';
+
+    declare corrected: [Player, Player];
+
+    constructor(readonly chosen: Array<Player> | undefined) {
+        super(FortuneTellerChooseInvalidPlayers.description);
+
+        this.chosen = chosen;
     }
 }
