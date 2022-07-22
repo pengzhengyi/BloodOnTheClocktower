@@ -13,6 +13,8 @@ import {
     InvestigatorInfoProvider,
     LibrarianInfo,
     LibrarianInfoProvider,
+    UndertakerInfo,
+    UndertakerInfoProvider,
     WasherwomanInfo,
     WasherwomanInfoProvider,
 } from '~/game/info';
@@ -31,6 +33,9 @@ import { Drunk } from '~/content/characters/output/drunk';
 import { Baron } from '~/content/characters/output/baron';
 import { Spy } from '~/content/characters/output/spy';
 import { Poisoner } from '~/content/characters/output/poisoner';
+import { Execution } from '~/game/execution';
+import { Mayor } from '~/content/characters/output/mayor';
+import { Butler } from '~/content/characters/output/butler';
 
 async function generateInfoCandidates<T>(
     playerDescriptions: Array<string>,
@@ -483,7 +488,7 @@ describe('True FortuneTeller info', () => {
     });
 
     /**
-     * {@link `FortuneTeller["gameplay"][0]`}
+     * {@link `fortuneteller["gameplay"][0]`}
      */
     test("The Fortune Teller chooses the Monk and the Undertaker, and learns a 'no'.", async () => {
         const monk = await playerFromDescription(
@@ -508,7 +513,7 @@ describe('True FortuneTeller info', () => {
     });
 
     /**
-     * {@link `FortuneTeller["gameplay"][1]`}
+     * {@link `fortuneteller["gameplay"][1]`}
      */
     test("The Fortune Teller chooses the Imp and the Empath, and learns a 'yes'.", async () => {
         const imp = await playerFromDescription(
@@ -533,7 +538,7 @@ describe('True FortuneTeller info', () => {
     });
 
     /**
-     * {@link `FortuneTeller["gameplay"][2]`}
+     * {@link `fortuneteller["gameplay"][2]`}
      */
     test("The Fortune Teller chooses an alive Butler and a dead Imp, and learns a 'yes'.", async () => {
         const imp = await playerFromDescription(
@@ -560,7 +565,7 @@ describe('True FortuneTeller info', () => {
     });
 
     /**
-     * {@link `FortuneTeller["gameplay"][3]`}
+     * {@link `fortuneteller["gameplay"][3]`}
      */
     test("The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'.", async () => {
         const saint = await playerFromDescription(
@@ -590,5 +595,125 @@ describe('True FortuneTeller info', () => {
         for (const candidate of candidates as Array<FortuneTellerInfo>) {
             expect(candidate.hasDemon).toBeTrue();
         }
+    });
+});
+
+describe('True Undertaker info', () => {
+    let UndertakerPlayer: Player;
+    let infoProvider: UndertakerInfoProvider;
+
+    beforeAll(async () => {
+        UndertakerPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Undertaker`
+        );
+    });
+
+    beforeEach(() => {
+        infoProvider = new UndertakerInfoProvider(UndertakerPlayer, true);
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][0]`}
+     */
+    test('The Mayor is executed today. That night, the Undertaker is shown the Mayor token.', async () => {
+        const mayorPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Mayor`
+        );
+
+        const mockExecution = mock<Execution>();
+        mockExecution.executed = mayorPlayer;
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [mayorPlayer, UndertakerPlayer],
+            infoProvider,
+            async (gameInfo, _) => {
+                gameInfo.execution = mockExecution;
+                return await gameInfo;
+            }
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<UndertakerInfo>) {
+            expect(candidate.character).toEqual(Mayor);
+        }
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][1]`}
+     */
+    test("The Drunk, who thinks they are the Virgin, is executed today. At night, the Undertaker is shown the Drunk token, because the Undertaker learns a player's true character, as opposed to the one they believe they are.", async () => {
+        const drunkPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Drunk`
+        );
+
+        const mockExecution = mock<Execution>();
+        mockExecution.executed = drunkPlayer;
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [drunkPlayer, UndertakerPlayer],
+            infoProvider,
+            async (gameInfo, _) => {
+                gameInfo.execution = mockExecution;
+                return await gameInfo;
+            }
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<UndertakerInfo>) {
+            expect(candidate.character).toEqual(Drunk);
+        }
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][2]`}
+     */
+    test('The Spy is executed. Two Travellers are exiled. That night, the Undertaker is shown the Butler token, because the Spy is registering as the Butler, and because the exiles are not executions.', async () => {
+        const gameUIStorytellerChooseMock = jest
+            .spyOn(GameUI, 'storytellerChoose')
+            .mockImplementation(async () => await Butler);
+
+        const spyPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Spy`
+        );
+
+        const mockExecution = mock<Execution>();
+        mockExecution.executed = spyPlayer;
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [spyPlayer, UndertakerPlayer],
+            infoProvider,
+            async (gameInfo, _) => {
+                gameInfo.execution = mockExecution;
+
+                const influence = new SpyInfluence(spyPlayer);
+
+                return await influence.apply(gameInfo, {
+                    unbiasedGameInfo: gameInfo,
+                });
+            }
+        );
+
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<UndertakerInfo>) {
+            expect(candidate.character).toEqual(Butler);
+        }
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][3]`}
+     */
+    test('Nobody was executed today. That night, the Undertaker does not wake.', async () => {
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [UndertakerPlayer],
+            infoProvider
+        );
+
+        expect(candidates).toHaveLength(0);
     });
 });

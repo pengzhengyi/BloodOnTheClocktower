@@ -151,7 +151,7 @@ export abstract class RegisterAsInfluence extends Influence {
             )
         );
 
-        return new GameInfo(playersAfterReplacement, gameInfo.characterSheet);
+        return gameInfo.replace({ players: playersAfterReplacement });
     }
 }
 
@@ -189,7 +189,7 @@ export abstract class RegisterAsDemonInfluence extends RegisterAsEvilInfluence {
             )
         );
 
-        return new GameInfo(playersAfterReplacement, gameInfo.characterSheet);
+        return gameInfo.replace({ players: playersAfterReplacement });
     }
 }
 

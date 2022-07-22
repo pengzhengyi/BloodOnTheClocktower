@@ -300,3 +300,44 @@ export class FortuneTellerInfoProvider extends InfoProvider<FortuneTellerInfo> {
         ]);
     }
 }
+
+/**
+ * {@link `undertaker["ability"]`}
+ * "Each night*, you learn which character died by execution today."
+ */
+export interface UndertakerInfo {
+    player: Player;
+    character: typeof Character;
+}
+
+export class UndertakerInfoProvider extends InfoProvider<UndertakerInfo> {
+    _trueInfoCandidates(gameInfo: GameInfo) {
+        const executed = gameInfo.executed;
+
+        if (executed === undefined) {
+            return Generator.empty<UndertakerInfo>();
+        } else {
+            return Generator.once([
+                {
+                    player: executed,
+                    character: executed.character,
+                } as UndertakerInfo,
+            ]);
+        }
+    }
+
+    _falseInfoCandidates(gameInfo: GameInfo) {
+        const executed = gameInfo.executed;
+
+        if (executed === undefined) {
+            return Generator.empty<UndertakerInfo>();
+        } else {
+            return Generator.once(gameInfo.characterSheet.characters).map(
+                (character) => ({
+                    player: executed,
+                    character,
+                })
+            );
+        }
+    }
+}

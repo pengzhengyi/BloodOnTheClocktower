@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { clockwise } from './common';
 import { NoVotesWhenCountingVote } from './exception';
 import { Player } from './player';
@@ -8,20 +10,27 @@ import { Confirm } from '~/interaction/confirm';
  * {@link `glossary["Vote"]`}
  * Raising a hand when the Storyteller is counting the number of players in favor of an execution. Players may vote per day. A dead player may only vote once for the rest of the game. The votes are tallied clockwise, ending with the nominated player. The exile process, though similar, is not a vote. See Exile.
  */
+@Exclude()
 export class Vote {
     static RECOLLECT_VOTE_PROMPT =
         'votes has already been collected, should recollect?';
 
+    @Expose({ toPlainOnly: true })
+    @Type(() => Player)
+    public readonly nominated: Player;
+
+    @Expose({ toPlainOnly: true })
+    public readonly forExile: boolean;
+
+    @Expose({ toPlainOnly: true })
+    @Type(() => Player)
     votes?: Array<Player>;
 
     get voted() {
         return this.hasVoted();
     }
 
-    constructor(
-        public readonly nominated: Player,
-        public readonly forExile: boolean = false
-    ) {
+    constructor(nominated: Player, forExile = false) {
         this.nominated = nominated;
         this.forExile = forExile;
     }
@@ -57,6 +66,10 @@ export class Vote {
         const nominatedIndex = players.indexOf(nominated);
         // array out of bound handled by clockwise
         return clockwise(players, nominatedIndex + 1);
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
     }
 
     async *collectVotes(players: Iterable<Player>) {

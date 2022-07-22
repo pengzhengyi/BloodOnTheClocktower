@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { Nomination } from './nomination';
 import { Player } from './player';
 import {
@@ -12,8 +14,14 @@ import { Predicate } from './types';
  * {@link `glossary["Execution"]`}
  * The group decision to kill a player other than a Traveller during the day. There is a maximum of one execution per day, but there may be none. A nominated player is executed if they got votes equal to at least half the number of alive players, and more votes than any other nominated player.
  */
+@Exclude()
 export class Execution {
+    @Expose({ toPlainOnly: true })
+    @Type(() => Player)
     executed?: Player = undefined;
+
+    @Expose({ toPlainOnly: true })
+    @Type(() => Nomination)
     readonly nominations: Array<Nomination> = [];
 
     /**
@@ -67,6 +75,10 @@ export class Execution {
         predicate: Predicate<Nomination>
     ): Nomination | undefined {
         return this.nominations.find(predicate);
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
     }
 
     async addNomination(nomination: Nomination) {
