@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { Action } from './types';
 
 enum Phase {
@@ -26,9 +28,14 @@ enum Phase {
     __LENGTH__,
 }
 
+@Exclude()
 export class GamePhase {
+    @Expose({ toPlainOnly: true })
     phase: Phase = Phase.Night;
+
+    @Expose({ toPlainOnly: true })
     cycleIndex = 0;
+
     readonly phaseToActions: Map<Phase, Array<Action>> = new Map();
 
     /**
@@ -59,5 +66,9 @@ export class GamePhase {
             actions?.forEach((action) => action());
             this.transition();
         }
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
     }
 }

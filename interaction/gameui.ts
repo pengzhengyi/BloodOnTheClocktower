@@ -12,7 +12,11 @@ export abstract class GameUI {
         throw new Error('Method not implemented.');
     }
 
-    static choose<T>(_player: Player, _options: Iterable<T>): Promise<T> {
+    static choose<T>(
+        _player: Player,
+        _options: Iterable<T>,
+        _reason?: string
+    ): Promise<T> {
         // TODO
         throw new Error('Method not implemented.');
     }

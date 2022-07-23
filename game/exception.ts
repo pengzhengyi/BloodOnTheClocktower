@@ -22,6 +22,7 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
+import { CharacterAct } from './characteract';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import { GameUI } from '~/interaction/gameui';
@@ -565,5 +566,15 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
         super(FortuneTellerChooseInvalidPlayers.description);
 
         this.chosen = chosen;
+    }
+}
+
+export class NoPlayerForCharacterAct extends RecoverableGameError {
+    static description = 'The character act has not been bound to a player';
+
+    constructor(readonly characterAct: CharacterAct) {
+        super(NoPlayerForCharacterAct.description);
+
+        this.characterAct = characterAct;
     }
 }

@@ -139,19 +139,13 @@ export abstract class RegisterAsInfluence extends Influence {
                 context.reason
             );
 
-        const playersAfterReplacement = Array.from(
-            gameInfo.players.replace(
-                (player) => player.equals(this.playerToRegister),
-                (player) =>
-                    thisClass.registerAs(
-                        player,
-                        characterToRegisterAs,
-                        alignmentToRegisterAs
-                    )
+        return gameInfo.updatePlayer(this.playerToRegister, (player) =>
+            thisClass.registerAs(
+                player,
+                characterToRegisterAs,
+                alignmentToRegisterAs
             )
         );
-
-        return gameInfo.replace({ players: playersAfterReplacement });
     }
 }
 
@@ -182,14 +176,9 @@ export abstract class RegisterAsDemonInfluence extends RegisterAsEvilInfluence {
     _apply(gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
         const thisClass = this.constructor as typeof RegisterAsDemonInfluence;
 
-        const playersAfterReplacement = Array.from(
-            gameInfo.players.replace(
-                (player) => player.equals(this.playerToRegister),
-                (player) => thisClass.registerAs(player)
-            )
+        return gameInfo.updatePlayer(this.playerToRegister, (player) =>
+            thisClass.registerAs(player)
         );
-
-        return gameInfo.replace({ players: playersAfterReplacement });
     }
 }
 

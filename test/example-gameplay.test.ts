@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { mock } from 'jest-mock-extended';
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
@@ -23,6 +25,7 @@ import { GameInfo } from '~/game/gameinfo';
 import { CharacterSheet } from '~/game/charactersheet';
 import {
     FortuneTellerRedHerringInfluence,
+    InfluenceApplyContext,
     RecluseInfluence,
     SpyInfluence,
 } from '~/game/influence';
@@ -36,6 +39,19 @@ import { Poisoner } from '~/content/characters/output/poisoner';
 import { Execution } from '~/game/execution';
 import { Mayor } from '~/content/characters/output/mayor';
 import { Butler } from '~/content/characters/output/butler';
+import { GamePhase } from '~/game/gamephase';
+
+function createMockGameInfo(
+    players: Array<Player>,
+    characterSheet?: CharacterSheet,
+    gamePhase?: GamePhase
+) {
+    return new GameInfo(
+        players,
+        characterSheet ?? mock<CharacterSheet>(),
+        gamePhase ?? mock<GamePhase>()
+    );
+}
 
 async function generateInfoCandidates<T>(
     playerDescriptions: Array<string>,
@@ -52,7 +68,7 @@ async function generateInfoCandidates<T>(
     const allPlayers = playerFromDescriptions.concat(players);
     allPlayers.forEach((player, index) => (player.seatNumber = index));
 
-    let gameInfo = new GameInfo(allPlayers, mock<CharacterSheet>());
+    let gameInfo = createMockGameInfo(allPlayers);
 
     if (gameInfoTransform !== undefined) {
         gameInfo = await gameInfoTransform(gameInfo, allPlayers);
@@ -126,9 +142,10 @@ describe('True Washerwoman info', () => {
                 async (gameInfo, [Marianna, _Sarah, _]) => {
                     const influence = new SpyInfluence(Marianna);
 
-                    return await influence.apply(gameInfo, {
-                        unbiasedGameInfo: gameInfo,
-                    });
+                    return await influence.apply(
+                        gameInfo,
+                        mock<InfluenceApplyContext>()
+                    );
                 }
             );
 
@@ -249,9 +266,10 @@ describe('True Investigator info', () => {
             async (gameInfo, [Angelus, _Lewis, _]) => {
                 const influence = new SpyInfluence(Angelus);
 
-                return await influence.apply(gameInfo, {
-                    unbiasedGameInfo: gameInfo,
-                });
+                return await influence.apply(
+                    gameInfo,
+                    mock<InfluenceApplyContext>()
+                );
             }
         );
 
@@ -280,9 +298,10 @@ describe('True Investigator info', () => {
                 async (gameInfo, [Brianna, _Marianna, _]) => {
                     const influence = new RecluseInfluence(Brianna);
 
-                    return await influence.apply(gameInfo, {
-                        unbiasedGameInfo: gameInfo,
-                    });
+                    return await influence.apply(
+                        gameInfo,
+                        mock<InfluenceApplyContext>()
+                    );
                 }
             );
 
@@ -585,9 +604,10 @@ describe('True FortuneTeller info', () => {
                     saint
                 );
 
-                return await influence.apply(gameInfo, {
-                    unbiasedGameInfo: gameInfo,
-                });
+                return await influence.apply(
+                    gameInfo,
+                    mock<InfluenceApplyContext>()
+                );
             }
         );
 
@@ -690,9 +710,10 @@ describe('True Undertaker info', () => {
 
                 const influence = new SpyInfluence(spyPlayer);
 
-                return await influence.apply(gameInfo, {
-                    unbiasedGameInfo: gameInfo,
-                });
+                return await influence.apply(
+                    gameInfo,
+                    mock<InfluenceApplyContext>()
+                );
             }
         );
 
@@ -715,5 +736,145 @@ describe('True Undertaker info', () => {
         );
 
         expect(candidates).toHaveLength(0);
+    });
+});
+
+describe('True Monk info', () => {
+    let monkPlayer: Player;
+
+    beforeAll(async () => {
+        monkPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Monk`
+        );
+    });
+
+    /**
+     * {@link `monk["gameplay"][0]`}
+     */
+    test('The Monk protects the Fortune Teller. The Imp attacks the Fortune Teller. No deaths occur tonight.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const fortuneTellerPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Fortune Teller`
+        );
+
+        const gamePhase = new GamePhase();
+        // @ts-ignore
+        jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
+
+        let gameInfo = createMockGameInfo(
+            [monkPlayer, impPlayer, fortuneTellerPlayer],
+            undefined,
+            gamePhase
+        );
+
+        const gameUIStorytellerChooseMock = jest
+            .spyOn(GameUI, 'choose')
+            .mockImplementation(
+                async () =>
+                    await gameInfo.getInfluencedPlayer(fortuneTellerPlayer)
+            );
+
+        gameInfo = await monkPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        await impPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+
+        expect(fortuneTellerPlayer.alive).toBeTrue();
+    });
+
+    /**
+     * {@link `monk["gameplay"][1]`}
+     */
+    test(`The Monk protects the Mayor, and the Imp attacks the Mayor. The Mayor's "another player dies" ability does not trigger, because the Mayor is safe from the Imp. Nobody dies tonight.`, async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const mayorPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Mayor`
+        );
+
+        const gamePhase = new GamePhase();
+        // @ts-ignore
+        jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
+
+        let gameInfo = createMockGameInfo(
+            [monkPlayer, impPlayer, mayorPlayer],
+            undefined,
+            gamePhase
+        );
+
+        const gameUIStorytellerChooseMock = jest
+            .spyOn(GameUI, 'choose')
+            .mockImplementation(
+                async () => await gameInfo.getInfluencedPlayer(mayorPlayer)
+            );
+
+        gameInfo = await monkPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        // TODO apply mayor's ability
+        // gameInfo = await mayorPlayer.characterAbility!.apply(
+        //     gameInfo,
+        //     mock<InfluenceApplyContext>()
+        // )!;
+
+        await impPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+
+        expect(mayorPlayer.alive).toBeTrue();
+        expect(impPlayer.alive).toBeTrue();
+        expect(monkPlayer.alive).toBeTrue();
+    });
+
+    /**
+     * {@link `monk["gameplay"][2]`}
+     */
+    test('The Monk protects the Imp . The Imp chooses to kill themself tonight, but nothing happens. The Imp stays alive and a new Imp is not created.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const gamePhase = new GamePhase();
+        // @ts-ignore
+        jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
+
+        let gameInfo = createMockGameInfo(
+            [monkPlayer, impPlayer],
+            undefined,
+            gamePhase
+        );
+
+        const gameUIStorytellerChooseMock = jest
+            .spyOn(GameUI, 'choose')
+            .mockImplementation(
+                async () => await gameInfo.getInfluencedPlayer(impPlayer)
+            );
+
+        gameInfo = await monkPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        await impPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+        expect(impPlayer.alive).toBeTrue();
     });
 });

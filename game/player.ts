@@ -17,6 +17,8 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
+import { DeadReason } from './deadreason';
+import { CharacterAct } from './characteract';
 import { GameUI } from '~/interaction/gameui';
 
 enum NegativeState {
@@ -76,7 +78,9 @@ export class Player {
     @Expose({ toPlainOnly: true })
     username: string;
 
-    character: typeof Character;
+    declare character: typeof Character;
+
+    characterAct?: CharacterAct;
 
     isWake = false;
 
@@ -95,6 +99,8 @@ export class Player {
     seatNumber?: number;
 
     readonly canSupportExile: boolean = true;
+
+    deadReason?: DeadReason;
 
     /**
      * {@link `glossary["Healthy"]`}
@@ -224,15 +230,21 @@ export class Player {
     ) {
         this.id = id;
         this.username = username;
-        this.character = character;
+        this.initializeCharacter(character);
     }
 
     isCharacterType(characterType: typeof CharacterType): boolean {
         return Object.is(this.characterType, characterType);
     }
 
-    setDead() {
+    setDead(reason: DeadReason = DeadReason.Other) {
+        this.deadReason = reason;
         this.state += NegativeState.Dead;
+    }
+
+    attack(victim: Player) {
+        // TODO
+        victim.setDead(DeadReason.DemonAttack);
     }
 
     isAlly(other: Player) {
@@ -297,6 +309,11 @@ export class Player {
         }
 
         return false;
+    }
+
+    protected initializeCharacter(character: typeof Character) {
+        this.character = character;
+        this.characterAct = CharacterAct.of(this);
     }
 
     protected async initializeAlignment(alignment?: Alignment) {

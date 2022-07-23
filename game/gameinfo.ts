@@ -2,8 +2,10 @@ import { Players } from './players';
 import type { CharacterSheet } from './charactersheet';
 import { Player } from './player';
 import { Seating } from './seating';
-import { Execution } from './execution';
+import type { Execution } from './execution';
 import { Generator } from './collections';
+import type { GamePhase } from './gamephase';
+import { Transform } from './types';
 
 type UnderlyingPlayers = Array<Player>;
 
@@ -11,6 +13,8 @@ export class GameInfo {
     execution?: Execution;
 
     characterSheet: CharacterSheet;
+
+    readonly gamePhase: GamePhase;
 
     protected readonly playerIdToInfluencedPlayer: Map<string, Player>;
 
@@ -32,6 +36,7 @@ export class GameInfo {
     constructor(
         players: UnderlyingPlayers,
         characterSheet: CharacterSheet,
+        gamePhase: GamePhase,
         execution?: Execution
     ) {
         this._players = players;
@@ -39,6 +44,7 @@ export class GameInfo {
         this.playerIdToInfluencedPlayer = new Map(
             Generator.map((player) => [player.id, player], players)
         );
+        this.gamePhase = gamePhase;
         this.execution = execution;
     }
 
@@ -46,7 +52,13 @@ export class GameInfo {
         return Seating.from(this._players);
     }
 
-    getInfluencedPlayer(player: string | Player): Player | undefined {
+    getInfluencedPlayer(
+        player: string | Player | undefined
+    ): Player | undefined {
+        if (player === undefined) {
+            return undefined;
+        }
+
         if (player instanceof Player) {
             return this.playerIdToInfluencedPlayer.get(player.id);
         } else {
@@ -58,6 +70,7 @@ export class GameInfo {
         changes: Partial<{
             players: UnderlyingPlayers;
             characterSheet: CharacterSheet;
+            gamePhase: GamePhase;
             execution?: Execution;
         }>
     ) {
@@ -66,10 +79,27 @@ export class GameInfo {
             {
                 execution: this.execution,
                 characterSheet: this.characterSheet,
+                gamePhase: this.gamePhase,
                 players: this._players,
             },
             changes
         );
-        return new GameInfo(args.players, args.characterSheet, args.execution);
+        return new GameInfo(
+            args.players,
+            args.characterSheet,
+            args.gamePhase,
+            args.execution
+        );
+    }
+
+    updatePlayer(original: Player, updateFunction: Transform<Player>) {
+        const updatedPlayers = Array.from(
+            this.players.replace(
+                (player) => player.equals(original),
+                updateFunction
+            )
+        );
+
+        return this.replace({ players: updatedPlayers });
     }
 }
