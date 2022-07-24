@@ -341,3 +341,54 @@ export class UndertakerInfoProvider extends InfoProvider<UndertakerInfo> {
         }
     }
 }
+
+/**
+ * {@link `ravenkeeper["ability"]`}
+ * "If you die at night, you are woken to choose a player: you learn their character."
+ */
+export interface RavenkeeperInfo {
+    player: Player;
+    character: typeof Character;
+}
+
+export class RavenkeeperInfoProvider extends InfoProvider<RavenkeeperInfo> {
+    protected chosenPlayerId?: string;
+
+    getChosenPlayer(gameInfo: GameInfo): Player | undefined {
+        return gameInfo.getInfluencedPlayer(this.chosenPlayerId);
+    }
+
+    choosePlayer(player: Player) {
+        this.chosenPlayerId = player.id;
+    }
+
+    _trueInfoCandidates(gameInfo: GameInfo) {
+        const chosen = this.getChosenPlayer(gameInfo);
+
+        if (chosen === undefined) {
+            return Generator.empty<RavenkeeperInfo>();
+        } else {
+            return Generator.once([
+                {
+                    player: chosen,
+                    character: chosen.character,
+                } as RavenkeeperInfo,
+            ]);
+        }
+    }
+
+    _falseInfoCandidates(gameInfo: GameInfo) {
+        const chosen = this.getChosenPlayer(gameInfo);
+
+        if (chosen === undefined) {
+            return Generator.empty<RavenkeeperInfo>();
+        } else {
+            return Generator.once(gameInfo.characterSheet.characters).map(
+                (character) => ({
+                    player: chosen,
+                    character,
+                })
+            );
+        }
+    }
+}

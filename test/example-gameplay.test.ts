@@ -15,6 +15,8 @@ import {
     InvestigatorInfoProvider,
     LibrarianInfo,
     LibrarianInfoProvider,
+    RavenkeeperInfo,
+    RavenkeeperInfoProvider,
     UndertakerInfo,
     UndertakerInfoProvider,
     WasherwomanInfo,
@@ -27,6 +29,7 @@ import {
     FortuneTellerRedHerringInfluence,
     InfluenceApplyContext,
     RecluseInfluence,
+    SoldierInfluence,
     SpyInfluence,
 } from '~/game/influence';
 import { GameUI } from '~/interaction/gameui';
@@ -40,6 +43,29 @@ import { Execution } from '~/game/execution';
 import { Mayor } from '~/content/characters/output/mayor';
 import { Butler } from '~/content/characters/output/butler';
 import { GamePhase } from '~/game/gamephase';
+import { Empath } from '~/content/characters/output/empath';
+import { Imp } from '~/content/characters/output/imp';
+import { Generator } from '~/game/collections';
+import { CharacterAct, SlayerAct } from '~/game/characteract';
+
+function mockStorytellerChoose<T>(chosen: T) {
+    return jest
+        .spyOn(GameUI, 'storytellerChoose')
+        .mockImplementation(async () => await chosen);
+}
+
+function mockChoosePlayer(chosen: Player) {
+    return jest.spyOn(GameUI, 'choose').mockImplementation(
+        async (_player, players) =>
+            await Generator.take(
+                1,
+                Generator.filter(
+                    (player) => player.equals(chosen),
+                    players as Iterable<Player>
+                )
+            )
+    );
+}
 
 function createMockGameInfo(
     players: Array<Player>,
@@ -53,6 +79,20 @@ function createMockGameInfo(
     );
 }
 
+function createNonfirstNightGamePhase() {
+    const gamePhase = new GamePhase();
+    // @ts-ignore
+    jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
+    return gamePhase;
+}
+
+function createDayGamePhase() {
+    const gamePhase = new GamePhase();
+    // @ts-ignore
+    jest.spyOn(gamePhase, 'isDay', 'get').mockReturnValue(true);
+    return gamePhase;
+}
+
 async function generateInfoCandidates<T>(
     playerDescriptions: Array<string>,
     players: Array<Player>,
@@ -60,7 +100,9 @@ async function generateInfoCandidates<T>(
     gameInfoTransform?: (
         gameInfo: GameInfo,
         allPlayers: Player[]
-    ) => Promise<GameInfo>
+    ) => Promise<GameInfo>,
+    characterSheet?: CharacterSheet,
+    gamePhase?: GamePhase
 ): Promise<[T | T[] | undefined, Array<Player>]> {
     const playerFromDescriptions = await Promise.all(
         playerDescriptions.map(playerFromDescription)
@@ -68,7 +110,7 @@ async function generateInfoCandidates<T>(
     const allPlayers = playerFromDescriptions.concat(players);
     allPlayers.forEach((player, index) => (player.seatNumber = index));
 
-    let gameInfo = createMockGameInfo(allPlayers);
+    let gameInfo = createMockGameInfo(allPlayers, characterSheet, gamePhase);
 
     if (gameInfoTransform !== undefined) {
         gameInfo = await gameInfoTransform(gameInfo, allPlayers);
@@ -130,9 +172,7 @@ describe('True Washerwoman info', () => {
      * {@link `washerwoman["gameplay"][2]`}
      */
     test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', async () => {
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(async () => await Ravenkeeper);
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Ravenkeeper);
 
         const [candidates, [_Marianna, _Sarah, _]] =
             await generateInfoCandidates(
@@ -255,9 +295,7 @@ describe('True Investigator info', () => {
      * {@link `investigator["gameplay"][1]`}
      */
     test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', async () => {
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(async () => await Spy);
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Spy);
 
         const [candidates, [Angelus, Lewis, _]] = await generateInfoCandidates(
             ['Angelus is the Spy', 'Lewis is the Poisoner'],
@@ -286,9 +324,7 @@ describe('True Investigator info', () => {
      * {@link `investigator["gameplay"][2]`}
      */
     test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(async () => await Poisoner);
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Poisoner);
 
         const [candidates, [Brianna, Marianna, _]] =
             await generateInfoCandidates(
@@ -370,9 +406,7 @@ describe('True Chef info', () => {
      * {@link `chef["gameplay"][2]`}
      */
     test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", async () => {
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(async () => await Poisoner);
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Poisoner);
 
         const [candidates, _] = await generateInfoCandidates(
             [
@@ -690,9 +724,7 @@ describe('True Undertaker info', () => {
      * {@link `undertaker["gameplay"][2]`}
      */
     test('The Spy is executed. Two Travellers are exiled. That night, the Undertaker is shown the Butler token, because the Spy is registering as the Butler, and because the exiles are not executions.', async () => {
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'storytellerChoose')
-            .mockImplementation(async () => await Butler);
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Butler);
 
         const spyPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Spy`
@@ -759,22 +791,13 @@ describe('True Monk info', () => {
             `${faker.name.firstName()} is the Fortune Teller`
         );
 
-        const gamePhase = new GamePhase();
-        // @ts-ignore
-        jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
-
         let gameInfo = createMockGameInfo(
             [monkPlayer, impPlayer, fortuneTellerPlayer],
             undefined,
-            gamePhase
+            createNonfirstNightGamePhase()
         );
 
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'choose')
-            .mockImplementation(
-                async () =>
-                    await gameInfo.getInfluencedPlayer(fortuneTellerPlayer)
-            );
+        const gameUIChooseMock = mockChoosePlayer(fortuneTellerPlayer);
 
         gameInfo = await monkPlayer.characterAct!.apply(
             gameInfo,
@@ -786,7 +809,7 @@ describe('True Monk info', () => {
             mock<InfluenceApplyContext>()
         )!;
 
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+        expect(gameUIChooseMock).toHaveBeenCalled();
 
         expect(fortuneTellerPlayer.alive).toBeTrue();
     });
@@ -802,21 +825,13 @@ describe('True Monk info', () => {
             `${faker.name.firstName()} is the Mayor`
         );
 
-        const gamePhase = new GamePhase();
-        // @ts-ignore
-        jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
-
         let gameInfo = createMockGameInfo(
             [monkPlayer, impPlayer, mayorPlayer],
             undefined,
-            gamePhase
+            createNonfirstNightGamePhase()
         );
 
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'choose')
-            .mockImplementation(
-                async () => await gameInfo.getInfluencedPlayer(mayorPlayer)
-            );
+        const gameUIChooseMock = mockChoosePlayer(mayorPlayer);
 
         gameInfo = await monkPlayer.characterAct!.apply(
             gameInfo,
@@ -834,7 +849,7 @@ describe('True Monk info', () => {
             mock<InfluenceApplyContext>()
         )!;
 
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+        expect(gameUIChooseMock).toHaveBeenCalled();
 
         expect(mayorPlayer.alive).toBeTrue();
         expect(impPlayer.alive).toBeTrue();
@@ -848,21 +863,14 @@ describe('True Monk info', () => {
         const impPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Imp`
         );
-        const gamePhase = new GamePhase();
-        // @ts-ignore
-        jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
 
         let gameInfo = createMockGameInfo(
             [monkPlayer, impPlayer],
             undefined,
-            gamePhase
+            createNonfirstNightGamePhase()
         );
 
-        const gameUIStorytellerChooseMock = jest
-            .spyOn(GameUI, 'choose')
-            .mockImplementation(
-                async () => await gameInfo.getInfluencedPlayer(impPlayer)
-            );
+        const gameUIChooseMock = mockChoosePlayer(impPlayer);
 
         gameInfo = await monkPlayer.characterAct!.apply(
             gameInfo,
@@ -874,7 +882,249 @@ describe('True Monk info', () => {
             mock<InfluenceApplyContext>()
         )!;
 
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+        expect(gameUIChooseMock).toHaveBeenCalled();
         expect(impPlayer.alive).toBeTrue();
+    });
+});
+
+describe('True Ravenkeeper info', () => {
+    let RavenkeeperPlayer: Player;
+    let infoProvider: RavenkeeperInfoProvider;
+
+    beforeAll(async () => {
+        RavenkeeperPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Ravenkeeper`
+        );
+    });
+
+    beforeEach(() => {
+        infoProvider = new RavenkeeperInfoProvider(RavenkeeperPlayer, true);
+    });
+
+    /**
+     * {@link `ravenkeeper["gameplay"][0]`}
+     */
+    test('The Ravenkeeper is killed by the Imp, and then wakes to choose a player. After some deliberation, they choose Benjamin. Benjamin is the Empath, and the Ravenkeeper learns this.', async () => {
+        const benjamin = await playerFromDescription(
+            `${faker.name.firstName()} is the Empath`
+        );
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+
+        const [candidates, _] = await generateInfoCandidates(
+            [],
+            [benjamin, impPlayer, RavenkeeperPlayer],
+            infoProvider,
+            async (gameInfo, _) => {
+                const gameUIChooseMock = mockChoosePlayer(RavenkeeperPlayer);
+
+                await impPlayer.characterAct!.apply(
+                    gameInfo,
+                    mock<InfluenceApplyContext>()
+                )!;
+
+                expect(gameUIChooseMock).toHaveBeenCalled();
+
+                infoProvider.choosePlayer(benjamin);
+
+                return gameInfo;
+            }
+        );
+
+        expect(candidates).toHaveLength(1);
+        for (const candidate of candidates as Array<RavenkeeperInfo>) {
+            expect(candidate.player.equals(benjamin)).toBeTrue();
+            expect(candidate.character).toEqual(Empath);
+        }
+    });
+
+    /**
+     * {@link `ravenkeeper["gameplay"][1]`}
+     */
+    test("The Imp attacks the Mayor. The Mayor doesn't die, but the Ravenkeeper dies instead, due to the Mayor's ability. The Ravenkeeper is woken and chooses Douglas, who is a dead Recluse. The Ravenkeeper learns that Douglas is the Scarlet Woman, since the Recluse registered as a Minion.", async () => {
+        // TODO
+    });
+});
+
+describe('True Slayer info', () => {
+    let SlayerPlayer: Player;
+
+    beforeAll(async () => {
+        SlayerPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Slayer`
+        );
+    });
+
+    /**
+     * {@link `slayer["gameplay"][0]`}
+     */
+    test('The Slayer chooses the Imp. The Imp dies, and good wins!', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+
+        const gameInfo = createMockGameInfo(
+            [impPlayer, SlayerPlayer],
+            undefined,
+            createDayGamePhase()
+        );
+
+        const gameUIChooseMock = mockChoosePlayer(impPlayer);
+
+        await SlayerPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIChooseMock).toHaveBeenCalled();
+
+        expect(impPlayer.dead).toBeTrue();
+    });
+
+    /**
+     * {@link `slayer["gameplay"][1]`}
+     */
+    test('The Slayer chooses the Recluse. The Storyteller decides that the Recluse registers as the Imp, so the Recluse dies, but the game continues.', async () => {
+        const reclusePlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Recluse`
+        );
+
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Imp);
+        const gameUIChooseMock = mockChoosePlayer(reclusePlayer);
+
+        let gameInfo = createMockGameInfo(
+            [reclusePlayer, SlayerPlayer],
+            undefined,
+            createDayGamePhase()
+        );
+
+        const influence = new RecluseInfluence(reclusePlayer);
+
+        gameInfo = await influence.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        );
+
+        await SlayerPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
+        expect(gameUIChooseMock).toHaveBeenCalled();
+
+        expect(reclusePlayer.dead).toBeTrue();
+    });
+
+    /**
+     * {@link `slayer["gameplay"][2]`}
+     */
+    test('The Imp is bluffing as the Slayer. They declare that they use their Slayer ability on the Scarlet Woman. Nothing happens.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const scarletWomanPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Scarlet Woman`
+        );
+
+        const gameInfo = createMockGameInfo(
+            [impPlayer, scarletWomanPlayer],
+            undefined,
+            createDayGamePhase()
+        );
+
+        if (SlayerAct === CharacterAct.from(impPlayer.character)) {
+            const gameUIChooseMock = mockChoosePlayer(scarletWomanPlayer);
+
+            await impPlayer.characterAct!.apply(
+                gameInfo,
+                mock<InfluenceApplyContext>()
+            )!;
+
+            expect(gameUIChooseMock).toHaveBeenCalledTimes(0);
+        }
+
+        expect(scarletWomanPlayer.alive).toBeTrue();
+    });
+});
+
+describe('True Soldier info', () => {
+    let SoldierPlayer: Player;
+
+    beforeAll(async () => {
+        SoldierPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Soldier`
+        );
+    });
+
+    /**
+     * {@link `soldier["gameplay"][0]`}
+     */
+    test('The Imp attacks the Soldier. The Soldier does not die, so nobody dies that night.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+
+        let gameInfo = createMockGameInfo(
+            [impPlayer, SoldierPlayer],
+            undefined,
+            createNonfirstNightGamePhase()
+        );
+
+        const gameUIChooseMock = mockChoosePlayer(SoldierPlayer);
+
+        const influence = new SoldierInfluence(SoldierPlayer);
+
+        gameInfo = await influence.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        );
+
+        await impPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIChooseMock).toHaveBeenCalled();
+
+        expect(SoldierPlayer.alive).toBeTrue();
+    });
+
+    /**
+     * {@link `soldier["gameplay"][1]`}
+     */
+    test('The Poisoner poisons the Soldier, then the Imp attacks the Soldier. The Soldier dies, since they have no ability.', async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `soldier["gameplay"][2]`}
+     */
+    test('The Imp attacks the Soldier. The Soldier dies, because they are actually the Drunk.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+
+        const drunkPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Drunk`
+        );
+
+        const gameInfo = createMockGameInfo(
+            [impPlayer, drunkPlayer],
+            undefined,
+            createNonfirstNightGamePhase()
+        );
+
+        const gameUIChooseMock = mockChoosePlayer(drunkPlayer);
+
+        await impPlayer.characterAct!.apply(
+            gameInfo,
+            mock<InfluenceApplyContext>()
+        )!;
+
+        expect(gameUIChooseMock).toHaveBeenCalled();
+
+        expect(drunkPlayer.alive).toBeFalse();
     });
 });

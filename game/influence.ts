@@ -6,6 +6,7 @@ import { IncorrectAlignmentForSpyToRegisterAs } from './exception';
 import { GameInfo } from './gameinfo';
 import { Demon } from './charactertype';
 import type { Player } from './player';
+import { DeadReason } from './deadreason';
 import { Spy } from '~/content/characters/output/spy';
 import { GameUI } from '~/interaction/gameui';
 import { Recluse } from '~/content/characters/output/recluse';
@@ -16,6 +17,27 @@ export interface InfluenceApplyContext {
 }
 
 export abstract class Influence {
+    static immuneFromDemonAttack(player: Player): Player {
+        return new Proxy(player, {
+            get: function (target, property, receiver) {
+                const original = Reflect.get(target, property, receiver);
+
+                switch (property) {
+                    case 'setDead':
+                        return (reason: DeadReason) => {
+                            if (reason === DeadReason.DemonAttack) {
+                                return;
+                            }
+
+                            return original(reason);
+                        };
+                    default:
+                        return original;
+                }
+            },
+        });
+    }
+
     constructor(readonly source: unknown, readonly description: string) {
         this.source = source;
         this.description = description;
@@ -218,5 +240,21 @@ export class FortuneTellerRedHerringInfluence extends RegisterAsDemonInfluence {
             FortuneTellerRedHerringInfluence.description
         );
         this.playerToRegister = playerAsRedHerring;
+    }
+}
+
+export class SoldierInfluence extends Influence {
+    static readonly description: string = 'Soldier is safe from the Demon.';
+
+    declare source: Player;
+
+    constructor(soldierPlayer: Player) {
+        super(soldierPlayer, SoldierInfluence.description);
+    }
+
+    _apply(gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
+        return gameInfo.updatePlayer(this.source, (player) =>
+            Influence.immuneFromDemonAttack(player)
+        );
     }
 }

@@ -3,8 +3,11 @@ import type { GameInfo as GameState } from './gameinfo';
 import { Influence, InfluenceApplyContext as Context } from './influence';
 import { Player } from './player';
 import { DeadReason } from './deadreason';
+import { Character } from './character';
 import { GameUI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
+import { Monk } from '~/content/characters/output/monk';
+import { Slayer } from '~/content/characters/output/slayer';
 
 /**
  * CharacterAct is when a player needs to perform some actions because of character ability. Such actions will usually affect the game.
@@ -12,18 +15,22 @@ import { Imp } from '~/content/characters/output/imp';
 export abstract class CharacterAct extends Influence {
     playerId?: string;
 
-    static of(player: Player) {
-        let characterAct: CharacterAct | undefined;
-
-        switch (player.character) {
+    static from(character: typeof Character) {
+        switch (character) {
             case Imp:
-                characterAct = ImpAct.of(player);
-                break;
+                return ImpAct;
+            case Monk:
+                return MonkAct;
+            case Slayer:
+                return SlayerAct;
             default:
-                break;
+                return undefined;
         }
+    }
 
-        return characterAct;
+    static of(player: Player) {
+        const characterAct = this.from(player.character);
+        return characterAct?.of(player);
     }
 
     constructor(player: Player, description: string) {
@@ -145,5 +152,47 @@ export class MonkAct extends NonfirstNightCharacterAct {
         return gameState.updatePlayer(protectedPlayer, (player) =>
             this.addProtectionToPlayer(player)
         );
+    }
+}
+
+export class SlayerAct extends CharacterAct {
+    static description =
+        'The Slayer can kill the Demon by guessing who they are.';
+
+    static of(player: Player) {
+        return new this(player, SlayerAct.description);
+    }
+
+    hasActed = false;
+
+    canAct(gameState: GameState): boolean {
+        return gameState.gamePhase.isDay && !this.hasActed;
+    }
+
+    killDemon(player: Player) {
+        if (player.isTheDemon) {
+            player.setDead(DeadReason.SlayerKill);
+        }
+    }
+
+    chooseSuspectedDemon(
+        slayerPlayer: Player,
+        players: Iterable<Player>
+    ): Promise<Player> {
+        return GameUI.choose(slayerPlayer, players, SlayerAct.description);
+    }
+
+    async _act(gameState: GameState, _context: Context): Promise<GameState> {
+        const slayerPlayer = await this.getPlayer(gameState);
+        const suspectedDemon = await this.chooseSuspectedDemon(
+            slayerPlayer,
+            gameState.players
+        );
+
+        this.killDemon(suspectedDemon);
+
+        this.hasActed = true;
+
+        return gameState;
     }
 }

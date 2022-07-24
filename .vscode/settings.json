@@ -60,6 +60,7 @@
         "pylint",
         "pylintrc",
         "pytest",
+        "Ravenkeeper",
         "scripttool",
         "stylelint",
         "toolsai",

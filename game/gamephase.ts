@@ -50,6 +50,10 @@ export class GamePhase {
         return this.phase === Phase.Night && this.cycleIndex !== 0;
     }
 
+    get isDay(): boolean {
+        return this.phase === Phase.Day;
+    }
+
     transition() {
         let phase = this.phase++;
         if (phase === Phase.__LENGTH__) {
