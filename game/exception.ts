@@ -25,6 +25,7 @@ import {
 import { CharacterAct } from './characteract';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
+import type { GameInfo } from './gameinfo';
 import { GameUI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
@@ -199,6 +200,22 @@ export class NominatedNominatedBefore extends RecoverableGameError {
         this.failedNomination = failedNomination;
         this.pastNomination = pastNomination;
         this.nominated = nominated;
+    }
+}
+
+export class CannotFindPlayerInGame extends RecoverableGameError {
+    static description = 'Cannot find a matching player in current game';
+
+    declare matchingPlayer: Player;
+
+    constructor(
+        readonly player: string | Player | undefined,
+        readonly gameState: GameInfo
+    ) {
+        super(CannotFindPlayerInGame.description);
+
+        this.player = player;
+        this.gameState = gameState;
     }
 }
 

@@ -15,15 +15,17 @@ export abstract class GameUI {
     static choose<T>(
         _player: Player,
         _options: Iterable<T>,
+        _n = 1,
         _reason?: string
-    ): Promise<T> {
+    ): Promise<T> | Promise<T[]> {
         // TODO
         throw new Error('Method not implemented.');
     }
 
     static storytellerChoose<T>(
         _options: Iterable<T>,
-        _reason?: string
+        _reason?: string,
+        _allowNotChoose = false
     ): Promise<T> {
         // TODO
         throw new Error('Method not implemented.');

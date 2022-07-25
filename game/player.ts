@@ -19,6 +19,7 @@ import {
 } from './charactertype';
 import { DeadReason } from './deadreason';
 import { CharacterAct } from './characteract';
+import { InfoRequester } from './info';
 import { GameUI } from '~/interaction/gameui';
 
 enum NegativeState {
@@ -81,6 +82,8 @@ export class Player {
     declare character: typeof Character;
 
     characterAct?: CharacterAct;
+
+    infoRequester?: unknown;
 
     isWake = false;
 
@@ -192,6 +195,10 @@ export class Player {
 
     get isTraveller(): boolean {
         return Object.is(this.characterType, Traveller);
+    }
+
+    get willGetFalseInfo(): boolean {
+        return this.drunk || this.poisoned;
     }
 
     /**
@@ -319,6 +326,7 @@ export class Player {
     protected initializeCharacter(character: typeof Character) {
         this.character = character;
         this.characterAct = CharacterAct.of(this);
+        this.infoRequester = InfoRequester.of(this);
     }
 
     protected async initializeAlignment(alignment?: Alignment) {

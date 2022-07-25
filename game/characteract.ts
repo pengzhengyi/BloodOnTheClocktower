@@ -1,21 +1,25 @@
-import { NoPlayerForCharacterAct } from './exception';
+import {
+    FortuneTellerChooseInvalidPlayers,
+    NoPlayerForCharacterAct,
+} from './exception';
 import type { GameInfo as GameState } from './gameinfo';
+import type { FortuneTellerInfoRequester } from './info';
 import { Influence } from './influence';
 import { Player } from './player';
 import { DeadReason } from './deadreason';
 import { Character } from './character';
 import { Context } from './infoprocessor';
+import { Phase } from './gamephase';
 import { GameUI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
+import { Fortuneteller } from '~/content/characters/output/fortuneteller';
 
 /**
  * CharacterAct is when a player needs to perform some actions because of character ability. Such actions will usually affect the game.
  */
 export abstract class CharacterAct extends Influence {
-    playerId?: string;
-
     static from(character: typeof Character) {
         switch (character) {
             case Imp:
@@ -24,6 +28,8 @@ export abstract class CharacterAct extends Influence {
                 return MonkAct;
             case Slayer:
                 return SlayerAct;
+            case Fortuneteller:
+                return FortuneTellerAct;
             default:
                 return undefined;
         }
@@ -34,6 +40,8 @@ export abstract class CharacterAct extends Influence {
         return characterAct?.of(player);
     }
 
+    playerId?: string;
+
     constructor(player: Player, description: string) {
         super(player, description);
         this.setPlayer(player);
@@ -41,12 +49,12 @@ export abstract class CharacterAct extends Influence {
 
     abstract act(gameState: GameState, context: Context): Promise<GameState>;
 
-    async apply(gameInfo: GameState, context: Context): Promise<GameState> {
-        return await this.act(gameInfo, context);
+    _apply(gameInfo: GameState, context: Context): Promise<GameState> {
+        return this.act(gameInfo, context);
     }
 
     _getPlayer(gameState: GameState): Player | undefined {
-        return gameState.getInfluencedPlayer(this.playerId);
+        return gameState._getPlayer(this.playerId);
     }
 
     setPlayer(player: Player) {
@@ -68,6 +76,20 @@ export abstract class CharacterAct extends Influence {
 }
 
 export abstract class NonfirstNightCharacterAct extends CharacterAct {
+    hasActed = false;
+
+    async isEligible(_gameState: GameState): Promise<boolean> {
+        return await !this.hasActed;
+    }
+
+    async act(gameState: GameState, _context: Context): Promise<GameState> {
+        this.hasActed = true;
+
+        return await gameState;
+    }
+}
+
+export abstract class OnceCharacterAct extends CharacterAct {
     async isEligible(gameState: GameState) {
         return await gameState.gamePhase.isNonfirstNight;
     }
@@ -81,11 +103,15 @@ export class ImpAct extends NonfirstNightCharacterAct {
         return new this(player, ImpAct.description);
     }
 
-    choosePlayerToKill(
-        impPlayer: Player,
-        players: Iterable<Player>
-    ): Promise<Player> {
-        return GameUI.choose(impPlayer, players, ImpAct.description);
+    applicablePhases = Phase.Night;
+
+    choosePlayerToKill(impPlayer: Player, players: Iterable<Player>) {
+        return GameUI.choose(
+            impPlayer,
+            players,
+            1,
+            ImpAct.description
+        ) as Promise<Player>;
     }
 
     async act(gameState: GameState, _context: Context): Promise<GameState> {
@@ -105,6 +131,8 @@ export class MonkAct extends NonfirstNightCharacterAct {
     static of(player: Player) {
         return new this(player, MonkAct.description);
     }
+
+    applicablePhases = Phase.Night;
 
     addProtectionToPlayer(player: Player): Player {
         return new Proxy(player, {
@@ -127,11 +155,13 @@ export class MonkAct extends NonfirstNightCharacterAct {
         });
     }
 
-    choosePlayerToProtect(
-        monkPlayer: Player,
-        players: Iterable<Player>
-    ): Promise<Player> {
-        return GameUI.choose(monkPlayer, players, MonkAct.description);
+    choosePlayerToProtect(monkPlayer: Player, players: Iterable<Player>) {
+        return GameUI.choose(
+            monkPlayer,
+            players,
+            1,
+            MonkAct.description
+        ) as Promise<Player>;
     }
 
     async act(gameState: GameState, _context: Context): Promise<GameState> {
@@ -146,7 +176,61 @@ export class MonkAct extends NonfirstNightCharacterAct {
     }
 }
 
-export class SlayerAct extends CharacterAct {
+export class FortuneTellerAct extends CharacterAct {
+    static description =
+        'The Fortune Teller detects who the Demon is, but sometimes thinks good players are Demons.';
+
+    static of(player: Player) {
+        return new this(player, FortuneTellerAct.description);
+    }
+
+    static isChoiceValid(players: Array<Player> | undefined): boolean {
+        return Array.isArray(players) && players.length === 2;
+    }
+
+    applicablePhases = Phase.Night;
+
+    async isEligible(gameState: GameState): Promise<boolean> {
+        return (
+            gameState.gamePhase.isNight &&
+            (await this.getPlayer(gameState)).alive
+        );
+    }
+
+    async choosePlayers(
+        fortuneTellerPlayer: Player,
+        players: Iterable<Player>
+    ): Promise<[Player, Player] | undefined> {
+        let chosen = (await GameUI.choose(
+            fortuneTellerPlayer,
+            players,
+            2,
+            FortuneTellerAct.description
+        )) as Array<Player> | undefined;
+
+        if (!FortuneTellerAct.isChoiceValid(chosen)) {
+            const error = new FortuneTellerChooseInvalidPlayers(chosen);
+            await error.resolve();
+            chosen = error.corrected;
+        }
+
+        return chosen as [Player, Player] | undefined;
+    }
+
+    async act(gameState: GameState, _context: Context): Promise<GameState> {
+        const fortuneTellerPlayer = await this.getPlayer(gameState);
+        const chosen = await this.choosePlayers(
+            fortuneTellerPlayer,
+            gameState.players
+        );
+        (
+            fortuneTellerPlayer.infoRequester as FortuneTellerInfoRequester
+        ).setChosenPlayers(chosen);
+        return gameState;
+    }
+}
+
+export class SlayerAct extends NonfirstNightCharacterAct {
     static description =
         'The Slayer can kill the Demon by guessing who they are.';
 
@@ -154,10 +238,10 @@ export class SlayerAct extends CharacterAct {
         return new this(player, SlayerAct.description);
     }
 
-    hasActed = false;
+    applicablePhases = Phase.Day;
 
     async isEligible(gameState: GameState): Promise<boolean> {
-        return (await gameState.gamePhase.isDay) && !this.hasActed;
+        return (await super.isEligible(gameState)) && gameState.gamePhase.isDay;
     }
 
     async killDemon(player: Player) {
@@ -166,14 +250,18 @@ export class SlayerAct extends CharacterAct {
         }
     }
 
-    chooseSuspectedDemon(
-        slayerPlayer: Player,
-        players: Iterable<Player>
-    ): Promise<Player> {
-        return GameUI.choose(slayerPlayer, players, SlayerAct.description);
+    chooseSuspectedDemon(slayerPlayer: Player, players: Iterable<Player>) {
+        return GameUI.choose(
+            slayerPlayer,
+            players,
+            1,
+            SlayerAct.description
+        ) as Promise<Player>;
     }
 
     async act(gameState: GameState, _context: Context): Promise<GameState> {
+        gameState = await super.act(gameState, _context);
+
         const slayerPlayer = await this.getPlayer(gameState);
         const suspectedDemon = await this.chooseSuspectedDemon(
             slayerPlayer,
@@ -181,8 +269,6 @@ export class SlayerAct extends CharacterAct {
         );
 
         await this.killDemon(suspectedDemon);
-
-        this.hasActed = true;
 
         return gameState;
     }

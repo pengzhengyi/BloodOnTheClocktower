@@ -565,7 +565,7 @@ describe('True FortuneTeller info', () => {
             `${faker.name.firstName()} is the Undertaker`
         );
 
-        infoProvider.choose([monk, undertaker]);
+        infoProvider.chosen = [monk, undertaker];
 
         const [candidates, _] = await generateInfoCandidates(
             [],
@@ -590,7 +590,7 @@ describe('True FortuneTeller info', () => {
             `${faker.name.firstName()} is the Empath`
         );
 
-        infoProvider.choose([imp, empath]);
+        infoProvider.chosen = [imp, empath];
 
         const [candidates, _] = await generateInfoCandidates(
             [],
@@ -617,7 +617,7 @@ describe('True FortuneTeller info', () => {
             `${faker.name.firstName()} is the Butler`
         );
 
-        infoProvider.choose([imp, butler]);
+        infoProvider.chosen = [imp, butler];
 
         const [candidates, _] = await generateInfoCandidates(
             [],
@@ -640,7 +640,7 @@ describe('True FortuneTeller info', () => {
         );
         await saint.setDead();
 
-        infoProvider.choose([saint, FortuneTellerPlayer]);
+        infoProvider.chosen = [saint, FortuneTellerPlayer];
 
         const [candidates, _] = await generateInfoCandidates(
             [],

@@ -1,13 +1,20 @@
 import { Character } from './character';
 import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
-import { MinionPlayer, DemonPlayer, Player } from './player';
+import type { MinionPlayer, DemonPlayer, Player } from './player';
 import { Generator } from './collections';
-import { FortuneTellerChooseInvalidPlayers } from './exception';
 import type { GameInfo } from './gameinfo';
 import { Players } from './players';
+import { Context, InfoProcessor } from './infoprocessor';
+import { Phase } from './gamephase';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
+import { GameUI } from '~/interaction/gameui';
+import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
+import { Undertaker } from '~/content/characters/output/undertaker';
+import { Fortuneteller } from '~/content/characters/output/fortuneteller';
+import { Empath } from '~/content/characters/output/empath';
+import { Chef } from '~/content/characters/output/chef';
 
 /**
  * {@link `glossary["Demon Info"]`}
@@ -28,7 +35,15 @@ export interface MinionInfo {
 }
 
 export abstract class InfoProvider<T> {
-    constructor(readonly receiver: Player, readonly isTrue: boolean) {
+    static EMPTY_CANDIDATES = Generator.cache([{}]);
+
+    static NO_CANDIDATES = Generator.cache([]);
+
+    readonly receiver: Player;
+
+    isTrue: boolean;
+
+    constructor(receiver: Player, isTrue: boolean) {
         this.receiver = receiver;
         this.isTrue = isTrue;
     }
@@ -41,15 +56,19 @@ export abstract class InfoProvider<T> {
         return await this._falseInfoCandidates(gameInfo);
     }
 
-    protected _trueInfoCandidates(_gameInfo: GameInfo): Generator<T> {
+    protected _trueInfoCandidates(
+        _gameInfo: GameInfo
+    ): Generator<T> | Generator<never> {
         throw new Error('Method not implemented.');
     }
 
-    protected _falseInfoCandidates(_gameInfo: GameInfo): Generator<T> {
+    protected _falseInfoCandidates(
+        _gameInfo: GameInfo
+    ): Generator<T> | Generator<never> {
         throw new Error('Method not implemented.');
     }
 
-    candidates(gameInfo: GameInfo): Promise<Generator<T>> {
+    candidates(gameInfo: GameInfo): Promise<Generator<T> | Generator<never>> {
         return this.isTrue
             ? this.trueInfoCandidates(gameInfo).catch((_) =>
                   Generator<T>.empty()
@@ -57,6 +76,166 @@ export abstract class InfoProvider<T> {
             : this.falseInfoCandidates(gameInfo).catch((_) =>
                   Generator<T>.empty()
               );
+    }
+}
+
+export abstract class InfoRequester<T, TInfoProvider extends InfoProvider<T>>
+    implements InfoProcessor
+{
+    static from(character: typeof Character) {
+        switch (character) {
+            case Washerwoman:
+                return WasherwomanInfoRequester;
+            case Librarian:
+                return LibrarianInfoRequester;
+            case Investigator:
+                return InvestigatorInfoRequester;
+            case Chef:
+                return ChefInfoRequester;
+            case Empath:
+                return EmpathInfoRequester;
+            case Fortuneteller:
+                return FortuneTellerInfoRequester;
+            case Undertaker:
+                return UndertakerInfoRequester;
+            case Ravenkeeper:
+                return RavenkeeperInfoRequester;
+            default:
+                return undefined;
+        }
+    }
+
+    static of(player: Player) {
+        const InfoRequesterClass = this.from(player.character);
+
+        if (InfoRequesterClass === undefined) {
+            return undefined;
+        }
+
+        return new InfoRequesterClass(player, true);
+    }
+
+    get description() {
+        return `${this.receiver} needs game information`;
+    }
+
+    get receiver() {
+        return this.infoProvider.receiver;
+    }
+
+    get requester() {
+        return this.receiver;
+    }
+
+    get willGetTrueInfo() {
+        return this.infoProvider.isTrue;
+    }
+
+    abstract applicablePhases: number | Phase;
+
+    declare infoProvider: TInfoProvider;
+
+    abstract isEligible(gameInfo: GameInfo): Promise<boolean>;
+
+    async apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
+        if (await this.isEligible(gameInfo)) {
+            return await this._apply(gameInfo, context);
+        } else {
+            return gameInfo;
+        }
+    }
+
+    async _apply(gameInfo: GameInfo, _context: Context): Promise<GameInfo> {
+        const candidates = await this.getCandidates(gameInfo);
+        const reason = this.description;
+
+        const selected = await GameUI.storytellerChoose(
+            candidates,
+            reason,
+            true
+        );
+        if (selected !== undefined) {
+            await GameUI.send(this.receiver, selected, reason);
+        }
+
+        return gameInfo;
+    }
+
+    async getCandidates(gameInfo: GameInfo) {
+        const player = await gameInfo.getPlayer(this.requester);
+        this.infoProvider.isTrue = !player.willGetFalseInfo;
+        return await this.infoProvider.candidates(gameInfo);
+    }
+}
+
+abstract class OnceInfoRequester<
+    T,
+    TInfoProvider extends InfoProvider<T>
+> extends InfoRequester<T, TInfoProvider> {
+    hasReceivedInfo = false;
+
+    async isEligible(_gameInfo: GameInfo): Promise<boolean> {
+        return await !this.hasReceivedInfo;
+    }
+
+    async _apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
+        const _gameInfo = await super._apply(gameInfo, context);
+        this.hasReceivedInfo = true;
+        return _gameInfo;
+    }
+}
+
+abstract class NightInfoRequester<
+    T,
+    TInfoProvider extends InfoProvider<T>
+> extends InfoRequester<T, TInfoProvider> {
+    applicablePhases: Phase = Phase.Night;
+}
+
+abstract class OnceNightInfoRequester<
+    T,
+    TInfoProvider extends InfoProvider<T>
+> extends OnceInfoRequester<T, TInfoProvider> {
+    applicablePhases: Phase = Phase.Night;
+
+    async isEligible(gameInfo: GameInfo): Promise<boolean> {
+        return (await super.isEligible(gameInfo)) && gameInfo.gamePhase.isNight;
+    }
+}
+
+abstract class FirstNightInfoRequester<
+    T,
+    TInfoProvider extends InfoProvider<T>
+> extends OnceNightInfoRequester<T, TInfoProvider> {
+    async isEligible(gameInfo: GameInfo): Promise<boolean> {
+        return (
+            (await super.isEligible(gameInfo)) &&
+            gameInfo.gamePhase.isFirstNight
+        );
+    }
+}
+
+abstract class EveryAliveNightInfoRequester<
+    T,
+    TInfoProvider extends InfoProvider<T>
+> extends NightInfoRequester<T, TInfoProvider> {
+    async isEligible(gameInfo: GameInfo): Promise<boolean> {
+        return (
+            gameInfo.gamePhase.isNight &&
+            (await gameInfo.isPlayerAlive(this.receiver))
+        );
+    }
+}
+
+abstract class EveryAliveNonfirstNightInfoRequester<
+    T,
+    TInfoProvider extends InfoProvider<T>
+> extends NightInfoRequester<T, TInfoProvider> {
+    async isEligible(gameInfo: GameInfo): Promise<boolean> {
+        return (
+            gameInfo.gamePhase.isNonfirstNight &&
+            (await gameInfo.isPlayerAlive(this.receiver))
+        );
     }
 }
 
@@ -119,6 +298,20 @@ export class WasherwomanInfoProvider extends OneCharacterForTwoPlayersInfoProvid
     protected expectedCharacterType: typeof CharacterType = Townsfolk;
 }
 
+export class WasherwomanInfoRequester extends FirstNightInfoRequester<
+    WasherwomanInfo,
+    WasherwomanInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Washerwoman who learns that a particular Townsfolk character is in play, but not exactly which player it is.`;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new WasherwomanInfoProvider(requester, isTrue);
+    }
+}
+
 export interface LibrarianInfo extends Partial<OneCharacterForTwoPlayers> {
     hasOutsider: boolean;
     players?: [Player, Player];
@@ -152,6 +345,20 @@ export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider
     }
 }
 
+export class LibrarianInfoRequester extends FirstNightInfoRequester<
+    LibrarianInfo,
+    LibrarianInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Librarian who learns that a particular Outsider character is in play, but not exactly which player it is.`;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new LibrarianInfoProvider(requester, isTrue);
+    }
+}
+
 export interface InvestigatorInfo extends OneCharacterForTwoPlayers {}
 
 export class InvestigatorInfoProvider extends OneCharacterForTwoPlayersInfoProvider<
@@ -159,6 +366,20 @@ export class InvestigatorInfoProvider extends OneCharacterForTwoPlayersInfoProvi
     typeof Investigator
 > {
     protected expectedCharacterType: typeof CharacterType = Minion;
+}
+
+export class InvestigatorInfoRequester extends FirstNightInfoRequester<
+    InvestigatorInfo,
+    InvestigatorInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Investigator who learns that a particular Minion character is in play, but not exactly which player it is.`;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new InvestigatorInfoProvider(requester, isTrue);
+    }
 }
 
 export interface ChefInfo {
@@ -198,6 +419,20 @@ export class ChefInfoProvider extends InfoProvider<ChefInfo> {
     }
 }
 
+export class ChefInfoRequester extends FirstNightInfoRequester<
+    ChefInfo,
+    ChefInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Chef who knows if evil players are sitting next to each other.`;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new ChefInfoProvider(requester, isTrue);
+    }
+}
+
 /**
  * {@link `empath["ability"]`}
  * "Each night, you learn how many of your 2 alive neighbours are evil."
@@ -233,6 +468,20 @@ export class EmpathInfoProvider extends InfoProvider<EmpathInfo> {
     }
 }
 
+export class EmpathInfoRequester extends EveryAliveNightInfoRequester<
+    EmpathInfo,
+    EmpathInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Empath who keeps learning if their living neighbours are good or evil.`;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new EmpathInfoProvider(requester, isTrue);
+    }
+}
+
 /**
  * {@link `fortuneteller["ability"]`}
  * "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you."
@@ -243,61 +492,73 @@ export interface FortuneTellerInfo {
 }
 
 export class FortuneTellerInfoProvider extends InfoProvider<FortuneTellerInfo> {
-    protected chosenPlayers?: [Player, Player];
+    chosen?: [Player, Player];
 
-    get chosen(): [Player, Player] | undefined {
-        return this.chosenPlayers;
+    getChosenPlayers(gameInfo: GameInfo): Players | undefined {
+        if (this.chosen === undefined) {
+            return undefined;
+        }
+
+        return gameInfo.players.intersect(this.chosen);
     }
 
-    static isChoiceValid(players: Array<Player> | undefined): boolean {
-        return Array.isArray(players) && players.length === 2;
-    }
+    _trueInfoCandidates(gameInfo: GameInfo) {
+        const chosenPlayers = this.getChosenPlayers(gameInfo);
 
-    choose(players: Array<Player> | undefined) {
-        if (FortuneTellerInfoProvider.isChoiceValid(players)) {
-            this.chosenPlayers = players as [Player, Player];
+        if (chosenPlayers === undefined) {
+            return InfoProvider.NO_CANDIDATES;
         } else {
-            throw new FortuneTellerChooseInvalidPlayers(players);
+            return Generator.once([
+                {
+                    players: Array.from(chosenPlayers),
+                    hasDemon: Generator.any(
+                        (player) => player.isDemon,
+                        chosenPlayers
+                    ),
+                } as FortuneTellerInfo,
+            ]);
         }
     }
 
-    async getChosenPlayers(gameInfo: GameInfo): Promise<Players> {
-        if (this.chosenPlayers?.length !== 2) {
-            const error = new FortuneTellerChooseInvalidPlayers(
-                this.chosenPlayers
-            );
-            await error.resolve();
-            this.chosenPlayers = error.corrected;
+    _falseInfoCandidates(gameInfo: GameInfo) {
+        const chosenPlayers = this.getChosenPlayers(gameInfo);
+
+        if (chosenPlayers === undefined) {
+            return InfoProvider.NO_CANDIDATES;
+        } else {
+            return Generator.once([
+                {
+                    players: this.chosen,
+                    hasDemon: true,
+                } as FortuneTellerInfo,
+                {
+                    players: this.chosen,
+                    hasDemon: false,
+                } as FortuneTellerInfo,
+            ]);
         }
+    }
+}
 
-        return gameInfo.players.intersect(this.chosenPlayers);
+export class FortuneTellerInfoRequester extends EveryAliveNightInfoRequester<
+    FortuneTellerInfo,
+    FortuneTellerInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a FortuneTeller who detects who the Demon is, but sometimes thinks good players are Demons.`;
     }
 
-    async trueInfoCandidates(gameInfo: GameInfo) {
-        const chosenPlayers = await this.getChosenPlayers(gameInfo);
-
-        return Generator.once([
-            {
-                players: Array.from(chosenPlayers),
-                hasDemon: Generator.any(
-                    (player) => player.isDemon,
-                    chosenPlayers
-                ),
-            } as FortuneTellerInfo,
-        ]);
+    getChosenPlayers(gameInfo: GameInfo): Players | undefined {
+        return this.infoProvider.getChosenPlayers(gameInfo);
     }
 
-    _falseInfoCandidates(_gameInfo: GameInfo) {
-        return Generator.once([
-            {
-                players: this.chosenPlayers,
-                hasDemon: true,
-            } as FortuneTellerInfo,
-            {
-                players: this.chosenPlayers,
-                hasDemon: false,
-            } as FortuneTellerInfo,
-        ]);
+    setChosenPlayers(players: [Player, Player] | undefined) {
+        this.infoProvider.chosen = players;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new FortuneTellerInfoProvider(requester, isTrue);
     }
 }
 
@@ -315,7 +576,7 @@ export class UndertakerInfoProvider extends InfoProvider<UndertakerInfo> {
         const executed = gameInfo.executed;
 
         if (executed === undefined) {
-            return Generator.empty<UndertakerInfo>();
+            return InfoProvider.NO_CANDIDATES;
         } else {
             return Generator.once([
                 {
@@ -330,15 +591,30 @@ export class UndertakerInfoProvider extends InfoProvider<UndertakerInfo> {
         const executed = gameInfo.executed;
 
         if (executed === undefined) {
-            return Generator.empty<UndertakerInfo>();
+            return InfoProvider.NO_CANDIDATES;
         } else {
             return Generator.once(gameInfo.characterSheet.characters).map(
-                (character) => ({
-                    player: executed,
-                    character,
-                })
+                (character) =>
+                    ({
+                        player: executed,
+                        character,
+                    } as UndertakerInfo)
             );
         }
+    }
+}
+
+export class UndertakerInfoRequester extends EveryAliveNonfirstNightInfoRequester<
+    UndertakerInfo,
+    UndertakerInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Undertaker who learns which character was executed today.`;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new UndertakerInfoProvider(requester, isTrue);
     }
 }
 
@@ -346,16 +622,18 @@ export class UndertakerInfoProvider extends InfoProvider<UndertakerInfo> {
  * {@link `ravenkeeper["ability"]`}
  * "If you die at night, you are woken to choose a player: you learn their character."
  */
-export interface RavenkeeperInfo {
+export interface _RavenkeeperInfo {
     player: Player;
     character: typeof Character;
 }
+
+export type RavenkeeperInfo = _RavenkeeperInfo | Record<string, never>;
 
 export class RavenkeeperInfoProvider extends InfoProvider<RavenkeeperInfo> {
     protected chosenPlayerId?: string;
 
     getChosenPlayer(gameInfo: GameInfo): Player | undefined {
-        return gameInfo.getInfluencedPlayer(this.chosenPlayerId);
+        return gameInfo._getPlayer(this.chosenPlayerId);
     }
 
     choosePlayer(player: Player) {
@@ -366,7 +644,7 @@ export class RavenkeeperInfoProvider extends InfoProvider<RavenkeeperInfo> {
         const chosen = this.getChosenPlayer(gameInfo);
 
         if (chosen === undefined) {
-            return Generator.empty<RavenkeeperInfo>();
+            return InfoProvider.EMPTY_CANDIDATES;
         } else {
             return Generator.once([
                 {
@@ -381,14 +659,39 @@ export class RavenkeeperInfoProvider extends InfoProvider<RavenkeeperInfo> {
         const chosen = this.getChosenPlayer(gameInfo);
 
         if (chosen === undefined) {
-            return Generator.empty<RavenkeeperInfo>();
+            return InfoProvider.EMPTY_CANDIDATES;
         } else {
             return Generator.once(gameInfo.characterSheet.characters).map(
-                (character) => ({
-                    player: chosen,
-                    character,
-                })
+                (character) =>
+                    ({
+                        player: chosen,
+                        character,
+                    } as RavenkeeperInfo)
             );
         }
     }
 }
+
+export class RavenkeeperInfoRequester extends OnceNightInfoRequester<
+    RavenkeeperInfo,
+    RavenkeeperInfoProvider
+> {
+    get description() {
+        return `${this.receiver} is a Ravenkeeper who learns one player's character if dies at night.`;
+    }
+
+    async isEligible(gameInfo: GameInfo): Promise<boolean> {
+        if (await super.isEligible(gameInfo)) {
+            const player = await gameInfo.getPlayer(this.requester);
+            return player.dead;
+        }
+        return false;
+    }
+
+    constructor(requester: Player, isTrue: boolean) {
+        super();
+        this.infoProvider = new RavenkeeperInfoProvider(requester, isTrue);
+    }
+}
+
+export type InfoRequesters = ReturnType<typeof InfoRequester.of>;

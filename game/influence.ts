@@ -9,7 +9,7 @@ import type { Player } from './player';
 import { DeadReason } from './deadreason';
 import type { Context, InfoProcessor } from './infoprocessor';
 import type { Nomination } from './nomination';
-import { GamePhase } from './gamephase';
+import { GamePhase, Phase } from './gamephase';
 import type { Execution } from './execution';
 import { Spy } from '~/content/characters/output/spy';
 import { GameUI } from '~/interaction/gameui';
@@ -40,6 +40,8 @@ export abstract class Influence implements InfoProcessor {
         });
     }
 
+    abstract applicablePhases: Phase;
+
     constructor(readonly source: unknown, readonly description: string) {
         this.source = source;
         this.description = description;
@@ -53,26 +55,12 @@ export abstract class Influence implements InfoProcessor {
         }
     }
 
-    _apply(_gameInfo: GameInfo, _context: Context): GameInfo {
+    _apply(_gameInfo: GameInfo, _context: Context): Promise<GameInfo> {
         throw new Error('Method not implemented.');
     }
 
     async isEligible(_gameState: GameInfo): Promise<boolean> {
         return await true;
-    }
-}
-
-export class Influences extends Influence {
-    declare source: Array<Influence>;
-
-    async apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
-        let influencedGameInfo: GameInfo = gameInfo;
-
-        for (const influence of this.source) {
-            influencedGameInfo = await influence.apply(gameInfo, context);
-        }
-
-        return influencedGameInfo;
     }
 }
 
@@ -196,10 +184,10 @@ export abstract class RegisterAsDemonInfluence extends RegisterAsEvilInfluence {
         });
     }
 
-    _apply(gameInfo: GameInfo, _context: Context): GameInfo {
+    async _apply(gameInfo: GameInfo, _context: Context) {
         const thisClass = this.constructor as typeof RegisterAsDemonInfluence;
 
-        return gameInfo.updatePlayer(this.playerToRegister, (player) =>
+        return await gameInfo.updatePlayer(this.playerToRegister, (player) =>
             thisClass.registerAs(player)
         );
     }
@@ -212,6 +200,8 @@ export class SpyInfluence extends RegisterAsGoodInfluence {
     static originalCharacter: typeof Character = Spy;
 
     declare source: Player;
+
+    applicablePhases = Phase.__ALL__;
 
     constructor(spyPlayer: Player) {
         super(spyPlayer, SpyInfluence.description);
@@ -226,6 +216,8 @@ export class RecluseInfluence extends RegisterAsGoodInfluence {
 
     declare source: Player;
 
+    applicablePhases = Phase.__ALL__;
+
     constructor(reclusePlayer: Player) {
         super(reclusePlayer, RecluseInfluence.description);
     }
@@ -234,6 +226,8 @@ export class RecluseInfluence extends RegisterAsGoodInfluence {
 export class FortuneTellerRedHerringInfluence extends RegisterAsDemonInfluence {
     static readonly description: string =
         'There is a good player that registers as a Demon to the Fortune Teller.';
+
+    applicablePhases = Phase.__ALL__;
 
     constructor(fortuneTellerPlayer: Player, playerAsRedHerring: Player) {
         super(
@@ -249,6 +243,8 @@ export class VirginInfluence extends Influence {
         'The 1st time virgin is nominated, if the nominator is a Townsfolk, they are executed immediately.';
 
     declare source: Player;
+
+    applicablePhases = Phase.Day;
 
     hasBeenNominated = false;
 
@@ -300,12 +296,14 @@ export class SoldierInfluence extends Influence {
 
     declare source: Player;
 
+    applicablePhases = Phase.__ALL__;
+
     constructor(soldierPlayer: Player) {
         super(soldierPlayer, SoldierInfluence.description);
     }
 
-    _apply(gameInfo: GameInfo, _context: Context): GameInfo {
-        return gameInfo.updatePlayer(this.source, (player) =>
+    async _apply(gameInfo: GameInfo, _context: Context) {
+        return await gameInfo.updatePlayer(this.source, (player) =>
             Influence.immuneFromDemonAttack(player)
         );
     }
@@ -316,6 +314,8 @@ export class MayorDieInsteadInfluence extends Influence {
         'If mayor die at night, another player might die instead.';
 
     declare source: Player;
+
+    applicablePhases = Phase.Night;
 
     constructor(mayorPlayer: Player) {
         super(mayorPlayer, MayorDieInsteadInfluence.description);
@@ -360,8 +360,8 @@ export class MayorDieInsteadInfluence extends Influence {
         });
     }
 
-    _apply(gameInfo: GameInfo, _context: Context): GameInfo {
-        return gameInfo.updatePlayer(this.source, (player) =>
+    async _apply(gameInfo: GameInfo, _context: Context) {
+        return await gameInfo.updatePlayer(this.source, (player) =>
             this.addInfluenceToMayor(gameInfo, player)
         );
     }
@@ -372,6 +372,8 @@ export class MayorPeacefulWinInfluence extends Influence {
         'If only 3 players live & no execution occurs, good wins.';
 
     declare source: Player;
+
+    applicablePhases = Phase.Day;
 
     constructor(mayorPlayer: Player) {
         super(mayorPlayer, MayorPeacefulWinInfluence.description);

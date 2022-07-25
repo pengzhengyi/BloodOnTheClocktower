@@ -3,6 +3,7 @@ import type { CharacterSheet } from './charactersheet';
 import { Player } from './player';
 import { Seating } from './seating';
 import type { Execution } from './execution';
+import { CannotFindPlayerInGame } from './exception';
 import { Generator } from './collections';
 import type { GamePhase } from './gamephase';
 import { Transform } from './types';
@@ -30,7 +31,7 @@ export class GameInfo {
     get executed(): Player | undefined {
         const player = this.execution?.executed;
         if (player !== undefined) {
-            return this.getInfluencedPlayer(player);
+            return this._getPlayer(player);
         }
 
         return player;
@@ -57,9 +58,21 @@ export class GameInfo {
         return Seating.from(this._players);
     }
 
-    getInfluencedPlayer(
-        player: string | Player | undefined
-    ): Player | undefined {
+    async getPlayer(player: string | Player | undefined): Promise<Player> {
+        let influencedPlayer = this._getPlayer(player);
+
+        if (influencedPlayer === undefined) {
+            const error = new CannotFindPlayerInGame(player, this);
+            await error.throwWhen(
+                (error) => error.matchingPlayer === undefined
+            );
+            influencedPlayer = error.matchingPlayer;
+        }
+
+        return influencedPlayer;
+    }
+
+    _getPlayer(player: string | Player | undefined): Player | undefined {
         if (player === undefined) {
             return undefined;
         }
@@ -69,6 +82,11 @@ export class GameInfo {
         } else {
             return this.playerIdToInfluencedPlayer.get(player);
         }
+    }
+
+    async isPlayerAlive(player: string | Player | undefined): Promise<boolean> {
+        const influencedPlayer = await this.getPlayer(player);
+        return influencedPlayer.alive;
     }
 
     replace(

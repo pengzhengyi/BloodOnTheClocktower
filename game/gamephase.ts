@@ -3,41 +3,49 @@ import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { Action } from './types';
 import { GameUI } from '~/interaction/gameui';
 
-enum Phase {
+export enum Phase {
+    /** before beginning a game */
+    Setup = 1,
+
     /**
      * {@link `glossary["Night"]`}
      * The game phase in which players close their eyes, and certain characters wake to act or receive information. The game begins with the night phase. Each day is followed by a night. Each night is followed by a day.
      */
-    Night = 0,
+    Night = 1 << 1,
     /**
      * {@link `glossary["Dawn"]`}
      * The end of a night, just before the next day begins. Characters that act “at dawn” act after almost all other characters.
      */
-    Dawn,
+    Dawn = 1 << 2,
 
     /**
      * {@link `glossary["Day"]`}
      * The game phase in which players have their eyes open, talk with each other, and vote for an execution. Each day is followed by a night. Each night is followed by a day.
      */
-    Day,
+    Day = 1 << 3,
     /**
      * {@link `glossary["Dusk"]`}
      * The start of a night, just after the players close their eyes. Characters that act “at dusk” act before almost all other characters. Abilities that last “until dusk” end as soon as the players go to sleep.
      */
-    Dusk,
+    Dusk = 1 << 4,
 
-    __LENGTH__,
+    /** Night, Dawn, Day, Dusk */
+    __ALL__ = 0b11110,
+}
+
+export function includePhase(phases: number, phase: Phase) {
+    return (phases & phase) === phase;
 }
 
 @Exclude()
 export class GamePhase {
-    @Expose({ toPlainOnly: true })
-    phase: Phase = Phase.Night;
-
-    @Expose({ toPlainOnly: true })
-    cycleIndex = 0;
-
     readonly phaseToActions: Map<Phase, Array<Action>> = new Map();
+
+    @Expose({ toPlainOnly: true })
+    protected phase: Phase;
+
+    @Expose({ toPlainOnly: true })
+    protected cycleIndex;
 
     /**
      * {@link `glossary["First night"]`}
@@ -61,6 +69,15 @@ export class GamePhase {
 
     static format(phase: Phase, cycleIndex: number): string {
         return `${Phase[phase]} ${cycleIndex}`;
+    }
+
+    static setup() {
+        return new this(Phase.Setup);
+    }
+
+    constructor(phase: Phase = Phase.Night, cycleIndex = 0) {
+        this.phase = phase;
+        this.cycleIndex = cycleIndex;
     }
 
     cycle() {
@@ -95,8 +112,8 @@ export class GamePhase {
     }
 
     protected transition() {
-        let phase = this.phase++;
-        if (phase === Phase.__LENGTH__) {
+        let phase = this.phase << 1;
+        if (phase > Phase.Dusk) {
             this.cycleIndex++;
             phase = Phase.Night;
         }
