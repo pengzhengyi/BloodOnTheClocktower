@@ -28,4 +28,19 @@ export abstract class GameUI {
         // TODO
         throw new Error('Method not implemented.');
     }
+
+    static confirm(_player: Player, _prompt: string): Promise<boolean> {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
+
+    static storytellerConfirm(_prompt: string): Promise<boolean> {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
+
+    static send<T>(_player: Player, _data: T, _reason?: string): Promise<void> {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
 }

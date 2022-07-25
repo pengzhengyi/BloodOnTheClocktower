@@ -54,6 +54,10 @@ export class GamePhase {
         return this.phase === Phase.Day;
     }
 
+    get isNight(): boolean {
+        return this.phase === Phase.Night;
+    }
+
     transition() {
         let phase = this.phase++;
         if (phase === Phase.__LENGTH__) {

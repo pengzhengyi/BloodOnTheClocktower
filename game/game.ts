@@ -1,7 +1,20 @@
 import { Alignment } from './alignment';
 import { Player } from './player';
+import { GameUI } from '~/interaction/gameui';
 
 export class Game {
+    winningTeam?: Alignment;
+
+    async setWinningTeam(winningTeam: Alignment) {
+        if (
+            await GameUI.storytellerConfirm(
+                `${winningTeam} will be the winning team?`
+            )
+        ) {
+            this.winningTeam = winningTeam;
+        }
+    }
+
     getWinningTeam(players: Iterable<Player>): Alignment | undefined {
         let evilWinConditionReached = true;
         let goodWinConditionReached = true;

@@ -28,6 +28,12 @@ module.exports = {
     ],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-this-alias': [
+      'error',
+      {
+        allowedNames: ['self'], // Allow `const self = this`; `[]` by default
+      },
+    ],
     'unused-imports/no-unused-imports': 'error',
     'unused-imports/no-unused-vars': [
       'error',

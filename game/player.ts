@@ -237,14 +237,15 @@ export class Player {
         return Object.is(this.characterType, characterType);
     }
 
-    setDead(reason: DeadReason = DeadReason.Other) {
+    async setDead(reason: DeadReason = DeadReason.Other): Promise<void> {
         this.deadReason = reason;
         this.state += NegativeState.Dead;
+        await undefined;
     }
 
-    attack(victim: Player) {
+    async attack(victim: Player) {
         // TODO
-        victim.setDead(DeadReason.DemonAttack);
+        await victim.setDead(DeadReason.DemonAttack);
     }
 
     isAlly(other: Player) {

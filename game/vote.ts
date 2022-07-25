@@ -4,7 +4,7 @@ import { clockwise } from './common';
 import { NoVotesWhenCountingVote } from './exception';
 import { Player } from './player';
 import { PlayerOrdering } from './types';
-import { Confirm } from '~/interaction/confirm';
+import { GameUI } from '~/interaction/gameui';
 
 /**
  * {@link `glossary["Vote"]`}
@@ -74,9 +74,9 @@ export class Vote {
 
     async *collectVotes(players: Iterable<Player>) {
         if (this.hasVoted()) {
-            const shouldVoteAgain = await new Confirm(
+            const shouldVoteAgain = await GameUI.storytellerConfirm(
                 Vote.RECOLLECT_VOTE_PROMPT
-            ).getValue();
+            );
             if (!shouldVoteAgain) {
                 yield* this.votes;
             }

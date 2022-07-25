@@ -7,12 +7,12 @@ export enum Alignment {
      * {@link `glossary["Good"]`}
      * The good alignment. Townsfolk and Outsiders (blue characters) start as good. Good wins if the Demon dies.
      */
-    Good,
+    Good = 'good',
     /**
      * {@link `glossary["Evil"]`}
      * The evil alignment. Minions and Demons (red characters) start as evil. Evil wins when just 2 players are alive, not including Travellers.
      */
-    Evil,
+    Evil = 'evil',
     /** Fabled characters are neutral */
-    Neutral,
+    Neutral = 'neutral',
 }

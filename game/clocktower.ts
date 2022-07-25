@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { PastMomentRewrite } from './exception';
-import { Confirm } from '~/interaction/confirm';
+import { GameUI } from '~/interaction/gameui';
 
 export class Toll {
     readonly when: Dayjs;
@@ -36,9 +36,9 @@ export class Clocktower {
 
         if (momentWithSameMeaning !== undefined) {
             if (
-                !(await new Confirm(
+                !(await GameUI.storytellerConfirm(
                     `Overwrite recorded timestamp for ${meaning}?`
-                ).ask())
+                ))
             ) {
                 await new PastMomentRewrite(
                     meaning,

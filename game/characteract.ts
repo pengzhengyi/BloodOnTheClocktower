@@ -1,9 +1,10 @@
 import { NoPlayerForCharacterAct } from './exception';
 import type { GameInfo as GameState } from './gameinfo';
-import { Influence, InfluenceApplyContext as Context } from './influence';
+import { Influence } from './influence';
 import { Player } from './player';
 import { DeadReason } from './deadreason';
 import { Character } from './character';
+import { Context } from './infoprocessor';
 import { GameUI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
@@ -38,9 +39,7 @@ export abstract class CharacterAct extends Influence {
         this.setPlayer(player);
     }
 
-    abstract canAct(gameState: GameState): boolean;
-
-    abstract _act(gameState: GameState, context: Context): Promise<GameState>;
+    abstract act(gameState: GameState, context: Context): Promise<GameState>;
 
     async apply(gameInfo: GameState, context: Context): Promise<GameState> {
         return await this.act(gameInfo, context);
@@ -52,14 +51,6 @@ export abstract class CharacterAct extends Influence {
 
     setPlayer(player: Player) {
         this.playerId = player.id;
-    }
-
-    async act(gameState: GameState, context: Context): Promise<GameState> {
-        if (this.canAct(gameState)) {
-            return await this._act(gameState, context);
-        } else {
-            return gameState;
-        }
     }
 
     protected async getPlayer(gameState: GameState): Promise<Player> {
@@ -77,8 +68,8 @@ export abstract class CharacterAct extends Influence {
 }
 
 export abstract class NonfirstNightCharacterAct extends CharacterAct {
-    canAct(gameState: GameState): boolean {
-        return gameState.gamePhase.isNonfirstNight;
+    async isEligible(gameState: GameState) {
+        return await gameState.gamePhase.isNonfirstNight;
     }
 }
 
@@ -97,13 +88,13 @@ export class ImpAct extends NonfirstNightCharacterAct {
         return GameUI.choose(impPlayer, players, ImpAct.description);
     }
 
-    async _act(gameState: GameState, _context: Context): Promise<GameState> {
+    async act(gameState: GameState, _context: Context): Promise<GameState> {
         const impPlayer = await this.getPlayer(gameState);
         const chosenPlayer = await this.choosePlayerToKill(
             impPlayer,
             gameState.players
         );
-        impPlayer.attack(chosenPlayer);
+        await impPlayer.attack(chosenPlayer);
         return gameState;
     }
 }
@@ -143,7 +134,7 @@ export class MonkAct extends NonfirstNightCharacterAct {
         return GameUI.choose(monkPlayer, players, MonkAct.description);
     }
 
-    async _act(gameState: GameState, _context: Context): Promise<GameState> {
+    async act(gameState: GameState, _context: Context): Promise<GameState> {
         const monkPlayer = await this.getPlayer(gameState);
         const protectedPlayer = await this.choosePlayerToProtect(
             monkPlayer,
@@ -165,13 +156,13 @@ export class SlayerAct extends CharacterAct {
 
     hasActed = false;
 
-    canAct(gameState: GameState): boolean {
-        return gameState.gamePhase.isDay && !this.hasActed;
+    async isEligible(gameState: GameState): Promise<boolean> {
+        return (await gameState.gamePhase.isDay) && !this.hasActed;
     }
 
-    killDemon(player: Player) {
+    async killDemon(player: Player) {
         if (player.isTheDemon) {
-            player.setDead(DeadReason.SlayerKill);
+            await player.setDead(DeadReason.SlayerKill);
         }
     }
 
@@ -182,14 +173,14 @@ export class SlayerAct extends CharacterAct {
         return GameUI.choose(slayerPlayer, players, SlayerAct.description);
     }
 
-    async _act(gameState: GameState, _context: Context): Promise<GameState> {
+    async act(gameState: GameState, _context: Context): Promise<GameState> {
         const slayerPlayer = await this.getPlayer(gameState);
         const suspectedDemon = await this.chooseSuspectedDemon(
             slayerPlayer,
             gameState.players
         );
 
-        this.killDemon(suspectedDemon);
+        await this.killDemon(suspectedDemon);
 
         this.hasActed = true;
 

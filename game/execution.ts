@@ -24,6 +24,13 @@ export class Execution {
     @Type(() => Nomination)
     readonly nominations: Array<Nomination> = [];
 
+    async setPlayerAboutToDie(numAlivePlayer: number): Promise<void> {
+        const playerAboutToDie = await this.getPlayerAboutToDie(numAlivePlayer);
+        this.executed = playerAboutToDie;
+    }
+
+    finalize = this.setPlayerAboutToDie;
+
     /**
      * {@link `glossary["About to die"]`}
      * @return The player who has enough votes to be executed and more votes than any other player today.

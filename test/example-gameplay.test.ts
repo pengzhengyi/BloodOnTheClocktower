@@ -25,9 +25,9 @@ import {
 import { Player } from '~/game/player';
 import { GameInfo } from '~/game/gameinfo';
 import { CharacterSheet } from '~/game/charactersheet';
+import type { Context } from '~/game/infoprocessor';
 import {
     FortuneTellerRedHerringInfluence,
-    InfluenceApplyContext,
     RecluseInfluence,
     SoldierInfluence,
     SpyInfluence,
@@ -47,6 +47,7 @@ import { Empath } from '~/content/characters/output/empath';
 import { Imp } from '~/content/characters/output/imp';
 import { Generator } from '~/game/collections';
 import { CharacterAct, SlayerAct } from '~/game/characteract';
+import { Game } from '~/game/game';
 
 function mockStorytellerChoose<T>(chosen: T) {
     return jest
@@ -70,12 +71,14 @@ function mockChoosePlayer(chosen: Player) {
 function createMockGameInfo(
     players: Array<Player>,
     characterSheet?: CharacterSheet,
-    gamePhase?: GamePhase
+    gamePhase?: GamePhase,
+    game?: Game
 ) {
     return new GameInfo(
         players,
         characterSheet ?? mock<CharacterSheet>(),
-        gamePhase ?? mock<GamePhase>()
+        gamePhase ?? mock<GamePhase>(),
+        game ?? mock<Game>()
     );
 }
 
@@ -131,6 +134,10 @@ describe('True Washerwoman info', () => {
         infoProvider = new WasherwomanInfoProvider(washerwomanPlayer, true);
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     /**
      * {@link `washerwoman["gameplay"][0]`}
      */
@@ -182,10 +189,7 @@ describe('True Washerwoman info', () => {
                 async (gameInfo, [Marianna, _Sarah, _]) => {
                     const influence = new SpyInfluence(Marianna);
 
-                    return await influence.apply(
-                        gameInfo,
-                        mock<InfluenceApplyContext>()
-                    );
+                    return await influence.apply(gameInfo, mock<Context>());
                 }
             );
 
@@ -209,6 +213,10 @@ describe('True Librarian info', () => {
             `${faker.name.firstName()} is the Librarian`
         );
         infoProvider = new LibrarianInfoProvider(librarianPlayer, true);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     /**
@@ -274,6 +282,10 @@ describe('True Investigator info', () => {
         infoProvider = new InvestigatorInfoProvider(investigatorPlayer, true);
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     /**
      * {@link `investigator["gameplay"][0]`}
      */
@@ -304,10 +316,7 @@ describe('True Investigator info', () => {
             async (gameInfo, [Angelus, _Lewis, _]) => {
                 const influence = new SpyInfluence(Angelus);
 
-                return await influence.apply(
-                    gameInfo,
-                    mock<InfluenceApplyContext>()
-                );
+                return await influence.apply(gameInfo, mock<Context>());
             }
         );
 
@@ -334,10 +343,7 @@ describe('True Investigator info', () => {
                 async (gameInfo, [Brianna, _Marianna, _]) => {
                     const influence = new RecluseInfluence(Brianna);
 
-                    return await influence.apply(
-                        gameInfo,
-                        mock<InfluenceApplyContext>()
-                    );
+                    return await influence.apply(gameInfo, mock<Context>());
                 }
             );
 
@@ -362,6 +368,10 @@ describe('True Chef info', () => {
             `${faker.name.firstName()} is the Chef`
         );
         infoProvider = new ChefInfoProvider(chefPlayer, true);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     /**
@@ -406,8 +416,6 @@ describe('True Chef info', () => {
      * {@link `chef["gameplay"][2]`}
      */
     test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", async () => {
-        const gameUIStorytellerChooseMock = mockStorytellerChoose(Poisoner);
-
         const [candidates, _] = await generateInfoCandidates(
             [
                 `${faker.name.firstName()} is the Imp`,
@@ -420,8 +428,6 @@ describe('True Chef info', () => {
             [chefPlayer],
             infoProvider
         );
-
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
 
         expect(candidates).toHaveLength(1);
         for (const candidate of candidates as Array<ChefInfo>) {
@@ -439,6 +445,10 @@ describe('True Empath info', () => {
             `${faker.name.firstName()} is the Empath`
         );
         infoProvider = new EmpathInfoProvider(empathPlayer, true);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     /**
@@ -471,11 +481,11 @@ describe('True Empath info', () => {
         const soldier = await playerFromDescription(
             `${faker.name.firstName()} is the Soldier`
         );
-        soldier.setDead();
+        await soldier.setDead();
         const monk = await playerFromDescription(
             `${faker.name.firstName()} is the Monk`
         );
-        monk.setDead();
+        await monk.setDead();
 
         const [candidates, _] = await generateInfoCandidates(
             [`${faker.name.firstName()} is the Librarian`],
@@ -496,19 +506,19 @@ describe('True Empath info', () => {
         const gunslinger = await playerFromDescription(
             `${faker.name.firstName()} is the evil Gunslinger`
         );
-        gunslinger.setDead();
+        await gunslinger.setDead();
         const soldier = await playerFromDescription(
             `${faker.name.firstName()} is the Soldier`
         );
-        soldier.setDead();
+        await soldier.setDead();
         const monk = await playerFromDescription(
             `${faker.name.firstName()} is the Monk`
         );
-        monk.setDead();
+        await monk.setDead();
         const librarian = await playerFromDescription(
             `${faker.name.firstName()} is the Librarian`
         );
-        librarian.setDead();
+        await librarian.setDead();
         const baron = await playerFromDescription(
             `${faker.name.firstName()} is the Baron`
         );
@@ -538,6 +548,10 @@ describe('True FortuneTeller info', () => {
 
     beforeEach(() => {
         infoProvider = new FortuneTellerInfoProvider(FortuneTellerPlayer, true);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     /**
@@ -597,7 +611,7 @@ describe('True FortuneTeller info', () => {
         const imp = await playerFromDescription(
             `${faker.name.firstName()} is the Imp`
         );
-        imp.setDead();
+        await imp.setDead();
 
         const butler = await playerFromDescription(
             `${faker.name.firstName()} is the Butler`
@@ -624,7 +638,7 @@ describe('True FortuneTeller info', () => {
         const saint = await playerFromDescription(
             `${faker.name.firstName()} is the Saint`
         );
-        saint.setDead();
+        await saint.setDead();
 
         infoProvider.choose([saint, FortuneTellerPlayer]);
 
@@ -638,10 +652,7 @@ describe('True FortuneTeller info', () => {
                     saint
                 );
 
-                return await influence.apply(
-                    gameInfo,
-                    mock<InfluenceApplyContext>()
-                );
+                return await influence.apply(gameInfo, mock<Context>());
             }
         );
 
@@ -664,6 +675,10 @@ describe('True Undertaker info', () => {
 
     beforeEach(() => {
         infoProvider = new UndertakerInfoProvider(UndertakerPlayer, true);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     /**
@@ -742,10 +757,7 @@ describe('True Undertaker info', () => {
 
                 const influence = new SpyInfluence(spyPlayer);
 
-                return await influence.apply(
-                    gameInfo,
-                    mock<InfluenceApplyContext>()
-                );
+                return await influence.apply(gameInfo, mock<Context>());
             }
         );
 
@@ -780,6 +792,10 @@ describe('True Monk info', () => {
         );
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     /**
      * {@link `monk["gameplay"][0]`}
      */
@@ -801,13 +817,10 @@ describe('True Monk info', () => {
 
         gameInfo = await monkPlayer.characterAct!.apply(
             gameInfo,
-            mock<InfluenceApplyContext>()
+            mock<Context>()
         )!;
 
-        await impPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -835,19 +848,16 @@ describe('True Monk info', () => {
 
         gameInfo = await monkPlayer.characterAct!.apply(
             gameInfo,
-            mock<InfluenceApplyContext>()
+            mock<Context>()
         )!;
 
         // TODO apply mayor's ability
         // gameInfo = await mayorPlayer.characterAbility!.apply(
         //     gameInfo,
-        //     mock<InfluenceApplyContext>()
+        //     mock<Context>()
         // )!;
 
-        await impPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -874,13 +884,10 @@ describe('True Monk info', () => {
 
         gameInfo = await monkPlayer.characterAct!.apply(
             gameInfo,
-            mock<InfluenceApplyContext>()
+            mock<Context>()
         )!;
 
-        await impPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
         expect(impPlayer.alive).toBeTrue();
@@ -901,6 +908,10 @@ describe('True Ravenkeeper info', () => {
         infoProvider = new RavenkeeperInfoProvider(RavenkeeperPlayer, true);
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     /**
      * {@link `ravenkeeper["gameplay"][0]`}
      */
@@ -919,10 +930,7 @@ describe('True Ravenkeeper info', () => {
             async (gameInfo, _) => {
                 const gameUIChooseMock = mockChoosePlayer(RavenkeeperPlayer);
 
-                await impPlayer.characterAct!.apply(
-                    gameInfo,
-                    mock<InfluenceApplyContext>()
-                )!;
+                await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
                 expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -956,6 +964,10 @@ describe('True Slayer info', () => {
         );
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     /**
      * {@link `slayer["gameplay"][0]`}
      */
@@ -972,10 +984,7 @@ describe('True Slayer info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(impPlayer);
 
-        await SlayerPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await SlayerPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -1001,20 +1010,14 @@ describe('True Slayer info', () => {
 
         const influence = new RecluseInfluence(reclusePlayer);
 
-        gameInfo = await influence.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        );
+        gameInfo = await influence.apply(gameInfo, mock<Context>());
 
-        await SlayerPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await SlayerPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+
+        expect(reclusePlayer.dead).toBeTrue();
 
         expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
         expect(gameUIChooseMock).toHaveBeenCalled();
-
-        expect(reclusePlayer.dead).toBeTrue();
     });
 
     /**
@@ -1037,10 +1040,7 @@ describe('True Slayer info', () => {
         if (SlayerAct === CharacterAct.from(impPlayer.character)) {
             const gameUIChooseMock = mockChoosePlayer(scarletWomanPlayer);
 
-            await impPlayer.characterAct!.apply(
-                gameInfo,
-                mock<InfluenceApplyContext>()
-            )!;
+            await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
             expect(gameUIChooseMock).toHaveBeenCalledTimes(0);
         }
@@ -1056,6 +1056,10 @@ describe('True Soldier info', () => {
         SoldierPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Soldier`
         );
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     /**
@@ -1076,15 +1080,9 @@ describe('True Soldier info', () => {
 
         const influence = new SoldierInfluence(SoldierPlayer);
 
-        gameInfo = await influence.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        );
+        gameInfo = await influence.apply(gameInfo, mock<Context>());
 
-        await impPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -1118,10 +1116,7 @@ describe('True Soldier info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(drunkPlayer);
 
-        await impPlayer.characterAct!.apply(
-            gameInfo,
-            mock<InfluenceApplyContext>()
-        )!;
+        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 

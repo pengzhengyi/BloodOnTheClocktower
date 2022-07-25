@@ -3,20 +3,19 @@ import type { Character } from './character';
 import type { CharacterSheet } from './charactersheet';
 import { Generator } from './collections';
 import { IncorrectAlignmentForSpyToRegisterAs } from './exception';
-import { GameInfo } from './gameinfo';
+import type { GameInfo } from './gameinfo';
 import { Demon } from './charactertype';
 import type { Player } from './player';
 import { DeadReason } from './deadreason';
+import type { Context, InfoProcessor } from './infoprocessor';
 import { Spy } from '~/content/characters/output/spy';
 import { GameUI } from '~/interaction/gameui';
 import { Recluse } from '~/content/characters/output/recluse';
 
-export interface InfluenceApplyContext {
-    unbiasedGameInfo: GameInfo;
-    reason?: string;
-}
-
-export abstract class Influence {
+/**
+ * Influence is usually some passive impact caused by character's ability.
+ */
+export abstract class Influence implements InfoProcessor {
     static immuneFromDemonAttack(player: Player): Player {
         return new Proxy(player, {
             get: function (target, property, receiver) {
@@ -43,25 +42,27 @@ export abstract class Influence {
         this.description = description;
     }
 
-    async apply(
-        gameInfo: GameInfo,
-        context: InfluenceApplyContext
-    ): Promise<GameInfo> {
-        return await this._apply(gameInfo, context);
+    async apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
+        if (await this.isEligible(gameInfo)) {
+            return await this._apply(gameInfo, context);
+        } else {
+            return gameInfo;
+        }
     }
 
-    _apply(_gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
+    _apply(_gameInfo: GameInfo, _context: Context): GameInfo {
         throw new Error('Method not implemented.');
+    }
+
+    async isEligible(_gameState: GameInfo): Promise<boolean> {
+        return await true;
     }
 }
 
 export class Influences extends Influence {
     declare source: Array<Influence>;
 
-    async apply(
-        gameInfo: GameInfo,
-        context: InfluenceApplyContext
-    ): Promise<GameInfo> {
+    async apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
         let influencedGameInfo: GameInfo = gameInfo;
 
         for (const influence of this.source) {
@@ -149,10 +150,7 @@ export abstract class RegisterAsInfluence extends Influence {
         this.playerToRegister = playerToRegister;
     }
 
-    async apply(
-        gameInfo: GameInfo,
-        context: InfluenceApplyContext
-    ): Promise<GameInfo> {
+    async apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
         const thisClass = this.constructor as typeof RegisterAsInfluence;
 
         const [characterToRegisterAs, alignmentToRegisterAs] =
@@ -195,7 +193,7 @@ export abstract class RegisterAsDemonInfluence extends RegisterAsEvilInfluence {
         });
     }
 
-    _apply(gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
+    _apply(gameInfo: GameInfo, _context: Context): GameInfo {
         const thisClass = this.constructor as typeof RegisterAsDemonInfluence;
 
         return gameInfo.updatePlayer(this.playerToRegister, (player) =>
@@ -252,9 +250,65 @@ export class SoldierInfluence extends Influence {
         super(soldierPlayer, SoldierInfluence.description);
     }
 
-    _apply(gameInfo: GameInfo, _context: InfluenceApplyContext): GameInfo {
+    _apply(gameInfo: GameInfo, _context: Context): GameInfo {
         return gameInfo.updatePlayer(this.source, (player) =>
             Influence.immuneFromDemonAttack(player)
+        );
+    }
+}
+
+export class MayorDieInsteadInfluence extends Influence {
+    static readonly description: string =
+        'If mayor die at night, another player might die instead.';
+
+    declare source: Player;
+
+    constructor(mayorPlayer: Player) {
+        super(mayorPlayer, MayorDieInsteadInfluence.description);
+    }
+
+    choosePlayerToDieInstead(players: Iterable<Player>): Promise<Player> {
+        return GameUI.storytellerChoose(
+            players,
+            MayorDieInsteadInfluence.description
+        );
+    }
+
+    async isEligible(gameInfo: GameInfo) {
+        return await gameInfo.gamePhase.isNight;
+    }
+
+    addInfluenceToMayor(gameInfo: GameInfo, mayorPlayer: Player): Player {
+        const self = this;
+
+        return new Proxy(mayorPlayer, {
+            get: function (target, property, receiver) {
+                const original = Reflect.get(target, property, receiver);
+
+                switch (property) {
+                    case 'setDead':
+                        return async (reason: DeadReason) => {
+                            if (await self.isEligible(gameInfo)) {
+                                const chosen =
+                                    await self.choosePlayerToDieInstead(
+                                        gameInfo.players
+                                    );
+                                await chosen.setDead(reason);
+                                return;
+                            }
+
+                            return await original(reason);
+                        };
+                    default:
+                        return original;
+                }
+            },
+        });
+    }
+
+    _apply(gameInfo: GameInfo, _context: Context): GameInfo {
+        return gameInfo.updatePlayer(this.source, (player) =>
+            this.addInfluenceToMayor(gameInfo, player)
         );
     }
 }

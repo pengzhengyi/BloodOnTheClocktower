@@ -6,6 +6,7 @@ import type { Execution } from './execution';
 import { Generator } from './collections';
 import type { GamePhase } from './gamephase';
 import { Transform } from './types';
+import { Game } from './game';
 
 type UnderlyingPlayers = Array<Player>;
 
@@ -15,6 +16,8 @@ export class GameInfo {
     characterSheet: CharacterSheet;
 
     readonly gamePhase: GamePhase;
+
+    readonly game: Game;
 
     protected readonly playerIdToInfluencedPlayer: Map<string, Player>;
 
@@ -37,6 +40,7 @@ export class GameInfo {
         players: UnderlyingPlayers,
         characterSheet: CharacterSheet,
         gamePhase: GamePhase,
+        game: Game,
         execution?: Execution
     ) {
         this._players = players;
@@ -45,6 +49,7 @@ export class GameInfo {
             Generator.map((player) => [player.id, player], players)
         );
         this.gamePhase = gamePhase;
+        this.game = game;
         this.execution = execution;
     }
 
@@ -71,6 +76,7 @@ export class GameInfo {
             players: UnderlyingPlayers;
             characterSheet: CharacterSheet;
             gamePhase: GamePhase;
+            game: Game;
             execution?: Execution;
         }>
     ) {
@@ -80,6 +86,7 @@ export class GameInfo {
                 execution: this.execution,
                 characterSheet: this.characterSheet,
                 gamePhase: this.gamePhase,
+                game: this.game,
                 players: this._players,
             },
             changes
@@ -88,6 +95,7 @@ export class GameInfo {
             args.players,
             args.characterSheet,
             args.gamePhase,
+            args.game,
             args.execution
         );
     }

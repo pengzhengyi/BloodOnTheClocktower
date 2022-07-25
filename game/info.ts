@@ -3,7 +3,7 @@ import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import { MinionPlayer, DemonPlayer, Player } from './player';
 import { Generator } from './collections';
 import { FortuneTellerChooseInvalidPlayers } from './exception';
-import { GameInfo } from './gameinfo';
+import type { GameInfo } from './gameinfo';
 import { Players } from './players';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
