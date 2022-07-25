@@ -9,6 +9,7 @@ import {
     NoVotesWhenCountingVote,
 } from './exception';
 import { Predicate } from './types';
+import { GameUI } from '~/interaction/gameui';
 
 /**
  * {@link `glossary["Execution"]`}
@@ -29,7 +30,18 @@ export class Execution {
         this.executed = playerAboutToDie;
     }
 
-    finalize = this.setPlayerAboutToDie;
+    async executeImmediately(player: Player): Promise<boolean> {
+        if (
+            await GameUI.storytellerConfirm(
+                `Confirm player ${player} will be executed immediately?`
+            )
+        ) {
+            this.executed = player;
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * {@link `glossary["About to die"]`}
@@ -88,7 +100,7 @@ export class Execution {
         return instanceToPlain(this);
     }
 
-    async addNomination(nomination: Nomination) {
+    async addNomination(nomination: Nomination): Promise<boolean> {
         const checks = await Promise.all([
             this.checkNominatorNotNominatedBefore(nomination),
             this.checkNominatedNotNominatedBefore(nomination),
@@ -96,7 +108,10 @@ export class Execution {
 
         if (checks.every((check) => check)) {
             this.nominations.push(nomination);
+            return true;
         }
+
+        return false;
     }
 
     private async checkNominatorNotNominatedBefore(

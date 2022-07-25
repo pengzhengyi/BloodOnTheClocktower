@@ -283,6 +283,10 @@ export class Player {
         return this.id === player.id;
     }
 
+    toString() {
+        return `${this.username}(${this.id})`;
+    }
+
     async nominate(nominated: Player): Promise<Nomination | undefined> {
         if (!this.canNominate) {
             const error = new DeadPlayerCannotNominate(this);

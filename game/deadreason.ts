@@ -1,5 +1,6 @@
 export enum DeadReason {
-    DemonAttack,
-    SlayerKill,
-    Other,
+    DemonAttack = 'Killed by demon',
+    SlayerKill = 'Killed as demon by slayer',
+    NominateVirgin = 'Executed for nominating the virgin',
+    Other = 'other',
 }

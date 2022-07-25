@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { Action } from './types';
+import { GameUI } from '~/interaction/gameui';
 
 enum Phase {
     /**
@@ -58,14 +59,8 @@ export class GamePhase {
         return this.phase === Phase.Night;
     }
 
-    transition() {
-        let phase = this.phase++;
-        if (phase === Phase.__LENGTH__) {
-            this.cycleIndex++;
-            phase = Phase.Night;
-        }
-
-        this.phase = phase;
+    static format(phase: Phase, cycleIndex: number): string {
+        return `${Phase[phase]} ${cycleIndex}`;
     }
 
     cycle() {
@@ -76,7 +71,36 @@ export class GamePhase {
         }
     }
 
+    async forceTransition(reason?: string): Promise<boolean> {
+        reason = reason ? ` because ${reason}` : '';
+
+        if (
+            await GameUI.storytellerConfirm(
+                `Should transition from ${this} to next phase${reason}`
+            )
+        ) {
+            this.transition();
+            return true;
+        }
+
+        return false;
+    }
+
     toJSON() {
         return instanceToPlain(this);
+    }
+
+    toString() {
+        return GamePhase.format(this.phase, this.cycleIndex);
+    }
+
+    protected transition() {
+        let phase = this.phase++;
+        if (phase === Phase.__LENGTH__) {
+            this.cycleIndex++;
+            phase = Phase.Night;
+        }
+
+        this.phase = phase;
     }
 }

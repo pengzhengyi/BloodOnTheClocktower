@@ -8,6 +8,9 @@ import { Demon } from './charactertype';
 import type { Player } from './player';
 import { DeadReason } from './deadreason';
 import type { Context, InfoProcessor } from './infoprocessor';
+import type { Nomination } from './nomination';
+import { GamePhase } from './gamephase';
+import type { Execution } from './execution';
 import { Spy } from '~/content/characters/output/spy';
 import { GameUI } from '~/interaction/gameui';
 import { Recluse } from '~/content/characters/output/recluse';
@@ -241,6 +244,57 @@ export class FortuneTellerRedHerringInfluence extends RegisterAsDemonInfluence {
     }
 }
 
+export class VirginInfluence extends Influence {
+    static readonly description: string =
+        'The 1st time virgin is nominated, if the nominator is a Townsfolk, they are executed immediately.';
+
+    declare source: Player;
+
+    hasBeenNominated = false;
+
+    constructor(virginPlayer: Player) {
+        super(virginPlayer, VirginInfluence.description);
+    }
+
+    addPenaltyToNominator(
+        execution: Execution,
+        gamePhase: GamePhase
+    ): Execution {
+        const proxyExecution = new Proxy(execution, {
+            get: function (target, property, receiver) {
+                const original = Reflect.get(target, property, receiver);
+
+                switch (property) {
+                    case 'addNomination':
+                        return async (nomination: Nomination) => {
+                            if (await original(nomination)) {
+                                if (nomination.nominator.isTownsfolk) {
+                                    (await proxyExecution.executeImmediately(
+                                        nomination.nominator
+                                    )) &&
+                                        (await gamePhase.forceTransition(
+                                            VirginInfluence.description
+                                        ));
+                                }
+
+                                return true;
+                            }
+                            return false;
+                        };
+                    default:
+                        return original;
+                }
+            },
+        });
+
+        return proxyExecution;
+    }
+
+    async isEligible(_gameInfo: GameInfo) {
+        return await !this.hasBeenNominated;
+    }
+}
+
 export class SoldierInfluence extends Influence {
     static readonly description: string = 'Soldier is safe from the Demon.';
 
@@ -310,5 +364,31 @@ export class MayorDieInsteadInfluence extends Influence {
         return gameInfo.updatePlayer(this.source, (player) =>
             this.addInfluenceToMayor(gameInfo, player)
         );
+    }
+}
+
+export class MayorPeacefulWinInfluence extends Influence {
+    static readonly description: string =
+        'If only 3 players live & no execution occurs, good wins.';
+
+    declare source: Player;
+
+    constructor(mayorPlayer: Player) {
+        super(mayorPlayer, MayorPeacefulWinInfluence.description);
+    }
+
+    async isEligible(gameInfo: GameInfo) {
+        return (
+            (await gameInfo.executed) === undefined &&
+            gameInfo.players.filter((player) => player.alive).count() === 3
+        );
+    }
+
+    async apply(gameInfo: GameInfo, _context: Context): Promise<GameInfo> {
+        if (await this.isEligible(gameInfo)) {
+            await gameInfo.game.setWinningTeam(Alignment.Good);
+        }
+
+        return gameInfo;
     }
 }
