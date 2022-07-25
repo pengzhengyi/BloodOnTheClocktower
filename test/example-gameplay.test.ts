@@ -127,7 +127,7 @@ describe('True Washerwoman info', () => {
     let washerwomanPlayer: Player;
     let infoProvider: WasherwomanInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         washerwomanPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Washerwoman`
         );
@@ -208,7 +208,7 @@ describe('True Librarian info', () => {
     let librarianPlayer: Player;
     let infoProvider: LibrarianInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         librarianPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Librarian`
         );
@@ -275,7 +275,7 @@ describe('True Investigator info', () => {
     let investigatorPlayer: Player;
     let infoProvider: InvestigatorInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         investigatorPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Investigator`
         );
@@ -363,7 +363,7 @@ describe('True Chef info', () => {
     let chefPlayer: Player;
     let infoProvider: ChefInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         chefPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Chef`
         );
@@ -440,7 +440,7 @@ describe('True Empath info', () => {
     let empathPlayer: Player;
     let infoProvider: EmpathInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         empathPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Empath`
         );
@@ -540,7 +540,7 @@ describe('True FortuneTeller info', () => {
     let FortuneTellerPlayer: Player;
     let infoProvider: FortuneTellerInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         FortuneTellerPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the FortuneTeller`
         );
@@ -667,7 +667,7 @@ describe('True Undertaker info', () => {
     let UndertakerPlayer: Player;
     let infoProvider: UndertakerInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         UndertakerPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Undertaker`
         );
@@ -786,7 +786,7 @@ describe('True Undertaker info', () => {
 describe('True Monk info', () => {
     let monkPlayer: Player;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         monkPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Monk`
         );
@@ -898,7 +898,7 @@ describe('True Ravenkeeper info', () => {
     let RavenkeeperPlayer: Player;
     let infoProvider: RavenkeeperInfoProvider;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         RavenkeeperPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Ravenkeeper`
         );
@@ -958,7 +958,7 @@ describe('True Ravenkeeper info', () => {
 describe('True Slayer info', () => {
     let SlayerPlayer: Player;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         SlayerPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Slayer`
         );
@@ -1052,7 +1052,7 @@ describe('True Slayer info', () => {
 describe('True Soldier info', () => {
     let SoldierPlayer: Player;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         SoldierPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Soldier`
         );
