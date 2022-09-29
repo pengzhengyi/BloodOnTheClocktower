@@ -44,21 +44,23 @@
         "vscode": {
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
-                "dbaeumer.vscode-eslint",
-                "aaron-bond.better-comments",
-                "streetsidesoftware.code-spell-checker",
-                "eamodio.gitlens",
-                "oderwat.indent-rainbow",
-                "ms-toolsai.jupyter",
-                "ms-python.vscode-pylance",
-                "ms-python.python",
-                "davidanson.vscode-markdownlint",
-                "octref.vetur",
-                "WakaTime.vscode-wakatime",
-                "esbenp.prettier-vscode",
-                "stylelint.vscode-stylelint",
-                "Orta.vscode-jest"
-            ]
+				"dbaeumer.vscode-eslint",
+				"aaron-bond.better-comments",
+				"streetsidesoftware.code-spell-checker",
+				"eamodio.gitlens",
+				"oderwat.indent-rainbow",
+				"ms-toolsai.jupyter",
+				"ms-python.vscode-pylance",
+				"ms-python.python",
+				"davidanson.vscode-markdownlint",
+				"octref.vetur",
+				"WakaTime.vscode-wakatime",
+				"esbenp.prettier-vscode",
+				"stylelint.vscode-stylelint",
+				"Orta.vscode-jest",
+				"ms-vscode.live-server",
+				"VisualStudioExptTeam.intellicode-api-usage-examples"
+			]
         }
     },
 
