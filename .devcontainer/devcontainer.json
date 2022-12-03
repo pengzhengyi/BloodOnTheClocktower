@@ -59,6 +59,7 @@
 				"stylelint.vscode-stylelint",
 				"Orta.vscode-jest",
 				"ms-vscode.live-server",
+                "VisualStudioExptTeam.vscodeintellicode",
 				"VisualStudioExptTeam.intellicode-api-usage-examples"
 			]
         }
