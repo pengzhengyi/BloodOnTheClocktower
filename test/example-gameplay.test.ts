@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { mock } from 'jest-mock-extended';
 import { faker } from '@faker-js/faker';
+import { mock } from 'jest-mock-extended';
 import { playerFromDescription } from './utils';
 import {
     ChefInfo,
@@ -48,6 +48,7 @@ import { Imp } from '~/content/characters/output/imp';
 import { Generator } from '~/game/collections';
 import { CharacterAct, SlayerAct } from '~/game/characteract';
 import { Game } from '~/game/game';
+import { setPlayerDead } from '~/__mocks__/player';
 
 function mockStorytellerChoose<T>(chosen: T) {
     return jest
@@ -481,11 +482,11 @@ describe('True Empath info', () => {
         const soldier = await playerFromDescription(
             `${faker.name.firstName()} is the Soldier`
         );
-        await soldier.setDead();
+        await setPlayerDead(soldier);
         const monk = await playerFromDescription(
             `${faker.name.firstName()} is the Monk`
         );
-        await monk.setDead();
+        await setPlayerDead(monk);
 
         const [candidates, _] = await generateInfoCandidates(
             [`${faker.name.firstName()} is the Librarian`],
@@ -506,19 +507,19 @@ describe('True Empath info', () => {
         const gunslinger = await playerFromDescription(
             `${faker.name.firstName()} is the evil Gunslinger`
         );
-        await gunslinger.setDead();
+        await setPlayerDead(gunslinger);
         const soldier = await playerFromDescription(
             `${faker.name.firstName()} is the Soldier`
         );
-        await soldier.setDead();
+        await setPlayerDead(soldier);
         const monk = await playerFromDescription(
             `${faker.name.firstName()} is the Monk`
         );
-        await monk.setDead();
+        await setPlayerDead(monk);
         const librarian = await playerFromDescription(
             `${faker.name.firstName()} is the Librarian`
         );
-        await librarian.setDead();
+        await setPlayerDead(librarian);
         const baron = await playerFromDescription(
             `${faker.name.firstName()} is the Baron`
         );
@@ -611,7 +612,7 @@ describe('True FortuneTeller info', () => {
         const imp = await playerFromDescription(
             `${faker.name.firstName()} is the Imp`
         );
-        await imp.setDead();
+        await setPlayerDead(imp);
 
         const butler = await playerFromDescription(
             `${faker.name.firstName()} is the Butler`
@@ -638,7 +639,7 @@ describe('True FortuneTeller info', () => {
         const saint = await playerFromDescription(
             `${faker.name.firstName()} is the Saint`
         );
-        await saint.setDead();
+        await setPlayerDead(saint);
 
         infoProvider.chosen = [saint, FortuneTellerPlayer];
 

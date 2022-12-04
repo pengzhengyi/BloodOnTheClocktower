@@ -1,13 +1,13 @@
+import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import 'reflect-metadata';
-import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
-import { Character } from './character';
-import { Nomination } from './nomination';
-import {
-    DeadPlayerCannotNominate,
-    PlayerHasUnclearAlignment,
-} from './exception';
 import { Alignment } from './alignment';
+import { Character } from './character';
+import { CharacterAct } from './characteract';
+import { DeadReason } from './deadreason';
+import { InfoRequester } from './info';
+import { Nomination } from './nomination';
+
 import {
     CharacterType,
     Demon,
@@ -17,9 +17,11 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import { DeadReason } from './deadreason';
-import { CharacterAct } from './characteract';
-import { InfoRequester } from './info';
+import {
+    DeadPlayerCannotNominate,
+    PlayerHasUnclearAlignment,
+} from './exception';
+
 import { GAME_UI } from '~/interaction/gameui';
 
 enum NegativeState {
@@ -55,6 +57,11 @@ enum NegativeState {
  */
 @Exclude()
 export class Player {
+    static reasonForReclaimDeadPlayerVote =
+        'Dead players may only vote once more during the game.';
+
+    static revokeVoteTokenDefaultPrompt = 'Revoke vote token for player: ';
+
     static async init(
         username: string,
         character: typeof Character,
@@ -247,10 +254,10 @@ export class Player {
         return Object.is(this.characterType, characterType);
     }
 
-    async setDead(reason: DeadReason = DeadReason.Other): Promise<void> {
+    async setDead(reason: DeadReason = DeadReason.Other): Promise<boolean> {
         this.deadReason = reason;
         this.state += NegativeState.Dead;
-        await undefined;
+        return await this.dead;
     }
 
     async attack(victim: Player) {
@@ -317,13 +324,38 @@ export class Player {
             (await GAME_UI.hasRaisedHandForVote(this))
         ) {
             if (this.dead) {
-                this.hasVoteToken = false;
+                await this.revokeVoteToken(
+                    Player.reasonForReclaimDeadPlayerVote
+                );
             }
 
             return true;
         }
 
         return false;
+    }
+
+    async revokeVoteToken(reason?: string): Promise<boolean> {
+        if (
+            await GAME_UI.storytellerConfirm(
+                this.formatPromptForRevokeVoteToken(reason)
+            )
+        ) {
+            this.hasVoteToken = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected formatPromptForRevokeVoteToken(reason?: string): string {
+        const hasReason = reason === undefined;
+        const playerString = this.toString();
+        return (
+            (hasReason ? reason + ' ' : '') +
+            Player.revokeVoteTokenDefaultPrompt +
+            playerString
+        );
     }
 
     protected initializeCharacter(character: typeof Character) {

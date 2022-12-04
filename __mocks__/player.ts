@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { mock } from 'jest-mock-extended';
+import { storytellerConfirmMock } from './gameui';
 import { Alignment } from '~/game/alignment';
 import { Character } from '~/game/character';
 import { CharacterLoader } from '~/game/characterloader';
@@ -48,4 +49,12 @@ export function mockPlayerWithPropertyValue<T>(
 
 export function mockDeadPlayer(): Player {
     return mockPlayerWithPropertyValue('alive', 'false');
+}
+
+export async function setPlayerDead(player: Player): Promise<void> {
+    storytellerConfirmMock.mockImplementationOnce(async (reason: string) => {
+        expect(reason).toContain(Player.revokeVoteTokenDefaultPrompt);
+        return await true;
+    });
+    await player.setDead();
 }

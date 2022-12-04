@@ -3,15 +3,19 @@ import {
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
 } from '~/__mocks__/gameui';
-
 jest.mock('~/interaction/gameui', () => ({
     GAME_UI,
 }));
-
+// eslint-disable-next-line import/order
 import { playerFromDescription } from './utils';
-import { Vote } from '~/game/vote';
-import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
+import {
+    createBasicPlayer,
+    mockPlayer,
+    setPlayerDead,
+} from '~/__mocks__/player';
+
 import { Player } from '~/game/player';
+import { Vote } from '~/game/vote';
 
 async function collectVotesForExecution(
     vote: Vote,
@@ -74,7 +78,7 @@ describe('Test Vote Edge Cases', () => {
         const nominated2 = mockPlayer();
         const alivePlayer = await createBasicPlayer();
         const deadPlayer = await createBasicPlayer();
-        await deadPlayer.setDead();
+        await setPlayerDead(deadPlayer);
 
         const votedPlayers = await createVoteAndCollectVotes(
             nominated1,
