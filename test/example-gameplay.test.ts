@@ -32,7 +32,7 @@ import {
     SoldierInfluence,
     SpyInfluence,
 } from '~/game/influence';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
@@ -51,12 +51,12 @@ import { Game } from '~/game/game';
 
 function mockStorytellerChoose<T>(chosen: T) {
     return jest
-        .spyOn(GameUI, 'storytellerChoose')
+        .spyOn(GAME_UI, 'storytellerChoose')
         .mockImplementation(async () => await chosen);
 }
 
 function mockChoosePlayer(chosen: Player) {
-    return jest.spyOn(GameUI, 'choose').mockImplementation(
+    return jest.spyOn(GAME_UI, 'choose').mockImplementation(
         async (_player, players) =>
             await Generator.take(
                 1,
@@ -815,12 +815,12 @@ describe('True Monk info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(fortuneTellerPlayer);
 
-        gameInfo = await monkPlayer.characterAct!.apply(
+        gameInfo = await monkPlayer.characterActs!.apply(
             gameInfo,
             mock<Context>()
         )!;
 
-        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await impPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -846,7 +846,7 @@ describe('True Monk info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(mayorPlayer);
 
-        gameInfo = await monkPlayer.characterAct!.apply(
+        gameInfo = await monkPlayer.characterActs!.apply(
             gameInfo,
             mock<Context>()
         )!;
@@ -857,7 +857,7 @@ describe('True Monk info', () => {
         //     mock<Context>()
         // )!;
 
-        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await impPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -882,12 +882,12 @@ describe('True Monk info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(impPlayer);
 
-        gameInfo = await monkPlayer.characterAct!.apply(
+        gameInfo = await monkPlayer.characterActs!.apply(
             gameInfo,
             mock<Context>()
         )!;
 
-        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await impPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
         expect(impPlayer.alive).toBeTrue();
@@ -930,7 +930,10 @@ describe('True Ravenkeeper info', () => {
             async (gameInfo, _) => {
                 const gameUIChooseMock = mockChoosePlayer(RavenkeeperPlayer);
 
-                await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+                await impPlayer.characterActs!.apply(
+                    gameInfo,
+                    mock<Context>()
+                )!;
 
                 expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -984,7 +987,7 @@ describe('True Slayer info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(impPlayer);
 
-        await SlayerPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await SlayerPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -1012,7 +1015,7 @@ describe('True Slayer info', () => {
 
         gameInfo = await influence.apply(gameInfo, mock<Context>());
 
-        await SlayerPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await SlayerPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(reclusePlayer.dead).toBeTrue();
 
@@ -1037,10 +1040,10 @@ describe('True Slayer info', () => {
             createDayGamePhase()
         );
 
-        if (SlayerAct === CharacterAct.from(impPlayer.character)) {
+        if (SlayerAct === CharacterAct.from(impPlayer.character)[0]) {
             const gameUIChooseMock = mockChoosePlayer(scarletWomanPlayer);
 
-            await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+            await impPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
             expect(gameUIChooseMock).toHaveBeenCalledTimes(0);
         }
@@ -1082,7 +1085,7 @@ describe('True Soldier info', () => {
 
         gameInfo = await influence.apply(gameInfo, mock<Context>());
 
-        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await impPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 
@@ -1116,7 +1119,7 @@ describe('True Soldier info', () => {
 
         const gameUIChooseMock = mockChoosePlayer(drunkPlayer);
 
-        await impPlayer.characterAct!.apply(gameInfo, mock<Context>())!;
+        await impPlayer.characterActs!.apply(gameInfo, mock<Context>())!;
 
         expect(gameUIChooseMock).toHaveBeenCalled();
 

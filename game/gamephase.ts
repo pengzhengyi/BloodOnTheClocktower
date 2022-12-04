@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { Action } from './types';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 
 export enum Phase {
     /** before beginning a game */
@@ -92,7 +92,7 @@ export class GamePhase {
         reason = reason ? ` because ${reason}` : '';
 
         if (
-            await GameUI.storytellerConfirm(
+            await GAME_UI.storytellerConfirm(
                 `Should transition from ${this} to next phase${reason}`
             )
         ) {

@@ -20,7 +20,7 @@ import {
 import { DeadReason } from './deadreason';
 import { CharacterAct } from './characteract';
 import { InfoRequester } from './info';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 
 enum NegativeState {
     None = 0,
@@ -81,7 +81,10 @@ export class Player {
 
     declare character: typeof Character;
 
-    characterAct?: CharacterAct;
+    /**
+     * TODO should this be an array?
+     */
+    characterActs?: CharacterAct;
 
     infoRequester?: unknown;
 
@@ -303,7 +306,7 @@ export class Player {
             }
         }
 
-        return await Nomination.init(this, nominated);
+        return Nomination.init(this, nominated);
     }
 
     async collectVote(forExile: boolean): Promise<boolean> {
@@ -311,7 +314,7 @@ export class Player {
             (forExile && this.canSupportExile) || this.canVote;
         if (
             shouldCheckHandRaised &&
-            (await GameUI.hasRaisedHandForVote(this))
+            (await GAME_UI.hasRaisedHandForVote(this))
         ) {
             if (this.dead) {
                 this.hasVoteToken = false;
@@ -325,7 +328,7 @@ export class Player {
 
     protected initializeCharacter(character: typeof Character) {
         this.character = character;
-        this.characterAct = CharacterAct.of(this);
+        this.characterActs = CharacterAct.fromPlayer(this)[0];
         this.infoRequester = InfoRequester.of(this);
     }
 

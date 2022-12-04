@@ -11,9 +11,9 @@ export enum NominationState {
 
 @Exclude()
 export class Nomination {
-    static async init(nominator: Player, nominated: Player) {
+    static init(nominator: Player, nominated: Player) {
         const nomination = new this(nominator, nominated);
-        return await nomination;
+        return nomination;
     }
 
     @Expose({ toPlainOnly: true })

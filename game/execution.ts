@@ -9,7 +9,7 @@ import {
     NoVotesWhenCountingVote,
 } from './exception';
 import { Predicate } from './types';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 
 /**
  * {@link `glossary["Execution"]`}
@@ -32,7 +32,7 @@ export class Execution {
 
     async executeImmediately(player: Player): Promise<boolean> {
         if (
-            await GameUI.storytellerConfirm(
+            await GAME_UI.storytellerConfirm(
                 `Confirm player ${player} will be executed immediately?`
             )
         ) {

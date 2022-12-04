@@ -10,7 +10,7 @@ import { DeadReason } from './deadreason';
 import { Character } from './character';
 import { Context } from './infoprocessor';
 import { Phase } from './gamephase';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
@@ -23,21 +23,23 @@ export abstract class CharacterAct extends Influence {
     static from(character: typeof Character) {
         switch (character) {
             case Imp:
-                return ImpAct;
+                return [ImpAct];
             case Monk:
-                return MonkAct;
+                return [MonkAct];
             case Slayer:
-                return SlayerAct;
+                return [SlayerAct];
             case Fortuneteller:
-                return FortuneTellerAct;
+                return [FortuneTellerAct];
             default:
-                return undefined;
+                return [];
         }
     }
 
-    static of(player: Player) {
-        const characterAct = this.from(player.character);
-        return characterAct?.of(player);
+    static fromPlayer(player: Player): Array<CharacterAct> {
+        const characterActClasses = this.from(player.character);
+        return characterActClasses.map((characterActClass) =>
+            characterActClass.of(player)
+        );
     }
 
     playerId?: string;
@@ -106,7 +108,7 @@ export class ImpAct extends NonfirstNightCharacterAct {
     applicablePhases = Phase.Night;
 
     choosePlayerToKill(impPlayer: Player, players: Iterable<Player>) {
-        return GameUI.choose(
+        return GAME_UI.choose(
             impPlayer,
             players,
             1,
@@ -156,7 +158,7 @@ export class MonkAct extends NonfirstNightCharacterAct {
     }
 
     choosePlayerToProtect(monkPlayer: Player, players: Iterable<Player>) {
-        return GameUI.choose(
+        return GAME_UI.choose(
             monkPlayer,
             players,
             1,
@@ -201,7 +203,7 @@ export class FortuneTellerAct extends CharacterAct {
         fortuneTellerPlayer: Player,
         players: Iterable<Player>
     ): Promise<[Player, Player] | undefined> {
-        let chosen = (await GameUI.choose(
+        let chosen = (await GAME_UI.choose(
             fortuneTellerPlayer,
             players,
             2,
@@ -251,7 +253,7 @@ export class SlayerAct extends NonfirstNightCharacterAct {
     }
 
     chooseSuspectedDemon(slayerPlayer: Player, players: Iterable<Player>) {
-        return GameUI.choose(
+        return GAME_UI.choose(
             slayerPlayer,
             players,
             1,

@@ -26,7 +26,7 @@ import { CharacterAct } from './characteract';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
     declare cause?: Error;
@@ -86,7 +86,7 @@ export class RecoverableGameError extends GameError {
 
     async throwWhen(condition: Predicate<this>) {
         if (condition(this)) {
-            if (await GameUI.handle(this)) {
+            if (await GAME_UI.handle(this)) {
                 this.handled_ = true;
                 if (condition(this)) {
                     this.throw();
@@ -98,7 +98,7 @@ export class RecoverableGameError extends GameError {
     }
 
     async resolve() {
-        if (await GameUI.handle(this)) {
+        if (await GAME_UI.handle(this)) {
             this.handled_ = true;
         }
     }

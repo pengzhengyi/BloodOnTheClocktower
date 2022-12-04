@@ -12,7 +12,7 @@ import type { Nomination } from './nomination';
 import { GamePhase, Phase } from './gamephase';
 import type { Execution } from './execution';
 import { Spy } from '~/content/characters/output/spy';
-import { GameUI } from '~/interaction/gameui';
+import { GAME_UI } from '~/interaction/gameui';
 import { Recluse } from '~/content/characters/output/recluse';
 
 /**
@@ -133,7 +133,7 @@ export abstract class RegisterAsInfluence extends Influence {
     ): Promise<typeof Character> {
         const options = this.getRegisterAsCharacterOptions(characterSheet);
 
-        return GameUI.storytellerChoose(options, reason);
+        return GAME_UI.storytellerChooseOne(options, reason);
     }
 
     constructor(playerToRegister: Player, description: string) {
@@ -322,7 +322,7 @@ export class MayorDieInsteadInfluence extends Influence {
     }
 
     choosePlayerToDieInstead(players: Iterable<Player>): Promise<Player> {
-        return GameUI.storytellerChoose(
+        return GAME_UI.storytellerChooseOne(
             players,
             MayorDieInsteadInfluence.description
         );
