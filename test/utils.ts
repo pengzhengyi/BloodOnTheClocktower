@@ -11,11 +11,13 @@ export async function playerFromDescription(description: string) {
     }
     const [_, username, alignmentDescription, characterName] = matchResult;
     const character = await CharacterLoader.loadAsync(characterName);
+
     let alignment: Alignment | undefined;
     if (alignmentDescription === 'evil') {
         alignment = Alignment.Evil;
     } else if (alignmentDescription === 'good') {
         alignment = Alignment.Good;
     }
+
     return await Player.init(username, character, alignment);
 }

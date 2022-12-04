@@ -79,6 +79,7 @@ export class Vote {
             );
             if (!shouldVoteAgain) {
                 yield* this.votes;
+                return;
             }
         }
 
