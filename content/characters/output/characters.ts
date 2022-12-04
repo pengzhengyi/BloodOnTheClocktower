@@ -287,3 +287,5 @@ ID_TO_CHARACTER.set('sentinel', Sentinel);
 ID_TO_CHARACTER.set('spiritofivory', Spiritofivory);
 ID_TO_CHARACTER.set('stormcatcher', Stormcatcher);
 ID_TO_CHARACTER.set('toymaker', Toymaker);
+
+export const CHARACTERS = Array.from(ID_TO_CHARACTER.values());

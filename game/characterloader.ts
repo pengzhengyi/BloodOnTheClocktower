@@ -2,9 +2,16 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Character } from './character';
 import { CharacterLoadFailure, NoCharacterMatchingId } from './exception';
 import type { RoleData } from './types';
-import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
+import {
+    CHARACTERS,
+    ID_TO_CHARACTER,
+} from '~/content/characters/output/characters';
 
 export abstract class CharacterLoader {
+    static randomLoad(): typeof Character {
+        return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+    }
+
     static tryLoad(id: string): typeof Character | undefined {
         return ID_TO_CHARACTER.get(Character.getCanonicalId(id));
     }
