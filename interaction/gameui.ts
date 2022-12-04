@@ -95,7 +95,7 @@ class GameUI {
     }
 
     /**
-     * Ask storyteller for confirmation/.
+     * Ask storyteller for confirmation.
      */
     storytellerConfirm(
         _prompt: string,
