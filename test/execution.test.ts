@@ -15,7 +15,7 @@ async function* addNominations(
     nominationPlayers: Array<[Player, Player]>
 ): AsyncIterable<boolean> {
     for (const [nominator, nominated] of nominationPlayers) {
-        const nomination = Nomination.init(nominator, nominated);
+        const nomination = await Nomination.init(nominator, nominated);
         yield await execution.addNomination(nomination);
     }
 }

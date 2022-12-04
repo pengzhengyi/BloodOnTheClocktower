@@ -306,7 +306,7 @@ export class Player {
             }
         }
 
-        return Nomination.init(this, nominated);
+        return await Nomination.init(this, nominated);
     }
 
     async collectVote(forExile: boolean): Promise<boolean> {
