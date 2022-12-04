@@ -6,7 +6,7 @@ import { Player } from './player';
 export enum NominationState {
     NotStarted,
     Ready,
-    Started,
+    Voted,
 }
 
 @Exclude()
@@ -34,7 +34,7 @@ export class Nomination {
         }
 
         if (this.vote.voted) {
-            return NominationState.Started;
+            return NominationState.Voted;
         } else {
             return NominationState.Ready;
         }
