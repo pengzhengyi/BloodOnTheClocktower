@@ -12,17 +12,12 @@ import { Seat } from './seat';
 import { Direction, Predicate, TAUTOLOGY } from './types';
 
 export class Seating {
-    static unsafeFrom(players: Iterable<Player>) {
-        const seats: Array<Seat> = [];
-
-        for (const player of players) {
-            const seatNumber = player.seatNumber!;
-            seats[seatNumber] = new Seat(seatNumber, player);
-        }
-
-        return new this(seats);
-    }
-
+    /**
+     * Create seating from players with assigned seat numbers.
+     *
+     * @param players Players with assigned seat numbers. If a player does not have assigned seat number, storyteller will decide on the spot.
+     * @returns A Seating where players with assigned seat will be sat and empty seats will be created when there are spaces between assigned seats.
+     */
     static async from(players: Iterable<Player>) {
         const seats: Array<Seat> = [];
 
@@ -32,7 +27,7 @@ export class Seating {
             );
             const seatNumber = player.seatNumber!;
 
-            seats[seatNumber] = new Seat(seatNumber, player);
+            seats[seatNumber] = await Seat.init(seatNumber, player);
         }
 
         for (
@@ -54,55 +49,81 @@ export class Seating {
     }
 
     protected static async createSeats(numSeats: number): Promise<Array<Seat>> {
+        await this.validateNumSeats(numSeats);
+
+        return this.createConsecutiveSeats(0, numSeats);
+    }
+
+    protected static createConsecutiveSeats(
+        start: number,
+        stop: number
+    ): Array<Seat> {
+        return Array.from(
+            Generator.map(
+                (seatNumber) => new Seat(seatNumber),
+                Generator.range(start, stop)
+            )
+        );
+    }
+
+    protected static async validateNumSeats(numSeats: number) {
         if (numSeats <= 0) {
             const error = new NumberOfSeatNotPositive(numSeats);
             await error.throwWhen((error) => error.correctedNumSeats <= 0);
             numSeats = error.correctedNumSeats;
         }
-
-        return Array.from(
-            Generator.map(
-                (seatNumber) => new Seat(seatNumber),
-                Generator.range(0, numSeats)
-            )
-        );
     }
 
     get allSat(): boolean {
         return this.seats.every((seat) => seat.isOccupied);
     }
 
+    get numSeats(): number {
+        return this.seats.length;
+    }
+
+    async changeNumSeats(newNumSeats: number) {
+        await Seating.validateNumSeats(newNumSeats);
+
+        const numSeats = this.numSeats;
+        if (newNumSeats < numSeats) {
+            for (let i = newNumSeats; i < numSeats; i++) {
+                await this.seats[i].remove();
+            }
+            this.seats.length = newNumSeats;
+        } else if (newNumSeats > numSeats) {
+            const newSeats = Seating.createConsecutiveSeats(
+                numSeats,
+                newNumSeats
+            );
+            return this.seats.push(...newSeats);
+        }
+    }
+
     protected constructor(public readonly seats: Array<Seat>) {
         this.seats = seats;
     }
 
-    *iterateSeats(
-        startSeat: Seat,
-        direction: Direction,
-        filterSeat: Predicate<Seat> = TAUTOLOGY
-    ): IterableIterator<Seat> {
-        const iterate =
-            direction === Direction.Clockwise ? clockwise : counterclockwise;
-
-        let isFirst = true;
-        for (const neighborSeat of iterate(this.seats, startSeat.position)) {
-            if (isFirst) {
-                isFirst = false;
-            } else if (filterSeat(neighborSeat)) {
-                yield neighborSeat;
-            }
-        }
+    tryGetNextSeat(
+        seatPosition: number,
+        filterSeat?: Predicate<Seat>
+    ): Seat | undefined {
+        const neighbors = this.iterateSeatsExcludingStart(
+            seatPosition,
+            Direction.Clockwise,
+            filterSeat
+        );
+        return neighbors.next().value;
     }
 
     async getClockwisePlayer(
-        seat: Seat,
-        filterSeat: Predicate<Seat> | undefined = undefined
+        seatPosition: number,
+        filterSeat?: Predicate<Seat>
     ): Promise<Player | undefined> {
-        const nextSeat = this.tryGetNextSeat(seat, filterSeat);
+        const nextSeat = this.tryGetNextSeat(seatPosition, filterSeat);
 
         if (nextSeat !== undefined) {
-            const checkSeatOccupied = new UnexpectedEmptySeat(nextSeat);
-            await checkSeatOccupied.throwWhen(
+            await new UnexpectedEmptySeat(nextSeat).throwWhen(
                 (error) => error.emptySeat.player === undefined
             );
         }
@@ -110,27 +131,26 @@ export class Seating {
         return nextSeat?.player;
     }
 
-    tryGetNextSeat(
-        seat: Seat,
-        filterSeat: Predicate<Seat> | undefined = undefined
+    tryGetPrevSeat(
+        seatPosition: number,
+        filterSeat?: Predicate<Seat>
     ): Seat | undefined {
-        const neighbors = this.iterateSeats(
-            seat,
-            Direction.Clockwise,
+        const neighbors = this.iterateSeatsExcludingStart(
+            seatPosition,
+            Direction.Counterclockwise,
             filterSeat
         );
         return neighbors.next().value;
     }
 
     async getCounterclockwisePlayer(
-        seat: Seat,
-        filterSeat: Predicate<Seat> | undefined = undefined
+        seatPosition: number,
+        filterSeat?: Predicate<Seat>
     ): Promise<Player | undefined> {
-        const prevSeat = this.tryGetPrevSeat(seat, filterSeat);
+        const prevSeat = this.tryGetPrevSeat(seatPosition, filterSeat);
 
         if (prevSeat !== undefined) {
-            const checkSeatOccupied = new UnexpectedEmptySeat(prevSeat);
-            await checkSeatOccupied.throwWhen(
+            await new UnexpectedEmptySeat(prevSeat).throwWhen(
                 (error) => error.emptySeat.player === undefined
             );
         }
@@ -138,29 +158,40 @@ export class Seating {
         return prevSeat?.player;
     }
 
-    tryGetPrevSeat(
-        seat: Seat,
-        filterSeat: Predicate<Seat> | undefined = undefined
-    ): Seat | undefined {
-        const neighbors = this.iterateSeats(
-            seat,
-            Direction.Counterclockwise,
-            filterSeat
+    async *getVoteOrder(seatPosition: number): AsyncGenerator<Player> {
+        const clockwiseSeats = this.iterateSeatsExcludingStart(
+            seatPosition,
+            Direction.Clockwise
         );
-        return neighbors.next().value;
+
+        for (const seat of Generator.push(
+            clockwiseSeats,
+            this.seats[seatPosition]
+        )) {
+            await new UnexpectedEmptySeat(seat).throwWhen(
+                (error) => error.emptySeat.player === undefined
+            );
+            yield seat.player!;
+        }
     }
 
+    /**
+     * Get the nearest seat satisfying a condition around a seat position and the distance.
+     * @param seatPosition Seat position to start search at.
+     * @param condition A condition that needs to be satisfied for a seat to be considered qualified.
+     * @returns A seat satisfying the condition and its distance from start seat position. Neighboring seats have a distance of 1.
+     */
     getNearestSeat(
-        seat: Seat,
+        seatPosition: number,
         condition: Predicate<Seat>
-    ): [number, Seat] | undefined {
-        const clockwiseIterator = this.iterateSeats(
-            seat,
+    ): [Seat, number] | undefined {
+        const clockwiseIterator = this.iterateSeatsExcludingStart(
+            seatPosition,
             Direction.Clockwise,
             condition
         );
-        const counterclockwiseIterator = this.iterateSeats(
-            seat,
+        const counterclockwiseIterator = this.iterateSeatsExcludingStart(
+            seatPosition,
             Direction.Counterclockwise,
             condition
         );
@@ -175,33 +206,35 @@ export class Seating {
         while (true) {
             ({ done: isClockwiseIterated, value: clockwiseSeat } =
                 clockwiseIterator.next());
-            if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
-                return undefined;
-            }
             if (isClockwiseIterated) {
                 return undefined;
             }
+            if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
+                return undefined;
+            }
+
             clockwiseDistance++;
             if (condition(clockwiseSeat)) {
-                return [clockwiseDistance, clockwiseSeat];
+                return [clockwiseSeat, clockwiseDistance];
             }
 
             ({ done: isCounterclockwiseIterated, value: counterclockwiseSeat } =
                 counterclockwiseIterator.next());
-            if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
-                return undefined;
-            }
             if (isCounterclockwiseIterated) {
                 return undefined;
             }
+            if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
+                return undefined;
+            }
+
             counterclockwiseDistance++;
             if (condition(counterclockwiseSeat)) {
-                return [counterclockwiseDistance, counterclockwiseSeat];
+                return [counterclockwiseSeat, counterclockwiseDistance];
             }
         }
     }
 
-    tryFindSeatByPlayer(player: Player): Seat | undefined {
+    tryGetSeatByPlayer(player: Player): Seat | undefined {
         const seatNum = player.seatNumber;
 
         if (seatNum === undefined) {
@@ -211,12 +244,12 @@ export class Seating {
         return this.seats[seatNum];
     }
 
-    async findSeatByPlayer(player: Player): Promise<Seat> {
+    async getSeatByPlayer(player: Player): Promise<Seat> {
         const checkPlayerSat = new PlayerNotSat(player);
         await checkPlayerSat.throwWhen(
-            (error) => this.tryFindSeatByPlayer(error.player) === undefined
+            (error) => this.tryGetSeatByPlayer(error.player) === undefined
         );
-        return this.tryFindSeatByPlayer(checkPlayerSat.player)!;
+        return this.tryGetSeatByPlayer(checkPlayerSat.player)!;
     }
 
     /**
@@ -224,11 +257,11 @@ export class Seating {
      * The two players, whether dead or alive, sitting one seat clockwise and counterclockwise from the player in question.
      */
     async getNeighbors(player: Player): Promise<[Player, Player]> {
-        const seat = await this.findSeatByPlayer(player);
+        const seat = await this.getSeatByPlayer(player);
 
         const neighbors = await Promise.all([
-            this.getCounterclockwisePlayer(seat),
-            this.getClockwisePlayer(seat),
+            this.getCounterclockwisePlayer(seat.position),
+            this.getClockwisePlayer(seat.position),
         ]);
 
         if (neighbors[0] !== undefined && neighbors[1] !== undefined) {
@@ -243,15 +276,15 @@ export class Seating {
      * The two alive players that are sitting closest—one clockwise, one counterclockwise—to the player in question, not including any dead players sitting between them.
      */
     async getAliveNeighbors(player: Player): Promise<[Player, Player]> {
-        const seat = await this.findSeatByPlayer(player);
+        const seat = await this.getSeatByPlayer(player);
 
         const neighbors = await Promise.all([
             this.getCounterclockwisePlayer(
-                seat,
+                seat.position,
                 (seat) => seat.player?.alive ?? false
             ),
             this.getClockwisePlayer(
-                seat,
+                seat.position,
                 (seat) => seat.player?.alive ?? false
             ),
         ]);
@@ -260,6 +293,28 @@ export class Seating {
             return [neighbors[0], neighbors[1]];
         } else {
             throw new PlayerNoAliveNeighbors(player, neighbors, this);
+        }
+    }
+
+    protected *iterateSeatsExcludingStart(
+        startSeatPosition: number,
+        direction: Direction,
+        filterSeat: Predicate<Seat> = TAUTOLOGY
+    ): IterableIterator<Seat> {
+        if (startSeatPosition < 0 || startSeatPosition >= this.numSeats) {
+            return;
+        }
+
+        const iterate =
+            direction === Direction.Clockwise ? clockwise : counterclockwise;
+
+        let isFirst = true;
+        for (const neighborSeat of iterate(this.seats, startSeatPosition)) {
+            if (isFirst) {
+                isFirst = false;
+            } else if (filterSeat(neighborSeat)) {
+                yield neighborSeat;
+            }
         }
     }
 }

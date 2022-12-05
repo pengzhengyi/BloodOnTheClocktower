@@ -172,6 +172,16 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static *push<T>(iterable: Iterable<T>, ...items: T[]): Iterable<T> {
+        for (const element of iterable) {
+            yield element;
+        }
+
+        for (const element of items) {
+            yield element;
+        }
+    }
+
     static *orElse<T>(iterable: Iterable<T>, defaultValue: T): Iterable<T> {
         let hasElement = false;
         for (const element of iterable) {
@@ -616,6 +626,10 @@ export class Generator<T> implements Iterable<T> {
 
     enumerate(start = 0) {
         return this.become((iterable) => Generator.enumerate(iterable, start));
+    }
+
+    push(...items: T[]) {
+        this.transform((iterable) => Generator.push(iterable, ...items));
     }
 
     orElse(defaultValue: T) {

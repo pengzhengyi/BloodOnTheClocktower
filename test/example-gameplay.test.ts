@@ -124,6 +124,16 @@ async function generateInfoCandidates<T>(
     return [candidates.take(), allPlayers];
 }
 
+beforeAll(() => {
+    jest.spyOn(GAME_UI, 'storytellerConfirm').mockImplementation(
+        async () => await true
+    );
+});
+
+afterAll(() => {
+    jest.restoreAllMocks();
+});
+
 describe('True Washerwoman info', () => {
     let washerwomanPlayer: Player;
     let infoProvider: WasherwomanInfoProvider;

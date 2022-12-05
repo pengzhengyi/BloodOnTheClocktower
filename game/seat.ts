@@ -1,35 +1,72 @@
 import { Player } from './player';
+import { GAME_UI } from '~/interaction/gameui';
 
 export class Seat {
-    protected _isEmpty = true;
-
     player?: Player;
 
-    constructor(public readonly position: number, player?: Player) {
+    static async init(position: number, player: Player) {
+        const seat = new this(position);
+        await seat.sit(player);
+        return seat;
+    }
+
+    constructor(public readonly position: number) {
         this.position = position;
-        this.player = player;
     }
 
     get isOccupied() {
-        return !this._isEmpty;
+        return !this.isEmpty;
     }
 
     get isEmpty() {
-        return this._isEmpty;
+        return this.player === undefined;
     }
 
-    trySit(player: Player): boolean {
+    async trySit(player: Player): Promise<boolean> {
         if (this.isOccupied) {
             return false;
         } else {
-            this._isEmpty = false;
-            this.player = player;
-            return true;
+            return await this.sit(player);
         }
     }
 
-    sit(player: Player) {
-        this.player = player;
-        this._isEmpty = false;
+    async sit(player: Player): Promise<boolean> {
+        if (
+            await GAME_UI.storytellerConfirm(
+                this.formatPromptForSitPlayer(player)
+            )
+        ) {
+            this.player = player;
+            player.seatNumber = this.position;
+            return true;
+        }
+
+        return false;
+    }
+
+    async remove(): Promise<Player | undefined> {
+        const satPlayer = this.player;
+        if (
+            satPlayer !== undefined &&
+            (await GAME_UI.storytellerConfirm(
+                this.formatPromptForRemovePlayer(satPlayer)
+            ))
+        ) {
+            satPlayer.seatNumber = 0;
+            this.player = undefined;
+            return satPlayer;
+        }
+    }
+
+    toString() {
+        return `Seat ${this.position}`;
+    }
+
+    protected formatPromptForSitPlayer(player: Player): string {
+        return `Allow ${player.toString()} to sit at ${this.toString()}`;
+    }
+
+    protected formatPromptForRemovePlayer(player: Player): string {
+        return `Remove ${player.toString()} from ${this.toString()}`;
     }
 }
