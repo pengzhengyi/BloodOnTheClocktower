@@ -257,6 +257,7 @@ export class Player {
     async setDead(reason: DeadReason = DeadReason.Other): Promise<boolean> {
         this.deadReason = reason;
         this.state += NegativeState.Dead;
+        // TODO lose ability and influences
         return await this.dead;
     }
 

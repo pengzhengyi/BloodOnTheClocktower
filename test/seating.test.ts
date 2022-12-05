@@ -5,7 +5,7 @@ jest.mock('~/interaction/gameui', () => ({
 import { clockwise, randomChoice } from '~/game/common';
 import { Player } from '~/game/player';
 import { Seating } from '~/game/seating';
-import { createBasicPlayer } from '~/__mocks__/player';
+import { createBasicPlayers } from '~/__mocks__/player';
 
 async function createSeating(players: Array<Player>): Promise<Seating> {
     const numPlayers = players.length;
@@ -23,11 +23,7 @@ async function createSeating(players: Array<Player>): Promise<Seating> {
 async function createPlayersAndSeating(
     numPlayers: number
 ): Promise<[Array<Player>, Seating]> {
-    const players: Array<Player> = [];
-
-    for (let i = 0; i < numPlayers; i++) {
-        players.push(await createBasicPlayer());
-    }
+    const players = await createBasicPlayers(numPlayers);
 
     const seating = await createSeating(players);
 

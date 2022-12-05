@@ -265,7 +265,7 @@ export class VirginInfluence extends Influence {
                         return async (nomination: Nomination) => {
                             if (await original(nomination)) {
                                 if (nomination.nominator.isTownsfolk) {
-                                    (await proxyExecution.executeImmediately(
+                                    (await proxyExecution.execute(
                                         nomination.nominator
                                     )) &&
                                         (await gamePhase.forceTransition(

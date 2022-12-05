@@ -24,6 +24,18 @@ export async function createBasicPlayer(
     return await Player.init(name, character, alignment);
 }
 
+export async function createBasicPlayers(
+    numPlayers: number
+): Promise<Array<Player>> {
+    const basicPlayerCreations: Array<Promise<Player>> = [];
+
+    for (let i = 0; i < numPlayers; i++) {
+        basicPlayerCreations.push(createBasicPlayer());
+    }
+
+    return await Promise.all(basicPlayerCreations);
+}
+
 export function mockPlayer() {
     return mock<Player>();
 }

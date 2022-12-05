@@ -1,14 +1,15 @@
+import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import 'reflect-metadata';
-import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
+import { DeadReason } from './deadreason';
 import { Nomination } from './nomination';
 import { Player } from './player';
+import { Predicate } from './types';
 import {
     NominatedNominatedBefore,
     NominatorNominatedBefore,
     NoVoteInNomination,
     NoVotesWhenCountingVote,
 } from './exception';
-import { Predicate } from './types';
 import { GAME_UI } from '~/interaction/gameui';
 
 /**
@@ -25,18 +26,38 @@ export class Execution {
     @Type(() => Nomination)
     readonly nominations: Array<Nomination> = [];
 
+    /**
+     * Set the player about to die as the one to be executed.
+     *
+     * @param numAlivePlayer Number of alive players in game.
+     */
     async setPlayerAboutToDie(numAlivePlayer: number): Promise<void> {
         const playerAboutToDie = await this.getPlayerAboutToDie(numAlivePlayer);
         this.executed = playerAboutToDie;
     }
 
-    async executeImmediately(player: Player): Promise<boolean> {
+    /**
+     * Execute the player about to die or another player when provided as replacement.
+     *
+     * @param player A player to be executed. If provided, this player will be executed immediately regardless whether another player is set to be executed. When not provided, the execution will carry out as intended.
+     * @returns Whether a player has been executed.
+     */
+    async execute(player?: Player): Promise<boolean> {
+        if (player === undefined) {
+            if (this.executed === undefined) {
+                return false;
+            } else {
+                player = this.executed;
+            }
+        }
+
         if (
             await GAME_UI.storytellerConfirm(
                 `Confirm player ${player} will be executed immediately?`
             )
         ) {
             this.executed = player;
+            player.setDead(DeadReason.Executed);
             return true;
         }
 

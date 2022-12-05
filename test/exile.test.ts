@@ -1,8 +1,4 @@
-import {
-    GAME_UI,
-    handleMock,
-    hasRaisedHandForVoteMock,
-} from '~/__mocks__/gameui';
+import { GAME_UI, handleMock } from '~/__mocks__/gameui';
 jest.mock('~/interaction/gameui', () => ({
     GAME_UI,
 }));
@@ -12,25 +8,7 @@ import { Player } from '~/game/player';
 import { Scapegoat } from '~/content/characters/output/scapegoat';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer, setPlayerDead } from '~/__mocks__/player';
-
-async function collectVotesForExile(
-    exile: Exile,
-    playerToWillRaiseHand: Map<Player, boolean>
-): Promise<Array<Player>> {
-    const votedPlayers: Array<Player> = [];
-
-    hasRaisedHandForVoteMock.mockImplementation(async (player: Player) => {
-        return await playerToWillRaiseHand.get(player);
-    });
-
-    for await (const votedPlayer of exile.startVote(
-        playerToWillRaiseHand.keys()
-    )) {
-        votedPlayers.push(votedPlayer);
-    }
-
-    return votedPlayers;
-}
+import { collectVotesForNomination as collectVotesForExile } from './execution.test';
 
 async function createExileAndCollectVotes(
     nominated: Player,
