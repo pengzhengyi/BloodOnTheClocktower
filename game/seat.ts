@@ -1,3 +1,4 @@
+import { InvalidPlayerToSit } from './exception';
 import { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
 
@@ -31,6 +32,15 @@ export class Seat {
     }
 
     async sit(player: Player): Promise<boolean> {
+        if (player === undefined) {
+            const error = new InvalidPlayerToSit(player);
+            await error.resolve();
+
+            if (error.correctedPlayer === undefined) {
+                return false;
+            }
+        }
+
         if (
             await GAME_UI.storytellerConfirm(
                 this.formatPromptForSitPlayer(player)

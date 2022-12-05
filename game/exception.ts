@@ -283,6 +283,18 @@ export class PlayerNotSat extends RecoverableGameError {
     }
 }
 
+export class InvalidPlayerToSit extends RecoverableGameError {
+    static description = 'Try to sit an invalid player';
+
+    declare correctedPlayer: Player;
+
+    constructor(readonly player: Player) {
+        super(PlayerNotSat.description);
+
+        this.player = player;
+    }
+}
+
 export class PlayerNoNeighbors extends RecoverableGameError {
     static description =
         'Cannot get two players that sitting nearest to the player';
@@ -363,7 +375,7 @@ export class CharacterLoadFailure extends RecoverableGameError {
 }
 
 export class NoEditionMatchingName extends RecoverableGameError {
-    static description = 'Cannot find a edition  with matching name';
+    static description = 'Cannot find a edition with matching name';
 
     declare correctedEditionName: string;
 

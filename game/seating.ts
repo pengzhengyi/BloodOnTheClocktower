@@ -82,6 +82,16 @@ export class Seating {
         return this.seats.length;
     }
 
+    protected constructor(public readonly seats: Array<Seat>) {
+        this.seats = seats;
+    }
+
+    async *sit(players: Iterable<Player>): AsyncGenerator<boolean> {
+        for (const [player, seat] of Generator.pair(players, this.seats)) {
+            yield await seat.sit(player);
+        }
+    }
+
     async changeNumSeats(newNumSeats: number) {
         await Seating.validateNumSeats(newNumSeats);
 
@@ -98,10 +108,6 @@ export class Seating {
             );
             return this.seats.push(...newSeats);
         }
-    }
-
-    protected constructor(public readonly seats: Array<Seat>) {
-        this.seats = seats;
     }
 
     tryGetNextSeat(
@@ -158,15 +164,15 @@ export class Seating {
         return prevSeat?.player;
     }
 
-    async *getVoteOrder(seatPosition: number): AsyncGenerator<Player> {
+    async *getVoteOrder(nominatedPosition: number): AsyncGenerator<Player> {
         const clockwiseSeats = this.iterateSeatsExcludingStart(
-            seatPosition,
+            nominatedPosition,
             Direction.Clockwise
         );
 
         for (const seat of Generator.push(
             clockwiseSeats,
-            this.seats[seatPosition]
+            this.seats[nominatedPosition]
         )) {
             await new UnexpectedEmptySeat(seat).throwWhen(
                 (error) => error.emptySeat.player === undefined
