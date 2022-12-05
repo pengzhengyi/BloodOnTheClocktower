@@ -66,3 +66,7 @@ export function onlyLetters(s: string) {
 export function lowercaseLetters(s: string) {
     return s.toLowerCase().replace(regex, '');
 }
+
+export function randomChoice<T>(elements: Array<T>): T {
+    return elements[Math.floor(Math.random() * elements.length)];
+}

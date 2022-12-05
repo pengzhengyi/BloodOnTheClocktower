@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Character } from './character';
+import { randomChoice } from './common';
 import { CharacterLoadFailure, NoCharacterMatchingId } from './exception';
 import type { RoleData } from './types';
 import {
@@ -9,7 +10,7 @@ import {
 
 export abstract class CharacterLoader {
     static randomLoad(): typeof Character {
-        return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+        return randomChoice(CHARACTERS);
     }
 
     static tryLoad(id: string): typeof Character | undefined {
