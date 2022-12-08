@@ -78,6 +78,38 @@ export class Player {
         return player;
     }
 
+    static isAlly(player: Player, otherPlayer: Player) {
+        return player.alignment === otherPlayer.alignment;
+    }
+
+    static *getAllies(
+        player: Player,
+        otherPlayers: Iterable<Player>
+    ): IterableIterator<Player> {
+        for (const other of otherPlayers) {
+            if (!Object.is(player, other) && this.isAlly(player, other)) {
+                yield other;
+            }
+        }
+    }
+
+    /**
+     * {@link `glossary["Team"]`}
+     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
+     *
+     * @param players Players to find teammates in.
+     */
+    static getTeam(players: Iterable<Player>): Map<Alignment, Array<Player>> {
+        return Generator.groupBy(players, (player) => player.alignment);
+    }
+
+    static isCharacterType(
+        player: Player,
+        characterType: typeof CharacterType
+    ): boolean {
+        return Object.is(player.characterType, characterType);
+    }
+
     @Expose({ toPlainOnly: true })
     declare alignment: Alignment;
 
@@ -239,38 +271,6 @@ export class Player {
     @Expose({ name: 'character', toPlainOnly: true })
     protected characterId(): string {
         return this.character.id;
-    }
-
-    static isAlly(player: Player, otherPlayer: Player) {
-        return player.alignment === otherPlayer.alignment;
-    }
-
-    static *getAllies(
-        player: Player,
-        otherPlayers: Iterable<Player>
-    ): IterableIterator<Player> {
-        for (const other of otherPlayers) {
-            if (!Object.is(player, other) && this.isAlly(player, other)) {
-                yield other;
-            }
-        }
-    }
-
-    /**
-     * {@link `glossary["Team"]`}
-     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
-     *
-     * @param players Players to find teammates in.
-     */
-    static getTeam(players: Iterable<Player>): Map<Alignment, Array<Player>> {
-        return Generator.groupBy(players, (player) => player.alignment);
-    }
-
-    static isCharacterType(
-        player: Player,
-        characterType: typeof CharacterType
-    ): boolean {
-        return Object.is(player.characterType, characterType);
     }
 
     protected constructor(
