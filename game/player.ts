@@ -17,6 +17,7 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
+import { Generator } from './collections';
 import {
     DeadPlayerCannotNominate,
     PlayerHasUnclearAlignment,
@@ -184,23 +185,23 @@ export class Player {
     }
 
     get isMinion() {
-        return this.isCharacterType(Minion);
+        return Player.isCharacterType(this, Minion);
     }
 
     get isDemon() {
-        return this.isCharacterType(Demon);
+        return Player.isCharacterType(this, Demon);
     }
 
     get isTownsfolk() {
-        return this.isCharacterType(Townsfolk);
+        return Player.isCharacterType(this, Townsfolk);
     }
 
     get isOutsider() {
-        return this.isCharacterType(Outsider);
+        return Player.isCharacterType(this, Outsider);
     }
 
     get isFabled() {
-        return this.isCharacterType(Fabled);
+        return Player.isCharacterType(this, Fabled);
     }
 
     get isTraveller(): boolean {
@@ -240,6 +241,38 @@ export class Player {
         return this.character.id;
     }
 
+    static isAlly(player: Player, otherPlayer: Player) {
+        return player.alignment === otherPlayer.alignment;
+    }
+
+    static *getAllies(
+        player: Player,
+        otherPlayers: Iterable<Player>
+    ): IterableIterator<Player> {
+        for (const other of otherPlayers) {
+            if (!Object.is(player, other) && this.isAlly(player, other)) {
+                yield other;
+            }
+        }
+    }
+
+    /**
+     * {@link `glossary["Team"]`}
+     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
+     *
+     * @param players Players to find teammates in.
+     */
+    static getTeam(players: Iterable<Player>): Map<Alignment, Array<Player>> {
+        return Generator.groupBy(players, (player) => player.alignment);
+    }
+
+    static isCharacterType(
+        player: Player,
+        characterType: typeof CharacterType
+    ): boolean {
+        return Object.is(player.characterType, characterType);
+    }
+
     protected constructor(
         id: string,
         username: string,
@@ -248,10 +281,6 @@ export class Player {
         this.id = id;
         this.username = username;
         this.initializeCharacter(character);
-    }
-
-    isCharacterType(characterType: typeof CharacterType): boolean {
-        return Object.is(this.characterType, characterType);
     }
 
     async setDead(reason: DeadReason = DeadReason.Other): Promise<boolean> {
@@ -264,45 +293,6 @@ export class Player {
     async attack(victim: Player) {
         // TODO
         await victim.setDead(DeadReason.DemonAttack);
-    }
-
-    isAlly(other: Player) {
-        return this.alignment === other.alignment;
-    }
-
-    *getAllies(players: Iterable<Player>): IterableIterator<Player> {
-        for (const other of players) {
-            if (!Object.is(this, other) && this.isAlly(other)) {
-                yield other;
-            }
-        }
-    }
-
-    /**
-     * {@link `glossary["Team"]`}
-     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
-     *
-     * @param players Players to find teammates in.
-     */
-    *getTeam(players: Iterable<Player>): IterableIterator<Player> {
-        yield this;
-        yield* this.getAllies(players);
-    }
-
-    toJSON() {
-        return instanceToPlain(this);
-    }
-
-    valueOf() {
-        return this.id;
-    }
-
-    equals(player: Player): boolean {
-        return this.id === player.id;
-    }
-
-    toString() {
-        return `${this.username}(${this.id})`;
     }
 
     async nominate(nominated: Player): Promise<Nomination | undefined> {
@@ -347,6 +337,22 @@ export class Player {
         } else {
             return false;
         }
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
+    }
+
+    valueOf() {
+        return this.id;
+    }
+
+    equals(player: Player): boolean {
+        return this.id === player.id;
+    }
+
+    toString() {
+        return `${this.username}(${this.id})`;
     }
 
     protected formatPromptForRevokeVoteToken(reason?: string): string {
