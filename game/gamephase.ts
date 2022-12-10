@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
-import { Action } from './types';
 import { GAME_UI } from '~/interaction/gameui';
 
 export enum Phase {
@@ -33,38 +32,64 @@ export enum Phase {
     __ALL__ = 0b11110,
 }
 
+function getPhaseIndex(phase: Phase): number {
+    let index = 0;
+    let bit = 1;
+
+    while ((bit & phase) === 0) {
+        bit <<= 1;
+        index++;
+    }
+
+    return index;
+}
+
 export function includePhase(phases: number, phase: Phase) {
     return (phases & phase) === phase;
 }
 
 @Exclude()
 export class GamePhase {
-    readonly phaseToActions: Map<Phase, Array<Action>> = new Map();
+    @Expose({ toPlainOnly: true })
+    protected _phase: Phase;
 
     @Expose({ toPlainOnly: true })
-    protected phase: Phase;
+    protected cycleIndex = 0;
 
-    @Expose({ toPlainOnly: true })
-    protected cycleIndex;
+    /**
+     * The index of current phase. Initial setup phase will has index 0 while first night has index 1.
+     */
+    protected phaseCounter;
+
+    /**
+     * The date index of current phase. Initial setup phase and first night is at date 0, while first day is at date 1, and each subsequent day the following date.
+     */
+    get dateIndex(): number {
+        return Math.floor((this.phaseCounter + 2) / 4);
+    }
+
+    get phase(): Phase {
+        return this._phase;
+    }
 
     /**
      * {@link `glossary["First night"]`}
      * The night phase that begins the game. Some characters act only during the first night. Some characters act during each night except the first. Players may talk about their characters only after the first night.
      */
     get isFirstNight(): boolean {
-        return this.phase === Phase.Night && this.cycleIndex === 0;
+        return this._phase === Phase.Night && this.cycleIndex === 0;
     }
 
     get isNonfirstNight(): boolean {
-        return this.phase === Phase.Night && this.cycleIndex !== 0;
+        return this._phase === Phase.Night && this.cycleIndex !== 0;
     }
 
     get isDay(): boolean {
-        return this.phase === Phase.Day;
+        return this._phase === Phase.Day;
     }
 
     get isNight(): boolean {
-        return this.phase === Phase.Night;
+        return this._phase === Phase.Night;
     }
 
     static format(phase: Phase, cycleIndex: number): string {
@@ -75,17 +100,9 @@ export class GamePhase {
         return new this(Phase.Setup);
     }
 
-    constructor(phase: Phase = Phase.Night, cycleIndex = 0) {
-        this.phase = phase;
-        this.cycleIndex = cycleIndex;
-    }
-
-    cycle() {
-        while (true) {
-            const actions = this.phaseToActions.get(this.phase);
-            actions?.forEach((action) => action());
-            this.transition();
-        }
+    constructor(phase: Phase = Phase.Night) {
+        this._phase = phase;
+        this.phaseCounter = getPhaseIndex(phase);
     }
 
     async forceTransition(reason?: string): Promise<boolean> {
@@ -108,16 +125,17 @@ export class GamePhase {
     }
 
     toString() {
-        return GamePhase.format(this.phase, this.cycleIndex);
+        return GamePhase.format(this._phase, this.cycleIndex);
     }
 
     protected transition() {
-        let phase = this.phase << 1;
+        let phase = this._phase << 1;
+        this.phaseCounter++;
         if (phase > Phase.Dusk) {
             this.cycleIndex++;
             phase = Phase.Night;
         }
 
-        this.phase = phase;
+        this._phase = phase;
     }
 }
