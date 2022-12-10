@@ -1,5 +1,5 @@
-import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import 'reflect-metadata';
+import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from './deadreason';
 import { Nomination } from './nomination';
 import { Player } from './player';

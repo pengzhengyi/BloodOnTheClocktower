@@ -44,22 +44,27 @@ function getPhaseIndex(phase: Phase): number {
     return index;
 }
 
+function getPhase(phaseCounter: number): Phase {
+    if (phaseCounter < 5) {
+        return 1 << phaseCounter;
+    } else {
+        return 1 << phaseCounter % 4;
+    }
+}
+
 export function includePhase(phases: number, phase: Phase) {
     return (phases & phase) === phase;
 }
 
 @Exclude()
 export class GamePhase {
-    @Expose({ toPlainOnly: true })
     protected _phase: Phase;
-
-    @Expose({ toPlainOnly: true })
-    protected cycleIndex = 0;
 
     /**
      * The index of current phase. Initial setup phase will has index 0 while first night has index 1.
      */
-    protected phaseCounter;
+    @Expose({ toPlainOnly: true })
+    protected phaseCounter: number;
 
     /**
      * The date index of current phase. Initial setup phase and first night is at date 0, while first day is at date 1, and each subsequent day the following date.
@@ -70,6 +75,10 @@ export class GamePhase {
 
     get phase(): Phase {
         return this._phase;
+    }
+
+    get cycleIndex(): number {
+        return Math.floor((this.phaseCounter - 1) / 4);
     }
 
     /**
@@ -97,12 +106,33 @@ export class GamePhase {
     }
 
     static setup() {
-        return new this(Phase.Setup);
+        return this.of(0);
     }
 
-    constructor(phase: Phase = Phase.Night) {
-        this._phase = phase;
-        this.phaseCounter = getPhaseIndex(phase);
+    static firstNight() {
+        return this.of(1);
+    }
+
+    static of(phaseCounter: number): GamePhase {
+        return new this(undefined, phaseCounter);
+    }
+
+    protected constructor(phase?: Phase, phaseCounter?: number) {
+        if (phase === undefined && phaseCounter === undefined) {
+            phase = Phase.Setup;
+        }
+
+        if (phase === undefined) {
+            this._phase = getPhase(phaseCounter!);
+        } else {
+            this._phase = phase;
+        }
+
+        if (phaseCounter === undefined) {
+            this.phaseCounter = getPhaseIndex(phase!);
+        } else {
+            this.phaseCounter = phaseCounter;
+        }
     }
 
     async forceTransition(reason?: string): Promise<boolean> {
@@ -128,11 +158,14 @@ export class GamePhase {
         return GamePhase.format(this._phase, this.cycleIndex);
     }
 
+    valueOf() {
+        return this.phaseCounter;
+    }
+
     protected transition() {
         let phase = this._phase << 1;
         this.phaseCounter++;
         if (phase > Phase.Dusk) {
-            this.cycleIndex++;
             phase = Phase.Night;
         }
 

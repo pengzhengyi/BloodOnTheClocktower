@@ -84,16 +84,12 @@ function createMockGameInfo(
 }
 
 function createNonfirstNightGamePhase() {
-    const gamePhase = new GamePhase();
-    // @ts-ignore
-    jest.spyOn(gamePhase, 'isNonfirstNight', 'get').mockReturnValue(true);
+    const gamePhase = GamePhase.of(5);
     return gamePhase;
 }
 
 function createDayGamePhase() {
-    const gamePhase = new GamePhase();
-    // @ts-ignore
-    jest.spyOn(gamePhase, 'isDay', 'get').mockReturnValue(true);
+    const gamePhase = GamePhase.of(3);
     return gamePhase;
 }
 

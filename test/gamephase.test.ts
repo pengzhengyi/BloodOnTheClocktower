@@ -21,10 +21,16 @@ async function createGamePhase(phaseIndex: number): Promise<GamePhase> {
     return gamePhase;
 }
 
-describe('test GamePhase toString', () => {
+describe('test basic GamePhase functionality', () => {
     test.concurrent('initial game phase toString', () => {
-        const gamePhase = new GamePhase();
+        const gamePhase = GamePhase.firstNight();
         expect(gamePhase.toString()).toEqual('Night 0');
+    });
+
+    test.concurrent('test equality', () => {
+        const firstNightGamePhase1 = GamePhase.firstNight();
+        const firstNightGamePhase2 = GamePhase.of(1);
+        expect(firstNightGamePhase1).toEqual(firstNightGamePhase2);
     });
 });
 
