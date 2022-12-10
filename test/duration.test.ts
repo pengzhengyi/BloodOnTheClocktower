@@ -21,4 +21,12 @@ describe('test basic Duration functionality', () => {
         expect(duration.phaseElapsed).toEqual(12 - 5);
         expect(duration.dateElapsed).toEqual(2);
     });
+
+    test.concurrent('duration in relative to a gamephase', () => {
+        const duration = new Duration(GamePhase.of(4), GamePhase.of(8));
+
+        expect(duration.isActiveAt(GamePhase.of(7))).toBeTrue();
+        expect(duration.hasEndedAt(GamePhase.of(12))).toBeTrue();
+        expect(duration.hasStartedAt(GamePhase.of(2))).toBeFalse();
+    });
 });

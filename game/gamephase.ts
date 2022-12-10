@@ -162,8 +162,16 @@ export class GamePhase {
         return this.phaseCounter;
     }
 
+    isBefore(other: GamePhase): boolean {
+        return this.phaseCounter < other.phaseCounter;
+    }
+
     equals(other: GamePhase): boolean {
         return this.phaseCounter === other.phaseCounter;
+    }
+
+    isAfter(other: GamePhase): boolean {
+        return this.phaseCounter > other.phaseCounter;
     }
 
     protected transition() {

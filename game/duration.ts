@@ -38,6 +38,18 @@ export class Duration {
         this.end = end;
     }
 
+    hasStartedAt(phase: GamePhase): boolean {
+        return phase.isAfter(this.start);
+    }
+
+    isActiveAt(phase: GamePhase): boolean {
+        return this.hasStarted(phase) && !this.hasEnded(phase);
+    }
+
+    hasEndedAt(phase: GamePhase): boolean {
+        return phase.isAfter(this.end);
+    }
+
     toJSON() {
         return instanceToPlain(this);
     }
