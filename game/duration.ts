@@ -8,6 +8,13 @@ export interface IDuration {
     dateElapsed: number;
     phaseElapsed: number;
 
+    /**
+     * Create a new duration by setting a different end.
+     *
+     * @param end The end of new duration.
+     */
+    setEnd(end: GamePhase): IDuration;
+
     hasStartedAt(phase: GamePhase): boolean;
 
     isActiveAt(phase: GamePhase): boolean;
@@ -55,6 +62,10 @@ export class Duration implements IDuration {
     constructor(start: GamePhase, end: GamePhase) {
         this.start = start;
         this.end = end;
+    }
+
+    setEnd(end: GamePhase): Duration {
+        return new Duration(this.start, end);
     }
 
     hasStartedAt(phase: GamePhase): boolean {

@@ -32,7 +32,7 @@ describe('test basic Duration functionality', () => {
     });
 });
 
-describe('test basic IndefniteDuration functionality', () => {
+describe('test basic IndefiniteDuration functionality', () => {
     test.concurrent('equality', () => {
         const duration1 = new IndefiniteDuration(GamePhase.of(7));
         const duration2 = new IndefiniteDuration(GamePhase.of(7));
