@@ -1,9 +1,28 @@
 import 'reflect-metadata';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { GamePhase } from './gamephase';
+import { UnsupportedOperation } from './exception';
+
+export interface IDuration {
+    atSameDate: boolean;
+    dateElapsed: number;
+    phaseElapsed: number;
+
+    hasStartedAt(phase: GamePhase): boolean;
+
+    isActiveAt(phase: GamePhase): boolean;
+
+    hasEndedAt(phase: GamePhase): boolean;
+
+    toJSON(): Record<string, any>;
+
+    toString(): string;
+
+    equals(duration: IDuration): boolean;
+}
 
 @Exclude()
-export class Duration {
+export class Duration implements IDuration {
     @Expose({ toPlainOnly: true })
     @Type(() => GamePhase)
     protected readonly start: GamePhase;
@@ -43,7 +62,7 @@ export class Duration {
     }
 
     isActiveAt(phase: GamePhase): boolean {
-        return this.hasStarted(phase) && !this.hasEnded(phase);
+        return this.hasStartedAt(phase) && !this.hasEndedAt(phase);
     }
 
     hasEndedAt(phase: GamePhase): boolean {
@@ -58,7 +77,80 @@ export class Duration {
         return Duration.format(this.start, this.end);
     }
 
-    equals(other: Duration): boolean {
-        return this.start.equals(other.start) && this.end.equals(other.end);
+    equals(other: IDuration): boolean {
+        if (other instanceof Duration) {
+            return this.start.equals(other.start) && this.end.equals(other.end);
+        } else {
+            return false;
+        }
+    }
+}
+
+@Exclude()
+export class IndefiniteDuration implements IDuration {
+    @Expose({ toPlainOnly: true })
+    @Type(() => GamePhase)
+    protected readonly start: GamePhase;
+
+    static DATE_ELAPSED_NOT_SUPPORTED_DESCRIPTION =
+        'getting the elapsed date is not supported for an indefinite duration';
+
+    static PHASE_ELAPSED_NOT_SUPPORTED_DESCRIPTION =
+        'getting the elapsed phase is not supported for an indefinite duration';
+
+    static format(start: GamePhase, compact = true): string {
+        return `${start} ${compact ? '--' : 'to'} ?`;
+    }
+
+    get atSameDate(): boolean {
+        return false;
+    }
+
+    get dateElapsed(): number {
+        throw new UnsupportedOperation(
+            IndefiniteDuration.DATE_ELAPSED_NOT_SUPPORTED_DESCRIPTION
+        );
+    }
+
+    get phaseElapsed(): number {
+        throw new UnsupportedOperation(
+            IndefiniteDuration.PHASE_ELAPSED_NOT_SUPPORTED_DESCRIPTION
+        );
+    }
+
+    constructor(start: GamePhase) {
+        this.start = start;
+    }
+
+    setEnd(end: GamePhase): Duration {
+        return new Duration(this.start, end);
+    }
+
+    hasStartedAt(phase: GamePhase): boolean {
+        return phase.isAfter(this.start);
+    }
+
+    isActiveAt(phase: GamePhase): boolean {
+        return this.hasStartedAt(phase) && !this.hasEndedAt(phase);
+    }
+
+    hasEndedAt(_phase: GamePhase): boolean {
+        return false;
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
+    }
+
+    toString() {
+        return IndefiniteDuration.format(this.start);
+    }
+
+    equals(other: IDuration): boolean {
+        if (other instanceof IndefiniteDuration) {
+            return this.start.equals(other.start);
+        } else {
+            return false;
+        }
     }
 }

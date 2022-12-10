@@ -104,6 +104,19 @@ export class RecoverableGameError extends GameError {
     }
 }
 
+export class UnsupportedOperation extends RecoverableGameError {
+    static description = 'Operation not supported';
+
+    constructor(readonly additionalDescription?: string) {
+        super(
+            UnsupportedOperation.description + additionalDescription ===
+                undefined
+                ? ''
+                : `: ${additionalDescription}`
+        );
+    }
+}
+
 export class NoVoteInNomination extends RecoverableGameError {
     static description = 'Nomination does not have a finished vote';
 

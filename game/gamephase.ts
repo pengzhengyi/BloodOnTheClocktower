@@ -30,6 +30,9 @@ export enum Phase {
 
     /** Night, Dawn, Day, Dusk */
     __ALL__ = 0b11110,
+
+    /** The end of the game */
+    GameEnd = 1 << 5,
 }
 
 function getPhaseIndex(phase: Phase): number {
