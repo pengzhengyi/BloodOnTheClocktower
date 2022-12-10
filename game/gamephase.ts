@@ -162,6 +162,10 @@ export class GamePhase {
         return this.phaseCounter;
     }
 
+    equals(other: GamePhase): boolean {
+        return this.phaseCounter === other.phaseCounter;
+    }
+
     protected transition() {
         let phase = this._phase << 1;
         this.phaseCounter++;
