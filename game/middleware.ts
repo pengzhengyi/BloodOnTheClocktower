@@ -6,8 +6,14 @@ export interface AsyncMiddleware<T> {
 }
 
 export class AsyncPipeline<T> {
-    constructor(readonly middlewares: Array<AsyncMiddleware<T>>) {
-        this.middlewares = middlewares;
+    protected get middlewares(): Array<AsyncMiddleware<T>> {
+        return this.#middlewares;
+    }
+
+    #middlewares: Array<AsyncMiddleware<T>>;
+
+    constructor(middlewares: Array<AsyncMiddleware<T>>) {
+        this.#middlewares = middlewares;
     }
 
     async apply(initialTarget: T): Promise<T> {

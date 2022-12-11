@@ -1,28 +1,41 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
-import { Effect } from './effect';
+import { Effect, EffectTarget } from './effect';
 import { EffectPrecedence } from './effectprecedence';
+import { AsyncPipeline } from './middleware';
 
-export class Effects {
-    protected effectToPriority: Map<Effect, number>;
+export class Effects<T = EffectTarget> extends AsyncPipeline<T> {
+    protected effectToPriority: Map<Effect<T>, number>;
 
-    protected hierarchy: OrderedMap<number, LinkList<Effect>>;
+    protected hierarchy: OrderedMap<number, LinkList<Effect<T>>>;
+
+    private shouldUpdatePipeline = false;
+
+    #middlewares: Array<Effect<T>> = [];
 
     get size(): number {
         return this.effectToPriority.size;
     }
 
+    protected get middlewares(): Array<Effect<T>> {
+        if (this.shouldUpdatePipeline) {
+            this.#middlewares = Array.from(this.getActiveEffects());
+            this.shouldUpdatePipeline = false;
+        }
+
+        return this.#middlewares;
+    }
+
     constructor() {
-        this.effectToPriority = new Map<Effect, number>();
-        this.hierarchy = new OrderedMap<number, LinkList<Effect>>();
+        super([]);
+        this.effectToPriority = new Map<Effect<T>, number>();
+        this.hierarchy = new OrderedMap<number, LinkList<Effect<T>>>(
+            [],
+            (priority, otherPriority) => otherPriority - priority
+        );
     }
 
     *[Symbol.iterator]() {
-        for (
-            let iterator = this.hierarchy.rBegin();
-            !iterator.equals(this.hierarchy.rEnd());
-            iterator = iterator.next()
-        ) {
-            const samePriorityEffects = iterator.pointer[1];
+        for (const [_, samePriorityEffects] of this.hierarchy) {
             for (
                 let effectIterator = samePriorityEffects.rBegin();
                 !effectIterator.equals(samePriorityEffects.rEnd());
@@ -41,25 +54,26 @@ export class Effects {
         }
     }
 
-    add(effect: Effect) {
+    add(effect: Effect<T>) {
         const priority = EffectPrecedence.getPriority(effect);
         this.effectToPriority.set(effect, priority);
 
         let samePriorityEffects = this.hierarchy.getElementByKey(priority);
 
         if (samePriorityEffects === undefined) {
-            samePriorityEffects = new LinkList<Effect>();
+            samePriorityEffects = new LinkList<Effect<T>>();
             this.hierarchy.setElement(priority, samePriorityEffects);
         }
 
         samePriorityEffects.pushBack(effect);
+        this.shouldUpdatePipeline = true;
     }
 
-    has(effect: Effect): boolean {
+    has(effect: Effect<T>): boolean {
         return this.effectToPriority.has(effect);
     }
 
-    delete(effect: Effect): boolean {
+    delete(effect: Effect<T>): boolean {
         const priority = this.effectToPriority.get(effect);
 
         if (priority === undefined) {
@@ -69,6 +83,7 @@ export class Effects {
         const samePriorityEffects = this.hierarchy.getElementByKey(priority)!;
         this.effectToPriority.delete(effect);
         samePriorityEffects.eraseElementByValue(effect);
+        this.shouldUpdatePipeline = true;
 
         return true;
     }

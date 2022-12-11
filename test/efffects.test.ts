@@ -10,6 +10,7 @@ jest.mock('~/game/effectprecedence', () => ({
 import { Effect } from '~/game/effect';
 import { Effects } from '~/game/effects';
 import { mockEffect, mockInactiveEffect } from '~/__mocks__/effect';
+import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
 
 function createEffects(effectToPriority: Map<Effect, number>): Effects {
     const effects = new Effects();
@@ -84,5 +85,26 @@ describe('Test Effects basic functionalities', () => {
         const effectByPriority = Array.from(effects.getActiveEffects());
 
         expect(effectByPriority).toEqual([effect3, effect2, effect1]);
+    });
+});
+
+describe('Test Effects edge cases', () => {
+    test('apply with no effect', async () => {
+        const effects = new Effects();
+        const player = mockPlayer();
+        const result = await effects.apply(player);
+        expect(result).toBe(player);
+    });
+
+    test('apply when there is an effect with empty apply', async () => {
+        const effect = mockEffect();
+        const effectToPriority = new Map<Effect, number>([[effect, 1]]);
+
+        const effects = createEffects(effectToPriority);
+        const player = await createBasicPlayer();
+        const effectByPriority = Array.from(effects.getActiveEffects());
+        expect(effectByPriority).toEqual([effect]);
+        const result = await effects.apply(player);
+        expect(result).toBeUndefined();
     });
 });
