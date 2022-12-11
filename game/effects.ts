@@ -1,9 +1,9 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
-import { Effect, EffectTarget } from './effect';
+import { Effect, EffectContext } from './effect';
 import { EffectPrecedence } from './effectprecedence';
 import { AsyncPipeline } from './middleware';
 
-export class Effects<T = EffectTarget> extends AsyncPipeline<T> {
+export class Effects<T = EffectContext> extends AsyncPipeline<T> {
     protected effectToPriority: Map<Effect<T>, number>;
 
     protected hierarchy: OrderedMap<number, LinkList<Effect<T>>>;

@@ -1,5 +1,8 @@
-export type NextFunction<T> = (target: T) => Promise<T>;
-export type ApplyFunction<T> = (target: T, next: NextFunction<T>) => Promise<T>;
+export type NextFunction<T> = (context: T) => Promise<T>;
+export type ApplyFunction<T> = (
+    context: T,
+    next: NextFunction<T>
+) => Promise<T>;
 
 export interface AsyncMiddleware<T> {
     apply: ApplyFunction<T>;
@@ -16,18 +19,18 @@ export class AsyncPipeline<T> {
         this.#middlewares = middlewares;
     }
 
-    async apply(initialTarget: T): Promise<T> {
-        return await this.applyMiddleware(initialTarget, 0);
+    async apply(initialContext: T): Promise<T> {
+        return await this.applyMiddleware(initialContext, 0);
     }
 
-    protected async applyMiddleware(target: T, index: number): Promise<T> {
+    protected async applyMiddleware(context: T, index: number): Promise<T> {
         const middleware = this.middlewares[index];
         if (middleware === undefined) {
-            return target;
+            return context;
         }
 
-        return await middleware.apply(target, (updatedTarget: T) =>
-            this.applyMiddleware(updatedTarget, index + 1)
+        return await middleware.apply(context, (updatedContext: T) =>
+            this.applyMiddleware(updatedContext, index + 1)
         );
     }
 }
