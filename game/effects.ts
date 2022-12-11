@@ -16,6 +16,14 @@ export class Effects {
         this.hierarchy = new OrderedMap<number, LinkList<Effect>>();
     }
 
+    *getActiveEffects() {
+        for (const effect of this) {
+            if (effect.active) {
+                yield effect;
+            }
+        }
+    }
+
     *[Symbol.iterator]() {
         for (
             let iterator = this.hierarchy.rBegin();

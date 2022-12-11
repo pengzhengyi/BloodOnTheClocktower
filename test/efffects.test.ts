@@ -9,7 +9,7 @@ jest.mock('~/game/effectprecedence', () => ({
 
 import { Effect } from '~/game/effect';
 import { Effects } from '~/game/effects';
-import { mockEffect } from '~/__mocks__/effect';
+import { mockEffect, mockInactiveEffect } from '~/__mocks__/effect';
 
 function createEffects(effectToPriority: Map<Effect, number>): Effects {
     const effects = new Effects();
@@ -60,5 +60,29 @@ describe('Test Effects basic functionalities', () => {
             effect2,
             effect1,
         ]);
+    });
+
+    test('active effects only', () => {
+        const effect1 = mockEffect();
+        const effect2 = mockEffect();
+        const effect3 = mockEffect();
+        const effect4 = mockInactiveEffect();
+        const effect5 = mockInactiveEffect();
+        const effect6 = mockInactiveEffect();
+
+        const effectToPriority = new Map<Effect, number>([
+            [effect1, 1],
+            [effect2, 1],
+            [effect3, 3],
+            [effect4, 2],
+            [effect5, 2],
+            [effect6, 1],
+        ]);
+
+        const effects = createEffects(effectToPriority);
+
+        const effectByPriority = Array.from(effects.getActiveEffects());
+
+        expect(effectByPriority).toEqual([effect3, effect2, effect1]);
     });
 });
