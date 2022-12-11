@@ -71,5 +71,6 @@
         "Waka",
         "wakatime",
         "whitespaces"
-    ]
+    ],
+    "cSpell.ignoreWords": ["proxied", "unproxied"]
 }
