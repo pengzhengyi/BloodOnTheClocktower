@@ -82,7 +82,9 @@ describe('Test Effects basic functionalities', () => {
 
         const effects = createEffects(effectToPriority);
 
-        const effectByPriority = Array.from(effects.getActiveEffects());
+        const effectByPriority = Array.from(
+            (effects as any).getApplicableMiddlewares()
+        );
 
         expect(effectByPriority).toEqual([effect3, effect2, effect1]);
     });
@@ -102,8 +104,6 @@ describe('Test Effects edge cases', () => {
 
         const effects = createEffects(effectToPriority);
         const player = await createBasicPlayer();
-        const effectByPriority = Array.from(effects.getActiveEffects());
-        expect(effectByPriority).toEqual([effect]);
         const result = await effects.apply(player);
         expect(result).toBeUndefined();
     });

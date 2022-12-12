@@ -8,29 +8,37 @@ export interface Middleware<TContext> {
     apply: ApplyFunction<TContext>;
 }
 
-export class Pipeline<TContext> {
-    get middlewares(): Array<Middleware<TContext>> {
-        return this.#middlewares;
-    }
+export class Pipeline<
+    TContext,
+    TMiddleware extends Middleware<TContext> = Middleware<TContext>
+> {
+    #middlewares: Array<TMiddleware>;
 
-    #middlewares: Array<Middleware<TContext>>;
-
-    constructor(middlewares: Array<Middleware<TContext>>) {
+    constructor(middlewares: Array<TMiddleware>) {
         this.#middlewares = middlewares;
     }
 
     apply(initialContext: TContext): TContext {
-        return this.applyMiddleware(initialContext, 0);
+        const middlewares = this.getApplicableMiddlewares(initialContext);
+        return this.applyMiddleware(initialContext, middlewares, 0);
     }
 
-    protected applyMiddleware(context: TContext, index: number): TContext {
-        const middleware = this.middlewares[index];
+    protected getApplicableMiddlewares(_context: TContext): Array<TMiddleware> {
+        return this.#middlewares;
+    }
+
+    protected applyMiddleware(
+        context: TContext,
+        middlewares: Array<TMiddleware>,
+        index: number
+    ): TContext {
+        const middleware = middlewares[index];
         if (middleware === undefined) {
             return context;
         }
 
         return middleware.apply(context, (updatedContext: TContext) =>
-            this.applyMiddleware(updatedContext, index + 1)
+            this.applyMiddleware(updatedContext, middlewares, index + 1)
         );
     }
 }

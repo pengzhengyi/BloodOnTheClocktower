@@ -7,7 +7,7 @@ describe('Test basic functionalities', () => {
         const minus6 = new Operation<number>((x) => x - 6, false);
         const plus1 = new Operation<number>((x) => x + 1, false);
 
-        const pipeline = new Pipeline([plus1, minus6, multiplyBy2]);
+        const pipeline = new Pipeline<number>([plus1, minus6, multiplyBy2]);
         expect(pipeline.apply(4)).toEqual(4 * 2 - 6 + 1);
     });
 
@@ -16,7 +16,7 @@ describe('Test basic functionalities', () => {
         const minus4 = new Operation<number>((x) => x - 4, false);
         const plus2 = new Operation<number>((x) => x + 2, false);
 
-        const pipeline = new Pipeline([minus4, divideBy2, plus2]);
+        const pipeline = new Pipeline<number>([minus4, divideBy2, plus2]);
         expect(pipeline.apply(8)).toEqual(8 / 2 + 2 - 4);
     });
 });
