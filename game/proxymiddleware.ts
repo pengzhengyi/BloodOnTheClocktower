@@ -9,7 +9,7 @@ export interface ProxyHandlerRequest<TTarget extends object> {
 
 export interface ProxyMiddlewareContext<TTarget extends object> {
     request: ProxyHandlerRequest<TTarget>;
-    target: TTarget;
+    response?: any;
 }
 
 export interface ProxyMiddleware<TTarget extends object>
@@ -54,18 +54,18 @@ export abstract class ProxyPipeline<
             this,
             enabledProxyHandlerPropertyName,
             (target: TTarget, ...args: any[]) => {
-                const context = this.createProxyMiddlewareContext(
+                const context = this.createContext(
                     enabledProxyHandlerPropertyName,
                     target,
                     args
                 );
 
-                return this.processContextByPipeline(context);
+                return this.handleContext(context);
             }
         );
     }
 
-    protected createProxyMiddlewareContext(
+    protected createContext(
         proxyHandlerPropertyName: string,
         target: TTarget,
         ...args: any[]
@@ -76,14 +76,11 @@ export abstract class ProxyPipeline<
                 target,
                 args,
             },
-            target,
         };
     }
 
-    protected processContextByPipeline(
-        _context: ProxyMiddlewareContext<TTarget>
-    ): any {
-        // TODO
-        return undefined;
+    protected handleContext(context: ProxyMiddlewareContext<TTarget>): any {
+        const updatedContext = this._pipeline.apply(context);
+        return updatedContext.response;
     }
 }

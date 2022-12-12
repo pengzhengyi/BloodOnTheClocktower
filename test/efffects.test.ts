@@ -46,7 +46,6 @@ function createBasicContext<TTarget extends object>(
             target,
             args,
         },
-        target,
     };
 }
 
