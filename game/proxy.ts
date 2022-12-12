@@ -1,4 +1,4 @@
-export class SelfProxy {
+export abstract class SelfProxy {
     protected readonly proxyHandlerPropertyNames: Array<
         keyof ProxyHandler<this>
     > = [

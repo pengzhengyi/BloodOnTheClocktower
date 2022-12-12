@@ -1,35 +1,35 @@
-export type NextFunction<T> = (context: T) => Promise<T>;
-export type ApplyFunction<T> = (
-    context: T,
-    next: NextFunction<T>
-) => Promise<T>;
+export type NextFunction<TContext> = (context: TContext) => TContext;
+export type ApplyFunction<TContext> = (
+    context: TContext,
+    next: NextFunction<TContext>
+) => TContext;
 
-export interface AsyncMiddleware<T> {
-    apply: ApplyFunction<T>;
+export interface Middleware<TContext> {
+    apply: ApplyFunction<TContext>;
 }
 
-export class AsyncPipeline<T> {
-    protected get middlewares(): Array<AsyncMiddleware<T>> {
+export class Pipeline<TContext> {
+    get middlewares(): Array<Middleware<TContext>> {
         return this.#middlewares;
     }
 
-    #middlewares: Array<AsyncMiddleware<T>>;
+    #middlewares: Array<Middleware<TContext>>;
 
-    constructor(middlewares: Array<AsyncMiddleware<T>>) {
+    constructor(middlewares: Array<Middleware<TContext>>) {
         this.#middlewares = middlewares;
     }
 
-    async apply(initialContext: T): Promise<T> {
-        return await this.applyMiddleware(initialContext, 0);
+    apply(initialContext: TContext): TContext {
+        return this.applyMiddleware(initialContext, 0);
     }
 
-    protected async applyMiddleware(context: T, index: number): Promise<T> {
+    protected applyMiddleware(context: TContext, index: number): TContext {
         const middleware = this.middlewares[index];
         if (middleware === undefined) {
             return context;
         }
 
-        return await middleware.apply(context, (updatedContext: T) =>
+        return middleware.apply(context, (updatedContext: TContext) =>
             this.applyMiddleware(updatedContext, index + 1)
         );
     }

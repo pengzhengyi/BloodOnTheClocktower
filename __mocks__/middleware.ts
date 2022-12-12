@@ -1,20 +1,20 @@
-import { AsyncMiddleware, NextFunction } from '~/game/middleware';
+import { Middleware, NextFunction } from '~/game/middleware';
 
-export class Operation<T> implements AsyncMiddleware<T> {
+export class Operation<TContext> implements Middleware<TContext> {
     constructor(
-        protected readonly operation: (context: T) => T,
+        protected readonly operation: (context: TContext) => TContext,
         protected readonly isBefore: boolean
     ) {
         this.operation = operation;
         this.isBefore = isBefore;
     }
 
-    async apply(context: T, next: NextFunction<T>): Promise<T> {
+    apply(context: TContext, next: NextFunction<TContext>): TContext {
         if (this.isBefore) {
             const updatedContext = this.operation(context);
-            return await next(updatedContext);
+            return next(updatedContext);
         } else {
-            const updatedContext = await next(context);
+            const updatedContext = next(context);
             return this.operation(updatedContext);
         }
     }

@@ -1,4 +1,4 @@
-import { ApplyFunction, AsyncMiddleware } from './middleware';
+import { ApplyFunction, Middleware } from './middleware';
 import { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
 
@@ -7,7 +7,9 @@ export type EffectContext = Player;
 /**
  * Effect is the influence resulting from player's character ability. Effect can impact either the state of the game or players.
  */
-export abstract class Effect<T = EffectContext> implements AsyncMiddleware<T> {
+export abstract class Effect<TContext = EffectContext>
+    implements Middleware<TContext>
+{
     protected _active = true;
 
     get active(): boolean {
@@ -40,7 +42,7 @@ export abstract class Effect<T = EffectContext> implements AsyncMiddleware<T> {
         return false;
     }
 
-    abstract apply: ApplyFunction<T>;
+    abstract apply: ApplyFunction<TContext>;
 
     abstract toString(): string;
 
