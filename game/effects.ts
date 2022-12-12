@@ -1,13 +1,16 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator } from './collections';
-import { Effect, EffectContext } from './effect';
+import { Effect, EffectContext, EffectTarget } from './effect';
 import { EffectPrecedence } from './effectprecedence';
 import { Pipeline } from './middleware';
 
-export class Effects<TContext = EffectContext> extends Pipeline<TContext> {
-    protected effectToPriority: Map<Effect<TContext>, number>;
+export class Effects<TTarget extends object = EffectTarget> extends Pipeline<
+    EffectContext<TTarget>,
+    Effect<TTarget>
+> {
+    protected effectToPriority: Map<Effect<TTarget>, number>;
 
-    protected hierarchy: OrderedMap<number, LinkList<Effect<TContext>>>;
+    protected hierarchy: OrderedMap<number, LinkList<Effect<TTarget>>>;
 
     get size(): number {
         return this.effectToPriority.size;
@@ -15,8 +18,8 @@ export class Effects<TContext = EffectContext> extends Pipeline<TContext> {
 
     constructor() {
         super([]);
-        this.effectToPriority = new Map<Effect<TContext>, number>();
-        this.hierarchy = new OrderedMap<number, LinkList<Effect<TContext>>>(
+        this.effectToPriority = new Map<Effect<TTarget>, number>();
+        this.hierarchy = new OrderedMap<number, LinkList<Effect<TTarget>>>(
             [],
             (priority, otherPriority) => otherPriority - priority
         );
@@ -34,25 +37,25 @@ export class Effects<TContext = EffectContext> extends Pipeline<TContext> {
         }
     }
 
-    add(effect: Effect<TContext>) {
+    add(effect: Effect<TTarget>) {
         const priority = EffectPrecedence.getPriority(effect);
         this.effectToPriority.set(effect, priority);
 
         let samePriorityEffects = this.hierarchy.getElementByKey(priority);
 
         if (samePriorityEffects === undefined) {
-            samePriorityEffects = new LinkList<Effect<TContext>>();
+            samePriorityEffects = new LinkList<Effect<TTarget>>();
             this.hierarchy.setElement(priority, samePriorityEffects);
         }
 
         samePriorityEffects.pushBack(effect);
     }
 
-    has(effect: Effect<TContext>): boolean {
+    has(effect: Effect<TTarget>): boolean {
         return this.effectToPriority.has(effect);
     }
 
-    delete(effect: Effect<TContext>): boolean {
+    delete(effect: Effect<TTarget>): boolean {
         const priority = this.effectToPriority.get(effect);
 
         if (priority === undefined) {
@@ -71,8 +74,8 @@ export class Effects<TContext = EffectContext> extends Pipeline<TContext> {
     }
 
     protected getApplicableMiddlewares(
-        _context: TContext
-    ): Array<Effect<TContext>> {
+        _context: EffectContext<TTarget>
+    ): Array<Effect<TTarget>> {
         return Array.from(Generator.filter((effect) => effect.active, this));
     }
 }

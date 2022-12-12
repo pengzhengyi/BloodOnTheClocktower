@@ -2,9 +2,9 @@ import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue } from './common';
 import { Effect } from '~/game/effect';
 
-export function mockEffect() {
-    return mock<Effect>();
+export function mockEffect<TTarget extends object>() {
+    return mock<Effect<TTarget>>();
 }
-export function mockInactiveEffect(): Effect {
+export function mockInactiveEffect<TTarget extends object>(): Effect<TTarget> {
     return mockWithPropertyValue('active', false);
 }

@@ -9,14 +9,17 @@ jest.mock('~/game/effectprecedence', () => ({
 
 import { Effect } from '~/game/effect';
 import { Effects } from '~/game/effects';
+import { ProxyMiddlewareContext } from '~/game/proxymiddleware';
 import { mockEffect, mockInactiveEffect } from '~/__mocks__/effect';
 import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
 
-function createEffects(effectToPriority: Map<Effect, number>): Effects {
-    const effects = new Effects();
+function createEffects<TTarget extends object>(
+    effectToPriority: Map<Effect<TTarget>, number>
+): Effects<TTarget> {
+    const effects: Effects<TTarget> = new Effects();
 
     getPriorityMock.mockImplementation(
-        (effect: Effect) => effectToPriority.get(effect) || 0
+        (effect: Effect<TTarget>) => effectToPriority.get(effect) || 0
     );
 
     for (const effect of effectToPriority.keys()) {
@@ -27,6 +30,21 @@ function createEffects(effectToPriority: Map<Effect, number>): Effects {
     getPriorityMock.mockReset();
 
     return effects;
+}
+
+function createBasicContext<TTarget extends object>(
+    target: TTarget,
+    trap = 'get',
+    args = []
+): ProxyMiddlewareContext<TTarget> {
+    return {
+        request: {
+            trap,
+            target,
+            args,
+        },
+        target,
+    };
 }
 
 describe('Test Effects basic functionalities', () => {
@@ -94,8 +112,9 @@ describe('Test Effects edge cases', () => {
     test('apply with no effect', async () => {
         const effects = new Effects();
         const player = mockPlayer();
-        const result = await effects.apply(player);
-        expect(result).toBe(player);
+        const basicContext = createBasicContext(player);
+        const result = await effects.apply(basicContext);
+        expect(result).toBe(basicContext);
     });
 
     test('apply when there is an effect with empty apply', async () => {
@@ -104,7 +123,7 @@ describe('Test Effects edge cases', () => {
 
         const effects = createEffects(effectToPriority);
         const player = await createBasicPlayer();
-        const result = await effects.apply(player);
+        const result = await effects.apply(createBasicContext(player));
         expect(result).toBeUndefined();
     });
 });

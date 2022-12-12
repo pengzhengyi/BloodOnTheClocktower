@@ -1,13 +1,15 @@
-import { Effect, EffectContext } from './effect';
+import { Effect } from './effect';
 
 export abstract class EffectPrecedence {
-    static getPriority<T = EffectContext>(_effect: Effect<T>): number {
+    static getPriority<TTarget extends object>(
+        _effect: Effect<TTarget>
+    ): number {
         return 0;
     }
 
-    static compare<T = EffectContext>(
-        _effect: Effect<T>,
-        _otherEffect: Effect<T>
+    static compare<TTarget extends object>(
+        _effect: Effect<TTarget>,
+        _otherEffect: Effect<TTarget>
     ): number {
         return 0;
     }

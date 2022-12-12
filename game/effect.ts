@@ -1,14 +1,21 @@
-import { ApplyFunction, Middleware } from './middleware';
+import { ApplyFunction } from './middleware';
 import { Player } from './player';
+import {
+    ProxyHandlerRequest,
+    ProxyMiddleware,
+    ProxyMiddlewareContext,
+} from './proxymiddleware';
 import { GAME_UI } from '~/interaction/gameui';
 
-export type EffectContext = Player;
+export type EffectTarget = Player | object;
+export type EffectContext<TTarget extends object = EffectTarget> =
+    ProxyMiddlewareContext<TTarget>;
 
 /**
  * Effect is the influence resulting from player's character ability. Effect can impact either the state of the game or players.
  */
-export abstract class Effect<TContext = EffectContext>
-    implements Middleware<TContext>
+export abstract class Effect<TTarget extends object = EffectTarget>
+    implements ProxyMiddleware<TTarget>
 {
     protected _active = true;
 
@@ -42,7 +49,9 @@ export abstract class Effect<TContext = EffectContext>
         return false;
     }
 
-    abstract apply: ApplyFunction<TContext>;
+    abstract apply: ApplyFunction<EffectContext<TTarget>>;
+
+    abstract isApplicable(_request: ProxyHandlerRequest<TTarget>): boolean;
 
     abstract toString(): string;
 
