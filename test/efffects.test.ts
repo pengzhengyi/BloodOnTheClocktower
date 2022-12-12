@@ -58,7 +58,7 @@ describe('Test Effects basic functionalities', () => {
         const effect5 = mockApplicableEffect();
         const effect6 = mockApplicableEffect();
 
-        const effectToPriority = new Map<Effect, number>([
+        const effectToPriority = new Map<Effect<object>, number>([
             [effect1, 1],
             [effect2, 1],
             [effect3, 3],
@@ -91,7 +91,7 @@ describe('Test Effects basic functionalities', () => {
         const effect5 = mockInapplicableEffect();
         const effect6 = mockInapplicableEffect();
 
-        const effectToPriority = new Map<Effect, number>([
+        const effectToPriority = new Map<Effect<object>, number>([
             [effect1, 1],
             [effect2, 1],
             [effect3, 3],
@@ -121,7 +121,7 @@ describe('Test Effects edge cases', () => {
 
     test('apply when there is an effect with empty apply', async () => {
         const effect = mockApplicableEffect();
-        const effectToPriority = new Map<Effect, number>([[effect, 1]]);
+        const effectToPriority = new Map<Effect<object>, number>([[effect, 1]]);
 
         const effects = createEffects(effectToPriority);
         const player = await createBasicPlayer();

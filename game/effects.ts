@@ -1,10 +1,10 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator } from './collections';
-import { Effect, EffectContext, EffectTarget } from './effect';
+import { Effect, EffectContext } from './effect';
 import { EffectPrecedence } from './effectprecedence';
 import { Pipeline } from './middleware';
 
-export class Effects<TTarget extends object = EffectTarget> extends Pipeline<
+export class Effects<TTarget extends object> extends Pipeline<
     EffectContext<TTarget>,
     Effect<TTarget>
 > {

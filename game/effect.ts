@@ -1,16 +1,14 @@
 import { ApplyFunction } from './middleware';
-import { Player } from './player';
 import { ProxyMiddleware, ProxyMiddlewareContext } from './proxymiddleware';
 import { GAME_UI } from '~/interaction/gameui';
 
-export type EffectTarget = Player | object;
-export type EffectContext<TTarget extends object = EffectTarget> =
+export type EffectContext<TTarget extends object> =
     ProxyMiddlewareContext<TTarget>;
 
 /**
  * Effect is the influence resulting from player's character ability. Effect can impact either the state of the game or players.
  */
-export abstract class Effect<TTarget extends object = EffectTarget>
+export abstract class Effect<TTarget extends object>
     implements ProxyMiddleware<TTarget>
 {
     protected _active = true;
