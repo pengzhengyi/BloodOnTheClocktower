@@ -74,8 +74,10 @@ export class Effects<TTarget extends object = EffectTarget> extends Pipeline<
     }
 
     protected getApplicableMiddlewares(
-        _context: EffectContext<TTarget>
+        context: EffectContext<TTarget>
     ): Array<Effect<TTarget>> {
-        return Array.from(Generator.filter((effect) => effect.active, this));
+        return Array.from(
+            Generator.filter((effect) => effect.isApplicable(context), this)
+        );
     }
 }

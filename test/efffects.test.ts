@@ -10,7 +10,10 @@ jest.mock('~/game/effectprecedence', () => ({
 import { Effect } from '~/game/effect';
 import { Effects } from '~/game/effects';
 import { ProxyMiddlewareContext } from '~/game/proxymiddleware';
-import { mockEffect, mockInactiveEffect } from '~/__mocks__/effect';
+import {
+    mockApplicableEffect,
+    mockInapplicableEffect,
+} from '~/__mocks__/effect';
 import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
 
 function createEffects<TTarget extends object>(
@@ -49,12 +52,12 @@ function createBasicContext<TTarget extends object>(
 
 describe('Test Effects basic functionalities', () => {
     test('iteration order', () => {
-        const effect1 = mockEffect();
-        const effect2 = mockEffect();
-        const effect3 = mockEffect();
-        const effect4 = mockEffect();
-        const effect5 = mockEffect();
-        const effect6 = mockEffect();
+        const effect1 = mockApplicableEffect();
+        const effect2 = mockApplicableEffect();
+        const effect3 = mockApplicableEffect();
+        const effect4 = mockApplicableEffect();
+        const effect5 = mockApplicableEffect();
+        const effect6 = mockApplicableEffect();
 
         const effectToPriority = new Map<Effect, number>([
             [effect1, 1],
@@ -82,12 +85,12 @@ describe('Test Effects basic functionalities', () => {
     });
 
     test('active effects only', () => {
-        const effect1 = mockEffect();
-        const effect2 = mockEffect();
-        const effect3 = mockEffect();
-        const effect4 = mockInactiveEffect();
-        const effect5 = mockInactiveEffect();
-        const effect6 = mockInactiveEffect();
+        const effect1 = mockApplicableEffect();
+        const effect2 = mockApplicableEffect();
+        const effect3 = mockApplicableEffect();
+        const effect4 = mockInapplicableEffect();
+        const effect5 = mockInapplicableEffect();
+        const effect6 = mockInapplicableEffect();
 
         const effectToPriority = new Map<Effect, number>([
             [effect1, 1],
@@ -118,7 +121,7 @@ describe('Test Effects edge cases', () => {
     });
 
     test('apply when there is an effect with empty apply', async () => {
-        const effect = mockEffect();
+        const effect = mockApplicableEffect();
         const effectToPriority = new Map<Effect, number>([[effect, 1]]);
 
         const effects = createEffects(effectToPriority);

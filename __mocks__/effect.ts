@@ -2,9 +2,17 @@ import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue } from './common';
 import { Effect } from '~/game/effect';
 
-export function mockEffect<TTarget extends object>() {
-    return mock<Effect<TTarget>>();
+export function mockApplicableEffect<TTarget extends object>() {
+    const effect = mock<Effect<TTarget>>();
+    effect.isApplicable.mockReturnValue(true);
+    return effect;
 }
-export function mockInactiveEffect<TTarget extends object>(): Effect<TTarget> {
-    return mockWithPropertyValue('active', false);
+export function mockInapplicableEffect<
+    TTarget extends object
+>(): Effect<TTarget> {
+    const effect: Effect<TTarget> = mockWithPropertyValue('active', false);
+
+    (effect.isApplicable as any).mockReturnValue(false);
+
+    return effect;
 }

@@ -1,10 +1,6 @@
 import { ApplyFunction } from './middleware';
 import { Player } from './player';
-import {
-    ProxyHandlerRequest,
-    ProxyMiddleware,
-    ProxyMiddlewareContext,
-} from './proxymiddleware';
+import { ProxyMiddleware, ProxyMiddlewareContext } from './proxymiddleware';
 import { GAME_UI } from '~/interaction/gameui';
 
 export type EffectTarget = Player | object;
@@ -49,9 +45,11 @@ export abstract class Effect<TTarget extends object = EffectTarget>
         return false;
     }
 
-    abstract apply: ApplyFunction<EffectContext<TTarget>>;
+    isApplicable(_context: EffectContext<TTarget>): boolean {
+        return this.active;
+    }
 
-    abstract isApplicable(_request: ProxyHandlerRequest<TTarget>): boolean;
+    abstract apply: ApplyFunction<EffectContext<TTarget>>;
 
     abstract toString(): string;
 
