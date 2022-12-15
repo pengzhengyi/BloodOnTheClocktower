@@ -1,5 +1,4 @@
 import { Clocktower } from './clocktower';
-import { GamePhase } from './gamephase';
 import { Seating } from './seating';
 
 /**
@@ -7,7 +6,6 @@ import { Seating } from './seating';
  * The grey cardboard sheet in the center of the seats. The Town Square has the player's life tokens and vote tokens on it, and the Traveller sheet under it.
  */
 export class TownSquare {
-    readonly gamePhase: GamePhase = GamePhase.setup();
     readonly clockTower: Clocktower = new Clocktower();
 
     constructor(readonly seating: Seating) {

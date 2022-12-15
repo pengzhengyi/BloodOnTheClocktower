@@ -1,12 +1,12 @@
-import type { Dayjs } from 'dayjs';
-import { StackFrame, fromError } from 'stacktrace-js';
+import { Dayjs } from 'dayjs';
+import { fromError, StackFrame } from 'stacktrace-js';
+import { CharacterAct } from './characteract';
 import type { Nomination } from './nomination';
 import type { Exile } from './exile';
 import type { Vote } from './vote';
 import type { Predicate, RoleData } from './types';
 import type { Player } from './player';
 import type { Seat } from './seat';
-import type { Meaning } from './clocktower';
 import type { Character } from './character';
 import type { StoryTeller } from './storyteller';
 import type {
@@ -22,10 +22,11 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import { CharacterAct } from './characteract';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
+import type { ITask } from './proxymiddleware';
+import type { Diary, Event as ClocktowerEvent } from './clocktower';
 import { GAME_UI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
@@ -339,22 +340,6 @@ export class PlayerNoAliveNeighbors extends PlayerNoNeighbors {
     }
 }
 
-export class PastMomentRewrite extends RecoverableGameError {
-    static description = "Attempt to rewrite a past event's moment";
-
-    constructor(
-        readonly meaning: Meaning,
-        readonly recordedTimestamp: Dayjs,
-        readonly newTimestamp: Dayjs
-    ) {
-        super(PastMomentRewrite.description);
-
-        this.meaning = meaning;
-        this.recordedTimestamp = recordedTimestamp;
-        this.newTimestamp = newTimestamp;
-    }
-}
-
 export class ExileNonTraveller extends RecoverableGameError {
     static description = 'Cannot exile an non-traveller';
 
@@ -618,5 +603,51 @@ export class NoPlayerForCharacterAct extends RecoverableGameError {
         super(NoPlayerForCharacterAct.description);
 
         this.characterAct = characterAct;
+    }
+}
+
+export class DifferentTaskCompleted<TTarget> extends RecoverableGameError {
+    static description = 'A different task was completed than the one expected';
+
+    constructor(
+        readonly expectedTask: ITask<TTarget>,
+        readonly completedTask: ITask<TTarget>
+    ) {
+        super(DifferentTaskCompleted.description);
+    }
+}
+
+export class NoTaskCompleted<TTarget> extends RecoverableGameError {
+    static description = 'Expected one task to complete when none was found';
+
+    constructor(readonly expectedTask: ITask<TTarget>) {
+        super(NoTaskCompleted.description);
+    }
+}
+
+export class RecallFutureDate extends RecoverableGameError {
+    static description =
+        'Trying to recall a future date not experienced in game';
+
+    constructor(readonly requestedDate: number, readonly furthestDate: number) {
+        super(RecallFutureDate.description);
+    }
+}
+
+export class PastMomentRewrite extends RecoverableGameError {
+    static description = "Attempt to rewrite a past event's moment";
+
+    constructor(
+        readonly diary: Diary,
+        readonly event: ClocktowerEvent,
+        readonly recordedTimestamp: Dayjs,
+        readonly newTimestamp: Dayjs
+    ) {
+        super(PastMomentRewrite.description);
+
+        this.diary = diary;
+        this.event = event;
+        this.recordedTimestamp = recordedTimestamp;
+        this.newTimestamp = newTimestamp;
     }
 }
