@@ -34,6 +34,10 @@ export class Players extends Generator<Player> {
         this.players = players;
     }
 
+    modify(modification: (players: Array<Player>) => void) {
+        modification(this.players);
+    }
+
     filterById(playerId: string) {
         return this.filter((player) => player.id === playerId);
     }
