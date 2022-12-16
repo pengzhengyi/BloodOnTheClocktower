@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import 'reflect-metadata';
 import { v4 as uuid } from 'uuid';
@@ -5,6 +6,8 @@ import { Alignment } from './alignment';
 import { Character } from './character';
 import { CharacterAct } from './characteract';
 import { DeadReason } from './deadreason';
+import { Effects } from './effects';
+import { EffectTarget } from './effecttarget';
 import { InfoRequester } from './info';
 import { Nomination } from './nomination';
 
@@ -17,7 +20,6 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import { Generator } from './collections';
 import {
     DeadPlayerCannotNominate,
     PlayerHasUnclearAlignment,
@@ -57,23 +59,38 @@ enum NegativeState {
  * Any person who has an in-play character, not including the Storyteller.
  */
 @Exclude()
-export class Player {
+export class Player extends EffectTarget<Player> {
     static reasonForReclaimDeadPlayerVote =
         'Dead players may only vote once more during the game.';
 
     static revokeVoteTokenDefaultPrompt = 'Revoke vote token for player: ';
 
+    protected static defaultEnabledProxyHandlerPropertyNames: Array<
+        keyof ProxyHandler<Player>
+    > = ['get'];
+
     static async init(
         username: string,
         character: typeof Character,
         alignment?: Alignment,
-        id?: string
+        id?: string,
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
     ) {
         if (id === undefined) {
             id = uuid();
         }
 
-        const player = new this(id, username, character);
+        if (enabledProxyHandlerPropertyNames === undefined) {
+            enabledProxyHandlerPropertyNames =
+                this.defaultEnabledProxyHandlerPropertyNames;
+        }
+
+        const player = new this(
+            id,
+            username,
+            character,
+            enabledProxyHandlerPropertyNames
+        );
         await player.initializeAlignment(alignment);
         return player;
     }
@@ -93,22 +110,14 @@ export class Player {
         }
     }
 
-    /**
-     * {@link `glossary["Team"]`}
-     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
-     *
-     * @param players Players to find teammates in.
-     */
-    static getTeam(players: Iterable<Player>): Map<Alignment, Array<Player>> {
-        return Generator.groupBy(players, (player) => player.alignment);
-    }
-
     static isCharacterType(
         player: Player,
         characterType: typeof CharacterType
     ): boolean {
         return Object.is(player.characterType, characterType);
     }
+
+    readonly _effects: Effects<Player> = new Effects();
 
     @Expose({ toPlainOnly: true })
     declare alignment: Alignment;
@@ -276,11 +285,14 @@ export class Player {
     protected constructor(
         id: string,
         username: string,
-        character: typeof Character
+        character: typeof Character,
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
     ) {
+        super(enabledProxyHandlerPropertyNames);
         this.id = id;
         this.username = username;
         this.initializeCharacter(character);
+        this.initializeEffects();
     }
 
     async setDead(reason: DeadReason = DeadReason.Other): Promise<boolean> {
@@ -369,6 +381,10 @@ export class Player {
         this.character = character;
         this.characterActs = CharacterAct.fromPlayer(this)[0];
         this.infoRequester = InfoRequester.of(this);
+    }
+
+    protected initializeEffects() {
+        // TODO
     }
 
     protected async initializeAlignment(alignment?: Alignment) {

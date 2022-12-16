@@ -7,11 +7,12 @@ import { Players } from './players';
  * The box that stores the Clocktower pieces, held and updated by the Storyteller. Players cannot look in the Grimoire. The Grimoire shows the actual states of all the characters, such as who is alive or dead, who is poisoned, who is acting at night, etc.
  */
 export class Grimoire {
-    private _players: Array<Player> = [];
+    private _players!: Players;
+
     charactersInPlay: Set<Character> = new Set();
 
     get players(): Players {
-        return new Players(this._players);
+        return this._players.reset();
     }
 
     constructor(players: Iterable<Player>) {
@@ -36,12 +37,14 @@ export class Grimoire {
     }
 
     protected initialize(players: Iterable<Player>) {
-        this._players = [];
+        const _players = [];
         this.charactersInPlay.clear();
 
         for (const player of players) {
-            this._players.push(player);
+            _players.push(player);
             this.charactersInPlay.add(player.character);
         }
+
+        this._players = new Players(_players);
     }
 }

@@ -9,8 +9,6 @@ import type { GamePhase } from './gamephase';
 import { Transform } from './types';
 import { Game } from './game';
 
-type UnderlyingPlayers = Array<Player>;
-
 export class GameInfo {
     execution?: Execution;
 
@@ -20,12 +18,12 @@ export class GameInfo {
 
     readonly game: Game;
 
-    protected readonly playerIdToInfluencedPlayer: Map<string, Player>;
+    protected readonly playerIdToPlayer: Map<string, Player>;
 
-    private _players: UnderlyingPlayers;
+    private _players: Players;
 
     get players(): Players {
-        return new Players(this._players, [], false);
+        return this._players.reset();
     }
 
     get executed(): Player | undefined {
@@ -38,15 +36,15 @@ export class GameInfo {
     }
 
     constructor(
-        players: UnderlyingPlayers,
+        players: Array<Player>,
         characterSheet: CharacterSheet,
         gamePhase: GamePhase,
         game: Game,
         execution?: Execution
     ) {
-        this._players = players;
+        this._players = new Players(players);
         this.characterSheet = characterSheet;
-        this.playerIdToInfluencedPlayer = new Map(
+        this.playerIdToPlayer = new Map(
             Generator.map((player) => [player.id, player], players)
         );
         this.gamePhase = gamePhase;
@@ -78,9 +76,9 @@ export class GameInfo {
         }
 
         if (player instanceof Player) {
-            return this.playerIdToInfluencedPlayer.get(player.id);
+            return this.playerIdToPlayer.get(player.id);
         } else {
-            return this.playerIdToInfluencedPlayer.get(player);
+            return this.playerIdToPlayer.get(player);
         }
     }
 
@@ -91,7 +89,7 @@ export class GameInfo {
 
     replace(
         changes: Partial<{
-            players: UnderlyingPlayers;
+            players: Array<Player>;
             characterSheet: CharacterSheet;
             gamePhase: GamePhase;
             game: Game;

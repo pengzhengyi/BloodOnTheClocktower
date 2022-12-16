@@ -545,6 +545,8 @@ export class Generator<T> implements Iterable<T> {
 
     cached?: Array<T>;
 
+    private initialIterable: Iterable<T>;
+
     *[Symbol.iterator]() {
         const supportMultipleIterations = this.supportMultipleIterations;
         if (this.cached === undefined) {
@@ -574,9 +576,24 @@ export class Generator<T> implements Iterable<T> {
         public transforms: Array<Transform<Iterable<T>>> = [],
         readonly supportMultipleIterations: boolean = true
     ) {
+        this.initialIterable = iterable;
         this.iterable = iterable;
         this.transforms = transforms;
         this.supportMultipleIterations = supportMultipleIterations;
+    }
+
+    /**
+     * Reset intends to un-apply all transforms so that the original iterable will directly be iterated.
+     *
+     * ! However, reset does not work in every scenario. For example, if the original iterable can only be iterated once and is currently iterated, reset will not restore it to before-iterated state.
+     *
+     * @returns Current generator with all transforms reset.
+     */
+    reset(): this {
+        this.iterable = this.initialIterable;
+        this.transforms = [];
+        this.cached = undefined;
+        return this;
     }
 
     transform(transform: Transform<Iterable<T>>) {

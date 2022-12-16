@@ -1,9 +1,14 @@
+import type { Alignment } from './alignment';
 import { CharacterType } from './charactertype';
 import { Generator } from './collections';
 import { PlayerNotSat } from './exception';
 import { Player } from './player';
 
 export class Players extends Generator<Player> {
+    static of(...players: Array<Player>) {
+        return new this(players);
+    }
+
     static alGood(iterable: Iterable<Player>): boolean {
         return Generator.every((player) => player.isGood, iterable);
     }
@@ -12,7 +17,28 @@ export class Players extends Generator<Player> {
         return Generator.every((player) => player.isEvil, iterable);
     }
 
-    findById(playerIds: Set<string>) {
+    /**
+     * {@link `glossary["Team"]`}
+     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
+     *
+     * @param players Players to find teammates in.
+     */
+    static getTeam(players: Iterable<Player>): Map<Alignment, Array<Player>> {
+        return Generator.groupBy(players, (player) => player.alignment);
+    }
+
+    protected readonly players: Array<Player>;
+
+    constructor(players: Array<Player>) {
+        super(players, [], false);
+        this.players = players;
+    }
+
+    filterById(playerId: string) {
+        return this.filter((player) => player.id === playerId);
+    }
+
+    filterByIds(playerIds: Set<string>) {
         if (playerIds.size === 0) {
             return Players.empty() as Players;
         }
@@ -20,7 +46,7 @@ export class Players extends Generator<Player> {
         return this.filter((player) => playerIds.has(player.id));
     }
 
-    intersect(players: Iterable<Player>) {
+    intersect(players?: Iterable<Player>) {
         if (players === undefined) {
             return Players.empty() as Players;
         }
@@ -28,7 +54,8 @@ export class Players extends Generator<Player> {
         const playerIds = new Set(
             Generator.map((player) => player.id, players)
         );
-        return this.findById(playerIds);
+
+        return this.filterByIds(playerIds);
     }
 
     isMinion() {
@@ -57,7 +84,7 @@ export class Players extends Generator<Player> {
         );
     }
 
-    async *getNeighbors() {
+    async *getNeighbors(): AsyncGenerator<[Player, Player]> {
         const reorderedPlayers: Array<Player> = [];
 
         for (const player of this) {
