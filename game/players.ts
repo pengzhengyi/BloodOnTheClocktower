@@ -29,6 +29,10 @@ export class Players extends Generator<Player> {
 
     protected readonly players: Array<Player>;
 
+    get length(): number {
+        return this.players.length;
+    }
+
     constructor(players: Array<Player>) {
         super(players, [], false);
         this.players = players;
