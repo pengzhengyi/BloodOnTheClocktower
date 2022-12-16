@@ -70,3 +70,20 @@ export function lowercaseLetters(s: string) {
 export function randomChoice<T>(elements: Array<T>): T {
     return elements[Math.floor(Math.random() * elements.length)];
 }
+
+export function shuffle<T>(elements: Iterable<T>): Array<T> {
+    const elementsWithPriority: Array<{ value: T; priority: number }> = [];
+
+    for (const value of elements) {
+        elementsWithPriority.push({
+            value,
+            priority: Math.random(),
+        });
+    }
+
+    elementsWithPriority.sort(
+        (elementWithPriority, otherElementWithPriority) =>
+            elementWithPriority.priority - otherElementWithPriority.priority
+    );
+    return elementsWithPriority.map(({ value }) => value);
+}

@@ -1,4 +1,4 @@
-import { clockwise, counterclockwise } from '~/game/common';
+import { clockwise, counterclockwise, shuffle } from '~/game/common';
 
 describe('test clockwise', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
@@ -74,5 +74,14 @@ describe('test counterclockwise', () => {
             'Bob',
             'Alice',
         ]);
+    });
+});
+
+describe('test shuffle', () => {
+    test.concurrent('random shuffle an array', () => {
+        const elements = [1, 2, 3, 4, 5];
+        const shuffled = shuffle(elements);
+
+        expect(elements).toIncludeAllMembers(shuffled);
     });
 });
