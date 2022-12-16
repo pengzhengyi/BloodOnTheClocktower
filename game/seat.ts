@@ -62,7 +62,7 @@ export class Seat {
                 this.formatPromptForRemovePlayer(satPlayer)
             ))
         ) {
-            satPlayer.seatNumber = 0;
+            satPlayer.seatNumber = undefined;
             this.player = undefined;
             return satPlayer;
         }
