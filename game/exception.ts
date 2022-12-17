@@ -309,6 +309,17 @@ export class InvalidPlayerToSit extends RecoverableGameError {
     }
 }
 
+export class AccessInvalidSeatPosition extends RecoverableGameError {
+    static description = 'Cannot get seat for an invalid position';
+
+    constructor(readonly position: number, readonly seating: Seating) {
+        super(AccessInvalidSeatPosition.description);
+
+        this.position = position;
+        this.seating = seating;
+    }
+}
+
 export class PlayerNoNeighbors extends RecoverableGameError {
     static description =
         'Cannot get two players that sitting nearest to the player';

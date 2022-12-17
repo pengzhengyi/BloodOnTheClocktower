@@ -1,15 +1,64 @@
 import { Generator } from './collections';
-import { clockwise, counterclockwise } from './common';
+import { clockwise, counterclockwise, shuffle } from './common';
+import { Player } from './player';
+import { Players } from './players';
+import { Seat } from './seat';
+import { Direction, Predicate, TAUTOLOGY } from './types';
 import {
+    AccessInvalidSeatPosition,
     NumberOfSeatNotPositive,
     PlayerNoAliveNeighbors,
     PlayerNoNeighbors,
     PlayerNotSat,
     UnexpectedEmptySeat,
 } from './exception';
-import { Player } from './player';
-import { Seat } from './seat';
-import { Direction, Predicate, TAUTOLOGY } from './types';
+import { GAME_UI } from '~/interaction/gameui';
+
+export interface SyncResult {
+    occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;
+    assignedPlayerMismatchUnoccupiedSeats: Set<Player>;
+}
+
+export class SeatAssignment {
+    unoccupied: Set<Seat> = new Set();
+
+    unassigned: Set<Player> = new Set();
+
+    occupied: Set<Seat> = new Set();
+
+    assigned: Set<Player> = new Set();
+
+    constructor(seats: Iterable<Seat>, players: Iterable<Player>) {
+        this.getSeatAssignment(seats, players);
+    }
+
+    protected getSeatAssignment(
+        seats: Iterable<Seat>,
+        players: Iterable<Player>
+    ) {
+        for (const seat of seats) {
+            if (seat.isEmpty) {
+                this.unoccupied.add(seat);
+            } else {
+                this.occupied.add(seat);
+                this.assigned.add(seat.player!);
+            }
+        }
+
+        for (const player of players) {
+            if (!this.assigned.has(player)) {
+                this.unassigned.add(player);
+            }
+        }
+    }
+}
+
+export enum SeatAssignmentMode {
+    NaturalInsert = 0,
+    RandomInsert = 1,
+    NaturalOverwrite = 2,
+    RandomOverwrite = 3,
+}
 
 export class Seating {
     /**
@@ -84,6 +133,18 @@ export class Seating {
 
     protected constructor(public readonly seats: Array<Seat>) {
         this.seats = seats;
+    }
+
+    [Symbol.iterator]() {
+        return this.seats[Symbol.iterator]();
+    }
+
+    getSeat(position: number): Seat {
+        if (position < 0 || position > this.numSeats) {
+            throw new AccessInvalidSeatPosition(position, this);
+        }
+
+        return this.seats[position];
     }
 
     async *sit(players: Iterable<Player>): AsyncGenerator<boolean> {
@@ -302,6 +363,122 @@ export class Seating {
         }
     }
 
+    async assign(
+        players: Players | Array<Player>,
+        seatAssignmentMode: SeatAssignmentMode
+    ): Promise<void> {
+        await this.fit(players.length);
+
+        let unoccupied: Iterable<Seat>;
+        let unassigned: Iterable<Player>;
+
+        if (seatAssignmentMode < SeatAssignmentMode.NaturalOverwrite) {
+            await this.sync(players);
+
+            unoccupied = Generator.filter((seat) => seat.isEmpty, this.seats);
+
+            unassigned = Generator.filter(
+                (player) => player.seatNumber === undefined,
+                players
+            );
+        } else {
+            unoccupied = this.seats;
+            unassigned = players;
+        }
+
+        await this.assignPlayersToSeats(
+            unassigned,
+            unoccupied,
+            seatAssignmentMode === SeatAssignmentMode.RandomInsert ||
+                seatAssignmentMode === SeatAssignmentMode.RandomOverwrite
+        );
+    }
+
+    protected async assignPlayersToSeats(
+        unassigned: Iterable<Player>,
+        unoccupied: Iterable<Seat>,
+        shouldRandomlyAssign: boolean
+    ): Promise<void> {
+        let unassignedPlayers: Iterable<Player>;
+
+        if (shouldRandomlyAssign) {
+            unassignedPlayers = shuffle(unassigned);
+        } else {
+            unassignedPlayers = unassigned;
+        }
+
+        for (const [unassignedPlayer, unoccupiedSeat] of Generator.pair(
+            unassignedPlayers,
+            unoccupied
+        )) {
+            await unoccupiedSeat.sit(unassignedPlayer);
+        }
+    }
+
+    /**
+     * Sync players' seat assignment with seats' occupancy.
+     *
+     * It will fix the following mismatch:
+     *
+     * - a player is assigned a seat but the seat appears to be empty (when player is pre-assigned)
+     * - a seat is occupied by a player but the player does not have this seat number assigned (rare, indicates a bug)
+     *
+     * ! It will not handle when a player is assigned a seat which is occupied by a different player.
+     * ! It will throw an error when there are fewer seats than the number of players.
+     *
+     * @param players
+     * @returns
+     */
+    protected async sync(players: Iterable<Player>): Promise<SyncResult> {
+        const occupiedSeatsMismatchUnassignedPlayer = new Set<Seat>();
+        const assignedPlayerMismatchUnoccupiedSeats = new Set<Player>();
+
+        for (const player of players) {
+            if (player.seatNumber !== undefined) {
+                const matchingSeat = this.getSeat(player.seatNumber);
+
+                if (matchingSeat.isEmpty) {
+                    assignedPlayerMismatchUnoccupiedSeats.add(player);
+                    await matchingSeat.sit(player);
+                }
+            }
+        }
+
+        for (const seat of this) {
+            if (seat.isOccupied && seat.player!.seatNumber === undefined) {
+                occupiedSeatsMismatchUnassignedPlayer.add(seat);
+                seat.player!.seatNumber = seat.position;
+            }
+        }
+
+        return {
+            occupiedSeatsMismatchUnassignedPlayer,
+            assignedPlayerMismatchUnoccupiedSeats,
+        };
+    }
+
+    /**
+     * Try to increase number of seats to accommodate all the players when necessary.
+     * @param numPlayers Number of players should fit.
+     * @returns Whether the number of seats can fit all players.
+     */
+    protected async fit(numPlayers: number): Promise<boolean> {
+        if (numPlayers <= this.numSeats) {
+            return true;
+        }
+
+        if (
+            await GAME_UI.storytellerConfirm(
+                this.formatPromptForSeatIncrease(numPlayers)
+            )
+        ) {
+            await this.changeNumSeats(numPlayers);
+            return true;
+        }
+
+        return false;
+    }
+
     protected *iterateSeatsExcludingStart(
         startSeatPosition: number,
         direction: Direction,
@@ -322,5 +499,9 @@ export class Seating {
                 yield neighborSeat;
             }
         }
+    }
+
+    protected formatPromptForSeatIncrease(newSize: number) {
+        return `Increase number of seats to ${newSize} to fit all players`;
     }
 }
