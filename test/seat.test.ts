@@ -10,11 +10,11 @@ beforeAll(() => {
     storytellerConfirmMock.mockImplementation(async () => await true);
 });
 
-describe('Test basic functionalities', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+afterAll(() => {
+    storytellerConfirmMock.mockReset();
+});
 
+describe('Test basic functionalities', () => {
     test("remove a player from seat should make the player's assigned seat position undefined", async () => {
         const player = await createBasicPlayer();
         const seat = await Seat.init(5, player);

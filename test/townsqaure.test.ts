@@ -12,14 +12,10 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-    storytellerConfirmMock.mockClear();
+    storytellerConfirmMock.mockReset();
 });
 
 describe('Test basic functionalities', () => {
-    afterEach(() => {
-        storytellerConfirmMock.mockClear();
-    });
-
     test('create equal number of players and seats and then random assign', async () => {
         const numPlayers = 12;
         const players = await createBasicPlayers(numPlayers);

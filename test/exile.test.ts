@@ -28,10 +28,6 @@ async function createExileAndCollectVotes(
 }
 
 describe('Test Exile Edge Cases', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     test('can only exile Traveller', async () => {
         const traveller = await createBasicPlayer(undefined, Scapegoat);
         const townsfolk = await createBasicPlayer(undefined, Washerwoman);
@@ -42,6 +38,7 @@ describe('Test Exile Edge Cases', () => {
             async () => await Exile.init(traveller, townsfolk)
         ).rejects.toThrowError(ExileNonTraveller);
         expect(handleMock).toHaveBeenCalledOnce();
+        handleMock.mockReset();
 
         const playersSupportExile = await createExileAndCollectVotes(
             traveller,

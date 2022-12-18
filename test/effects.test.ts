@@ -29,7 +29,6 @@ function createEffects<TTarget extends object>(
         effects.add(effect);
     }
 
-    getPriorityMock.mockClear();
     getPriorityMock.mockReset();
 
     return effects;

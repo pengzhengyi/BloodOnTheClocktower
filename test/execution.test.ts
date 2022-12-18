@@ -35,6 +35,8 @@ export async function collectVotesForNomination(
         votedPlayers.push(votedPlayer);
     }
 
+    hasRaisedHandForVoteMock.mockClear();
+
     return votedPlayers;
 }
 

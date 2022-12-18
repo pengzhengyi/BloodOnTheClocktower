@@ -17,6 +17,11 @@ import {
 import { Player } from '~/game/player';
 import { Vote } from '~/game/vote';
 
+afterAll(() => {
+    hasRaisedHandForVoteMock.mockReset();
+    storytellerConfirmMock.mockReset();
+});
+
 async function collectVotesForExecution(
     vote: Vote,
     playerToWillRaiseHand: Map<Player, boolean>
@@ -69,10 +74,6 @@ describe('test Vote serialization', () => {
 });
 
 describe('Test Vote Edge Cases', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     test('A dead player may only vote once for the rest of the game.', async () => {
         const nominated1 = mockPlayer();
         const nominated2 = mockPlayer();
@@ -87,8 +88,6 @@ describe('Test Vote Edge Cases', () => {
             [true, true]
         );
         expect(votedPlayers).toEqual([alivePlayer, deadPlayer]);
-
-        hasRaisedHandForVoteMock.mockClear();
 
         const votedPlayersSecondRound = await createVoteAndCollectVotes(
             nominated2,

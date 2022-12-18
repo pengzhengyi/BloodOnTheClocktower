@@ -35,14 +35,10 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-    storytellerConfirmMock.mockClear();
+    storytellerConfirmMock.mockReset();
 });
 
 describe('Test basic functionalities', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     test('Get vote order', async () => {
         const [players, seating] = await createPlayersAndSeating(10);
 
