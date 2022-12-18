@@ -74,6 +74,7 @@
         "whitespaces"
     ],
     "cSpell.ignoreWords": [
+        "Nominateds",
         "effectprecedence",
         "proxied",
         "proxymiddleware",

@@ -26,6 +26,10 @@ export class Execution {
     @Type(() => Nomination)
     readonly nominations: Array<Nomination> = [];
 
+    protected readonly pastNominators: Set<Player> = new Set();
+
+    protected readonly pastNominateds: Set<Player> = new Set();
+
     /**
      * Set the player about to die as the one to be executed.
      *
@@ -129,6 +133,10 @@ export class Execution {
 
         if (checks.every((check) => check)) {
             this.nominations.push(nomination);
+
+            this.pastNominators.add(nomination.nominator);
+            this.pastNominateds.add(nomination.nominated);
+
             return true;
         }
 
@@ -138,10 +146,10 @@ export class Execution {
     private async checkNominatorNotNominatedBefore(
         nomination: Nomination
     ): Promise<boolean> {
-        const pastNomination = this.getPastNomination((pastNomination) =>
-            Object.is(pastNomination.nominator, nomination.nominator)
-        );
-        if (pastNomination !== undefined) {
+        if (this.pastNominators.has(nomination.nominator)) {
+            const pastNomination = this.getPastNomination((pastNomination) =>
+                pastNomination.nominator.equals(nomination.nominator)
+            )!;
             const error = new NominatorNominatedBefore(
                 nomination,
                 pastNomination,
@@ -157,10 +165,10 @@ export class Execution {
     private async checkNominatedNotNominatedBefore(
         nomination: Nomination
     ): Promise<boolean> {
-        const pastNomination = this.getPastNomination((pastNomination) =>
-            Object.is(pastNomination.nominated, nomination.nominated)
-        );
-        if (pastNomination !== undefined) {
+        if (this.pastNominateds.has(nomination.nominated)) {
+            const pastNomination = this.getPastNomination((pastNomination) =>
+                pastNomination.nominated.equals(nomination.nominated)
+            )!;
             const error = new NominatedNominatedBefore(
                 nomination,
                 pastNomination,
