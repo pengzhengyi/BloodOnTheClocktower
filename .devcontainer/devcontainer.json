@@ -35,7 +35,14 @@
         "python.testing.pytestPath": "pytest",
         "python.testing.unittestEnabled": false,
         "python.linting.banditEnabled": true,
-        "python.linting.banditPath": "bandit"
+        "python.linting.banditPath": "bandit",
+        "typescript.extension.sortImports.pathSortOrder": [
+            "package",
+            "relativeDownLevel",
+            "relativeUpLevel"
+        ],
+        "typescript.extension.sortImports.sortMethod": "path",
+        "jest.jestCommandLine": "yarn test --maxWorkers=25%"
     },
 
     // Configure tool-specific properties.
