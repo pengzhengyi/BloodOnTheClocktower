@@ -8,15 +8,8 @@ import { Seating } from '~/game/seating';
 import { createBasicPlayers } from '~/__mocks__/player';
 
 async function createSeating(players: Array<Player>): Promise<Seating> {
-    const numPlayers = players.length;
-    const seating = await Seating.init(numPlayers);
-
-    for await (const hasSat of seating.sit(players)) {
-        expect(hasSat).toBeTrue();
-    }
-
+    const seating = await Seating.from(players);
     expect(seating.allSat).toBeTrue();
-
     return seating;
 }
 

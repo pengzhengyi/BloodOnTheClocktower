@@ -2,6 +2,13 @@ import { InvalidPlayerToSit } from './exception';
 import { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
 
+export interface SitResult {
+    player: Player;
+    // eslint-disable-next-line no-use-before-define
+    seat: Seat;
+    hasSat: boolean;
+}
+
 export class Seat {
     player?: Player;
 
@@ -23,21 +30,29 @@ export class Seat {
         return this.player === undefined;
     }
 
-    async trySit(player: Player): Promise<boolean> {
+    async trySit(player: Player): Promise<SitResult> {
         if (this.isOccupied) {
-            return false;
+            return {
+                player,
+                seat: this,
+                hasSat: false,
+            };
         } else {
             return await this.sit(player);
         }
     }
 
-    async sit(player: Player): Promise<boolean> {
+    async sit(player: Player): Promise<SitResult> {
         if (player === undefined) {
             const error = new InvalidPlayerToSit(player);
             await error.resolve();
 
             if (error.correctedPlayer === undefined) {
-                return false;
+                return {
+                    player,
+                    seat: this,
+                    hasSat: false,
+                };
             }
         }
 
@@ -48,10 +63,18 @@ export class Seat {
         ) {
             this.player = player;
             player.seatNumber = this.position;
-            return true;
+            return {
+                player,
+                seat: this,
+                hasSat: true,
+            };
         }
 
-        return false;
+        return {
+            player,
+            seat: this,
+            hasSat: false,
+        };
     }
 
     async remove(): Promise<Player | undefined> {

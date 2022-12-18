@@ -20,8 +20,7 @@ export class TownSquare {
         seatAssignmentMode: SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
     ) {
         const _players = new Players(players);
-        const seating = await Seating.init(players.length);
-        await seating.assign(players, seatAssignmentMode);
+        const seating = await Seating.from(players, seatAssignmentMode);
         return new this(seating, _players);
     }
 
@@ -80,6 +79,7 @@ export class TownSquare {
         }
         // seat is unoccupied now
 
-        return await seat.trySit(player);
+        const sitResult = await seat.trySit(player);
+        return sitResult.hasSat;
     }
 }
