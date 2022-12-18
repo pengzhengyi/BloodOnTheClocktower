@@ -47,7 +47,7 @@ repos:
 
   # Autoformats python code to a single standard
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
         stages: [commit]
@@ -55,7 +55,7 @@ repos:
 
   # Groups and sorts python imports, see .isort.cfg for configuration
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: v5.11.3
     hooks:
       - id: isort
         stages: [commit]
@@ -80,7 +80,7 @@ repos:
   # Push hooks (runs on push because developers may commit incomplete changes)
   # Python files linter, see .pylintrc for configuration
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.7
+    rev: v2.15.9
     hooks:
       - id: pylint
         stages: [push]
