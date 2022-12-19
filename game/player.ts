@@ -10,6 +10,7 @@ import { Effects } from './effects';
 import { EffectTarget } from './effecttarget';
 import { InfoRequester } from './info';
 import { Nomination } from './nomination';
+import { PlayerState } from './playerstate';
 
 import {
     CharacterType,
@@ -26,33 +27,6 @@ import {
 } from './exception';
 
 import { GAME_UI } from '~/interaction/gameui';
-
-enum NegativeState {
-    None = 0,
-    /**
-     * {@link `glossary["Dead"]`}
-     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
-     */
-    Dead = 1,
-
-    /**
-     * {@link `glossary["Drunk"]`}
-     * A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
-     */
-    Drunk = 1 << 1,
-
-    /**
-     * {@link `glossary["Poisoned"]`}
-     * A poisoned player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Poisoned players do not know they are poisoned. See Drunk.
-     */
-    Poisoned = 1 << 2,
-
-    /**
-     * {@link `glossary["Mad"]`}
-     * A player who is “mad” about something is trying to convince the group that something is true. Some players are instructed to be mad about something - if the Storyteller thinks that a player has not put effort to convince the group of the thing they are mad about, then a penalty may apply. Some players are instructed to not be mad about something - if the Storyteller thinks that a player has tried to convince the group of that thing, then a penalty may apply.
-     */
-    Mad = 1 << 3,
-}
 
 /**
  * {@link `glossary["Player"]`}
@@ -145,12 +119,6 @@ export class Player extends EffectTarget<Player> {
      */
     hasVoteToken = true;
 
-    /**
-     * {@link `glossary["State"]`}
-     * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
-     */
-    state: number = NegativeState.None;
-
     seatNumber?: number;
 
     readonly canSupportExile: boolean = true;
@@ -162,11 +130,11 @@ export class Player extends EffectTarget<Player> {
      * Not poisoned.
      */
     get healthy(): boolean {
-        return !this.poisoned;
+        return this.state.healthy;
     }
 
     get poisoned(): boolean {
-        return (this.state & NegativeState.Poisoned) === NegativeState.Poisoned;
+        return this.state.healthy;
     }
 
     /**
@@ -174,7 +142,7 @@ export class Player extends EffectTarget<Player> {
      * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
      */
     get alive(): boolean {
-        return !this.dead;
+        return this.state.alive;
     }
 
     /**
@@ -182,7 +150,7 @@ export class Player extends EffectTarget<Player> {
      * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
      */
     get dead(): boolean {
-        return (this.state & NegativeState.Dead) === NegativeState.Dead;
+        return this.state.dead;
     }
 
     /**
@@ -198,7 +166,7 @@ export class Player extends EffectTarget<Player> {
      * Not drunk.
      */
     get sober(): boolean {
-        return !this.drunk;
+        return this.state.sober;
     }
 
     /**
@@ -206,15 +174,15 @@ export class Player extends EffectTarget<Player> {
      *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
      */
     get drunk(): boolean {
-        return (this.state & NegativeState.Drunk) === NegativeState.Drunk;
+        return this.state.drunk;
     }
 
     get sane(): boolean {
-        return !this.mad;
+        return this.state.sane;
     }
 
     get mad(): boolean {
-        return (this.state & NegativeState.Mad) === NegativeState.Mad;
+        return this.state.mad;
     }
 
     get canNominate(): boolean {
@@ -277,6 +245,12 @@ export class Player extends EffectTarget<Player> {
         return this.alignment === Alignment.Evil;
     }
 
+    /**
+     * {@link `glossary["State"]`}
+     * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
+     */
+    protected readonly state: PlayerState = PlayerState.init();
+
     @Expose({ name: 'character', toPlainOnly: true })
     protected characterId(): string {
         return this.character.id;
@@ -297,7 +271,7 @@ export class Player extends EffectTarget<Player> {
 
     async setDead(reason: DeadReason = DeadReason.Other): Promise<boolean> {
         this.deadReason = reason;
-        this.state += NegativeState.Dead;
+        this.state.dead = true;
         // TODO lose ability and influences
         return await this.dead;
     }

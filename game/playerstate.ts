@@ -1,0 +1,210 @@
+import 'reflect-metadata';
+import { Expose, Exclude, instanceToPlain } from 'class-transformer';
+import { Generator } from './collections';
+
+export enum State {
+    None = 0,
+    /**
+     * {@link `glossary["Dead"]`}
+     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
+     */
+    Dead = 1,
+
+    /**
+     * {@link `glossary["Drunk"]`}
+     * A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
+     */
+    Drunk = 2 /* 1 << 1 */,
+
+    /**
+     * {@link `glossary["Poisoned"]`}
+     * A poisoned player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Poisoned players do not know they are poisoned. See Drunk.
+     */
+    Poisoned = 4 /* 1 << 2 */,
+
+    /**
+     * {@link `glossary["Mad"]`}
+     * A player who is “mad” about something is trying to convince the group that something is true. Some players are instructed to be mad about something - if the Storyteller thinks that a player has not put effort to convince the group of the thing they are mad about, then a penalty may apply. Some players are instructed to not be mad about something - if the Storyteller thinks that a player has tried to convince the group of that thing, then a penalty may apply.
+     */
+    Mad = 8 /* 1 << 3 */,
+}
+
+export type NegativeState = Exclude<State, State.None>;
+
+@Exclude()
+export class PlayerState {
+    static get NEGATIVE_STATES(): Iterable<NegativeState> {
+        return Generator.filter(
+            (state) => !isNaN(Number(state)) && state > 0,
+            Object.values(State)
+        ) as Iterable<NegativeState>;
+    }
+
+    static getStateName(negativeState: NegativeState): string {
+        return State[negativeState];
+    }
+
+    static getOppositeStateName(negativeState: NegativeState): string {
+        switch (negativeState) {
+            case State.Dead:
+                return 'Alive';
+            case State.Drunk:
+                return 'Sober';
+            case State.Poisoned:
+                return 'Healthy';
+            case State.Mad:
+                return 'Sane';
+            default:
+                return `Not ${this.getStateName(negativeState)}`;
+        }
+    }
+
+    static of(state: number) {
+        return new this(state);
+    }
+
+    static init() {
+        return new this(State.None);
+    }
+
+    /**
+     * {@link `glossary["Drunk"]`}
+     *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
+     */
+    get drunk(): boolean {
+        return this.hasNegativeState(State.Drunk);
+    }
+
+    set drunk(active: boolean) {
+        this.setNegativeState(State.Drunk, active);
+    }
+
+    /**
+     * {@link `glossary["Sober"]`}
+     * Not drunk.
+     */
+    get sober(): boolean {
+        return !this.drunk;
+    }
+
+    set sober(active: boolean) {
+        this.setNegativeState(State.Drunk, !active);
+    }
+
+    get poisoned(): boolean {
+        return this.hasNegativeState(State.Poisoned);
+    }
+
+    set poisoned(active: boolean) {
+        this.setNegativeState(State.Poisoned, active);
+    }
+
+    /**
+     * {@link `glossary["Healthy"]`}
+     * Not poisoned.
+     */
+    get healthy(): boolean {
+        return !this.poisoned;
+    }
+
+    set healthy(active: boolean) {
+        this.setNegativeState(State.Poisoned, !active);
+    }
+
+    /**
+     * {@link `glossary["Alive"]`}
+     * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
+     */
+    get alive(): boolean {
+        return !this.dead;
+    }
+
+    set alive(active: boolean) {
+        this.setNegativeState(State.Dead, !active);
+    }
+
+    /**
+     * {@link `glossary["Dead"]`}
+     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
+     */
+    get dead(): boolean {
+        return this.hasNegativeState(State.Dead);
+    }
+
+    set dead(active: boolean) {
+        this.setNegativeState(State.Dead, active);
+    }
+
+    get mad(): boolean {
+        return this.hasNegativeState(State.Mad);
+    }
+
+    set mad(active: boolean) {
+        this.setNegativeState(State.Mad, active);
+    }
+
+    get sane(): boolean {
+        return !this.mad;
+    }
+
+    set sane(active: boolean) {
+        this.setNegativeState(State.Mad, !active);
+    }
+
+    /**
+     * {@link `glossary["State"]`}
+     * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
+     */
+    @Expose({ toPlainOnly: true })
+    protected state: number = State.None;
+
+    protected constructor(state: number) {
+        this.state = state;
+    }
+
+    addNegativeState(negativeState: NegativeState) {
+        this.state |= negativeState;
+    }
+
+    removeNegativeState(negativeState: NegativeState) {
+        this.state &= ~negativeState;
+    }
+
+    setNegativeState(negativeState: NegativeState, active: boolean) {
+        if (active) {
+            this.addNegativeState(negativeState);
+        } else {
+            this.removeNegativeState(negativeState);
+        }
+    }
+
+    hasNegativeState(negativeState: NegativeState): boolean {
+        return (this.state & negativeState) === negativeState;
+    }
+
+    valueOf() {
+        return this.state;
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
+    }
+
+    equals(other: PlayerState): boolean {
+        return this.state === other.state;
+    }
+
+    toString() {
+        const stateNames = Array.from(
+            Generator.map(
+                (negativeState) =>
+                    this.hasNegativeState(negativeState)
+                        ? PlayerState.getStateName(negativeState)
+                        : PlayerState.getOppositeStateName(negativeState),
+                PlayerState.NEGATIVE_STATES
+            )
+        );
+
+        return stateNames.join(', ');
+    }
+}
