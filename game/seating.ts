@@ -93,7 +93,7 @@ export class Seating {
     }
 
     static async from(
-        players: Array<Player>,
+        players: Array<Player> | Players,
         seatAssignmentMode: SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
     ) {
         const seating = await Seating.init(players.length);
@@ -353,6 +353,36 @@ export class Seating {
         }
     }
 
+    /**
+     * Exchange the players sitting at specified seating positions.
+     * @param seatPosition The position of one seat
+     * @param otherSeatPosition The position of the other seat
+     * @returns The sitting results when players exchange the seat. Can have length 0, 1, or 2.
+     */
+    async exchange(
+        seatPosition: number,
+        otherSeatPosition: number
+    ): Promise<Array<SitResult>> {
+        const seat = this.getSeat(seatPosition);
+        const otherSeat = this.getSeat(otherSeatPosition);
+
+        const [player, otherPlayer] = await Promise.all([
+            seat.remove(),
+            otherSeat.remove(),
+        ]);
+
+        const willSit: Array<Promise<SitResult>> = [];
+        if (player !== undefined) {
+            willSit.push(otherSeat.sit(player));
+        }
+
+        if (otherPlayer !== undefined) {
+            willSit.push(seat.sit(otherPlayer));
+        }
+
+        return await Promise.all(willSit);
+    }
+
     protected getSeatByPlayer(player: Player): Seat {
         const seat = this.tryGetSeatByPlayer(player);
 
@@ -396,22 +426,24 @@ export class Seating {
      * ! It will throw an error when there are fewer seats than the number of players.
      *
      * @param players
-     * @returns
+     * @returns The result of syncing which describes the mismatches.
      */
     protected async sync(players: Iterable<Player>): Promise<SyncResult> {
         const occupiedSeatsMismatchUnassignedPlayer = new Set<Seat>();
         const assignedPlayerMismatchUnoccupiedSeats = new Set<Player>();
 
+        const willSit: Array<Promise<SitResult>> = [];
         for (const player of players) {
             if (player.seatNumber !== undefined) {
                 const matchingSeat = this.getSeat(player.seatNumber);
 
                 if (matchingSeat.isEmpty) {
                     assignedPlayerMismatchUnoccupiedSeats.add(player);
-                    await matchingSeat.sit(player);
+                    willSit.push(matchingSeat.sit(player));
                 }
             }
         }
+        await Promise.all(willSit);
 
         for (const seat of this) {
             if (seat.isOccupied && seat.player!.seatNumber === undefined) {

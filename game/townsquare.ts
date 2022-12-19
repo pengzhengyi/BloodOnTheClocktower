@@ -1,8 +1,13 @@
 import { Clocktower } from './clocktower';
 import { Player } from './player';
-import { Players } from './players';
+import { Players, PlayersModification } from './players';
 import { Seat } from './seat';
 import { SeatAssignment, SeatAssignmentMode, Seating } from './seating';
+
+export interface ResitResult {
+    oldSeating: Seating;
+    newSeating: Seating;
+}
 
 /**
  * {@link `glossary["Town Square"]`}
@@ -37,6 +42,23 @@ export class TownSquare {
     protected constructor(seating: Seating, players: Players) {
         this.seating = seating;
         this.players = players;
+    }
+
+    getPlayerOnSeat(position: number): Player | undefined {
+        return this.seating.getSeat(position).player;
+    }
+
+    async resit(
+        modification: PlayersModification,
+        seatAssignmentMode: SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
+    ): Promise<ResitResult> {
+        const resitResult: Partial<ResitResult> = {
+            oldSeating: this.seating,
+        };
+        this.players.modify(modification);
+        const seating = await Seating.from(this.players, seatAssignmentMode);
+        this.seating = resitResult.newSeating = seating;
+        return resitResult as ResitResult;
     }
 
     /**

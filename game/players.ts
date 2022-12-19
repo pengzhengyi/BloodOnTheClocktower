@@ -4,6 +4,8 @@ import { Generator } from './collections';
 import { PlayerNotSat } from './exception';
 import { Player } from './player';
 
+export type PlayersModification = (players: Array<Player>) => void;
+
 export class Players extends Generator<Player> {
     static of(...players: Array<Player>) {
         return new this(players);
@@ -38,7 +40,7 @@ export class Players extends Generator<Player> {
         this.players = players;
     }
 
-    modify(modification: (players: Array<Player>) => void) {
+    modify(modification: PlayersModification) {
         modification(this.players);
     }
 
