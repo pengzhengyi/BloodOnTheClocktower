@@ -2,9 +2,9 @@ import { EditionData, EditionKeyName } from './types';
 import { IncompleteEditionData } from './exception';
 import { CharacterSheet } from './charactersheet';
 import { Generator } from './collections';
-import { Character } from './character';
+import type { Character } from './character';
 import { onlyLetters } from './common';
-import { CharacterType } from './charactertype';
+import type { CharacterType } from './charactertype';
 
 export enum EditionName {
     TroubleBrewing = 'Trouble Brewing',
@@ -92,6 +92,10 @@ export abstract class Edition {
         return this.characterSheet.getCharactersByType(characterType);
     }
 
+    static toJSON() {
+        return this.editionData;
+    }
+
     protected static checkForRequiredKeyNames(
         editionData: Partial<EditionData>
     ) {
@@ -101,4 +105,12 @@ export abstract class Edition {
             }
         }
     }
+}
+
+export function createCustomEdition(
+    editionData: Partial<EditionData>
+): typeof Edition {
+    const customEdition = class extends Edition {};
+    customEdition.initialize(editionData);
+    return customEdition;
 }

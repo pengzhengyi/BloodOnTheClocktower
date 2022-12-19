@@ -2,9 +2,11 @@ import script from './custom-script.json';
 import { ScriptConstraintsHelper, ScriptTool } from '~/game/scripttool';
 import { Generator } from '~/game/collections';
 import { EditionName } from '~/game/edition';
+import { EditionKeyName } from '~/game/types';
 import { Scarletwoman } from '~/content/characters/output/scarletwoman';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Judge } from '~/content/characters/output/judge';
+import { Mathematician } from '~/content/characters/output/mathematician';
 
 describe('Load Custom Script', () => {
     const characterSheet = ScriptTool.load(script);
@@ -21,6 +23,21 @@ describe('Load Custom Script', () => {
             expect(characters.length).toBeGreaterThan(0);
         }
     });
+
+    test.concurrent(
+        'create a custom edition based on custom character sheet',
+        () => {
+            const customEdition = ScriptTool.createCustomEdition(
+                characterSheet,
+                {
+                    [EditionKeyName.NAME]: 'custom1',
+                }
+            );
+
+            expect(customEdition.townsfolk.includes(Mathematician)).toBeTrue();
+            expect(customEdition.characters).toHaveLength(script.length);
+        }
+    );
 });
 
 describe('Random CharacterSheet Generation', () => {

@@ -1,7 +1,7 @@
-import { RoleDataKeyName, Script } from './types';
+import { EditionData, EditionKeyName, RoleDataKeyName, Script } from './types';
 import { CharacterSheet } from './charactersheet';
 import { Character } from './character';
-import { Edition, EditionName } from './edition';
+import { createCustomEdition, Edition, EditionName } from './edition';
 import { Generator } from './collections';
 import { EditionLoader } from './editionloader';
 import { CharacterLoader } from './characterloader';
@@ -400,11 +400,11 @@ export abstract class ScriptTool {
         );
     }
 
-    static load(script: Script) {
+    static load(script: Script): CharacterSheet {
         return CharacterSheet.from(this.getScriptCharacterIds(script));
     }
 
-    static async loadAsync(script: Script) {
+    static async loadAsync(script: Script): Promise<CharacterSheet> {
         return await CharacterSheet.fromAsync(
             this.getScriptCharacterIds(script)
         );
@@ -416,5 +416,21 @@ export abstract class ScriptTool {
     ): Promise<Iterable<CharacterSheet>> {
         const solver = await ScriptConstraintsHelper.fromDefaults(constraints);
         return solver.candidateCharacterSheets.limit(numCandidateUpperbound);
+    }
+
+    static createCustomEdition(
+        characterSheet: CharacterSheet,
+        otherEditionData: Partial<Omit<EditionData, EditionKeyName.CHARACTERS>>
+    ): typeof Edition {
+        const characterEditionData: Pick<
+            EditionData,
+            EditionKeyName.CHARACTERS
+        > = { [EditionKeyName.CHARACTERS]: characterSheet.toJSON() };
+        const editionData: Partial<EditionData> = Object.assign(
+            {},
+            otherEditionData,
+            characterEditionData
+        );
+        return createCustomEdition(editionData);
     }
 }
