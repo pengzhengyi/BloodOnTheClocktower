@@ -51,4 +51,21 @@ describe('Test basic functionalities', () => {
             expect(actualPlayerToVote).toEqual(expectedPlayerToVote);
         }
     });
+
+    test('exchange player seats', async () => {
+        const [_players, seating] = await createPlayersAndSeating(8);
+
+        const firstPlayer = seating.getPlayerOnSeat(4);
+        const otherPlayer = seating.getPlayerOnSeat(6);
+
+        const sitResults = await seating.exchange(4, 6);
+
+        expect(sitResults).toHaveLength(2);
+        expect(
+            sitResults.map((sitResult) => sitResult.player)
+        ).toIncludeSameMembers([firstPlayer, otherPlayer]);
+        expect(
+            sitResults.map((sitResult) => sitResult.hasSat)
+        ).toIncludeAllMembers([true]);
+    });
 });

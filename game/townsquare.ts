@@ -45,7 +45,7 @@ export class TownSquare {
     }
 
     getPlayerOnSeat(position: number): Player | undefined {
-        return this.seating.getSeat(position).player;
+        return this.seating.getPlayerOnSeat(position);
     }
 
     async resit(

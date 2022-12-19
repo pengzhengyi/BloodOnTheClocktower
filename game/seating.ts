@@ -156,6 +156,10 @@ export class Seating {
         return this.seats[position];
     }
 
+    getPlayerOnSeat(position: number): Player | undefined {
+        return this.getSeat(position).player;
+    }
+
     async changeNumSeats(newNumSeats: number) {
         await Seating.validateNumSeats(newNumSeats);
 
