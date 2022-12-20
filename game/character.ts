@@ -48,27 +48,35 @@ export abstract class Character {
     }
 
     static get isMinion() {
-        return this.isCharacterType(Minion);
+        return this.is(Minion);
     }
 
     static get isDemon() {
-        return this.isCharacterType(Demon);
+        return this.is(Demon);
     }
 
     static get isTownsfolk() {
-        return this.isCharacterType(Townsfolk);
+        return this.is(Townsfolk);
     }
 
     static get isOutsider() {
-        return this.isCharacterType(Outsider);
+        return this.is(Outsider);
     }
 
     static get isTraveller() {
-        return this.isCharacterType(Traveller);
+        return this.is(Traveller);
     }
 
     static get isFabled() {
-        return this.isCharacterType(Fabled);
+        return this.is(Fabled);
+    }
+
+    static get isEvilCharacter() {
+        return this.isDemon || this.isMinion;
+    }
+
+    static get isGoodCharacter() {
+        return this.isTownsfolk || this.isOutsider;
     }
 
     static initialize(roleData: Partial<RoleData>) {
@@ -85,8 +93,8 @@ export abstract class Character {
         return { [RoleDataKeyName.ID]: this.toJSON() };
     }
 
-    static isCharacterType(characterType: typeof CharacterType): boolean {
-        return Object.is(this.characterType, characterType);
+    static is(characterType: typeof CharacterType): boolean {
+        return this.characterType.is(characterType);
     }
 
     protected static setCharacterType(roleData: Partial<RoleData>) {

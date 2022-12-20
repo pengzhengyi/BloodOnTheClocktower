@@ -214,7 +214,7 @@ export class Player extends EffectTarget<Player> {
     }
 
     get isTraveller(): boolean {
-        return Object.is(this.characterType, Traveller);
+        return this.characterType.is(Traveller);
     }
 
     get willGetFalseInfo(): boolean {
@@ -226,7 +226,7 @@ export class Player extends EffectTarget<Player> {
      * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
      */
     get isTheDemon(): boolean {
-        return this.alive && Object.is(this.characterType, Demon);
+        return this.alive && this.characterType.is(Demon);
     }
 
     get isAliveNontraveller(): boolean {

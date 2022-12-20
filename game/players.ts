@@ -1,5 +1,12 @@
 import type { Alignment } from './alignment';
-import { CharacterType } from './charactertype';
+import {
+    CharacterType,
+    Demon,
+    Fabled,
+    Minion,
+    Outsider,
+    Townsfolk,
+} from './charactertype';
 import { Generator } from './collections';
 import { PlayerNotSat } from './exception';
 import { Player } from './player';
@@ -69,29 +76,27 @@ export class Players extends Generator<Player> {
     }
 
     isMinion() {
-        return this.filter((player) => player.character.isMinion);
+        return this.isCharacterType(Minion);
     }
 
     isDemon() {
-        return this.filter((player) => player.character.isDemon);
+        return this.isCharacterType(Demon);
     }
 
     isTownsfolk() {
-        return this.filter((player) => player.character.isTownsfolk);
+        return this.isCharacterType(Townsfolk);
     }
 
     isOutsider() {
-        return this.filter((player) => player.character.isOutsider);
+        return this.isCharacterType(Outsider);
     }
 
     isFabled() {
-        return this.filter((player) => player.character.isFabled);
+        return this.isCharacterType(Fabled);
     }
 
     isCharacterType(characterType: typeof CharacterType) {
-        return this.filter((player) =>
-            player.character.isCharacterType(characterType)
-        );
+        return this.filter((player) => player.character.is(characterType));
     }
 
     async *getNeighbors(): AsyncGenerator<[Player, Player]> {

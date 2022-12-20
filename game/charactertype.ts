@@ -12,6 +12,10 @@ export abstract class CharacterType {
         return this.name.toLowerCase();
     }
 
+    static is(characterType: typeof CharacterType): boolean {
+        return Object.is(this, characterType);
+    }
+
     static includes(type?: string): boolean {
         if (type === undefined) {
             return false;
