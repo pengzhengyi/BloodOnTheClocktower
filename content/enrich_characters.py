@@ -129,11 +129,11 @@ def _write_typescript_export(filepath: str, imports: List[Tuple[str, str]]) -> N
             import_statement + os.linesep for import_statement in import_statements
         )
         file_writer.write(
-            'import { Character } from "~/game/character";' + os.linesep + os.linesep
+            'import type { CharacterToken } from "~/game/character";' + os.linesep + os.linesep
         )
 
         file_writer.write(
-            "export const ID_TO_CHARACTER: Map<string, typeof Character> = new Map();" + os.linesep
+            "export const ID_TO_CHARACTER: Map<string, CharacterToken> = new Map();" + os.linesep
         )
         file_writer.writelines(
             mapset_statement + os.linesep for mapset_statement in mapset_statements

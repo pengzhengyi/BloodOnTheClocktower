@@ -53,7 +53,7 @@ export class GameInfo {
     }
 
     getSeating(): Promise<Seating> {
-        return Seating.from(this._players);
+        return Seating.of(this._players);
     }
 
     async getPlayer(player: string | Player | undefined): Promise<Player> {

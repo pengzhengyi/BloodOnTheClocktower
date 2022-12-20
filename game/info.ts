@@ -15,7 +15,7 @@
  *    |<-----INFO-----|                 |              |
  */
 
-import { Character } from './character';
+import type { Character, CharacterToken } from './character';
 import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import type { MinionPlayer, DemonPlayer, Player } from './player';
 import { Generator } from './collections';
@@ -97,7 +97,7 @@ export abstract class InfoProvider<T> {
 export abstract class InfoRequester<T, TInfoProvider extends InfoProvider<T>>
     implements InfoProcessor
 {
-    static from(character: typeof Character) {
+    static from(character: CharacterToken) {
         switch (character) {
             case Washerwoman:
                 return WasherwomanInfoRequester;
@@ -259,14 +259,15 @@ abstract class EveryAliveNonfirstNightInfoRequester<
 
 interface OneCharacterForTwoPlayers {
     players: [Player, Player];
-    character: typeof Character;
+    character: CharacterToken;
 }
 
 abstract class OneCharacterForTwoPlayersInfoProvider<
     TInfo extends Partial<OneCharacterForTwoPlayers>,
+    // eslint-disable-next-line unused-imports/no-unused-vars
     TCharacter
 > extends InfoProvider<TInfo> {
-    declare targetPlayer: Player & { character: TCharacter };
+    declare targetPlayer: Player;
 
     protected abstract expectedCharacterType: typeof CharacterType;
 
@@ -351,7 +352,7 @@ export class WasherwomanInfoRequester extends FirstNightInfoRequester<
 export interface LibrarianInfo extends Partial<OneCharacterForTwoPlayers> {
     hasOutsider: boolean;
     players?: [Player, Player];
-    character?: typeof Character;
+    character?: CharacterToken;
 }
 
 export class LibrarianInfoProvider extends OneCharacterForTwoPlayersInfoProvider<
@@ -606,7 +607,7 @@ export class FortuneTellerInfoRequester extends EveryAliveNightInfoRequester<
  */
 export interface UndertakerInfo {
     player: Player;
-    character: typeof Character;
+    character: CharacterToken;
 }
 
 export class UndertakerInfoProvider extends InfoProvider<UndertakerInfo> {
@@ -662,7 +663,7 @@ export class UndertakerInfoRequester extends EveryAliveNonfirstNightInfoRequeste
  */
 export interface _RavenkeeperInfo {
     player: Player;
-    character: typeof Character;
+    character: CharacterToken;
 }
 
 export type RavenkeeperInfo = _RavenkeeperInfo | Record<string, never>;

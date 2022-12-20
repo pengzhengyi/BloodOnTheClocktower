@@ -7,7 +7,7 @@ import type { Vote } from './vote';
 import type { Predicate, RoleData } from './types';
 import type { Player } from './player';
 import type { Seat } from './seat';
-import type { Character } from './character';
+import type { CharacterToken } from './character';
 import type { StoryTeller } from './storyteller';
 import type {
     NumberOfCharacters,
@@ -364,7 +364,7 @@ export class ExileNonTraveller extends RecoverableGameError {
 export class CannotDetermineCharacterType extends RecoverableGameError {
     static description = 'Cannot determine character type of a character';
 
-    constructor(readonly character: typeof Character, readonly type?: string) {
+    constructor(readonly character: CharacterToken, readonly type?: string) {
         super(CannotDetermineCharacterType.description);
 
         this.character = character;
@@ -422,7 +422,7 @@ export class CharacterLoadFailures<
 
     constructor(
         failures: Iterable<E>,
-        readonly loadedCharacters: Array<typeof Character>
+        readonly loadedCharacters: Array<CharacterToken>
     ) {
         super(CharacterLoadFailures.description);
 
@@ -495,10 +495,10 @@ export class CharacterSheetCreationFailure extends RecoverableGameError {
         'Cannot initialize character sheet from provided arguments';
 
     constructor(
-        readonly characters?: Iterable<typeof Character>,
+        readonly characters?: Iterable<CharacterToken>,
         readonly characterTypes?: Map<
             typeof CharacterType,
-            Array<typeof Character>
+            Array<CharacterToken>
         >
     ) {
         super(CharacterSheetCreationFailure.description);
@@ -581,7 +581,7 @@ export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
     declare correctedAlignmentToRegisterAs: Alignment;
 
     constructor(
-        readonly characterToRegisterAs: typeof Character,
+        readonly characterToRegisterAs: CharacterToken,
         readonly alignmentToRegisterAs?: Alignment
     ) {
         super(IncorrectAlignmentForSpyToRegisterAs.description);

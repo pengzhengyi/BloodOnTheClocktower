@@ -7,7 +7,7 @@ import type { FortuneTellerInfoRequester } from './info';
 import { Influence } from './influence';
 import { Player } from './player';
 import { DeadReason } from './deadreason';
-import { Character } from './character';
+import type { CharacterToken } from './character';
 import { Context } from './infoprocessor';
 import { Phase } from './gamephase';
 import { GAME_UI } from '~/interaction/gameui';
@@ -20,7 +20,7 @@ import { Fortuneteller } from '~/content/characters/output/fortuneteller';
  * CharacterAct is when a player needs to perform some actions because of character ability. Such actions will usually affect the game.
  */
 export abstract class CharacterAct extends Influence {
-    static from(character: typeof Character) {
+    static from(character: CharacterToken) {
         switch (character) {
             case Imp:
                 return [ImpAct];

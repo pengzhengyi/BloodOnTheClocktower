@@ -141,9 +141,9 @@ import { Sentinel } from './sentinel';
 import { Spiritofivory } from './spiritofivory';
 import { Stormcatcher } from './stormcatcher';
 import { Toymaker } from './toymaker';
-import { Character } from '~/game/character';
+import type { CharacterToken } from '~/game/character';
 
-export const ID_TO_CHARACTER: Map<string, typeof Character> = new Map();
+export const ID_TO_CHARACTER: Map<string, CharacterToken> = new Map();
 ID_TO_CHARACTER.set('washerwoman', Washerwoman);
 ID_TO_CHARACTER.set('librarian', Librarian);
 ID_TO_CHARACTER.set('investigator', Investigator);

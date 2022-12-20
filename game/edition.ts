@@ -2,7 +2,7 @@ import { EditionData, EditionKeyName } from './types';
 import { IncompleteEditionData } from './exception';
 import { CharacterSheet } from './charactersheet';
 import { Generator } from './collections';
-import type { Character } from './character';
+import type { CharacterToken } from './character';
 import { onlyLetters } from './common';
 import type { CharacterType } from './charactertype';
 
@@ -47,31 +47,31 @@ export abstract class Edition {
         return this._characterSheet;
     }
 
-    static get characters(): Array<typeof Character> {
+    static get characters(): Array<CharacterToken> {
         return this.characterSheet.characters;
     }
 
-    static get minion(): Array<typeof Character> {
+    static get minion(): Array<CharacterToken> {
         return this.characterSheet.minion;
     }
 
-    static get demon(): Array<typeof Character> {
+    static get demon(): Array<CharacterToken> {
         return this.characterSheet.demon;
     }
 
-    static get townsfolk(): Array<typeof Character> {
+    static get townsfolk(): Array<CharacterToken> {
         return this.characterSheet.townsfolk;
     }
 
-    static get outsider(): Array<typeof Character> {
+    static get outsider(): Array<CharacterToken> {
         return this.characterSheet.outsider;
     }
 
-    static get traveller(): Array<typeof Character> {
+    static get traveller(): Array<CharacterToken> {
         return this.characterSheet.traveller;
     }
 
-    static get fabled(): Array<typeof Character> {
+    static get fabled(): Array<CharacterToken> {
         return this.characterSheet.fabled;
     }
 
@@ -88,7 +88,7 @@ export abstract class Edition {
 
     static getCharactersByType(
         characterType: typeof CharacterType
-    ): Array<typeof Character> {
+    ): Array<CharacterToken> {
         return this.characterSheet.getCharactersByType(characterType);
     }
 

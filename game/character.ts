@@ -112,6 +112,11 @@ export abstract class Character {
     }
 }
 
-export const CharacterToID = (character: typeof Character) => character.id;
-export const CharactersToIDs = (characters: Array<typeof Character>) =>
+/**
+ * {@link `glossary["Character token"]`}
+ * The large round token that each player gets at the start of the game that indicates their character. Players cannot look at each other's character tokens.
+ */
+export type CharacterToken = typeof Character;
+export const CharacterToID = (character: CharacterToken) => character.id;
+export const CharactersToIDs = (characters: Array<CharacterToken>) =>
     characters.map(CharacterToID);

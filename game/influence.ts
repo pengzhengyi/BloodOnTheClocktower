@@ -1,5 +1,5 @@
 import { Alignment } from './alignment';
-import type { Character } from './character';
+import type { CharacterToken } from './character';
 import type { CharacterSheet } from './charactersheet';
 import { Generator } from './collections';
 import { IncorrectAlignmentForSpyToRegisterAs } from './exception';
@@ -66,13 +66,13 @@ export abstract class Influence implements InfoProcessor {
 
 export abstract class RegisterAsInfluence extends Influence {
     declare playerToRegister: Player;
-    declare static originalCharacter: typeof Character;
+    declare static originalCharacter: CharacterToken;
     declare static registerAsAlignment: Alignment.Good | Alignment.Evil;
 
     static async getRegisteredAs(
         characterSheet: CharacterSheet,
         reason?: string
-    ): Promise<[typeof Character, Alignment]> {
+    ): Promise<[CharacterToken, Alignment]> {
         const characterToRegisterAs = await this.getRegisterAsCharacter(
             characterSheet,
             reason
@@ -96,7 +96,7 @@ export abstract class RegisterAsInfluence extends Influence {
 
     static registerAs(
         player: Player,
-        characterToRegisterAs: typeof Character,
+        characterToRegisterAs: CharacterToken,
         alignmentToRegisterAs: Alignment
     ): Player {
         return new Proxy(player, {
@@ -115,14 +115,14 @@ export abstract class RegisterAsInfluence extends Influence {
 
     protected static getRegisterAsCharacterOptions(
         characterSheet: CharacterSheet
-    ): Iterable<typeof Character> {
+    ): Iterable<CharacterToken> {
         const characterOptionIterables =
             this.registerAsAlignment === Alignment.Good
                 ? [characterSheet.townsfolk, characterSheet.outsider]
                 : [characterSheet.minion, characterSheet.demon];
         characterOptionIterables.push([this.originalCharacter]);
 
-        return Generator.chain_from_iterable<typeof Character>(
+        return Generator.chain_from_iterable<CharacterToken>(
             characterOptionIterables
         );
     }
@@ -130,7 +130,7 @@ export abstract class RegisterAsInfluence extends Influence {
     protected static getRegisterAsCharacter(
         characterSheet: CharacterSheet,
         reason?: string
-    ): Promise<typeof Character> {
+    ): Promise<CharacterToken> {
         const options = this.getRegisterAsCharacterOptions(characterSheet);
 
         return GAME_UI.storytellerChooseOne(options, reason);
@@ -197,7 +197,7 @@ export class SpyInfluence extends RegisterAsGoodInfluence {
     static readonly description: string =
         'The Spy might appear to be a good character, but is actually evil. The Spy might register as good & as a Townsfolk or Outsider, even if dead.';
 
-    static originalCharacter: typeof Character = Spy;
+    static originalCharacter: CharacterToken = Spy;
 
     declare source: Player;
 
@@ -212,7 +212,7 @@ export class RecluseInfluence extends RegisterAsGoodInfluence {
     static readonly description: string =
         'The Recluse might appear to be an evil character, but is actually good. The Recluse might register as evil & as a Minion or Demon, even if dead.';
 
-    static originalCharacter: typeof Character = Recluse;
+    static originalCharacter: CharacterToken = Recluse;
 
     declare source: Player;
 

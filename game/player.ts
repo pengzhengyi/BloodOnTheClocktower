@@ -3,7 +3,7 @@ import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import 'reflect-metadata';
 import { v4 as uuid } from 'uuid';
 import { Alignment } from './alignment';
-import { Character } from './character';
+import { CharacterToken } from './character';
 import { CharacterAct } from './characteract';
 import { DeadReason } from './deadreason';
 import { Effects } from './effects';
@@ -45,7 +45,7 @@ export class Player extends EffectTarget<Player> {
 
     static async init(
         username: string,
-        character: typeof Character,
+        character: CharacterToken,
         alignment?: Alignment,
         id?: string,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
@@ -102,7 +102,7 @@ export class Player extends EffectTarget<Player> {
     @Expose({ toPlainOnly: true })
     username: string;
 
-    declare character: typeof Character;
+    declare character: CharacterToken;
 
     /**
      * TODO should this be an array?
@@ -259,7 +259,7 @@ export class Player extends EffectTarget<Player> {
     protected constructor(
         id: string,
         username: string,
-        character: typeof Character,
+        character: CharacterToken,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
     ) {
         super(enabledProxyHandlerPropertyNames);
@@ -351,7 +351,7 @@ export class Player extends EffectTarget<Player> {
         );
     }
 
-    protected initializeCharacter(character: typeof Character) {
+    protected initializeCharacter(character: CharacterToken) {
         this.character = character;
         this.characterActs = CharacterAct.fromPlayer(this)[0];
         this.infoRequester = InfoRequester.of(this);

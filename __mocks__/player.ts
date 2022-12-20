@@ -3,13 +3,13 @@ import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue } from './common';
 import { storytellerConfirmMock } from './gameui';
 import { Alignment } from '~/game/alignment';
-import { Character } from '~/game/character';
+import type { CharacterToken } from '~/game/character';
 import { CharacterLoader } from '~/game/characterloader';
 import { Player } from '~/game/player';
 
 export async function createBasicPlayer(
     name?: string,
-    character?: typeof Character
+    character?: CharacterToken
 ) {
     if (name === undefined) {
         name = faker.name.firstName();

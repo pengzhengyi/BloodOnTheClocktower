@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Character } from './character';
+import { Character, CharacterToken } from './character';
 import { randomChoice } from './common';
 import { CharacterLoadFailure, NoCharacterMatchingId } from './exception';
 import type { RoleData } from './types';
@@ -9,15 +9,15 @@ import {
 } from '~/content/characters/output/characters';
 
 export abstract class CharacterLoader {
-    static randomLoad(): typeof Character {
+    static randomLoad(): CharacterToken {
         return randomChoice(CHARACTERS);
     }
 
-    static tryLoad(id: string): typeof Character | undefined {
+    static tryLoad(id: string): CharacterToken | undefined {
         return ID_TO_CHARACTER.get(Character.getCanonicalId(id));
     }
 
-    static async loadAsync(id: string): Promise<typeof Character> {
+    static async loadAsync(id: string): Promise<CharacterToken> {
         const error = new NoCharacterMatchingId(id);
         await error.throwWhen(
             (error) => this.tryLoad(error.correctedId) === undefined
@@ -32,7 +32,7 @@ export abstract class CharacterLoader {
         return character;
     }
 
-    protected static loadCharacterClass(): typeof Character {
+    protected static loadCharacterClass(): CharacterToken {
         return class extends Character {};
     }
 

@@ -6,7 +6,7 @@ import {
     Type,
     instanceToPlain,
 } from 'class-transformer';
-import { Character, CharactersToIDs } from './character';
+import { CharactersToIDs, CharacterToken } from './character';
 import { CharacterLoader } from './characterloader';
 import {
     CharacterType,
@@ -52,7 +52,7 @@ export class CharacterSheet {
     static fromTypeToCharacters(
         characterTypeToCharacters: Map<
             typeof CharacterType,
-            Array<typeof Character>
+            Array<CharacterToken>
         >
     ) {
         return new this(undefined, characterTypeToCharacters);
@@ -68,7 +68,7 @@ export class CharacterSheet {
             characterPromises
         );
         const characters = parsePromiseSettledResults<
-            typeof Character,
+            CharacterToken,
             GameError
         >(characterSettledResults, (errors, values) => {
             throw new CharacterLoadFailures(errors, values);
@@ -78,7 +78,7 @@ export class CharacterSheet {
 
     protected static _validateFoundCharacter(
         id: string,
-        character?: typeof Character
+        character?: CharacterToken
     ) {
         if (character === undefined) {
             throw new NoCharacterMatchingId(id);
@@ -90,58 +90,58 @@ export class CharacterSheet {
     @Expose({ groups: ['compact'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    declare characters: Array<typeof Character>;
+    declare characters: Array<CharacterToken>;
 
     declare characterTypeToCharacters: Map<
         typeof CharacterType,
-        Array<typeof Character>
+        Array<CharacterToken>
     >;
 
     @Expose({ groups: ['primary'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    get minion(): Array<typeof Character> {
+    get minion(): Array<CharacterToken> {
         return this.getCharactersByType(Minion);
     }
 
     @Expose({ groups: ['primary'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    get demon(): Array<typeof Character> {
+    get demon(): Array<CharacterToken> {
         return this.getCharactersByType(Demon);
     }
 
     @Expose({ groups: ['primary'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    get townsfolk(): Array<typeof Character> {
+    get townsfolk(): Array<CharacterToken> {
         return this.getCharactersByType(Townsfolk);
     }
 
     @Expose({ groups: ['primary'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    get outsider(): Array<typeof Character> {
+    get outsider(): Array<CharacterToken> {
         return this.getCharactersByType(Outsider);
     }
 
     @Expose({ groups: ['primary'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    get traveller(): Array<typeof Character> {
+    get traveller(): Array<CharacterToken> {
         return this.getCharactersByType(Traveller);
     }
 
     @Expose({ groups: ['primary'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    get fabled(): Array<typeof Character> {
+    get fabled(): Array<CharacterToken> {
         return this.getCharactersByType(Fabled);
     }
 
     constructor(
-        characters?: Iterable<typeof Character>,
-        characterTypes?: Map<typeof CharacterType, Array<typeof Character>>
+        characters?: Iterable<CharacterToken>,
+        characterTypes?: Map<typeof CharacterType, Array<CharacterToken>>
     ) {
         if (characters !== undefined) {
             this.initFromCharacters(characters);
@@ -168,11 +168,11 @@ export class CharacterSheet {
 
     getCharactersByType(
         characterType: typeof CharacterType
-    ): Array<typeof Character> {
+    ): Array<CharacterToken> {
         return this.characterTypeToCharacters.get(characterType) || [];
     }
 
-    protected initFromCharacters(characters: Iterable<typeof Character>) {
+    protected initFromCharacters(characters: Iterable<CharacterToken>) {
         if (Array.isArray(characters)) {
             this.characters = characters;
             this.characterTypeToCharacters = Generator.groupBy(
@@ -192,7 +192,7 @@ export class CharacterSheet {
     protected initFromTypeToCharacters(
         characterTypeToCharacters: Map<
             typeof CharacterType,
-            Array<typeof Character>
+            Array<CharacterToken>
         >
     ) {
         this.characterTypeToCharacters = characterTypeToCharacters;

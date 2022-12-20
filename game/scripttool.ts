@@ -1,6 +1,6 @@
 import { EditionData, EditionKeyName, RoleDataKeyName, Script } from './types';
 import { CharacterSheet } from './charactersheet';
-import { Character } from './character';
+import { Character, CharacterToken } from './character';
 import { createCustomEdition, Edition, EditionName } from './edition';
 import { Generator } from './collections';
 import { EditionLoader } from './editionloader';
@@ -106,20 +106,20 @@ export class ScriptConstraintsHelper {
 
     protected declare editions: Array<typeof Edition>;
 
-    protected declare fabled: Array<typeof Character>;
+    protected declare fabled: Array<CharacterToken>;
 
-    protected declare excludes: Array<typeof Character>;
+    protected declare excludes: Array<CharacterToken>;
 
-    protected declare includes: Array<typeof Character>;
+    protected declare includes: Array<CharacterToken>;
 
     protected declare characterTypeToIncludedCharacters: Map<
         typeof CharacterType,
-        Array<typeof Character>
+        Array<CharacterToken>
     >;
 
     protected declare simplified: NumberOfCharacters;
 
-    protected _excludedCandidateCharacters?: Set<typeof Character>;
+    protected _excludedCandidateCharacters?: Set<CharacterToken>;
     protected get excludedCandidateCharacters() {
         if (this._excludedCandidateCharacters === undefined) {
             this._excludedCandidateCharacters = new Set(
@@ -129,7 +129,7 @@ export class ScriptConstraintsHelper {
         return this._excludedCandidateCharacters;
     }
 
-    protected _townsfolkCandidates?: Generator<typeof Character>;
+    protected _townsfolkCandidates?: Generator<CharacterToken>;
     protected get townsfolkCandidates() {
         if (this._townsfolkCandidates === undefined) {
             this._townsfolkCandidates =
@@ -138,7 +138,7 @@ export class ScriptConstraintsHelper {
         return this._townsfolkCandidates;
     }
 
-    protected _outsiderCandidates?: Generator<typeof Character>;
+    protected _outsiderCandidates?: Generator<CharacterToken>;
     protected get outsiderCandidates() {
         if (this._outsiderCandidates === undefined) {
             this._outsiderCandidates =
@@ -147,7 +147,7 @@ export class ScriptConstraintsHelper {
         return this._outsiderCandidates;
     }
 
-    protected _minionCandidates?: Generator<typeof Character>;
+    protected _minionCandidates?: Generator<CharacterToken>;
     protected get minionCandidates() {
         if (this._minionCandidates === undefined) {
             this._minionCandidates = this.getCandidatesByCharacterType(Minion);
@@ -155,7 +155,7 @@ export class ScriptConstraintsHelper {
         return this._minionCandidates;
     }
 
-    protected _demonCandidates?: Generator<typeof Character>;
+    protected _demonCandidates?: Generator<CharacterToken>;
     protected get demonCandidates() {
         if (this._demonCandidates === undefined) {
             this._demonCandidates = this.getCandidatesByCharacterType(Demon);
@@ -163,7 +163,7 @@ export class ScriptConstraintsHelper {
         return this._demonCandidates;
     }
 
-    protected _travellerCandidates?: Generator<typeof Character>;
+    protected _travellerCandidates?: Generator<CharacterToken>;
     protected get travellerCandidates() {
         if (this._travellerCandidates === undefined) {
             this._travellerCandidates =
@@ -177,9 +177,8 @@ export class ScriptConstraintsHelper {
         if (this._candidateCharacterSheets === undefined) {
             const numberOfCharacters = this.simplified;
 
-            const characterTypeCombinations: Array<
-                Iterable<typeof Character[]>
-            > = [];
+            const characterTypeCombinations: Array<Iterable<CharacterToken[]>> =
+                [];
 
             if (numberOfCharacters.townsfolk > 0) {
                 characterTypeCombinations.push(
@@ -233,9 +232,10 @@ export class ScriptConstraintsHelper {
             this._candidateCharacterSheets = Generator.once(
                 characterCombinations
             ).map((charactersForCharacterType) => {
-                const characters = Generator.chain_from_iterable<
-                    typeof Character
-                >(charactersForCharacterType);
+                const characters =
+                    Generator.chain_from_iterable<CharacterToken>(
+                        charactersForCharacterType
+                    );
 
                 if (this.hasIncludes) {
                     return new CharacterSheet(
@@ -371,7 +371,7 @@ export class ScriptConstraintsHelper {
 
     getCandidatesByCharacterType(
         characterType: typeof CharacterType
-    ): Generator<typeof Character> {
+    ): Generator<CharacterToken> {
         const candidates = Generator.cache(
             Generator.chain_from_iterable(
                 Generator.map(
