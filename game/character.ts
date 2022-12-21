@@ -47,6 +47,39 @@ export abstract class Character {
         return id;
     }
 
+    static get readableName() {
+        const name = this.roleData[RoleDataKeyName.NAME];
+        if (name === undefined) {
+            throw new IncompleteCharacterRoleData(
+                this.roleData,
+                RoleDataKeyName.NAME
+            );
+        }
+        return name;
+    }
+
+    static get firstNightOrder(): number {
+        const order = this.roleData[RoleDataKeyName.FIRSTNIGHT];
+        if (order === undefined) {
+            throw new IncompleteCharacterRoleData(
+                this.roleData,
+                RoleDataKeyName.FIRSTNIGHT
+            );
+        }
+        return order;
+    }
+
+    static get otherNightOrder(): number {
+        const order = this.roleData[RoleDataKeyName.OTHERNIGHT];
+        if (order === undefined) {
+            throw new IncompleteCharacterRoleData(
+                this.roleData,
+                RoleDataKeyName.OTHERNIGHT
+            );
+        }
+        return order;
+    }
+
     static get isMinion() {
         return this.is(Minion);
     }
@@ -87,6 +120,10 @@ export abstract class Character {
 
     static toJSON(): string {
         return this.id;
+    }
+
+    static toString() {
+        return `${this.readableName})`;
     }
 
     static toScriptCharacter(): ScriptCharacter {

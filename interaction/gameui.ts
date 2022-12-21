@@ -83,6 +83,18 @@ class GameUI {
     }
 
     /**
+     * Ask storyteller to decide. The required response might be like deciding a night act oder for a character.
+     */
+    storytellerDecide<T>(
+        _reason?: string,
+        _allowNotChoose = false,
+        _timeout = GameUI.DEFAULT_TIMEOUT
+    ): Promise<T> | Promise<undefined> {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
+
+    /**
      * Ask a player for confirmation.
      */
     confirm(
