@@ -42,7 +42,7 @@
             "relativeUpLevel"
         ],
         "typescript.extension.sortImports.sortMethod": "path",
-        "jest.jestCommandLine": "yarn test --maxWorkers=25%"
+        "jest.jestCommandLine": "yarn test%"
     },
 
     // Configure tool-specific properties.
