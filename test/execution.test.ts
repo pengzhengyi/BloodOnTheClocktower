@@ -18,6 +18,15 @@ import {
 } from '~/__mocks__/player';
 import { Player } from '~/game/player';
 import { Generator } from '~/game/collections';
+import { AttemptMoreThanOneExecution } from '~/game/exception';
+
+beforeAll(() => {
+    storytellerConfirmMock.mockImplementation(async () => await true);
+});
+
+afterAll(() => {
+    storytellerConfirmMock.mockReset();
+});
 
 export async function collectVotesForNomination(
     nomination: Nomination,
@@ -35,7 +44,7 @@ export async function collectVotesForNomination(
         votedPlayers.push(votedPlayer);
     }
 
-    hasRaisedHandForVoteMock.mockClear();
+    hasRaisedHandForVoteMock.mockReset();
 
     return votedPlayers;
 }
@@ -88,10 +97,6 @@ async function createExecutionAndAddVotedNominations(
 }
 
 describe('Test basic functionalities', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     test('Correctly get the player to execute', async () => {
         /**
          * Voted = V; Nominator = *; Nominated = @; Dead = #
@@ -148,18 +153,13 @@ describe('Test basic functionalities', () => {
         );
 
         await execution.setPlayerAboutToDie(10 - 3);
-        expect(execution.executed).toEqual(players[7]);
-        storytellerConfirmMock.mockImplementationOnce(async () => await true);
+        expect(execution.toExecute).toEqual(players[7]);
         expect(await execution.execute()).toBeTrue();
         expect(players[7].dead).toBeTrue();
     });
 });
 
 describe('Test Execution Edge Cases', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     test('Players may nominate once per day', async () => {
         const nominator = mockPlayer();
         const nominated1 = mockPlayer();
@@ -184,5 +184,24 @@ describe('Test Execution Edge Cases', () => {
         ]);
 
         expect(canAddNominations).toEqual([true, false]);
+    });
+
+    test('There is a maximum of one execution per day', async () => {
+        const players = await createBasicPlayers(10);
+
+        const execution = await createExecutionAndAddVotedNominations(
+            [[players[0], players[1]]],
+            [new Map(players.map((player) => [player, true]))]
+        );
+
+        expect(await execution.setPlayerAboutToDie(players.length)).toBe(
+            players[1]
+        );
+        expect(await execution.execute()).toBeTrue();
+        expect(execution.executed).toBe(players[1]);
+
+        await expect(
+            async () => await execution.execute()
+        ).rejects.toThrowError(AttemptMoreThanOneExecution);
     });
 });

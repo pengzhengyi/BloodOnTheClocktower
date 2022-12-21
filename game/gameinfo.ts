@@ -27,7 +27,7 @@ export class GameInfo {
     }
 
     get executed(): Player | undefined {
-        const player = this.execution?.executed;
+        const player = this.execution?.toExecute;
         if (player !== undefined) {
             return this._getPlayer(player);
         }

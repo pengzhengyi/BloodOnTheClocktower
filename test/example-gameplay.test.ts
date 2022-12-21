@@ -697,7 +697,7 @@ describe('True Undertaker info', () => {
         );
 
         const mockExecution = mock<Execution>();
-        mockExecution.executed = mayorPlayer;
+        (mockExecution as any).toExecute = mayorPlayer;
 
         const [candidates, _] = await generateInfoCandidates(
             [],
@@ -724,7 +724,7 @@ describe('True Undertaker info', () => {
         );
 
         const mockExecution = mock<Execution>();
-        mockExecution.executed = drunkPlayer;
+        (mockExecution as any).toExecute = drunkPlayer;
 
         const [candidates, _] = await generateInfoCandidates(
             [],
@@ -753,7 +753,7 @@ describe('True Undertaker info', () => {
         );
 
         const mockExecution = mock<Execution>();
-        mockExecution.executed = spyPlayer;
+        (mockExecution as any).toExecute = spyPlayer;
 
         const [candidates, _] = await generateInfoCandidates(
             [],

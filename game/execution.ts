@@ -5,6 +5,7 @@ import { Nomination } from './nomination';
 import { Player } from './player';
 import { Predicate } from './types';
 import {
+    AttemptMoreThanOneExecution,
     NominatedNominatedBefore,
     NominatorNominatedBefore,
     NoVoteInNomination,
@@ -19,25 +20,40 @@ import { GAME_UI } from '~/interaction/gameui';
 @Exclude()
 export class Execution {
     @Expose({ toPlainOnly: true })
-    @Type(() => Player)
-    executed?: Player = undefined;
-
-    @Expose({ toPlainOnly: true })
     @Type(() => Nomination)
     readonly nominations: Array<Nomination> = [];
+
+    @Expose({ toPlainOnly: true })
+    @Type(() => Player)
+    get toExecute(): Player | undefined {
+        return this._toExecute;
+    }
+
+    @Expose({ toPlainOnly: true })
+    @Type(() => Player)
+    get executed(): Player | undefined {
+        return this._executed;
+    }
 
     protected readonly pastNominators: Set<Player> = new Set();
 
     protected readonly pastNominateds: Set<Player> = new Set();
+
+    protected _executed?: Player;
+
+    protected _toExecute?: Player;
 
     /**
      * Set the player about to die as the one to be executed.
      *
      * @param numAlivePlayer Number of alive players in game.
      */
-    async setPlayerAboutToDie(numAlivePlayer: number): Promise<void> {
+    async setPlayerAboutToDie(
+        numAlivePlayer: number
+    ): Promise<Player | undefined> {
         const playerAboutToDie = await this.getPlayerAboutToDie(numAlivePlayer);
-        this.executed = playerAboutToDie;
+        this._toExecute = playerAboutToDie;
+        return playerAboutToDie;
     }
 
     /**
@@ -47,22 +63,41 @@ export class Execution {
      * @returns Whether a player has been executed.
      */
     async execute(player?: Player): Promise<boolean> {
-        if (player === undefined) {
-            if (this.executed === undefined) {
+        if (this.executed !== undefined) {
+            if (player === undefined && this.toExecute === undefined) {
                 return false;
             } else {
-                player = this.executed;
+                const attemptedToExecute = (player || this.toExecute) as Player;
+                throw new AttemptMoreThanOneExecution(
+                    this,
+                    this.executed,
+                    attemptedToExecute
+                );
+            }
+        }
+
+        if (player === undefined) {
+            if (this.toExecute === undefined) {
+                return false;
+            } else {
+                player = this.toExecute;
             }
         }
 
         if (
             await GAME_UI.storytellerConfirm(
-                `Confirm player ${player} will be executed immediately?`
+                this.formatPromptForExecutePlayer(player)
             )
         ) {
-            this.executed = player;
-            player.setDead(DeadReason.Executed);
-            return true;
+            this._toExecute = player;
+            const executionResult = await player.setDead(DeadReason.Executed);
+
+            if (executionResult) {
+                this._executed = player;
+                return true;
+            } else {
+                return false;
+            }
         }
 
         return false;
@@ -141,6 +176,10 @@ export class Execution {
         }
 
         return false;
+    }
+
+    protected formatPromptForExecutePlayer(player: Player): string {
+        return `Confirm player ${player} will be executed immediately?`;
     }
 
     private async checkNominatorNotNominatedBefore(

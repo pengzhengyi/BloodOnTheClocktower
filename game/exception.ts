@@ -1,6 +1,7 @@
 import { Dayjs } from 'dayjs';
 import { fromError, StackFrame } from 'stacktrace-js';
 import { CharacterAct } from './characteract';
+import type { Execution } from './execution';
 import type { Nomination } from './nomination';
 import type { Exile } from './exile';
 import type { Vote } from './vote';
@@ -125,6 +126,22 @@ export class NoVoteInNomination extends RecoverableGameError {
         super(NoVoteInNomination.description);
 
         this.nomination = nomination;
+    }
+}
+
+export class AttemptMoreThanOneExecution extends RecoverableGameError {
+    static description = 'There is a maximum of one execution per day';
+
+    constructor(
+        readonly execution: Execution,
+        readonly executed: Player,
+        readonly attemptedToExecute: Player
+    ) {
+        super(AttemptMoreThanOneExecution.description);
+
+        this.execution = execution;
+        this.executed = executed;
+        this.attemptedToExecute = attemptedToExecute;
     }
 }
 
