@@ -1,4 +1,5 @@
 import type { Alignment } from './alignment';
+import type { CharacterToken } from './character';
 import {
     CharacterType,
     Demon,
@@ -40,6 +41,14 @@ export class Players extends Generator<Player> {
 
     get length(): number {
         return this.players.length;
+    }
+
+    /**
+     * {@link `glossary["In play"]`}
+     * A character that exists in the current game, either alive or dead.
+     */
+    get charactersInPlay(): Iterable<CharacterToken> {
+        return Generator.map((player) => player.character, this.players);
     }
 
     constructor(players: Array<Player>) {
