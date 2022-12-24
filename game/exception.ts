@@ -26,7 +26,6 @@ import {
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
-import type { ITask } from './proxymiddleware';
 import type { Diary, Event as ClocktowerEvent } from './clocktower';
 import { GAME_UI } from '~/interaction/gameui';
 
@@ -631,25 +630,6 @@ export class NoPlayerForCharacterAct extends RecoverableGameError {
         super(NoPlayerForCharacterAct.description);
 
         this.characterAct = characterAct;
-    }
-}
-
-export class DifferentTaskCompleted<TTarget> extends RecoverableGameError {
-    static description = 'A different task was completed than the one expected';
-
-    constructor(
-        readonly expectedTask: ITask<TTarget>,
-        readonly completedTask: ITask<TTarget>
-    ) {
-        super(DifferentTaskCompleted.description);
-    }
-}
-
-export class NoTaskCompleted<TTarget> extends RecoverableGameError {
-    static description = 'Expected one task to complete when none was found';
-
-    constructor(readonly expectedTask: ITask<TTarget>) {
-        super(NoTaskCompleted.description);
     }
 }
 

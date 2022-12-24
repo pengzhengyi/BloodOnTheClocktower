@@ -7,9 +7,8 @@ jest.mock('~/game/effectprecedence', () => ({
     EffectPrecedence,
 }));
 
-import { Effect } from '~/game/effect';
+import type { Effect, InteractionContext } from '~/game/effect';
 import { Effects } from '~/game/effects';
-import { ProxyMiddlewareContext } from '~/game/proxymiddleware';
 import {
     mockApplicableEffect,
     mockInapplicableEffect,
@@ -38,7 +37,7 @@ function createBasicContext<TTarget extends object>(
     target: TTarget,
     trap = 'get',
     args = []
-): ProxyMiddlewareContext<TTarget> {
+): InteractionContext<TTarget> {
     return {
         request: {
             trap,

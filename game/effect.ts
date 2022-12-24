@@ -1,16 +1,34 @@
-import { ApplyFunction } from './middleware';
-import { ProxyMiddleware, ProxyMiddlewareContext } from './proxymiddleware';
+import { ApplyFunction, Middleware } from './middleware';
 import { GAME_UI } from '~/interaction/gameui';
 
-export type EffectContext<TTarget extends object> =
-    ProxyMiddlewareContext<TTarget>;
+interface ProxyHandlerRequest<TTarget extends object> {
+    trap: string;
+    target: TTarget;
+    args: any[];
+}
+
+export type InteractionRequest<TTarget extends object> =
+    ProxyHandlerRequest<TTarget>;
+
+export interface InteractionContext<TTarget extends object> {
+    request: InteractionRequest<TTarget>;
+    response?: any;
+    requester?: any;
+}
+
+export interface Effect<TTarget extends object>
+    extends Middleware<InteractionContext<TTarget>> {
+    /**
+     * Determine whether the effect will trigger under a given context
+     * @param context The context under which the interaction request might trigger the effect.
+     */
+    isApplicable(context: InteractionContext<TTarget>): boolean;
+}
 
 /**
  * Effect is the influence resulting from player's character ability. Effect can impact either the state of the game or players.
  */
-export abstract class Effect<TTarget extends object>
-    implements ProxyMiddleware<TTarget>
-{
+export abstract class Effect<TTarget extends object> {
     protected _active = true;
 
     get active(): boolean {
@@ -43,11 +61,11 @@ export abstract class Effect<TTarget extends object>
         return false;
     }
 
-    isApplicable(_context: EffectContext<TTarget>): boolean {
+    isApplicable(_context: InteractionContext<TTarget>): boolean {
         return this.active;
     }
 
-    abstract apply: ApplyFunction<EffectContext<TTarget>>;
+    abstract apply: ApplyFunction<InteractionContext<TTarget>>;
 
     abstract toString(): string;
 

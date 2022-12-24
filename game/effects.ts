@@ -1,11 +1,11 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator } from './collections';
-import { Effect, EffectContext } from './effect';
+import { Effect, InteractionContext } from './effect';
 import { EffectPrecedence } from './effectprecedence';
 import { Pipeline } from './middleware';
 
 export class Effects<TTarget extends object> extends Pipeline<
-    EffectContext<TTarget>,
+    InteractionContext<TTarget>,
     Effect<TTarget>
 > {
     protected effectToPriority: Map<Effect<TTarget>, number>;
@@ -74,7 +74,7 @@ export class Effects<TTarget extends object> extends Pipeline<
     }
 
     protected getApplicableMiddlewares(
-        context: EffectContext<TTarget>
+        context: InteractionContext<TTarget>
     ): Array<Effect<TTarget>> {
         return Array.from(
             Generator.filter((effect) => effect.isApplicable(context), this)
