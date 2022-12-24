@@ -54,7 +54,7 @@ export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
         ...args: any[]
     ): InteractionContext<TTarget> {
         return {
-            request: {
+            interaction: {
                 trap: proxyHandlerPropertyName,
                 target,
                 args,
@@ -65,6 +65,6 @@ export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
 
     protected handleContext(context: InteractionContext<TTarget>): any {
         const updatedContext = this._pipeline.apply(context);
-        return updatedContext.response;
+        return updatedContext.result;
     }
 }

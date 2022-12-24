@@ -7,13 +7,16 @@ interface ProxyHandlerRequest<TTarget extends object> {
     args: any[];
 }
 
-export type InteractionRequest<TTarget extends object> =
-    ProxyHandlerRequest<TTarget>;
+export type Interaction<TTarget extends object> = ProxyHandlerRequest<TTarget>;
+
+export type InteractionResult = any;
+
+export type InteractionInitiator = any;
 
 export interface InteractionContext<TTarget extends object> {
-    request: InteractionRequest<TTarget>;
-    response?: any;
-    requester?: any;
+    interaction: Interaction<TTarget>;
+    result?: InteractionResult;
+    initiator?: InteractionInitiator;
 }
 
 export interface Effect<TTarget extends object>

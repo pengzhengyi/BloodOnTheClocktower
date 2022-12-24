@@ -39,7 +39,7 @@ function createBasicContext<TTarget extends object>(
     args = []
 ): InteractionContext<TTarget> {
     return {
-        request: {
+        interaction: {
             trap,
             target,
             args,
