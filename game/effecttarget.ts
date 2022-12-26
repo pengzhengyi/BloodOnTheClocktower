@@ -149,10 +149,10 @@ export class EffectTargetFromPerspective<
             return super.handleContext.call(this.originalEffectTarget, context);
         } else {
             // @ts-ignore: forwarding other interaction requests that will not be influenced by effects
-            context.result = Reflect[context.interaction.trap](
+            context.result = Reflect[context.interaction.trap].apply(null, [
                 context.interaction.target,
-                ...context.interaction.args
-            );
+                ...context.interaction.args,
+            ]);
             return context.result;
         }
     }

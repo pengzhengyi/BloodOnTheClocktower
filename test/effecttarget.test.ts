@@ -47,8 +47,7 @@ class RoleCanAccess<T> extends Effect<PrivilegedData<T>> {
     ): InteractionContext<PrivilegedData<T>> {
         const selectedData = context.interaction.target._data.get(this.role);
         context.result = selectedData;
-        next(context);
-        return context;
+        return next(context);
     }
 
     constructor(readonly role: Role) {
@@ -57,15 +56,17 @@ class RoleCanAccess<T> extends Effect<PrivilegedData<T>> {
     }
 
     toString(): string {
-        return `defines data accessible for role ${Role[this.role]}`;
+        return `${super.toString()}(${Role[this.role]})`;
     }
 
     isApplicable(context: InteractionContext<PrivilegedData<T>>): boolean {
         return (
             super.isApplicable(context) &&
-            context.interaction.trap === 'get' &&
-            context.interaction.args[0] === 'data' &&
-            (context.initiator as User)?.role === this.role
+            this.isGetProperty(context, 'data') &&
+            this.matchNotNullInitiator<User>(
+                context,
+                (initiator) => initiator.role === this.role
+            )
         );
     }
 }

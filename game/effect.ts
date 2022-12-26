@@ -1,3 +1,4 @@
+import { Predicate } from './types';
 import type { Middleware, NextFunction } from './middleware';
 import { GAME_UI } from '~/interaction/gameui';
 
@@ -77,6 +78,72 @@ export abstract class Effect<TTarget extends object> {
         return this.constructor.name;
     }
 
+    protected isTrap(
+        context: InteractionContext<TTarget>,
+        trap: keyof ProxyHandler<TTarget>
+    ): boolean {
+        return context.interaction.trap === trap;
+    }
+
+    protected matchTrap(
+        context: InteractionContext<TTarget>,
+        predicate: Predicate<keyof ProxyHandler<TTarget>>
+    ) {
+        return predicate(context.interaction.trap);
+    }
+
+    protected isInitiator(
+        context: InteractionContext<TTarget>,
+        initiator: InteractionInitiator
+    ): boolean {
+        return context.initiator === initiator;
+    }
+
+    protected matchInitiator<T = InteractionInitiator>(
+        context: InteractionContext<TTarget>,
+        predicate: Predicate<T>
+    ) {
+        return predicate(context.initiator);
+    }
+
+    protected matchNotNullInitiator<T = InteractionInitiator>(
+        context: InteractionContext<TTarget>,
+        predicate: Predicate<NonNullable<T>>
+    ) {
+        if (context.initiator === null || context.initiator === undefined) {
+            return false;
+        }
+
+        return predicate(context.initiator);
+    }
+
+    protected matchArgs(
+        context: InteractionContext<TTarget>,
+        predicate: Predicate<any[]>
+    ) {
+        return predicate(context.interaction.args);
+    }
+
+    protected matchFirstArg<T>(
+        context: InteractionContext<TTarget>,
+        predicate: Predicate<T>
+    ) {
+        return predicate(context.interaction.args[0]);
+    }
+
+    protected isGetProperty(
+        context: InteractionContext<TTarget>,
+        property: keyof TTarget
+    ) {
+        return (
+            this.isTrap(context, 'get') &&
+            this.matchFirstArg<string>(
+                context,
+                (actualProperty) => property === actualProperty
+            )
+        );
+    }
+
     protected formatDeactivatePrompt(reason?: string): string {
         return `should deactivate ${this.toString()}${
             reason === undefined ? '' : ' because ' + reason
@@ -105,10 +172,10 @@ export class Forwarding<TTarget extends object> extends Effect<TTarget> {
     ): InteractionContext<TTarget> {
         if (context.result === undefined) {
             // @ts-ignore: allow dynamically invocation of Reflect methods
-            context.result = Reflect[context.interaction.trap](
+            context.result = Reflect[context.interaction.trap].apply(null, [
                 context.interaction.target,
-                ...context.interaction.args
-            );
+                ...context.interaction.args,
+            ]);
         }
 
         return next(context);
