@@ -1,15 +1,16 @@
+/** @deprecated */
+import { DeadReason } from './deadreason';
+import { Phase } from './gamephase';
+import { Influence } from './influence';
+import { Context } from './infoprocessor';
+import { Player } from './player';
 import {
     FortuneTellerChooseInvalidPlayers,
     NoPlayerForCharacterAct,
 } from './exception';
 import type { GameInfo as GameState } from './gameinfo';
 import type { FortuneTellerInfoRequester } from './info';
-import { Influence } from './influence';
-import { Player } from './player';
-import { DeadReason } from './deadreason';
 import type { CharacterToken } from './character';
-import { Context } from './infoprocessor';
-import { Phase } from './gamephase';
 import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';

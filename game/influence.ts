@@ -1,3 +1,5 @@
+/** @deprecated */
+
 import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
 import type { CharacterSheet } from './charactersheet';

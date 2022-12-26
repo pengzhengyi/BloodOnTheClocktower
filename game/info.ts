@@ -1,3 +1,5 @@
+/** @deprecated */
+
 /**
  * Information is sent by storyteller to the player.
  *

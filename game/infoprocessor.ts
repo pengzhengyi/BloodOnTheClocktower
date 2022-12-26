@@ -1,3 +1,5 @@
+/** @deprecated */
+
 import type { GameInfo } from './gameinfo';
 import type { Phase } from './gamephase';
 

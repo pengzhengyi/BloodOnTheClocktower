@@ -1,3 +1,5 @@
+/** @deprecated */
+
 import { Players } from './players';
 import type { CharacterSheet } from './charactersheet';
 import { Player } from './player';
