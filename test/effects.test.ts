@@ -18,7 +18,7 @@ import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
 function createEffects<TTarget extends object>(
     effectToPriority: Map<Effect<TTarget>, number>
 ): Effects<TTarget> {
-    const effects: Effects<TTarget> = new Effects();
+    const effects: Effects<TTarget> = Effects.init(false);
 
     getPriorityMock.mockImplementation(
         (effect: Effect<TTarget>) => effectToPriority.get(effect) || 0
@@ -35,7 +35,7 @@ function createEffects<TTarget extends object>(
 
 function createBasicContext<TTarget extends object>(
     target: TTarget,
-    trap = 'get',
+    trap: keyof ProxyHandler<TTarget> = 'get',
     args = []
 ): InteractionContext<TTarget> {
     return {
@@ -110,7 +110,7 @@ describe('Test Effects basic functionalities', () => {
 
 describe('Test Effects edge cases', () => {
     test('apply with no effect', async () => {
-        const effects = new Effects();
+        const effects = Effects.init(false);
         const player = mockPlayer();
         const basicContext = createBasicContext(player);
         const result = await effects.apply(basicContext);

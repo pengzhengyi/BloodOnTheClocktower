@@ -3,10 +3,9 @@ import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import 'reflect-metadata';
 import { v4 as uuid } from 'uuid';
 import { Alignment } from './alignment';
-import { CharacterToken } from './character';
+import type { CharacterToken } from './character';
 import { CharacterAct } from './characteract';
 import { DeadReason } from './deadreason';
-import { Effects } from './effects';
 import { EffectTarget } from './effecttarget';
 import { InfoRequester } from './info';
 import { Nomination } from './nomination';
@@ -90,8 +89,6 @@ export class Player extends EffectTarget<Player> {
     ): boolean {
         return Object.is(player.characterType, characterType);
     }
-
-    readonly _effects: Effects<Player> = new Effects();
 
     @Expose({ toPlainOnly: true })
     declare alignment: Alignment;
@@ -358,7 +355,8 @@ export class Player extends EffectTarget<Player> {
     }
 
     protected initializeEffects() {
-        // TODO
+        super.initializeEffects();
+        // TODO initialize player specific effects
     }
 
     protected async initializeAlignment(alignment?: Alignment) {

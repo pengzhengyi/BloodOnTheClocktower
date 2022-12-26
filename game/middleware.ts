@@ -5,7 +5,7 @@ export type ApplyFunction<TContext> = (
 ) => TContext;
 
 export interface Middleware<TContext> {
-    apply: ApplyFunction<TContext>;
+    apply(context: TContext, next: NextFunction<TContext>): TContext;
 }
 
 export class Pipeline<

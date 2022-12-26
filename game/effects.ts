@@ -1,6 +1,6 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator } from './collections';
-import { Effect, InteractionContext } from './effect';
+import { Effect, Forwarding, InteractionContext } from './effect';
 import { EffectPrecedence } from './effectprecedence';
 import { Pipeline } from './middleware';
 
@@ -8,6 +8,16 @@ export class Effects<TTarget extends object> extends Pipeline<
     InteractionContext<TTarget>,
     Effect<TTarget>
 > {
+    static init<TTarget extends object>(enableForwarding = true) {
+        const effects = new this<TTarget>();
+
+        if (enableForwarding) {
+            effects.add(Forwarding.instance<TTarget>());
+        }
+
+        return effects;
+    }
+
     protected effectToPriority: Map<Effect<TTarget>, number>;
 
     protected hierarchy: OrderedMap<number, LinkList<Effect<TTarget>>>;
@@ -16,7 +26,7 @@ export class Effects<TTarget extends object> extends Pipeline<
         return this.effectToPriority.size;
     }
 
-    constructor() {
+    protected constructor() {
         super([]);
         this.effectToPriority = new Map<Effect<TTarget>, number>();
         this.hierarchy = new OrderedMap<number, LinkList<Effect<TTarget>>>(

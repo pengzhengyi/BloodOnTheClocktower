@@ -1,8 +1,8 @@
-import { ApplyFunction, Middleware } from './middleware';
+import type { Middleware, NextFunction } from './middleware';
 import { GAME_UI } from '~/interaction/gameui';
 
 interface ProxyHandlerRequest<TTarget extends object> {
-    trap: string;
+    trap: keyof ProxyHandler<TTarget>;
     target: TTarget;
     args: any[];
 }
@@ -68,9 +68,14 @@ export abstract class Effect<TTarget extends object> {
         return this.active;
     }
 
-    abstract apply: ApplyFunction<InteractionContext<TTarget>>;
+    abstract apply(
+        context: InteractionContext<TTarget>,
+        next: NextFunction<InteractionContext<TTarget>>
+    ): InteractionContext<TTarget>;
 
-    abstract toString(): string;
+    toString(): string {
+        return this.constructor.name;
+    }
 
     protected formatDeactivatePrompt(reason?: string): string {
         return `should deactivate ${this.toString()}${
@@ -82,5 +87,30 @@ export abstract class Effect<TTarget extends object> {
         return `should reactivate ${this.toString()}${
             reason === undefined ? '' : ' because ' + reason
         }?`;
+    }
+}
+
+export class Forwarding<TTarget extends object> extends Effect<TTarget> {
+    // eslint-disable-next-line no-use-before-define
+    private static _instance: Forwarding<object>;
+
+    static instance<TTarget extends object>(): Forwarding<TTarget> {
+        return (this._instance ||
+            (this._instance = new this<TTarget>())) as Forwarding<TTarget>;
+    }
+
+    apply(
+        context: InteractionContext<TTarget>,
+        next: NextFunction<InteractionContext<TTarget>>
+    ): InteractionContext<TTarget> {
+        if (context.result === undefined) {
+            // @ts-ignore: allow dynamically invocation of Reflect methods
+            context.result = Reflect[context.interaction.trap](
+                context.interaction.target,
+                ...context.interaction.args
+            );
+        }
+
+        return next(context);
     }
 }

@@ -1,7 +1,5 @@
 export abstract class SelfProxy {
-    protected readonly proxyHandlerPropertyNames: Array<
-        keyof ProxyHandler<this>
-    > = [
+    readonly proxyHandlerPropertyNames: Array<keyof ProxyHandler<this>> = [
         'apply',
         'construct',
         'defineProperty',
