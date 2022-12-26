@@ -65,7 +65,7 @@ export class Player extends EffectTarget<Player> {
             enabledProxyHandlerPropertyNames
         );
         await player.initializeAlignment(alignment);
-        return player;
+        return player.getProxy();
     }
 
     static isAlly(player: Player, otherPlayer: Player) {
