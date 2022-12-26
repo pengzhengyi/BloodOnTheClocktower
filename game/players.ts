@@ -9,8 +9,9 @@ import {
     Townsfolk,
 } from './charactertype';
 import { Generator } from './collections';
+import type { InteractionInitiator } from './effect';
 import { PlayerNotSat } from './exception';
-import { Player } from './player';
+import type { Player } from './player';
 
 export type PlayersModification = (players: Array<Player>) => void;
 
@@ -54,6 +55,11 @@ export class Players extends Generator<Player> {
     constructor(players: Array<Player>) {
         super(players, [], false);
         this.players = players;
+    }
+
+    from(initiator: InteractionInitiator): this {
+        this.map((player) => player.from(initiator));
+        return this;
     }
 
     modify(modification: PlayersModification) {
