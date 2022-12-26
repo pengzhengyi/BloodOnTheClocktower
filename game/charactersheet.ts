@@ -194,9 +194,9 @@ export class CharacterSheet {
      * A character that does not exist in the current game, but is on the character sheet.
      */
     getCharactersNotInPlay(
-        charactersInPlayer: Iterable<CharacterToken>
+        charactersInPlay: Iterable<CharacterToken>
     ): Iterable<CharacterToken> {
-        return Generator.exclude(this.characters, charactersInPlayer);
+        return Generator.exclude(this.characters, charactersInPlay);
     }
 
     protected initFromTypeToCharacters(

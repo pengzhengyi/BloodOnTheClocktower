@@ -52,9 +52,33 @@ export class Players extends Generator<Player> {
         return Generator.map((player) => player.character, this.players);
     }
 
+    get isMinion() {
+        return this.isCharacterType(Minion);
+    }
+
+    get isDemon() {
+        return this.isCharacterType(Demon);
+    }
+
+    get isTownsfolk() {
+        return this.isCharacterType(Townsfolk);
+    }
+
+    get isOutsider() {
+        return this.isCharacterType(Outsider);
+    }
+
+    get isFabled() {
+        return this.isCharacterType(Fabled);
+    }
+
     constructor(players: Array<Player>) {
         super(players, [], false);
         this.players = players;
+    }
+
+    clone(): Players {
+        return new Players(this.players);
     }
 
     from(initiator: InteractionInitiator): this {
@@ -88,26 +112,6 @@ export class Players extends Generator<Player> {
         );
 
         return this.filterByIds(playerIds);
-    }
-
-    isMinion() {
-        return this.isCharacterType(Minion);
-    }
-
-    isDemon() {
-        return this.isCharacterType(Demon);
-    }
-
-    isTownsfolk() {
-        return this.isCharacterType(Townsfolk);
-    }
-
-    isOutsider() {
-        return this.isCharacterType(Outsider);
-    }
-
-    isFabled() {
-        return this.isCharacterType(Fabled);
     }
 
     isCharacterType(characterType: typeof CharacterType) {
