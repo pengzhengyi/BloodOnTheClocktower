@@ -162,6 +162,19 @@ export abstract class Character {
  * The large round token that each player gets at the start of the game that indicates their character. Players cannot look at each other's character tokens.
  */
 export type CharacterToken = typeof Character;
+export type TownsfolkCharacterToken = CharacterToken & {
+    characterType: Townsfolk;
+};
+export type OutsiderCharacterToken = CharacterToken & {
+    characterType: Outsider;
+};
+export type MinionCharacterToken = CharacterToken & { characterType: Minion };
+export type DemonCharacterToken = CharacterToken & { characterType: Demon };
+export type TravellerCharacterToken = CharacterToken & {
+    characterType: Traveller;
+};
+export type FabledCharacterToken = CharacterToken & { characterType: Fabled };
+
 export const CharacterToID = (character: CharacterToken) => character.id;
 export const CharactersToIDs = (characters: Array<CharacterToken>) =>
     characters.map(CharacterToID);

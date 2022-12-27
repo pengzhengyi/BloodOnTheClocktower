@@ -37,6 +37,7 @@ export interface ScriptConstraints extends NumberOfCharacters {
     // ids of character should not appear
     excludes: Array<string>;
 }
+
 export class ScriptConstraintsHelper {
     static defaultConstraints(): ScriptConstraints {
         return {
