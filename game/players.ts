@@ -81,7 +81,7 @@ export class Players extends Generator<Player> {
         return new Players(this.players);
     }
 
-    from(initiator: InteractionInitiator): this {
+    from(initiator?: InteractionInitiator): this {
         this.map((player) => player.from(initiator));
         return this;
     }

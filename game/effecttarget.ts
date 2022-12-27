@@ -19,6 +19,8 @@ export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
         return this._effects;
     }
 
+    protected original?: this;
+
     constructor(
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<TTarget>>
     ) {
@@ -35,7 +37,15 @@ export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
      * @param initiator The initiator of interaction. Effects might apply / not apply because of it.
      * @returns A no-op proxy forwarding to this object but with interaction initiator set to the specified initiator.
      */
-    from(initiator: InteractionInitiator): this {
+    from(initiator?: InteractionInitiator): this {
+        if (initiator === undefined) {
+            return this.original === undefined ? this : this.original;
+        }
+
+        if (this.original === undefined) {
+            this.original = this;
+        }
+
         return EffectTargetFromPerspective.of(
             this,
             initiator

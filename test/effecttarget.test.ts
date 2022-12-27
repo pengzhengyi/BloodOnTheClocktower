@@ -72,17 +72,23 @@ class RoleCanAccess<T> extends Effect<PrivilegedData<T>> {
 }
 
 describe('Test basic functionalities', () => {
-    test('effect application', () => {
-        const adminData = 'Highly confidential data';
-        const contributorData = 'confidential data';
-        const data = PrivilegedData.init<string>(
+    let adminData: string;
+    let contributorData: string;
+    let data: PrivilegedData<string>;
+
+    beforeAll(() => {
+        adminData = 'Highly confidential data';
+        contributorData = 'confidential data';
+        data = PrivilegedData.init<string>(
             new Map([
                 [Role.Admin, adminData],
                 [Role.Contributor, contributorData],
                 [Role.User, 'general data'],
             ])
         );
+    });
 
+    test('effect application', () => {
         expect(data.data).toBeUndefined();
 
         const contributorName = faker.name.firstName();
@@ -99,5 +105,21 @@ describe('Test basic functionalities', () => {
                 role: Role.Admin,
             }).data
         ).toEqual(adminData);
+    });
+
+    test('track and untrack interaction initiator', () => {
+        expect(data.data).toBeUndefined();
+
+        const contributorUser = {
+            user: faker.name.firstName(),
+            role: Role.Contributor,
+        };
+        const dataFromContributor = data.from(contributorUser);
+        expect(dataFromContributor.data).toEqual(contributorData);
+        expect(dataFromContributor).not.toBe(data);
+
+        const _data = dataFromContributor.from(undefined);
+        expect(_data.data).toBeUndefined();
+        expect(_data).toBe(data);
     });
 });
