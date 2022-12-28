@@ -76,6 +76,8 @@
     "cSpell.ignoreWords": [
         "Nominateds",
         "effectprecedence",
+        "infoprovider",
+        "inforequester",
         "proxied",
         "proxymiddleware",
         "unproxied"

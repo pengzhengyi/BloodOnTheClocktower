@@ -1,17 +1,21 @@
 import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue, mockWithPropertyValues } from './common';
 import type { CharacterSheet } from '~/game/charactersheet';
-import { Clocktower } from '~/game/clocktower';
+import type { Clocktower } from '~/game/clocktower';
 import type { InfoProvideContext } from '~/game/infoprovider';
 import type {
     InformationRequestContext,
     IInfoRequester,
 } from '~/game/inforequester';
-import { DemonInformation } from '~/game/information';
+import type {
+    DemonInformation,
+    WasherwomanInformation,
+} from '~/game/information';
 import type { Player } from '~/game/player';
-import { Players } from '~/game/players';
+import type { Players } from '~/game/players';
 import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/travellersheet';
+import { Washerwoman } from '~/content/characters/output/washerwoman';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -65,6 +69,32 @@ export function mockContextForDemonInformation(
         ['isTheDemon', 'alive'],
         [requestedPlayerIsTheDemon, requestedPlayerIsAlive]
     );
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isFirstNight',
+        isFirstNight
+    );
+
+    (context.requestedPlayer.from as jest.Mock).mockReturnValue(
+        context.requestedPlayer
+    );
+
+    return context;
+}
+
+export function mockContextForWasherwomanInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isFirstNight: boolean
+): InformationRequestContext<WasherwomanInformation> {
+    const context = mockInformationRequestContext<WasherwomanInformation>(
+        false,
+        willGetTrueInformation
+    );
+
+    context.requestedPlayer = mockWithPropertyValues<
+        Player,
+        [Washerwoman, boolean]
+    >(['character', 'alive'], [Washerwoman, requestedPlayerIsAlive]);
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isFirstNight',
         isFirstNight
