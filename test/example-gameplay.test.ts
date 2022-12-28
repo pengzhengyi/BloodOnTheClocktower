@@ -19,8 +19,6 @@ import {
     RavenkeeperInfoProvider,
     UndertakerInfo,
     UndertakerInfoProvider,
-    WasherwomanInfo,
-    WasherwomanInfoProvider,
 } from '~/game/info';
 import { Player } from '~/game/player';
 import { GameInfo } from '~/game/gameinfo';
@@ -33,7 +31,6 @@ import {
     SpyInfluence,
 } from '~/game/influence';
 import { GAME_UI } from '~/interaction/gameui';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
 import { Baron } from '~/content/characters/output/baron';
@@ -128,87 +125,6 @@ beforeAll(() => {
 
 afterAll(() => {
     jest.restoreAllMocks();
-});
-
-describe('True Washerwoman info', () => {
-    let washerwomanPlayer: Player;
-    let infoProvider: WasherwomanInfoProvider;
-
-    beforeEach(async () => {
-        washerwomanPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Washerwoman`
-        );
-        infoProvider = new WasherwomanInfoProvider(washerwomanPlayer, true);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    /**
-     * {@link `washerwoman["gameplay"][0]`}
-     */
-    test('Evin is the Chef, and Amy is the Ravenkeeper. The Washerwoman learns that either Evin or Amy is the Chef.', async () => {
-        const [candidates, [Evin, Amy, _]] = await generateInfoCandidates(
-            ['Evin is the Chef', 'Amy is the Ravenkeeper'],
-            [washerwomanPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(2);
-        for (const candidate of candidates as Array<WasherwomanInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Evin, Amy]);
-            expect(candidate.character).toBeOneOf([
-                Evin.character,
-                Amy.character,
-            ]);
-        }
-    });
-
-    /**
-     * {@link `washerwoman["gameplay"][1]`}
-     */
-    test('Julian is the Imp, and Alex is the Virgin. The Washerwoman learns that either Julian or Alex is the Virgin.', async () => {
-        const [candidates, [Julian, Alex, _]] = await generateInfoCandidates(
-            ['Julian is the Imp', 'Alex is the Virgin'],
-            [washerwomanPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<WasherwomanInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Julian, Alex]);
-            expect(candidate.character).toBe(Alex.character);
-        }
-    });
-
-    /**
-     * {@link `washerwoman["gameplay"][2]`}
-     */
-    test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', async () => {
-        const gameUIStorytellerChooseMock = mockStorytellerChoose(Ravenkeeper);
-
-        const [candidates, [_Marianna, _Sarah, _]] =
-            await generateInfoCandidates(
-                ['Marianna is the Spy', 'Sarah is the Scarlet Woman'],
-                [washerwomanPlayer],
-                infoProvider,
-                async (gameInfo, [Marianna, _Sarah, _]) => {
-                    const influence = new SpyInfluence(Marianna);
-
-                    return await influence.apply(gameInfo, mock<Context>());
-                }
-            );
-
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<WasherwomanInfo>) {
-            expect(candidate.players).toHaveLength(2);
-            expect(candidate.players).not.toContain(washerwomanPlayer);
-            expect(candidate.character).toBe(Ravenkeeper);
-        }
-    });
 });
 
 describe('True Librarian info', () => {
