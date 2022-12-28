@@ -1,5 +1,8 @@
-import { BlankGrimoire } from './exception';
+import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
 import { Grimoire } from './grimoire';
+import { InfoProvider, InfoProviders } from './infoprovider';
+import type { InfoRequestContext } from './inforequester';
+import type { Info } from './information';
 import { Player } from './player';
 import { AsyncTask } from './types';
 
@@ -12,6 +15,8 @@ export class StoryTeller {
         'Player is awaken to act or receive information';
 
     protected grimoire?: Grimoire;
+
+    protected infoProviders: InfoProviders = new InfoProviders();
 
     async getGrimoire(): Promise<Grimoire> {
         await new BlankGrimoire(this).throwWhen(
@@ -47,5 +52,31 @@ export class StoryTeller {
         await this.interact(player, action, reason);
 
         player.isWake = false;
+    }
+
+    async giveInfo<TInformation, InfoType extends Info<TInformation>>(
+        context: InfoRequestContext<TInformation>
+    ): Promise<InfoType> {
+        const provideInfo = this.infoProviders.getInfoProviderMethod(
+            context.requester,
+            context.isStoryTellerInformation,
+            (context as any).willGetTrueInformation
+        );
+
+        if (provideInfo === undefined) {
+            const error = new NoDefinedInfoProvider<InfoType, TInformation>(
+                context,
+                this.infoProviders
+            );
+            await error.throwWhen((error) => error.correctedInfo === undefined);
+            return error.correctedInfo!;
+        } else {
+            const infoOptions = await provideInfo(context);
+            const info = (await InfoProvider.chooseOne(
+                infoOptions,
+                context.reason
+            )) as InfoType;
+            return info;
+        }
     }
 }

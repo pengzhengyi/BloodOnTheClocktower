@@ -41,6 +41,10 @@ export function mockPlayer() {
     return mock<Player>();
 }
 
+export function mockAlivePlayer(): Player {
+    return mockWithPropertyValue('alive', true);
+}
+
 export function mockDeadPlayer(): Player {
     return mockWithPropertyValue('alive', false);
 }

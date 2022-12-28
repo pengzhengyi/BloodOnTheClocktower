@@ -5,6 +5,8 @@ import type { Execution } from './execution';
 import type { Nomination } from './nomination';
 import type { Exile } from './exile';
 import type { Vote } from './vote';
+import type { InfoRequestContext } from './inforequester';
+import type { InfoProviders } from './infoprovider';
 import type { Predicate, RoleData } from './types';
 import type { Player } from './player';
 import type { Seat } from './seat';
@@ -657,5 +659,25 @@ export class PastMomentRewrite extends RecoverableGameError {
         this.event = event;
         this.recordedTimestamp = recordedTimestamp;
         this.newTimestamp = newTimestamp;
+    }
+}
+
+export class NoDefinedInfoProvider<
+    InfoType,
+    TInformation
+> extends RecoverableGameError {
+    static description =
+        'Cannot process an information request because there is no associated info provider';
+
+    correctedInfo?: InfoType;
+
+    constructor(
+        readonly context: InfoRequestContext<TInformation>,
+        readonly infoProviders: InfoProviders
+    ) {
+        super(NoDefinedInfoProvider.description);
+
+        this.context = context;
+        this.infoProviders = infoProviders;
     }
 }
