@@ -138,3 +138,11 @@ export type InvestigatorInformation = OneOfTwoPlayersIsMinion;
 export interface ChefInformation {
     numPairEvilPlayers: number;
 }
+
+/**
+ * {@link `empath["ability"]`}
+ * "Each night, you learn how many of your 2 alive neighbours are evil."
+ */
+export interface EmpathInformation {
+    numEvilAliveNeighbors: 0 | 1 | 2;
+}

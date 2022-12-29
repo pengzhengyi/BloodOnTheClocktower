@@ -7,6 +7,7 @@ import { playerFromDescription } from './utils';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import {
     ChefInformationProvider,
+    EmpathInformationProvider,
     InvestigatorInformationProvider,
     LibrarianInformationProvider,
     WasherwomanInformationProvider,
@@ -17,6 +18,7 @@ import { Minion, Outsider, Townsfolk } from '~/game/charactertype';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Chef } from '~/content/characters/output/chef';
 import { Players } from '~/game/players';
+import { DeadReason } from '~/game/deadreason';
 import { Player } from '~/game/player';
 import { Seating } from '~/game/seating';
 import { Virgin } from '~/content/characters/output/virgin';
@@ -29,6 +31,10 @@ import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Baron } from '~/content/characters/output/baron';
+import { Empath } from '~/content/characters/output/empath';
+import { Imp } from '~/content/characters/output/imp';
+import { Monk } from '~/content/characters/output/monk';
+import { Soldier } from '~/content/characters/output/soldier';
 
 async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
@@ -372,6 +378,112 @@ describe('True Chef info', () => {
         for (const option of trueInfoOptions) {
             expect(option.isTrueInfo).toBeTrue();
             expect(option.info.numPairEvilPlayers).toBe(3);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+});
+
+describe('True EmpathInformationProvider', () => {
+    const provider = new EmpathInformationProvider();
+
+    /**
+     * {@link `empath["gameplay"][0]`}
+     */
+    test("The Empath neighbours two good players—a Soldier and a Monk . The Empath learns a '0'.", async () => {
+        const context = await createInfoProvideContextFromPlayerDescriptions(
+            (player) => player.character === Empath,
+            `${faker.name.firstName()} is the Librarian`,
+            `${faker.name.firstName()} is the Soldier`,
+            `${faker.name.firstName()} is the Empath`,
+            `${faker.name.firstName()} is the Monk`
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.numEvilAliveNeighbors).toBe(0);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `empath["gameplay"][1]`}
+     */
+    test("The next day, the Soldier is executed. That night, the Monk is killed by the Imp. The Empath now detects the players sitting next to the Soldier and the Monk, which are a Librarian and an evil Gunslinger. The Empath now learns a '1'.", async () => {
+        const context = await createInfoProvideContextFromPlayerDescriptions(
+            (player) => player.character === Empath,
+            `${faker.name.firstName()} is the Librarian`,
+            `${faker.name.firstName()} is the Soldier`,
+            `${faker.name.firstName()} is the Empath`,
+            `${faker.name.firstName()} is the Monk`,
+            `${faker.name.firstName()} is the evil Gunslinger`,
+            `${faker.name.firstName()} is the Imp`
+        );
+
+        const characterToDeadReason = new Map([
+            [Soldier, DeadReason.Executed],
+            [Monk, DeadReason.DemonAttack],
+        ]);
+        for (const playerShouldBeDead of context.players
+            .clone()
+            .filter((player) => !characterToDeadReason.has(player.character))) {
+            await playerShouldBeDead.setDead(
+                characterToDeadReason.get(playerShouldBeDead.character)
+            );
+        }
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.numEvilAliveNeighbors).toBe(2);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `empath["gameplay"][2]`}
+     */
+    test("There are only three players left alive: the Empath, the Imp, and the Baron. No matter who is seated where, the Empath learns a '2'.", async () => {
+        const context = await createInfoProvideContextFromPlayerDescriptions(
+            (player) => player.character === Chef,
+            `${faker.name.firstName()} is the evil Gunslinger`,
+            `${faker.name.firstName()} is the Imp`,
+            `${faker.name.firstName()} is the Monk`,
+            `${faker.name.firstName()} is the Baron`,
+            `${faker.name.firstName()} is the Librarian`,
+            `${faker.name.firstName()} is the Poisoner`,
+            `${faker.name.firstName()} is the Empath`
+        );
+
+        const aliveCharacters = new Set([Empath, Imp, Baron]);
+        for (const playerShouldBeDead of context.players
+            .clone()
+            .filter((player) => !aliveCharacters.has(player.character))) {
+            await playerShouldBeDead.setDead();
+        }
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.numEvilAliveNeighbors).toBe(2);
             expect(
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);

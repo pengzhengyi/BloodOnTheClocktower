@@ -1,6 +1,7 @@
 import {
     ChefInformationRequester,
     DemonInformationRequester,
+    EmpathInformationRequester,
     InformationRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
@@ -9,6 +10,7 @@ import {
 import type {
     ChefInformation,
     DemonInformation,
+    EmpathInformation,
     InvestigatorInformation,
     LibrarianInformation,
     WasherwomanInformation,
@@ -18,6 +20,7 @@ import { mockWithPropertyValues } from '~/__mocks__/common';
 import {
     mockContextForChefInformation,
     mockContextForDemonInformation,
+    mockContextForEmpathInformation,
     mockContextForInvestigatorInformation,
     mockContextForLibrarianInformation,
     mockContextForWasherwomanInformation,
@@ -200,6 +203,27 @@ describe('test ChefInformationRequester', () => {
 
     test.concurrent('not eligible because requester is dead', async () => {
         const context = mockContextForChefInformation(true, false, true);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+});
+
+describe('test EmpathInformationRequester', () => {
+    const requester = new EmpathInformationRequester<
+        InformationRequestContext<EmpathInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForEmpathInformation(true, true, true);
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because is not night', async () => {
+        const context = mockContextForEmpathInformation(true, true, false);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because requester is dead', async () => {
+        const context = mockContextForEmpathInformation(true, false, true);
         expect(await requester.isEligible(context)).toBeFalse();
     });
 });
