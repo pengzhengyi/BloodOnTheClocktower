@@ -5,12 +5,14 @@ import type {
     DemonInformation,
     Info,
     Information,
+    InvestigatorInformation,
     LibrarianInformation,
     StoryTellerInformation,
     WasherwomanInformation,
 } from './information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
+import { Investigator } from '~/content/characters/output/investigator';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -283,4 +285,17 @@ class BaseLibrarianInformationRequester<
 
 export const LibrarianInformationRequester = IsAlive(
     AtFirstNight(BaseLibrarianInformationRequester)
+);
+
+class BaseInvestigatorInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<InvestigatorInformation>
+> extends CharacterInformationRequester<
+    InvestigatorInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Investigator;
+}
+
+export const InvestigatorInformationRequester = IsAlive(
+    AtFirstNight(BaseInvestigatorInformationRequester)
 );

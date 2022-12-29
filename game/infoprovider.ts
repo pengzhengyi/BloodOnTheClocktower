@@ -1,4 +1,4 @@
-import { CharacterType, Outsider, Townsfolk } from './charactertype';
+import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import { Generator, LazyMap } from './collections';
 import {
     DemonInformation,
@@ -6,6 +6,7 @@ import {
     FalseInformationOptions,
     InfoOptions,
     Information,
+    InvestigatorInformation,
     LibrarianInformation,
     LibrarianNoOutsiderInformation,
     OneOfTwoPlayersHasCharacterType,
@@ -28,6 +29,7 @@ import type { Clocktower } from './clocktower';
 import type { Players } from './players';
 import type { StoryTeller } from './storyteller';
 import type { TravellerSheet } from './travellersheet';
+import { InvestigatorInfoRequester } from './info';
 import { GAME_UI } from '~/interaction/gameui';
 
 export interface InfoProvideContext {
@@ -361,6 +363,15 @@ export class LibrarianInformationProvider<
     }
 }
 
+export class InvestigatorInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends OneOfTwoPlayersHasCharacterTypeInformationProvider<
+    TInfoProvideContext,
+    InvestigatorInformation
+> {
+    protected expectedCharacterType: typeof CharacterType = Minion;
+}
+
 type InfoProviderConstructor<TInformation> = new (
     ...args: any[]
 ) => InfoProvider<TInformation>;
@@ -420,6 +431,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(WasherwomanInformationProvider);
         } else if (requester instanceof LibrarianInformationRequester) {
             return this.providers.get(LibrarianInformationProvider);
+        } else if (requester instanceof InvestigatorInfoRequester) {
+            return this.providers.get(InvestigatorInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }

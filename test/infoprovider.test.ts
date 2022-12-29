@@ -1,12 +1,13 @@
 import { playerFromDescription } from './utils';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import {
+    InvestigatorInformationProvider,
     LibrarianInformationProvider,
     WasherwomanInformationProvider,
 } from '~/game/infoprovider';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
-import { Outsider, Townsfolk } from '~/game/charactertype';
+import { Minion, Outsider, Townsfolk } from '~/game/charactertype';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Chef } from '~/content/characters/output/chef';
 import { Players } from '~/game/players';
@@ -19,6 +20,8 @@ import type {
 } from '~/game/information';
 import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
+import { Investigator } from '~/content/characters/output/investigator';
+import { Baron } from '~/content/characters/output/baron';
 
 function createInfoProvideContext(player: Player, otherPlayers: Player[]) {
     const context = mockInfoProvideContext();
@@ -183,5 +186,56 @@ describe('test LibrarianInformationProvider', () => {
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);
         }
+    });
+});
+
+describe('test InvestigatorInformationProvider', () => {
+    const provider = new InvestigatorInformationProvider();
+    let investigatorPlayer: Player;
+
+    beforeAll(async () => {
+        investigatorPlayer = await createBasicPlayer(undefined, Investigator);
+    });
+
+    /**
+     * {@link `investigator["gameplay"][0]`}
+     */
+    test('Amy is the Baron, and Julian is the Mayor. The Investigator learns that either Amy or Julian is the Baron.', async () => {
+        const Julian = await playerFromDescription('Julian is the Mayor');
+        const Amy = await playerFromDescription('Amy is the Baron');
+
+        const context = createInfoProvideContext(investigatorPlayer, [
+            Julian,
+            Amy,
+        ]);
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.characterType).toBe(Minion);
+            expect(option.info.players).toIncludeSameMembers([Julian, Amy]);
+            expect(option.info.character).toBe(Baron);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `investigator["gameplay"][1]`}
+     */
+    test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `investigator["gameplay"][2]`}
+     */
+    test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
+        // TODO
     });
 });

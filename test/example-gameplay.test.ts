@@ -11,8 +11,6 @@ import {
     FortuneTellerInfo,
     FortuneTellerInfoProvider,
     InfoProvider,
-    InvestigatorInfo,
-    InvestigatorInfoProvider,
     RavenkeeperInfo,
     RavenkeeperInfoProvider,
     UndertakerInfo,
@@ -30,9 +28,6 @@ import {
 } from '~/game/influence';
 import { GAME_UI } from '~/interaction/gameui';
 import { Drunk } from '~/content/characters/output/drunk';
-import { Baron } from '~/content/characters/output/baron';
-import { Spy } from '~/content/characters/output/spy';
-import { Poisoner } from '~/content/characters/output/poisoner';
 import { Execution } from '~/game/execution';
 import { Mayor } from '~/content/characters/output/mayor';
 import { Butler } from '~/content/characters/output/butler';
@@ -122,94 +117,6 @@ beforeAll(() => {
 
 afterAll(() => {
     jest.restoreAllMocks();
-});
-
-describe('True Investigator info', () => {
-    let investigatorPlayer: Player;
-    let infoProvider: InvestigatorInfoProvider;
-
-    beforeEach(async () => {
-        investigatorPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Investigator`
-        );
-        infoProvider = new InvestigatorInfoProvider(investigatorPlayer, true);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    /**
-     * {@link `investigator["gameplay"][0]`}
-     */
-    test('Amy is the Baron, and Julian is the Mayor. The Investigator learns that either Amy or Julian is the Baron.', async () => {
-        const [candidates, [Amy, Julian, _]] = await generateInfoCandidates(
-            ['Amy is the Baron', 'Julian is the Mayor'],
-            [investigatorPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<InvestigatorInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Amy, Julian]);
-            expect(candidate.character).toBe(Baron);
-        }
-    });
-
-    /**
-     * {@link `investigator["gameplay"][1]`}
-     */
-    test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', async () => {
-        const gameUIStorytellerChooseMock = mockStorytellerChoose(Spy);
-
-        const [candidates, [Angelus, Lewis, _]] = await generateInfoCandidates(
-            ['Angelus is the Spy', 'Lewis is the Poisoner'],
-            [investigatorPlayer],
-            infoProvider,
-            async (gameInfo, [Angelus, _Lewis, _]) => {
-                const influence = new SpyInfluence(Angelus);
-
-                return await influence.apply(gameInfo, mock<Context>());
-            }
-        );
-
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
-
-        expect(candidates).toHaveLength(2);
-        for (const candidate of candidates as Array<InvestigatorInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Angelus, Lewis]);
-            expect(candidate.character).toBeOneOf([Spy, Poisoner]);
-        }
-    });
-
-    /**
-     * {@link `investigator["gameplay"][2]`}
-     */
-    test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
-        const gameUIStorytellerChooseMock = mockStorytellerChoose(Poisoner);
-
-        const [candidates, [Brianna, Marianna, _]] =
-            await generateInfoCandidates(
-                ['Brianna is the Recluse', 'Marianna is the Imp'],
-                [investigatorPlayer],
-                infoProvider,
-                async (gameInfo, [Brianna, _Marianna, _]) => {
-                    const influence = new RecluseInfluence(Brianna);
-
-                    return await influence.apply(gameInfo, mock<Context>());
-                }
-            );
-
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
-
-        expect(candidates).toBeArrayOfSize(1);
-        for (const candidate of candidates as Array<InvestigatorInfo>) {
-            expect(
-                candidate.players.map((player) => player.username)
-            ).toIncludeSameMembers([Brianna.username, Marianna.username]);
-            expect(candidate.character).toBe(Poisoner);
-        }
-    });
 });
 
 describe('True Chef info', () => {
@@ -491,6 +398,7 @@ describe('True FortuneTeller info', () => {
         const saint = await playerFromDescription(
             `${faker.name.firstName()} is the Saint`
         );
+        const gameUIStorytellerChooseMock = mockStorytellerChoose(Imp);
         await setPlayerDead(saint);
 
         infoProvider.chosen = [saint, FortuneTellerPlayer];
@@ -509,6 +417,7 @@ describe('True FortuneTeller info', () => {
             }
         );
 
+        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
         expect(candidates).toHaveLength(1);
         for (const candidate of candidates as Array<FortuneTellerInfo>) {
             expect(candidate.hasDemon).toBeTrue();
