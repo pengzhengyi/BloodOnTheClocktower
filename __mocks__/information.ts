@@ -10,6 +10,7 @@ import type {
 import type {
     ChefInformation,
     DemonInformation,
+    EmpathInformation,
     InvestigatorInformation,
     LibrarianInformation,
     WasherwomanInformation,
@@ -23,6 +24,7 @@ import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Chef } from '~/content/characters/output/chef';
+import { Empath } from '~/content/characters/output/empath';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -172,4 +174,20 @@ export function mockContextForChefInformation(
         isFirstNight,
         Chef
     );
+}
+
+export function mockContextForEmpathInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isNight: boolean
+): InformationRequestContext<EmpathInformation> {
+    const context = mockContextForCharacterInformation<
+        Empath,
+        EmpathInformation
+    >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Empath);
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isNight',
+        isNight
+    );
+    return context;
 }

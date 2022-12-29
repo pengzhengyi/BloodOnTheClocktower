@@ -361,18 +361,16 @@ export class Player extends EffectTarget<Player> {
 
     protected async initializeAlignment(alignment?: Alignment) {
         if (alignment === undefined) {
-            const alignment = this.characterType.defaultAlignment;
+            alignment = this.characterType.defaultAlignment;
 
             if (alignment === undefined) {
                 await new PlayerHasUnclearAlignment(this, alignment).throwWhen(
                     (error) => error.player.alignment === undefined
                 );
-            } else {
-                this.alignment = alignment;
             }
-        } else {
-            this.alignment = alignment;
         }
+
+        this.alignment = alignment!;
     }
 }
 

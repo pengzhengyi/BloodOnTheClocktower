@@ -3,6 +3,7 @@ import { Generator, LazyMap } from './collections';
 import {
     ChefInformation,
     DemonInformation,
+    EmpathInformation,
     FalseInformation,
     FalseInformationOptions,
     InfoOptions,
@@ -19,6 +20,7 @@ import {
 import {
     ChefInformationRequester,
     DemonInformationRequester,
+    EmpathInformationRequester,
     IInfoRequester,
     InfoRequestContext,
     LibrarianInformationRequester,
@@ -407,22 +409,10 @@ export class ChefInformationProvider<
     async getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<ChefInformation>> {
-        let numPairEvilPlayers = 0;
-
-        for await (const [
-            player,
-            otherPlayer,
-        ] of context.seating.iterateNeighbors()) {
-            const players = Players.of(player, otherPlayer).from(
-                context.requestedPlayer
-            );
-
-            if (Players.allEvil(players)) {
-                numPairEvilPlayers++;
-            }
-
-            players.from();
-        }
+        const numPairEvilPlayers = await this.getNumPairEvilPlayers(
+            context,
+            false
+        );
 
         return Generator.once([
             Information.true({
@@ -480,13 +470,10 @@ export class ChefInformationProvider<
                 ChefInformationProvider.cachedKeyForNumPairEvilPlayers
             )
         ) {
-            let actualNumPairEvilPlayers = 0;
-
-            for await (const players of context.seating.iterateNeighbors()) {
-                if (Players.allEvil(players)) {
-                    actualNumPairEvilPlayers++;
-                }
-            }
+            const actualNumPairEvilPlayers = await this.getNumPairEvilPlayers(
+                context,
+                false
+            );
 
             evaluationContext.set(
                 ChefInformationProvider.cachedKeyForNumPairEvilPlayers,
@@ -495,6 +482,134 @@ export class ChefInformationProvider<
         }
 
         return evaluationContext;
+    }
+
+    protected async getNumPairEvilPlayers(
+        context: TInfoProvideContext,
+        shouldFromRequestedPlayerPerspective: boolean
+    ): Promise<number> {
+        let numPairEvilPlayers = 0;
+
+        for await (const _players of context.seating.iterateNeighbors()) {
+            const players = shouldFromRequestedPlayerPerspective
+                ? _players.map((player) => player.from(context.requestedPlayer))
+                : _players;
+
+            if (Players.allEvil(players)) {
+                numPairEvilPlayers++;
+            }
+        }
+
+        return numPairEvilPlayers;
+    }
+}
+
+export class EmpathInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends InformationProvider<TInfoProvideContext, EmpathInformation> {
+    protected static readonly cachedKeyForNumEvilAliveNeighbors =
+        'actualNumEvilAliveNeighbors';
+
+    async getTrueInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<TrueInformationOptions<EmpathInformation>> {
+        const numEvilAliveNeighbors = await this.getNumEvilAliveNeighbors(
+            context,
+            true
+        );
+
+        return Generator.once([
+            Information.true({
+                numEvilAliveNeighbors,
+            } as EmpathInformation),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        _context: TInfoProvideContext
+    ): Promise<FalseInformationOptions<EmpathInformation>> {
+        await undefined;
+        return Generator.once(
+            Generator.map(
+                (numEvilAliveNeighbors) =>
+                    Information.false({
+                        numEvilAliveNeighbors,
+                    }) as FalseInformation<EmpathInformation>,
+                Generator.range(0, 3)
+            )
+        );
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 1 if the number of evil alive neighbors is correct, otherwise, the negative of the difference between actual and provided information is used as score. For example, suppose there are 2 evil alive neighbors, 0 reported in information will get -2 as the goodness score.
+     */
+    async evaluateGoodness(
+        information: EmpathInformation,
+        context: TInfoProvideContext,
+        evaluationContext?: LazyMap<string, any>
+    ): Promise<number> {
+        evaluationContext = await this.buildEvaluationContext(
+            context,
+            evaluationContext
+        );
+        const actualNumEvilAliveNeighbors = evaluationContext.getOrDefault(
+            EmpathInformationProvider.cachedKeyForNumEvilAliveNeighbors,
+            0
+        );
+
+        if (information.numEvilAliveNeighbors === actualNumEvilAliveNeighbors) {
+            return 1;
+        } else {
+            return -Math.abs(
+                information.numEvilAliveNeighbors - actualNumEvilAliveNeighbors
+            );
+        }
+    }
+
+    protected async buildEvaluationContextImpl(
+        context: TInfoProvideContext,
+        evaluationContext: LazyMap<string, any>
+    ) {
+        if (
+            !evaluationContext.has(
+                EmpathInformationProvider.cachedKeyForNumEvilAliveNeighbors
+            )
+        ) {
+            const actualNumEvilAliveNeighbors =
+                await this.getNumEvilAliveNeighbors(context, false);
+
+            evaluationContext.set(
+                EmpathInformationProvider.cachedKeyForNumEvilAliveNeighbors,
+                actualNumEvilAliveNeighbors
+            );
+        }
+
+        return evaluationContext;
+    }
+
+    protected async getNumEvilAliveNeighbors(
+        context: TInfoProvideContext,
+        shouldFromRequestedPlayerPerspective: boolean
+    ): Promise<number> {
+        const aliveNeighbors = await context.seating.getAliveNeighbors(
+            context.requestedPlayer,
+            (seat) => {
+                const player = shouldFromRequestedPlayerPerspective
+                    ? seat.player?.from(context.requestedPlayer)
+                    : seat.player;
+
+                return player?.alive ?? false;
+            }
+        );
+
+        return aliveNeighbors.reduce((accumulator, _player) => {
+            const player = shouldFromRequestedPlayerPerspective
+                ? _player.from(context.requestedPlayer)
+                : _player;
+            const newValue = accumulator + (player.isEvil ? 1 : 0);
+
+            return newValue;
+        }, 0);
     }
 }
 
@@ -561,6 +676,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(InvestigatorInformationProvider);
         } else if (requester instanceof ChefInformationRequester) {
             return this.providers.get(ChefInformationProvider);
+        } else if (requester instanceof EmpathInformationRequester) {
+            return this.providers.get(EmpathInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }

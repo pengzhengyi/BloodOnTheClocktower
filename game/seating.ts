@@ -7,7 +7,6 @@ import { Direction, Predicate, TAUTOLOGY } from './types';
 import {
     AccessInvalidSeatPosition,
     NumberOfSeatNotPositive,
-    PlayerNoAliveNeighbors,
     PlayerNoNeighbors,
     PlayerNotSat,
     UnexpectedEmptySeat,
@@ -281,12 +280,15 @@ export class Seating {
      * {@link `glossary["Neighbors"]`}
      * The two players, whether dead or alive, sitting one seat clockwise and counterclockwise from the player in question.
      */
-    async getNeighbors(player: Player): Promise<[Player, Player]> {
+    async getNeighbors(
+        player: Player,
+        predicate?: Predicate<Seat>
+    ): Promise<[Player, Player]> {
         const seat = this.getSeatByPlayer(player);
 
         const neighbors = await Promise.all([
-            this.getCounterclockwisePlayer(seat.position),
-            this.getClockwisePlayer(seat.position),
+            this.getCounterclockwisePlayer(seat.position, predicate),
+            this.getClockwisePlayer(seat.position, predicate),
         ]);
 
         if (neighbors[0] !== undefined && neighbors[1] !== undefined) {
@@ -297,28 +299,14 @@ export class Seating {
     }
 
     /**
-     * {@link `glossary["Alive neighbours:"]`}
+     * {@link `glossary["Alive neighbours"]`}
      * The two alive players that are sitting closest—one clockwise, one counterclockwise—to the player in question, not including any dead players sitting between them.
      */
-    async getAliveNeighbors(player: Player): Promise<[Player, Player]> {
-        const seat = this.getSeatByPlayer(player);
-
-        const neighbors = await Promise.all([
-            this.getCounterclockwisePlayer(
-                seat.position,
-                (seat) => seat.player?.alive ?? false
-            ),
-            this.getClockwisePlayer(
-                seat.position,
-                (seat) => seat.player?.alive ?? false
-            ),
-        ]);
-
-        if (neighbors[0] !== undefined && neighbors[1] !== undefined) {
-            return [neighbors[0], neighbors[1]];
-        } else {
-            throw new PlayerNoAliveNeighbors(player, neighbors, this);
-        }
+    async getAliveNeighbors(
+        player: Player,
+        isAlive: Predicate<Seat> = (seat) => seat.player?.alive ?? false
+    ): Promise<[Player, Player]> {
+        return await this.getNeighbors(player, isAlive);
     }
 
     async assign(
