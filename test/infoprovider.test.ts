@@ -1,6 +1,12 @@
+import { faker } from '@faker-js/faker';
+import { GAME_UI, storytellerConfirmMock } from '~/__mocks__/gameui';
+jest.mock('~/interaction/gameui', () => ({
+    GAME_UI,
+}));
 import { playerFromDescription } from './utils';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import {
+    ChefInformationProvider,
     InvestigatorInformationProvider,
     LibrarianInformationProvider,
     WasherwomanInformationProvider,
@@ -12,6 +18,7 @@ import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Chef } from '~/content/characters/output/chef';
 import { Players } from '~/game/players';
 import { Player } from '~/game/player';
+import { Seating } from '~/game/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
 import type {
@@ -23,12 +30,57 @@ import { Drunk } from '~/content/characters/output/drunk';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Baron } from '~/content/characters/output/baron';
 
+async function createSeatingAndPlayersFromDescriptions(
+    ...playerDescriptions: Array<string>
+): Promise<[Seating, Array<Player>]> {
+    const players = await Promise.all(
+        playerDescriptions.map((description) =>
+            playerFromDescription(description)
+        )
+    );
+    const seating = await Seating.from(players);
+    expect(seating.allSat).toBeTrue();
+    return [seating, players];
+}
+
 function createInfoProvideContext(player: Player, otherPlayers: Player[]) {
     const context = mockInfoProvideContext();
     context.requestedPlayer = player;
     context.players = Players.of(player, ...otherPlayers);
     return context;
 }
+
+async function createInfoProvideContextFromPlayerDescriptions(
+    isRequestedPlayer: (player: Player) => boolean,
+    ...playerDescriptions: Array<string>
+) {
+    const [seating, players] = await createSeatingAndPlayersFromDescriptions(
+        ...playerDescriptions
+    );
+
+    let requestedPlayer: Player;
+    const otherPlayers: Array<Player> = [];
+
+    for (const player of players) {
+        if (isRequestedPlayer(player)) {
+            requestedPlayer = player;
+        } else {
+            otherPlayers.push(player);
+        }
+    }
+
+    const context = createInfoProvideContext(requestedPlayer!, otherPlayers);
+    context.seating = seating;
+    return context;
+}
+
+beforeAll(() => {
+    storytellerConfirmMock.mockImplementation(async () => await true);
+});
+
+afterAll(() => {
+    storytellerConfirmMock.mockReset();
+});
 
 describe('test WasherwomanInformationProvider', () => {
     const provider = new WasherwomanInformationProvider();
@@ -237,5 +289,92 @@ describe('test InvestigatorInformationProvider', () => {
      */
     test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
         // TODO
+    });
+});
+
+describe('True Chef info', () => {
+    const provider = new ChefInformationProvider();
+
+    /**
+     * {@link `chef["gameplay"][0]`}
+     */
+    test("No evil players are sitting next to each other. The Chef learns a '0'.", async () => {
+        const context = await createInfoProvideContextFromPlayerDescriptions(
+            (player) => player.character === Chef,
+            `${faker.name.firstName()} is the Chef`,
+            `${faker.name.firstName()} is the Imp`,
+            `${faker.name.firstName()} is the Empath`,
+            `${faker.name.firstName()} is the Undertaker`
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.numPairEvilPlayers).toBe(0);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `chef["gameplay"][1]`}
+     */
+    test("The Imp is sitting next to the Baron. Across the circle, the Poisoner is sitting next to the Scarlet Woman. The Chef learns a '2'.", async () => {
+        const context = await createInfoProvideContextFromPlayerDescriptions(
+            (player) => player.character === Chef,
+            `${faker.name.firstName()} is the Chef`,
+            `${faker.name.firstName()} is the Imp`,
+            `${faker.name.firstName()} is the Baron`,
+            `${faker.name.firstName()} is the Empath`,
+            `${faker.name.firstName()} is the Poisoner`,
+            `${faker.name.firstName()} is the Scarlet Woman`
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.numPairEvilPlayers).toBe(2);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `chef["gameplay"][2]`}
+     */
+    test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", async () => {
+        const context = await createInfoProvideContextFromPlayerDescriptions(
+            (player) => player.character === Chef,
+            `${faker.name.firstName()} is the Chef`,
+            `${faker.name.firstName()} is the Imp`,
+            `${faker.name.firstName()} is the evil Scapegoat`,
+            `${faker.name.firstName()} is the Baron`,
+            `${faker.name.firstName()} is the Undertaker`,
+            `${faker.name.firstName()} is the Poisoner`,
+            `${faker.name.firstName()} is the Scarlet Woman`
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.numPairEvilPlayers).toBe(3);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
     });
 });

@@ -118,6 +118,9 @@ export class Players extends Generator<Player> {
         return this.filter((player) => player.character.is(characterType));
     }
 
+    /**
+     * @deprecated
+     */
     async *getNeighbors(): AsyncGenerator<[Player, Player]> {
         const reorderedPlayers: Array<Player> = [];
 

@@ -8,6 +8,7 @@ import type {
     IInfoRequester,
 } from '~/game/inforequester';
 import type {
+    ChefInformation,
     DemonInformation,
     InvestigatorInformation,
     LibrarianInformation,
@@ -15,11 +16,13 @@ import type {
 } from '~/game/information';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
+import type { Seating } from '~/game/seating';
 import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/travellersheet';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
+import { Chef } from '~/content/characters/output/chef';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -28,6 +31,7 @@ export function mockInfoProvideContext(): InfoProvideContext {
         travellerSheet: mock<TravellerSheet>(),
         requestedPlayer: mock<Player>(),
         players: mock<Players>(),
+        seating: mock<Seating>(),
         storyteller: mock<StoryTeller>(),
     };
 }
@@ -154,5 +158,18 @@ export function mockContextForInvestigatorInformation(
         requestedPlayerIsAlive,
         isFirstNight,
         Investigator
+    );
+}
+
+export function mockContextForChefInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isFirstNight: boolean
+): InformationRequestContext<ChefInformation> {
+    return mockContextForCharacterInformation<Chef, ChefInformation>(
+        willGetTrueInformation,
+        requestedPlayerIsAlive,
+        isFirstNight,
+        Chef
     );
 }

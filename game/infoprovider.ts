@@ -1,6 +1,7 @@
 import { CharacterType, Minion, Outsider, Townsfolk } from './charactertype';
 import { Generator, LazyMap } from './collections';
 import {
+    ChefInformation,
     DemonInformation,
     FalseInformation,
     FalseInformationOptions,
@@ -16,6 +17,7 @@ import {
     WasherwomanInformation,
 } from './information';
 import {
+    ChefInformationRequester,
     DemonInformationRequester,
     IInfoRequester,
     InfoRequestContext,
@@ -26,7 +28,8 @@ import { Player } from './player';
 import type { CharacterToken } from './character';
 import type { CharacterSheet } from './charactersheet';
 import type { Clocktower } from './clocktower';
-import type { Players } from './players';
+import { Players } from './players';
+import type { Seating } from './seating';
 import type { StoryTeller } from './storyteller';
 import type { TravellerSheet } from './travellersheet';
 import { InvestigatorInfoRequester } from './info';
@@ -39,6 +42,7 @@ export interface InfoProvideContext {
     requestedPlayer: Player;
     players: Players;
     storyteller: StoryTeller;
+    seating: Seating;
     reason?: string;
 }
 
@@ -50,11 +54,13 @@ export interface IInformationProvider<
      * Give a score for a piece of information based on its "goodness". Positive score means this information is helpful while negative score means it is misleading. Zero means no evaluation is provided. This score can be used in UI to sort options available for storyteller to choose from.
      * @param information The information to be evaluated.
      * @param context The context where the information is requested
+     * @param evaluationContext A context used for caching expensive computation purpose in evaluation of information goodness. By passing in same evaluation context, the implementation might take advantage of any saved information.
      * @returns A score indicating how "good" a piece of information is to its requester.
      */
     evaluateGoodness(
         information: TInformation,
-        context: TInfoProvideContext
+        context: TInfoProvideContext,
+        evaluationContext?: LazyMap<string, any>
     ): Promise<number>;
 
     getTrueInformationOptions(
@@ -108,9 +114,29 @@ export abstract class InformationProvider<
 
     async evaluateGoodness(
         _information: TInformation,
-        _context: TInfoProvideContext
+        _context: TInfoProvideContext,
+        _evaluationContext?: LazyMap<string, any>
     ): Promise<number> {
         return await 0;
+    }
+
+    protected async buildEvaluationContext(
+        context: TInfoProvideContext,
+        evaluationContext?: LazyMap<string, any>
+    ): Promise<LazyMap<string, any>> {
+        evaluationContext ??= new LazyMap(() => undefined);
+
+        return await this.buildEvaluationContextImpl(
+            context,
+            evaluationContext
+        );
+    }
+
+    protected async buildEvaluationContextImpl(
+        _context: TInfoProvideContext,
+        evaluationContext: LazyMap<string, any>
+    ): Promise<LazyMap<string, any>> {
+        return await evaluationContext;
     }
 }
 
@@ -372,6 +398,106 @@ export class InvestigatorInformationProvider<
     protected expectedCharacterType: typeof CharacterType = Minion;
 }
 
+export class ChefInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends InformationProvider<TInfoProvideContext, ChefInformation> {
+    protected static readonly cachedKeyForNumPairEvilPlayers =
+        'actualNumPairEvilPlayers';
+
+    async getTrueInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<TrueInformationOptions<ChefInformation>> {
+        let numPairEvilPlayers = 0;
+
+        for await (const [
+            player,
+            otherPlayer,
+        ] of context.seating.iterateNeighbors()) {
+            const players = Players.of(player, otherPlayer).from(
+                context.requestedPlayer
+            );
+
+            if (Players.allEvil(players)) {
+                numPairEvilPlayers++;
+            }
+
+            players.from();
+        }
+
+        return Generator.once([
+            Information.true({
+                numPairEvilPlayers,
+            }),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<FalseInformationOptions<ChefInformation>> {
+        const numPlayers = await context.players.length;
+
+        return Generator.once(
+            Generator.map(
+                (numPairEvilPlayers) =>
+                    Information.false({ numPairEvilPlayers }),
+                Generator.range(0, numPlayers + 1)
+            )
+        );
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 1 if the number of pairs of evil players is correct, otherwise, the negative of the difference between actual and provided information is used as score. For example, suppose there are 3 pairs, both 1 and 5 reported in information will get -2 as the goodness score.
+     */
+    async evaluateGoodness(
+        information: ChefInformation,
+        context: TInfoProvideContext,
+        evaluationContext?: LazyMap<string, any>
+    ): Promise<number> {
+        evaluationContext = await this.buildEvaluationContext(
+            context,
+            evaluationContext
+        );
+        const actualNumPairEvilPlayers = evaluationContext.getOrDefault(
+            ChefInformationProvider.cachedKeyForNumPairEvilPlayers,
+            0
+        );
+
+        if (information.numPairEvilPlayers === actualNumPairEvilPlayers) {
+            return 1;
+        } else {
+            return -Math.abs(
+                information.numPairEvilPlayers - actualNumPairEvilPlayers
+            );
+        }
+    }
+
+    protected async buildEvaluationContextImpl(
+        context: TInfoProvideContext,
+        evaluationContext: LazyMap<string, any>
+    ) {
+        if (
+            !evaluationContext.has(
+                ChefInformationProvider.cachedKeyForNumPairEvilPlayers
+            )
+        ) {
+            let actualNumPairEvilPlayers = 0;
+
+            for await (const players of context.seating.iterateNeighbors()) {
+                if (Players.allEvil(players)) {
+                    actualNumPairEvilPlayers++;
+                }
+            }
+
+            evaluationContext.set(
+                ChefInformationProvider.cachedKeyForNumPairEvilPlayers,
+                actualNumPairEvilPlayers
+            );
+        }
+
+        return evaluationContext;
+    }
+}
+
 type InfoProviderConstructor<TInformation> = new (
     ...args: any[]
 ) => InfoProvider<TInformation>;
@@ -433,6 +559,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(LibrarianInformationProvider);
         } else if (requester instanceof InvestigatorInfoRequester) {
             return this.providers.get(InvestigatorInformationProvider);
+        } else if (requester instanceof ChefInformationRequester) {
+            return this.providers.get(ChefInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }

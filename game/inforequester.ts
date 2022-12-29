@@ -2,6 +2,7 @@
 import type { CharacterToken } from './character';
 import type { InfoProvideContext } from './infoprovider';
 import type {
+    ChefInformation,
     DemonInformation,
     Info,
     Information,
@@ -13,6 +14,7 @@ import type {
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
+import { Chef } from '~/content/characters/output/chef';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -298,4 +300,17 @@ class BaseInvestigatorInformationRequester<
 
 export const InvestigatorInformationRequester = IsAlive(
     AtFirstNight(BaseInvestigatorInformationRequester)
+);
+
+class BaseChefInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<ChefInformation>
+> extends CharacterInformationRequester<
+    ChefInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Chef;
+}
+
+export const ChefInformationRequester = IsAlive(
+    AtFirstNight(BaseChefInformationRequester)
 );

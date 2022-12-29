@@ -188,7 +188,7 @@ export class Seating {
             clockwiseSeats,
             this.seats[nominatedPosition]
         )) {
-            await new UnexpectedEmptySeat(seat).throwWhen(
+            await new UnexpectedEmptySeat(this, seat).throwWhen(
                 (error) => error.emptySeat.player === undefined
             );
             yield seat.player!;
@@ -262,6 +262,19 @@ export class Seating {
         }
 
         return this.seats[seatNum];
+    }
+
+    async *iterateNeighbors(): AsyncIterable<[Player, Player]> {
+        for (const seats of this.iterateNeighboringSeats()) {
+            for (const seat of seats) {
+                await new UnexpectedEmptySeat(this, seat).throwWhen(
+                    (error) =>
+                        error.emptySeat === undefined || error.emptySeat.isEmpty
+                );
+            }
+
+            yield seats.map((seat) => seat.player!) as [Player, Player];
+        }
     }
 
     /**
@@ -506,6 +519,13 @@ export class Seating {
         }
     }
 
+    protected iterateNeighboringSeats(): Iterable<[Seat, Seat]> {
+        return Generator.pair(
+            clockwise(this.seats, 0),
+            clockwise(this.seats, 1)
+        );
+    }
+
     protected tryGetNextSeat(
         seatPosition: number,
         filterSeat?: Predicate<Seat>
@@ -525,7 +545,7 @@ export class Seating {
         const nextSeat = this.tryGetNextSeat(seatPosition, filterSeat);
 
         if (nextSeat !== undefined) {
-            await new UnexpectedEmptySeat(nextSeat).throwWhen(
+            await new UnexpectedEmptySeat(this, nextSeat).throwWhen(
                 (error) => error.emptySeat.player === undefined
             );
         }
@@ -552,7 +572,7 @@ export class Seating {
         const prevSeat = this.tryGetPrevSeat(seatPosition, filterSeat);
 
         if (prevSeat !== undefined) {
-            await new UnexpectedEmptySeat(prevSeat).throwWhen(
+            await new UnexpectedEmptySeat(this, prevSeat).throwWhen(
                 (error) => error.emptySeat.player === undefined
             );
         }

@@ -298,9 +298,10 @@ export class UnexpectedEmptySeat extends RecoverableGameError {
         return this.emptySeat.player;
     }
 
-    constructor(readonly emptySeat: Seat) {
+    constructor(readonly seating: Seating, readonly emptySeat: Seat) {
         super(UnexpectedEmptySeat.description);
 
+        this.seating = seating;
         this.emptySeat = emptySeat;
     }
 }

@@ -134,3 +134,7 @@ export type LibrarianInformation =
     | LibrarianNoOutsiderInformation;
 
 export type InvestigatorInformation = OneOfTwoPlayersIsMinion;
+
+export interface ChefInformation {
+    numPairEvilPlayers: number;
+}

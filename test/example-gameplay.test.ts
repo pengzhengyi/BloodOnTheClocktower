@@ -4,8 +4,6 @@ import { faker } from '@faker-js/faker';
 import { mock } from 'jest-mock-extended';
 import { playerFromDescription } from './utils';
 import {
-    ChefInfo,
-    ChefInfoProvider,
     EmpathInfo,
     EmpathInfoProvider,
     FortuneTellerInfo,
@@ -117,83 +115,6 @@ beforeAll(() => {
 
 afterAll(() => {
     jest.restoreAllMocks();
-});
-
-describe('True Chef info', () => {
-    let chefPlayer: Player;
-    let infoProvider: ChefInfoProvider;
-
-    beforeEach(async () => {
-        chefPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Chef`
-        );
-        infoProvider = new ChefInfoProvider(chefPlayer, true);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    /**
-     * {@link `chef["gameplay"][0]`}
-     */
-    test("No evil players are sitting next to each other. The Chef learns a '0'.", async () => {
-        const [candidates, _] = await generateInfoCandidates(
-            ['Julian is the Mayor'],
-            [chefPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<ChefInfo>) {
-            expect(candidate.numPairEvilPlayers).toBe(0);
-        }
-    });
-
-    /**
-     * {@link `chef["gameplay"][1]`}
-     */
-    test("The Imp is sitting next to the Baron. Across the circle, the Poisoner is sitting next to the Scarlet Woman. The Chef learns a '2'.", async () => {
-        const [candidates, _] = await generateInfoCandidates(
-            [
-                `${faker.name.firstName()} is the Imp`,
-                `${faker.name.firstName()} is the Baron`,
-                `${faker.name.firstName()} is the Empath`,
-                `${faker.name.firstName()} is the Poisoner`,
-                `${faker.name.firstName()} is the Scarlet Woman`,
-            ],
-            [chefPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<ChefInfo>) {
-            expect(candidate.numPairEvilPlayers).toBe(2);
-        }
-    });
-
-    /**
-     * {@link `chef["gameplay"][2]`}
-     */
-    test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", async () => {
-        const [candidates, _] = await generateInfoCandidates(
-            [
-                `${faker.name.firstName()} is the Imp`,
-                `${faker.name.firstName()} is the evil Scapegoat`,
-                `${faker.name.firstName()} is the Baron`,
-                `${faker.name.firstName()} is the Undertaker`,
-                `${faker.name.firstName()} is the Poisoner`,
-                `${faker.name.firstName()} is the Scarlet Woman`,
-            ],
-            [chefPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<ChefInfo>) {
-            expect(candidate.numPairEvilPlayers).toBe(3);
-        }
-    });
 });
 
 describe('True Empath info', () => {

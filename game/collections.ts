@@ -25,6 +25,10 @@ export class LazyMap<K, V> extends Map<K, V> {
 
         return super.get(key);
     }
+
+    getOrDefault(key: K, defaultValue: V) {
+        return super.get(key) ?? defaultValue;
+    }
 }
 
 export class DefaultDict<K, V, Vs = Array<V>> extends Map<K, Vs> {
