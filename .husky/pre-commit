@@ -10,4 +10,5 @@ fi
 
 yarn lintfix
 yarn lint-staged
+yarn test
 pre-commit run
