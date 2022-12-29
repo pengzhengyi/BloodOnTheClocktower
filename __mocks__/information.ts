@@ -9,6 +9,7 @@ import type {
 } from '~/game/inforequester';
 import type {
     DemonInformation,
+    LibrarianInformation,
     WasherwomanInformation,
 } from '~/game/information';
 import type { Player } from '~/game/player';
@@ -16,6 +17,7 @@ import type { Players } from '~/game/players';
 import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/travellersheet';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
+import { Librarian } from '~/content/characters/output/librarian';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -81,20 +83,21 @@ export function mockContextForDemonInformation(
     return context;
 }
 
-export function mockContextForWasherwomanInformation(
+export function mockContextForCharacterInformation<TCharacter, TInformation>(
     willGetTrueInformation: boolean,
     requestedPlayerIsAlive: boolean,
-    isFirstNight: boolean
-): InformationRequestContext<WasherwomanInformation> {
-    const context = mockInformationRequestContext<WasherwomanInformation>(
+    isFirstNight: boolean,
+    character: TCharacter
+): InformationRequestContext<TInformation> {
+    const context = mockInformationRequestContext<TInformation>(
         false,
         willGetTrueInformation
     );
 
     context.requestedPlayer = mockWithPropertyValues<
         Player,
-        [Washerwoman, boolean]
-    >(['character', 'alive'], [Washerwoman, requestedPlayerIsAlive]);
+        [TCharacter, boolean]
+    >(['character', 'alive'], [character, requestedPlayerIsAlive]);
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isFirstNight',
         isFirstNight
@@ -105,4 +108,33 @@ export function mockContextForWasherwomanInformation(
     );
 
     return context;
+}
+
+export function mockContextForWasherwomanInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isFirstNight: boolean
+): InformationRequestContext<WasherwomanInformation> {
+    return mockContextForCharacterInformation<
+        Washerwoman,
+        WasherwomanInformation
+    >(
+        willGetTrueInformation,
+        requestedPlayerIsAlive,
+        isFirstNight,
+        Washerwoman
+    );
+}
+
+export function mockContextForLibrarianInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isFirstNight: boolean
+): InformationRequestContext<LibrarianInformation> {
+    return mockContextForCharacterInformation<Librarian, LibrarianInformation>(
+        willGetTrueInformation,
+        requestedPlayerIsAlive,
+        isFirstNight,
+        Librarian
+    );
 }

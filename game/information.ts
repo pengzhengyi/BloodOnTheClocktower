@@ -16,7 +16,7 @@
  */
 import { Generator } from './collections';
 import type { CharacterToken } from './character';
-import type { CharacterType, Townsfolk } from './charactertype';
+import type { CharacterType, Outsider, Townsfolk } from './charactertype';
 import { MinionPlayer, Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
 
@@ -111,4 +111,15 @@ export type OneOfTwoPlayersIsTownsfolk = OneOfTwoPlayersHasCharacterType & {
     characterType: Townsfolk;
 };
 
+export type OneOfTwoPlayersIsOutsider = OneOfTwoPlayersHasCharacterType & {
+    characterType: Outsider;
+};
+
 export type WasherwomanInformation = OneOfTwoPlayersIsTownsfolk;
+
+export type LibrarianNoOutsiderInformation = {
+    noOutsiders: true;
+};
+export type LibrarianInformation =
+    | OneOfTwoPlayersIsOutsider
+    | LibrarianNoOutsiderInformation;

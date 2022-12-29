@@ -1,11 +1,15 @@
-import { CharacterType, Townsfolk } from './charactertype';
+import { CharacterType, Outsider, Townsfolk } from './charactertype';
 import { Generator, LazyMap } from './collections';
 import {
     DemonInformation,
+    FalseInformation,
     FalseInformationOptions,
     InfoOptions,
     Information,
+    LibrarianInformation,
+    LibrarianNoOutsiderInformation,
     OneOfTwoPlayersHasCharacterType,
+    OneOfTwoPlayersIsOutsider,
     StoryTellerInformationOptions,
     TrueInformationOptions,
     WasherwomanInformation,
@@ -14,6 +18,7 @@ import {
     DemonInformationRequester,
     IInfoRequester,
     InfoRequestContext,
+    LibrarianInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
 import { Player } from './player';
@@ -108,12 +113,11 @@ export abstract class InformationProvider<
 }
 
 export class DemonInformationProvider<
-    TInfoProvideContext extends InfoProvideContext,
-    TInformation extends DemonInformation
-> extends InformationProvider<TInfoProvideContext, TInformation> {
+    TInfoProvideContext extends InfoProvideContext
+> extends InformationProvider<TInfoProvideContext, DemonInformation> {
     async getTrueInformationOptions(
         context: TInfoProvideContext
-    ): Promise<TrueInformationOptions<TInformation>> {
+    ): Promise<TrueInformationOptions<DemonInformation>> {
         const minionPlayers = context.players
             .clone()
             .from(context.requestedPlayer)
@@ -143,7 +147,7 @@ export class DemonInformationProvider<
             Information.true({
                 minions,
                 notInPlayGoodCharacters,
-            } as TInformation)
+            })
         );
 
         return await infoOptions;
@@ -151,7 +155,7 @@ export class DemonInformationProvider<
 
     async getFalseInformationOptions(
         context: TInfoProvideContext
-    ): Promise<FalseInformationOptions<TInformation>> {
+    ): Promise<FalseInformationOptions<DemonInformation>> {
         const perceivedMinionPlayersCombinations = context.players
             .isNot(context.requestedPlayer)
             .combinations(context.travellerSheet.actualAssignment.minion);
@@ -175,7 +179,7 @@ export class DemonInformationProvider<
             Information.false({
                 minions,
                 notInPlayGoodCharacters,
-            } as TInformation)
+            })
         );
 
         return await infoOptions;
@@ -185,7 +189,7 @@ export class DemonInformationProvider<
      * @override Goodness is evaluated on the following criterion: 5 for each player that is a minion, -5 if not; 3 for each character that is not in play, -3 if not.
      */
     async evaluateGoodness(
-        information: TInformation,
+        information: DemonInformation,
         context: TInfoProvideContext
     ): Promise<number> {
         let score = Generator.reduce(
@@ -288,13 +292,73 @@ abstract class OneOfTwoPlayersHasCharacterTypeInformationProvider<
 }
 
 export class WasherwomanInformationProvider<
-    TInfoProvideContext extends InfoProvideContext,
-    TInformation extends WasherwomanInformation
+    TInfoProvideContext extends InfoProvideContext
 > extends OneOfTwoPlayersHasCharacterTypeInformationProvider<
     TInfoProvideContext,
-    TInformation
+    WasherwomanInformation
 > {
     protected expectedCharacterType: typeof CharacterType = Townsfolk;
+}
+
+export class LibrarianInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends OneOfTwoPlayersHasCharacterTypeInformationProvider<
+    TInfoProvideContext,
+    OneOfTwoPlayersIsOutsider
+> {
+    static readonly NO_OUTSIDER_INFORMATION: LibrarianInformation = {
+        noOutsiders: true,
+    };
+
+    protected expectedCharacterType: typeof CharacterType = Outsider;
+
+    async evaluateGoodness(
+        information: LibrarianInformation,
+        context: TInfoProvideContext
+    ): Promise<number> {
+        if ((information as LibrarianNoOutsiderInformation).noOutsiders) {
+            return context.players.any((player) => player.isOutsider) ? -1 : 1;
+        } else {
+            return await super.evaluateGoodness(
+                information as OneOfTwoPlayersIsOutsider,
+                context
+            );
+        }
+    }
+
+    // @ts-ignore: allow different return type for overridden method
+    async getTrueInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<TrueInformationOptions<LibrarianInformation>> {
+        const infoOptions = (await super.getTrueInformationOptions(
+            context
+        )) as TrueInformationOptions<LibrarianInformation>;
+        const options: TrueInformationOptions<LibrarianInformation> =
+            infoOptions.orElse(
+                Information.true(
+                    LibrarianInformationProvider.NO_OUTSIDER_INFORMATION
+                )
+            );
+
+        return options;
+    }
+
+    // @ts-ignore: allow different return type for overridden method
+    async getFalseInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<FalseInformationOptions<LibrarianInformation>> {
+        const infoOptions = (await super.getFalseInformationOptions(
+            context
+        )) as Generator<FalseInformation<LibrarianInformation>>;
+        const options: Generator<FalseInformation<LibrarianInformation>> =
+            infoOptions.push(
+                Information.false({
+                    noOutsiders: true,
+                }) as FalseInformation<LibrarianInformation>
+            );
+
+        return options;
+    }
 }
 
 type InfoProviderConstructor<TInformation> = new (
@@ -354,6 +418,8 @@ export class InfoProviders<TInformation = any> {
     ): InfoProvider<TInformation> | undefined {
         if (requester instanceof WasherwomanInformationRequester) {
             return this.providers.get(WasherwomanInformationProvider);
+        } else if (requester instanceof LibrarianInformationRequester) {
+            return this.providers.get(LibrarianInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }

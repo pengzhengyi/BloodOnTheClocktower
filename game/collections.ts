@@ -182,7 +182,12 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
-    static *orElse<T>(iterable: Iterable<T>, defaultValue: T): Iterable<T> {
+    // TODO: submit bug report on Typescript
+    static *orElse<T1, T2 = T1>(
+        iterable: Iterable<T1>,
+        defaultValue: T2
+        // @ts-ignore: enforce type for orElse
+    ): Iterable<T1> | Iterable<T2> {
         let hasElement = false;
         for (const element of iterable) {
             hasElement = true;
@@ -613,6 +618,11 @@ export class Generator<T> implements Iterable<T> {
         return this.transform(transform);
     }
 
+    transmute<T2, G>(transform: Transform<Iterable<T>, T2>): G {
+        // @ts-ignore: force type conversion here instead of creating a new instance
+        return this.transform(transform);
+    }
+
     filter(predicate: Predicate<T>) {
         return this.transform((iterable) =>
             Generator.filter(predicate, iterable)
@@ -646,13 +656,14 @@ export class Generator<T> implements Iterable<T> {
     }
 
     push(...items: T[]) {
-        this.transform((iterable) => Generator.push(iterable, ...items));
+        return this.transform((iterable) => Generator.push(iterable, ...items));
     }
 
-    orElse(defaultValue: T) {
-        return this.transform((iterable) =>
-            Generator.orElse(iterable, defaultValue)
-        );
+    orElse<T2 = T>(defaultValue: T2) {
+        return this.transmute<
+            Iterable<T> | Iterable<T2>,
+            Generator<T> | Generator<T2>
+        >((iterable) => Generator.orElse<T, T2>(iterable, defaultValue));
     }
 
     pair<T2>(otherIterable: Iterable<T2>) {

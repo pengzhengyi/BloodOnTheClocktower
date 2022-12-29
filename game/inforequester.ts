@@ -1,13 +1,16 @@
 /* eslint-disable unused-imports/no-unused-vars */
+import type { CharacterToken } from './character';
 import type { InfoProvideContext } from './infoprovider';
 import type {
     DemonInformation,
     Info,
     Information,
+    LibrarianInformation,
     StoryTellerInformation,
     WasherwomanInformation,
 } from './information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
+import { Librarian } from '~/content/characters/output/librarian';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -223,9 +226,8 @@ function IsAlive<
 }
 
 class BaseDemonInformationRequester<
-    TInformation extends DemonInformation,
-    TInformationRequestContext extends InformationRequestContext<TInformation>
-> extends InformationRequester<TInformation, TInformationRequestContext> {
+    TInformationRequestContext extends InformationRequestContext<DemonInformation>
+> extends InformationRequester<DemonInformation, TInformationRequestContext> {
     async isEligible(context: TInformationRequestContext): Promise<boolean> {
         if ((await super.isEligible(context)) && context.players.length >= 7) {
             const isTheDemon = context.requestedPlayer.from(
@@ -243,18 +245,42 @@ export const DemonInformationRequester = IsAlive(
     AtFirstNight(BaseDemonInformationRequester)
 );
 
-class BaseWasherwomanInformationRequester<
-    TInformation extends WasherwomanInformation,
+abstract class CharacterInformationRequester<
+    TInformation,
     TInformationRequestContext extends InformationRequestContext<TInformation>
 > extends InformationRequester<TInformation, TInformationRequestContext> {
+    abstract readonly expectedCharacter: CharacterToken;
+
     async isEligible(context: TInformationRequestContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
-            context.requestedPlayer.character === Washerwoman
+            context.requestedPlayer.character === this.expectedCharacter
         );
     }
 }
 
+class BaseWasherwomanInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<WasherwomanInformation>
+> extends CharacterInformationRequester<
+    WasherwomanInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Washerwoman;
+}
+
 export const WasherwomanInformationRequester = IsAlive(
     AtFirstNight(BaseWasherwomanInformationRequester)
+);
+
+class BaseLibrarianInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<LibrarianInformation>
+> extends CharacterInformationRequester<
+    LibrarianInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Librarian;
+}
+
+export const LibrarianInformationRequester = IsAlive(
+    AtFirstNight(BaseLibrarianInformationRequester)
 );

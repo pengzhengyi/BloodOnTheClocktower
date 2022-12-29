@@ -1,22 +1,24 @@
 import {
     DemonInformationRequester,
     InformationRequestContext,
+    LibrarianInformationRequester,
     WasherwomanInformationRequester,
 } from '~/game/inforequester';
 import type {
     DemonInformation,
+    LibrarianInformation,
     WasherwomanInformation,
 } from '~/game/information';
 import type { Player } from '~/game/player';
 import { mockWithPropertyValues } from '~/__mocks__/common';
 import {
     mockContextForDemonInformation,
+    mockContextForLibrarianInformation,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
 
 describe('test DemonInformationRequester', () => {
     const requester = new DemonInformationRequester<
-        DemonInformation,
         InformationRequestContext<DemonInformation>
     >();
 
@@ -106,7 +108,6 @@ describe('test DemonInformationRequester', () => {
 
 describe('test WasherwomanInformationRequester', () => {
     const requester = new WasherwomanInformationRequester<
-        WasherwomanInformation,
         InformationRequestContext<WasherwomanInformation>
     >();
 
@@ -122,6 +123,27 @@ describe('test WasherwomanInformationRequester', () => {
 
     test.concurrent('not eligible because requester is dead', async () => {
         const context = mockContextForWasherwomanInformation(true, false, true);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+});
+
+describe('test LibrarianInformationRequester', () => {
+    const requester = new LibrarianInformationRequester<
+        InformationRequestContext<LibrarianInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForLibrarianInformation(true, true, true);
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because is not first night', async () => {
+        const context = mockContextForLibrarianInformation(true, true, false);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because requester is dead', async () => {
+        const context = mockContextForLibrarianInformation(true, false, true);
         expect(await requester.isEligible(context)).toBeFalse();
     });
 });

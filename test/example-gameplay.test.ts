@@ -13,8 +13,6 @@ import {
     InfoProvider,
     InvestigatorInfo,
     InvestigatorInfoProvider,
-    LibrarianInfo,
-    LibrarianInfoProvider,
     RavenkeeperInfo,
     RavenkeeperInfoProvider,
     UndertakerInfo,
@@ -31,7 +29,6 @@ import {
     SpyInfluence,
 } from '~/game/influence';
 import { GAME_UI } from '~/interaction/gameui';
-import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
 import { Baron } from '~/content/characters/output/baron';
 import { Spy } from '~/content/characters/output/spy';
@@ -125,73 +122,6 @@ beforeAll(() => {
 
 afterAll(() => {
     jest.restoreAllMocks();
-});
-
-describe('True Librarian info', () => {
-    let librarianPlayer: Player;
-    let infoProvider: LibrarianInfoProvider;
-
-    beforeEach(async () => {
-        librarianPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Librarian`
-        );
-        infoProvider = new LibrarianInfoProvider(librarianPlayer, true);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    /**
-     * {@link `librarian["gameplay"][0]`}
-     */
-    test('Benjamin is the Saint, and Filip is the Baron. The Librarian learns that either Benjamin or Filip is the Saint.', async () => {
-        const [candidates, [Benjamin, Filip, _]] = await generateInfoCandidates(
-            ['Benjamin is the Saint', 'Filip is the Baron'],
-            [librarianPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<LibrarianInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Benjamin, Filip]);
-            expect(candidate.character).toBe(Saint);
-        }
-    });
-
-    /**
-     * {@link `librarian["gameplay"][1]`}
-     */
-    test("There are no Outsiders in this game. The Librarian learns a '0'.", async () => {
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [librarianPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<LibrarianInfo>) {
-            expect(candidate.hasOutsider).toBeFalse();
-        }
-    });
-
-    /**
-     * {@link `librarian["gameplay"][2]`}
-     */
-    test('Abdallah is the Drunk, who thinks they are the Monk, and Douglas is the Undertaker. The Librarian learns that either Abdallah or Douglas is the Drunk. (This happens because the Librarian learns the true character. The Drunk is Abdallah’s true character, not the Monk.)', async () => {
-        const [candidates, [Abdallah, Douglas, _]] =
-            await generateInfoCandidates(
-                ['Abdallah is the Drunk', 'Douglas is the Undertaker'],
-                [librarianPlayer],
-                infoProvider
-            );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<LibrarianInfo>) {
-            expect(candidate.players).toIncludeAllMembers([Abdallah, Douglas]);
-            expect(candidate.character).toBe(Drunk);
-        }
-    });
 });
 
 describe('True Investigator info', () => {
