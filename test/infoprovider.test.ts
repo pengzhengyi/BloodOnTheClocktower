@@ -8,6 +8,8 @@ import { Washerwoman } from '~/content/characters/output/washerwoman';
 import {
     ChefInformationProvider,
     EmpathInformationProvider,
+    FortuneTellerInformationProvider,
+    FortuneTellerInformationProviderContext,
     InvestigatorInformationProvider,
     LibrarianInformationProvider,
     WasherwomanInformationProvider,
@@ -35,6 +37,7 @@ import { Empath } from '~/content/characters/output/empath';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
 import { Soldier } from '~/content/characters/output/soldier';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
@@ -78,6 +81,20 @@ async function createInfoProvideContextFromPlayerDescriptions(
     const context = createInfoProvideContext(requestedPlayer!, otherPlayers);
     context.seating = seating;
     return context;
+}
+
+function createFortuneTellerInfoProviderContext(
+    fortuneTellerPlayer: Player,
+    chosenPlayers: [Player, Player],
+    otherPlayers: Array<Player>
+): FortuneTellerInformationProviderContext {
+    const context = createInfoProvideContext(fortuneTellerPlayer, [
+        ...chosenPlayers,
+        ...otherPlayers,
+    ]);
+    (context as FortuneTellerInformationProviderContext).chosenPlayers =
+        chosenPlayers;
+    return context as FortuneTellerInformationProviderContext;
 }
 
 beforeAll(() => {
@@ -488,5 +505,124 @@ describe('True EmpathInformationProvider', () => {
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);
         }
+    });
+});
+
+describe('True FortuneTeller info', () => {
+    const provider = new FortuneTellerInformationProvider();
+    let fortuneTellerPlayer: Player;
+
+    beforeAll(async () => {
+        fortuneTellerPlayer = await createBasicPlayer(undefined, FortuneTeller);
+    });
+
+    /**
+     * {@link `fortuneteller["gameplay"][0]`}
+     */
+    test("The Fortune Teller chooses the Monk and the Undertaker, and learns a 'no'.", async () => {
+        const monk = await playerFromDescription(
+            `${faker.name.firstName()} is the Monk`
+        );
+        const undertaker = await playerFromDescription(
+            `${faker.name.firstName()} is the Undertaker`
+        );
+
+        const context = createFortuneTellerInfoProviderContext(
+            fortuneTellerPlayer,
+            [monk, undertaker],
+            []
+        );
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.hasDemon).toBeFalse();
+            expect(option.info.chosenPlayers).toIncludeSameMembers([
+                monk,
+                undertaker,
+            ]);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `fortuneteller["gameplay"][1]`}
+     */
+    test("The Fortune Teller chooses the Imp and the Empath, and learns a 'yes'.", async () => {
+        const imp = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const empath = await playerFromDescription(
+            `${faker.name.firstName()} is the Empath`
+        );
+
+        const context = createFortuneTellerInfoProviderContext(
+            fortuneTellerPlayer,
+            [imp, empath],
+            []
+        );
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.hasDemon).toBeTrue();
+            expect(option.info.chosenPlayers).toIncludeSameMembers([
+                imp,
+                empath,
+            ]);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `fortuneteller["gameplay"][2]`}
+     */
+    test("The Fortune Teller chooses an alive Butler and a dead Imp, and learns a 'yes'.", async () => {
+        const butler = await playerFromDescription(
+            `${faker.name.firstName()} is the Butler`
+        );
+        const imp = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        expect(await imp.setDead()).toBeTrue();
+
+        const context = createFortuneTellerInfoProviderContext(
+            fortuneTellerPlayer,
+            [butler, imp],
+            []
+        );
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.hasDemon).toBeTrue();
+            expect(option.info.chosenPlayers).toIncludeSameMembers([
+                imp,
+                butler,
+            ]);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `fortuneteller["gameplay"][3]`}
+     */
+    test("The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'.", async () => {
+        // TODO
     });
 });

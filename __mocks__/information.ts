@@ -11,6 +11,7 @@ import type {
     ChefInformation,
     DemonInformation,
     EmpathInformation,
+    FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
     WasherwomanInformation,
@@ -25,6 +26,7 @@ import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -185,6 +187,22 @@ export function mockContextForEmpathInformation(
         Empath,
         EmpathInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Empath);
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isNight',
+        isNight
+    );
+    return context;
+}
+
+export function mockContextForFortuneTellerInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isNight: boolean
+): InformationRequestContext<FortuneTellerInformation> {
+    const context = mockContextForCharacterInformation<
+        FortuneTeller,
+        FortuneTellerInformation
+    >(willGetTrueInformation, requestedPlayerIsAlive, isNight, FortuneTeller);
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isNight',
         isNight

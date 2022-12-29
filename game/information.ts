@@ -157,6 +157,6 @@ export interface EmpathInformation {
  * "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you."
  */
 export interface FortuneTellerInformation {
-    players: [Player, Player];
+    chosenPlayers: [Player, Player];
     hasDemon: boolean;
 }

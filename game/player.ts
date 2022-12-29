@@ -223,7 +223,7 @@ export class Player extends EffectTarget<Player> {
      * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
      */
     get isTheDemon(): boolean {
-        return this.alive && this.characterType.is(Demon);
+        return this.alive && this.isDemon;
     }
 
     get isAliveNontraveller(): boolean {

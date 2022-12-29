@@ -6,6 +6,7 @@ import {
     EmpathInformation,
     FalseInformation,
     FalseInformationOptions,
+    FortuneTellerInformation,
     InfoOptions,
     Information,
     InvestigatorInformation,
@@ -21,6 +22,7 @@ import {
     ChefInformationRequester,
     DemonInformationRequester,
     EmpathInformationRequester,
+    FortuneTellerInformationRequester,
     IInfoRequester,
     InfoRequestContext,
     LibrarianInformationRequester,
@@ -613,6 +615,106 @@ export class EmpathInformationProvider<
     }
 }
 
+export interface FortuneTellerInformationProviderContext
+    extends InfoProvideContext {
+    chosenPlayers: [Player, Player];
+}
+
+export class FortuneTellerInformationProvider<
+    TInfoProvideContext extends FortuneTellerInformationProviderContext
+> extends InformationProvider<TInfoProvideContext, FortuneTellerInformation> {
+    protected static readonly cachedKeyForHasDemon = 'actualHasDemon';
+
+    async getTrueInformationOptions(
+        context: FortuneTellerInformationProviderContext
+    ): Promise<TrueInformationOptions<FortuneTellerInformation>> {
+        const hasDemon = await this.getHasDemonInChosenPlayers(context, true);
+
+        return Generator.once([
+            Information.true({
+                chosenPlayers: context.chosenPlayers,
+                hasDemon,
+            } as FortuneTellerInformation),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        context: FortuneTellerInformationProviderContext
+    ): Promise<FalseInformationOptions<FortuneTellerInformation>> {
+        await undefined;
+        return Generator.once(
+            Generator.map(
+                (hasDemon) =>
+                    Information.false({
+                        chosenPlayers: context.chosenPlayers,
+                        hasDemon,
+                    }) as FalseInformation<FortuneTellerInformation>,
+                [true, false]
+            )
+        );
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 1 if actual and provided information match implying one of two chosen players is a demon , -1 otherwise.
+     */
+    async evaluateGoodness(
+        information: FortuneTellerInformation,
+        context: TInfoProvideContext,
+        evaluationContext?: LazyMap<string, any>
+    ): Promise<number> {
+        evaluationContext = await this.buildEvaluationContext(
+            context,
+            evaluationContext
+        );
+        const actualHasDemon = evaluationContext.getOrDefault(
+            FortuneTellerInformationProvider.cachedKeyForHasDemon,
+            false
+        );
+
+        if (information.hasDemon === actualHasDemon) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    protected async buildEvaluationContextImpl(
+        context: FortuneTellerInformationProviderContext,
+        evaluationContext: LazyMap<string, any>
+    ) {
+        if (
+            !evaluationContext.has(
+                FortuneTellerInformationProvider.cachedKeyForHasDemon
+            )
+        ) {
+            const actualHasDemon = await this.getHasDemonInChosenPlayers(
+                context,
+                false
+            );
+
+            evaluationContext.set(
+                FortuneTellerInformationProvider.cachedKeyForHasDemon,
+                actualHasDemon
+            );
+        }
+
+        return evaluationContext;
+    }
+
+    protected async getHasDemonInChosenPlayers(
+        context: FortuneTellerInformationProviderContext,
+        shouldFromRequestedPlayerPerspective: boolean
+    ): Promise<boolean> {
+        const players = shouldFromRequestedPlayerPerspective
+            ? context.chosenPlayers.map((player) =>
+                  player.from(context.requestedPlayer)
+              )
+            : context.chosenPlayers;
+
+        return await players.some((player) => player.isDemon);
+    }
+}
+
 type InfoProviderConstructor<TInformation> = new (
     ...args: any[]
 ) => InfoProvider<TInformation>;
@@ -678,6 +780,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(ChefInformationProvider);
         } else if (requester instanceof EmpathInformationRequester) {
             return this.providers.get(EmpathInformationProvider);
+        } else if (requester instanceof FortuneTellerInformationRequester) {
+            return this.providers.get(FortuneTellerInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }

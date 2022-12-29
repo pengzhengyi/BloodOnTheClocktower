@@ -2,6 +2,7 @@ import {
     ChefInformationRequester,
     DemonInformationRequester,
     EmpathInformationRequester,
+    FortuneTellerInformationRequester,
     InformationRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
@@ -11,6 +12,7 @@ import type {
     ChefInformation,
     DemonInformation,
     EmpathInformation,
+    FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
     WasherwomanInformation,
@@ -21,6 +23,7 @@ import {
     mockContextForChefInformation,
     mockContextForDemonInformation,
     mockContextForEmpathInformation,
+    mockContextForFortuneTellerInformation,
     mockContextForInvestigatorInformation,
     mockContextForLibrarianInformation,
     mockContextForWasherwomanInformation,
@@ -224,6 +227,39 @@ describe('test EmpathInformationRequester', () => {
 
     test.concurrent('not eligible because requester is dead', async () => {
         const context = mockContextForEmpathInformation(true, false, true);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+});
+
+describe('test FortuneTellerInformationRequester', () => {
+    const requester = new FortuneTellerInformationRequester<
+        InformationRequestContext<FortuneTellerInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForFortuneTellerInformation(
+            true,
+            true,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because is not night', async () => {
+        const context = mockContextForFortuneTellerInformation(
+            true,
+            true,
+            false
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because requester is dead', async () => {
+        const context = mockContextForFortuneTellerInformation(
+            true,
+            false,
+            true
+        );
         expect(await requester.isEligible(context)).toBeFalse();
     });
 });

@@ -4,8 +4,6 @@ import { faker } from '@faker-js/faker';
 import { mock } from 'jest-mock-extended';
 import { playerFromDescription } from './utils';
 import {
-    FortuneTellerInfo,
-    FortuneTellerInfoProvider,
     InfoProvider,
     RavenkeeperInfo,
     RavenkeeperInfoProvider,
@@ -17,7 +15,6 @@ import { GameInfo } from '~/game/gameinfo';
 import { CharacterSheet } from '~/game/charactersheet';
 import type { Context } from '~/game/infoprocessor';
 import {
-    FortuneTellerRedHerringInfluence,
     RecluseInfluence,
     SoldierInfluence,
     SpyInfluence,
@@ -33,7 +30,6 @@ import { Imp } from '~/content/characters/output/imp';
 import { Generator } from '~/game/collections';
 import { CharacterAct, SlayerAct } from '~/game/characteract';
 import { Game } from '~/game/game';
-import { setPlayerDead } from '~/__mocks__/player';
 
 function mockStorytellerChoose<T>(chosen: T) {
     return jest
@@ -113,135 +109,6 @@ beforeAll(() => {
 
 afterAll(() => {
     jest.restoreAllMocks();
-});
-
-describe('True FortuneTeller info', () => {
-    let FortuneTellerPlayer: Player;
-    let infoProvider: FortuneTellerInfoProvider;
-
-    beforeEach(async () => {
-        FortuneTellerPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the FortuneTeller`
-        );
-    });
-
-    beforeEach(() => {
-        infoProvider = new FortuneTellerInfoProvider(FortuneTellerPlayer, true);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    /**
-     * {@link `fortuneteller["gameplay"][0]`}
-     */
-    test("The Fortune Teller chooses the Monk and the Undertaker, and learns a 'no'.", async () => {
-        const monk = await playerFromDescription(
-            `${faker.name.firstName()} is the Monk`
-        );
-        const undertaker = await playerFromDescription(
-            `${faker.name.firstName()} is the Undertaker`
-        );
-
-        infoProvider.chosen = [monk, undertaker];
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [monk, undertaker, FortuneTellerPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<FortuneTellerInfo>) {
-            expect(candidate.hasDemon).toBeFalse();
-        }
-    });
-
-    /**
-     * {@link `fortuneteller["gameplay"][1]`}
-     */
-    test("The Fortune Teller chooses the Imp and the Empath, and learns a 'yes'.", async () => {
-        const imp = await playerFromDescription(
-            `${faker.name.firstName()} is the Imp`
-        );
-        const empath = await playerFromDescription(
-            `${faker.name.firstName()} is the Empath`
-        );
-
-        infoProvider.chosen = [imp, empath];
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [imp, empath, FortuneTellerPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<FortuneTellerInfo>) {
-            expect(candidate.hasDemon).toBeTrue();
-        }
-    });
-
-    /**
-     * {@link `fortuneteller["gameplay"][2]`}
-     */
-    test("The Fortune Teller chooses an alive Butler and a dead Imp, and learns a 'yes'.", async () => {
-        const imp = await playerFromDescription(
-            `${faker.name.firstName()} is the Imp`
-        );
-        await setPlayerDead(imp);
-
-        const butler = await playerFromDescription(
-            `${faker.name.firstName()} is the Butler`
-        );
-
-        infoProvider.chosen = [imp, butler];
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [butler, imp, FortuneTellerPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<FortuneTellerInfo>) {
-            expect(candidate.hasDemon).toBeTrue();
-        }
-    });
-
-    /**
-     * {@link `fortuneteller["gameplay"][3]`}
-     */
-    test("The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'.", async () => {
-        const saint = await playerFromDescription(
-            `${faker.name.firstName()} is the Saint`
-        );
-        const gameUIStorytellerChooseMock = mockStorytellerChoose(Imp);
-        await setPlayerDead(saint);
-
-        infoProvider.chosen = [saint, FortuneTellerPlayer];
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [saint, FortuneTellerPlayer],
-            infoProvider,
-            async (gameInfo, _) => {
-                const influence = new FortuneTellerRedHerringInfluence(
-                    FortuneTellerPlayer,
-                    saint
-                );
-
-                return await influence.apply(gameInfo, mock<Context>());
-            }
-        );
-
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<FortuneTellerInfo>) {
-            expect(candidate.hasDemon).toBeTrue();
-        }
-    });
 });
 
 describe('True Undertaker info', () => {
