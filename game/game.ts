@@ -1,9 +1,21 @@
 import { Alignment } from './alignment';
 import { Player } from './player';
+import { Players } from './players';
+import { Edition } from './edition';
+import { StoryTeller } from './storyteller';
+import { TownSquare } from './townsquare';
 import { GAME_UI } from '~/interaction/gameui';
 
 export class Game {
     winningTeam?: Alignment;
+
+    declare townSquare: TownSquare;
+
+    declare storyTeller: StoryTeller;
+
+    declare players: Players;
+
+    declare edition: Edition;
 
     async setWinningTeam(winningTeam: Alignment) {
         if (
