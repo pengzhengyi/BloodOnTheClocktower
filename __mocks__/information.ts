@@ -1,7 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue, mockWithPropertyValues } from './common';
 import type { CharacterSheet } from '~/game/charactersheet';
-import type { Clocktower } from '~/game/clocktower';
+import type { Clocktower, Diary } from '~/game/clocktower';
 import type { InfoProvideContext } from '~/game/infoprovider';
 import type {
     InformationRequestContext,
@@ -14,6 +14,7 @@ import type {
     FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
+    UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
 import type { Player } from '~/game/player';
@@ -27,6 +28,7 @@ import { Investigator } from '~/content/characters/output/investigator';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import { Undertaker } from '~/content/characters/output/undertaker';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -206,6 +208,33 @@ export function mockContextForFortuneTellerInformation(
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isNight',
         isNight
+    );
+    return context;
+}
+
+export function mockContextForUndertakerInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isNonfirstNight: boolean,
+    hasExecution: boolean
+): InformationRequestContext<UndertakerInformation> {
+    const context = mockContextForCharacterInformation<
+        Undertaker,
+        UndertakerInformation
+    >(
+        willGetTrueInformation,
+        requestedPlayerIsAlive,
+        isNonfirstNight,
+        Undertaker
+    );
+    const today = mockWithPropertyValue<Diary, boolean>(
+        'hasExecution',
+        hasExecution
+    );
+
+    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
+        ['isNonfirstNight', 'today'],
+        [isNonfirstNight, today]
     );
     return context;
 }

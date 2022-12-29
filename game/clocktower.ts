@@ -36,6 +36,14 @@ export class Diary {
 
     protected eventToMoment: Map<Event, Moment> = new Map();
 
+    get hasExecution(): boolean {
+        return this.execution !== undefined;
+    }
+
+    get hasExile(): boolean {
+        return this.exiles.length > 0;
+    }
+
     record(event: Event): boolean {
         const moment = this.tryRecord(event);
 

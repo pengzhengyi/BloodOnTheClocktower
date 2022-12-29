@@ -7,23 +7,13 @@ import {
     InfoProvider,
     RavenkeeperInfo,
     RavenkeeperInfoProvider,
-    UndertakerInfo,
-    UndertakerInfoProvider,
 } from '~/game/info';
 import { Player } from '~/game/player';
 import { GameInfo } from '~/game/gameinfo';
 import { CharacterSheet } from '~/game/charactersheet';
 import type { Context } from '~/game/infoprocessor';
-import {
-    RecluseInfluence,
-    SoldierInfluence,
-    SpyInfluence,
-} from '~/game/influence';
+import { RecluseInfluence, SoldierInfluence } from '~/game/influence';
 import { GAME_UI } from '~/interaction/gameui';
-import { Drunk } from '~/content/characters/output/drunk';
-import { Execution } from '~/game/execution';
-import { Mayor } from '~/content/characters/output/mayor';
-import { Butler } from '~/content/characters/output/butler';
 import { GamePhase } from '~/game/gamephase';
 import { Empath } from '~/content/characters/output/empath';
 import { Imp } from '~/content/characters/output/imp';
@@ -109,126 +99,6 @@ beforeAll(() => {
 
 afterAll(() => {
     jest.restoreAllMocks();
-});
-
-describe('True Undertaker info', () => {
-    let UndertakerPlayer: Player;
-    let infoProvider: UndertakerInfoProvider;
-
-    beforeEach(async () => {
-        UndertakerPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Undertaker`
-        );
-    });
-
-    beforeEach(() => {
-        infoProvider = new UndertakerInfoProvider(UndertakerPlayer, true);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    /**
-     * {@link `undertaker["gameplay"][0]`}
-     */
-    test('The Mayor is executed today. That night, the Undertaker is shown the Mayor token.', async () => {
-        const mayorPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Mayor`
-        );
-
-        const mockExecution = mock<Execution>();
-        (mockExecution as any).toExecute = mayorPlayer;
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [mayorPlayer, UndertakerPlayer],
-            infoProvider,
-            async (gameInfo, _) => {
-                gameInfo.execution = mockExecution;
-                return await gameInfo;
-            }
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<UndertakerInfo>) {
-            expect(candidate.character).toEqual(Mayor);
-        }
-    });
-
-    /**
-     * {@link `undertaker["gameplay"][1]`}
-     */
-    test("The Drunk, who thinks they are the Virgin, is executed today. At night, the Undertaker is shown the Drunk token, because the Undertaker learns a player's true character, as opposed to the one they believe they are.", async () => {
-        const drunkPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Drunk`
-        );
-
-        const mockExecution = mock<Execution>();
-        (mockExecution as any).toExecute = drunkPlayer;
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [drunkPlayer, UndertakerPlayer],
-            infoProvider,
-            async (gameInfo, _) => {
-                gameInfo.execution = mockExecution;
-                return await gameInfo;
-            }
-        );
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<UndertakerInfo>) {
-            expect(candidate.character).toEqual(Drunk);
-        }
-    });
-
-    /**
-     * {@link `undertaker["gameplay"][2]`}
-     */
-    test('The Spy is executed. Two Travellers are exiled. That night, the Undertaker is shown the Butler token, because the Spy is registering as the Butler, and because the exiles are not executions.', async () => {
-        const gameUIStorytellerChooseMock = mockStorytellerChoose(Butler);
-
-        const spyPlayer = await playerFromDescription(
-            `${faker.name.firstName()} is the Spy`
-        );
-
-        const mockExecution = mock<Execution>();
-        (mockExecution as any).toExecute = spyPlayer;
-
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [spyPlayer, UndertakerPlayer],
-            infoProvider,
-            async (gameInfo, _) => {
-                gameInfo.execution = mockExecution;
-
-                const influence = new SpyInfluence(spyPlayer);
-
-                return await influence.apply(gameInfo, mock<Context>());
-            }
-        );
-
-        expect(gameUIStorytellerChooseMock).toHaveBeenCalled();
-
-        expect(candidates).toHaveLength(1);
-        for (const candidate of candidates as Array<UndertakerInfo>) {
-            expect(candidate.character).toEqual(Butler);
-        }
-    });
-
-    /**
-     * {@link `undertaker["gameplay"][3]`}
-     */
-    test('Nobody was executed today. That night, the Undertaker does not wake.', async () => {
-        const [candidates, _] = await generateInfoCandidates(
-            [],
-            [UndertakerPlayer],
-            infoProvider
-        );
-
-        expect(candidates).toHaveLength(0);
-    });
 });
 
 describe('True Monk info', () => {

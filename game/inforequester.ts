@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import type { CharacterToken } from './character';
 import type { InfoProvideContext } from './infoprovider';
 import type {
@@ -11,6 +10,7 @@ import type {
     InvestigatorInformation,
     LibrarianInformation,
     StoryTellerInformation,
+    UndertakerInformation,
     WasherwomanInformation,
 } from './information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
@@ -19,6 +19,7 @@ import { Investigator } from '~/content/characters/output/investigator';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import { Undertaker } from '~/content/characters/output/undertaker';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -168,6 +169,7 @@ function AtNight<
     };
 }
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 function OnceAtNight<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
@@ -343,4 +345,24 @@ class BaseFortuneTellerInformationRequester<
 
 export const FortuneTellerInformationRequester = IsAlive(
     EachNight(BaseFortuneTellerInformationRequester)
+);
+
+class BaseUndertakerInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<UndertakerInformation>
+> extends CharacterInformationRequester<
+    UndertakerInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Undertaker;
+
+    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+        return (
+            (await super.isEligible(context)) &&
+            context.clocktower.today.hasExecution
+        );
+    }
+}
+
+export const UndertakerInformationRequester = IsAlive(
+    EachNonfirstNight(BaseUndertakerInformationRequester)
 );

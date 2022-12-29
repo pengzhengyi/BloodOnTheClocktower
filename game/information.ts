@@ -160,3 +160,12 @@ export interface FortuneTellerInformation {
     chosenPlayers: [Player, Player];
     hasDemon: boolean;
 }
+
+/**
+ * {@link `undertaker["ability"]`}
+ * "Each night*, you learn which character died by execution today."
+ */
+export interface UndertakerInformation {
+    executedPlayer: Player;
+    character: CharacterToken;
+}

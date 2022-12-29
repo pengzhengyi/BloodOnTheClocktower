@@ -6,6 +6,7 @@ import {
     InformationRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
+    UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from '~/game/inforequester';
 import type {
@@ -15,6 +16,7 @@ import type {
     FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
+    UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
 import type { Player } from '~/game/player';
@@ -26,6 +28,7 @@ import {
     mockContextForFortuneTellerInformation,
     mockContextForInvestigatorInformation,
     mockContextForLibrarianInformation,
+    mockContextForUndertakerInformation,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
 
@@ -262,4 +265,56 @@ describe('test FortuneTellerInformationRequester', () => {
         );
         expect(await requester.isEligible(context)).toBeFalse();
     });
+});
+
+describe('test UndertakerInformationRequester', () => {
+    const requester = new UndertakerInformationRequester<
+        InformationRequestContext<UndertakerInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForUndertakerInformation(
+            true,
+            true,
+            true,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because is not non-first night', async () => {
+        const context = mockContextForUndertakerInformation(
+            true,
+            true,
+            false,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because requester is dead', async () => {
+        const context = mockContextForUndertakerInformation(
+            true,
+            false,
+            true,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][3]`}
+     */
+    test.concurrent(
+        'Nobody was executed today. That night, the Undertaker does not wake.',
+        async () => {
+            const context = mockContextForUndertakerInformation(
+                true,
+                false,
+                true,
+                false
+            );
+            expect(await requester.isEligible(context)).toBeFalse();
+        }
+    );
 });

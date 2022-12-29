@@ -12,6 +12,8 @@ import {
     FortuneTellerInformationProviderContext,
     InvestigatorInformationProvider,
     LibrarianInformationProvider,
+    UndertakerInformationProvider,
+    UndertakerInformationProviderContext,
     WasherwomanInformationProvider,
 } from '~/game/infoprovider';
 import { createBasicPlayer } from '~/__mocks__/player';
@@ -38,6 +40,8 @@ import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
 import { Soldier } from '~/content/characters/output/soldier';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import { Mayor } from '~/content/characters/output/mayor';
+import { Undertaker } from '~/content/characters/output/undertaker';
 
 async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
@@ -95,6 +99,20 @@ function createFortuneTellerInfoProviderContext(
     (context as FortuneTellerInformationProviderContext).chosenPlayers =
         chosenPlayers;
     return context as FortuneTellerInformationProviderContext;
+}
+
+function createUndertakerInfoProviderContext(
+    undertakerPlayer: Player,
+    executedPlayer: Player,
+    otherPlayers: Array<Player>
+): UndertakerInformationProviderContext {
+    const context = createInfoProvideContext(undertakerPlayer, [
+        executedPlayer,
+        ...otherPlayers,
+    ]);
+    (context as UndertakerInformationProviderContext).executedPlayer =
+        executedPlayer;
+    return context as UndertakerInformationProviderContext;
 }
 
 beforeAll(() => {
@@ -315,7 +333,7 @@ describe('test InvestigatorInformationProvider', () => {
     });
 });
 
-describe('True Chef info', () => {
+describe('test ChefInformationProvider', () => {
     const provider = new ChefInformationProvider();
 
     /**
@@ -623,6 +641,78 @@ describe('True FortuneTeller info', () => {
      * {@link `fortuneteller["gameplay"][3]`}
      */
     test("The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'.", async () => {
+        // TODO
+    });
+});
+
+describe('test UndertakerInformationProvider', () => {
+    const provider = new UndertakerInformationProvider();
+    let undertakerPlayer: Player;
+
+    beforeAll(async () => {
+        undertakerPlayer = await createBasicPlayer(undefined, Undertaker);
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][0]`}
+     */
+    test('The Mayor is executed today. That night, the Undertaker is shown the Mayor token.', async () => {
+        const mayorPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Mayor`
+        );
+
+        const context = createUndertakerInfoProviderContext(
+            undertakerPlayer,
+            mayorPlayer,
+            []
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.character).toBe(Mayor);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][1]`}
+     */
+    test("The Drunk, who thinks they are the Virgin, is executed today. At night, the Undertaker is shown the Drunk token, because the Undertaker learns a player's true character, as opposed to the one they believe they are.", async () => {
+        const drunkPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Drunk`
+        );
+
+        const context = createUndertakerInfoProviderContext(
+            undertakerPlayer,
+            drunkPlayer,
+            []
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.character).toBe(Drunk);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][2]`}
+     */
+    test('The Spy is executed. Two Travellers are exiled. That night, the Undertaker is shown the Butler token, because the Spy is registering as the Butler, and because the exiles are not executions.', async () => {
         // TODO
     });
 });

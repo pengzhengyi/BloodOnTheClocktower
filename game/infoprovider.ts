@@ -16,6 +16,7 @@ import {
     OneOfTwoPlayersIsOutsider,
     StoryTellerInformationOptions,
     TrueInformationOptions,
+    UndertakerInformation,
     WasherwomanInformation,
 } from './information';
 import {
@@ -26,6 +27,7 @@ import {
     IInfoRequester,
     InfoRequestContext,
     LibrarianInformationRequester,
+    UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
 import { Player } from './player';
@@ -714,6 +716,59 @@ export class FortuneTellerInformationProvider<
         return await players.some((player) => player.isDemon);
     }
 }
+export interface UndertakerInformationProviderContext
+    extends InfoProvideContext {
+    executedPlayer: Player;
+}
+
+export class UndertakerInformationProvider<
+    TInfoProvideContext extends UndertakerInformationProviderContext
+> extends InformationProvider<TInfoProvideContext, UndertakerInformation> {
+    async getTrueInformationOptions(
+        context: UndertakerInformationProviderContext
+    ): Promise<TrueInformationOptions<UndertakerInformation>> {
+        await undefined;
+        const perceivedCharacter = context.executedPlayer.from(
+            context.requestedPlayer
+        ).character;
+        return Generator.once([
+            Information.true({
+                executedPlayer: context.executedPlayer,
+                character: perceivedCharacter,
+            } as UndertakerInformation),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        context: UndertakerInformationProviderContext
+    ): Promise<FalseInformationOptions<UndertakerInformation>> {
+        await undefined;
+        return Generator.once(
+            Generator.map(
+                (character) =>
+                    Information.false({
+                        executedPlayer: context.executedPlayer,
+                        character,
+                    }) as FalseInformation<UndertakerInformation>,
+                context.characterSheet.characters
+            )
+        );
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 1 if actual character and provided character in information match , -1 otherwise.
+     */
+    async evaluateGoodness(
+        information: UndertakerInformation,
+        context: TInfoProvideContext,
+        _evaluationContext?: LazyMap<string, any>
+    ): Promise<number> {
+        await undefined;
+        return context.executedPlayer.character === information.character
+            ? 1
+            : -1;
+    }
+}
 
 type InfoProviderConstructor<TInformation> = new (
     ...args: any[]
@@ -782,6 +837,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(EmpathInformationProvider);
         } else if (requester instanceof FortuneTellerInformationRequester) {
             return this.providers.get(FortuneTellerInformationProvider);
+        } else if (requester instanceof UndertakerInformationRequester) {
+            return this.providers.get(UndertakerInformationRequester);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }
