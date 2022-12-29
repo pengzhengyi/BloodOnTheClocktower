@@ -31,7 +31,7 @@ import { Investigator } from '~/content/characters/output/investigator';
 import { GAME_UI } from '~/interaction/gameui';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Undertaker } from '~/content/characters/output/undertaker';
-import { Fortuneteller } from '~/content/characters/output/fortuneteller';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Empath } from '~/content/characters/output/empath';
 import { Chef } from '~/content/characters/output/chef';
 
@@ -111,7 +111,7 @@ export abstract class InfoRequester<T, TInfoProvider extends InfoProvider<T>>
                 return ChefInfoRequester;
             case Empath:
                 return EmpathInfoRequester;
-            case Fortuneteller:
+            case FortuneTeller:
                 return FortuneTellerInfoRequester;
             case Undertaker:
                 return UndertakerInfoRequester;

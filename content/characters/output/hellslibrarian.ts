@@ -1,6 +1,6 @@
 import roleData from './hellslibrarian.json';
 import { Character } from '~/game/character';
 
-export abstract class Hellslibrarian extends Character {}
+export abstract class HellsLibrarian extends Character {}
 
-Hellslibrarian.initialize(roleData);
+HellsLibrarian.initialize(roleData);

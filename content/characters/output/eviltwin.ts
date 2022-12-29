@@ -1,6 +1,6 @@
 import roleData from './eviltwin.json';
 import { Character } from '~/game/character';
 
-export abstract class Eviltwin extends Character {}
+export abstract class EvilTwin extends Character {}
 
-Eviltwin.initialize(roleData);
+EvilTwin.initialize(roleData);

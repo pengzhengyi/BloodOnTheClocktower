@@ -18,6 +18,7 @@ import { Generator } from './collections';
 import type { CharacterToken } from './character';
 import type {
     CharacterType,
+    Demon,
     Minion,
     Outsider,
     Townsfolk,
@@ -124,6 +125,10 @@ export type OneOfTwoPlayersIsMinion = OneOfTwoPlayersHasCharacterType & {
     characterType: Minion;
 };
 
+export type OneOfTwoPlayersIsDemon = OneOfTwoPlayersHasCharacterType & {
+    characterType: Demon;
+};
+
 export type WasherwomanInformation = OneOfTwoPlayersIsTownsfolk;
 
 export type LibrarianNoOutsiderInformation = {
@@ -145,4 +150,13 @@ export interface ChefInformation {
  */
 export interface EmpathInformation {
     numEvilAliveNeighbors: 0 | 1 | 2;
+}
+
+/**
+ * {@link `fortuneteller["ability"]`}
+ * "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you."
+ */
+export interface FortuneTellerInformation {
+    players: [Player, Player];
+    hasDemon: boolean;
 }

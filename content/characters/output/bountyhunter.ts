@@ -1,6 +1,6 @@
 import roleData from './bountyhunter.json';
 import { Character } from '~/game/character';
 
-export abstract class Bountyhunter extends Character {}
+export abstract class BountyHunter extends Character {}
 
-Bountyhunter.initialize(roleData);
+BountyHunter.initialize(roleData);

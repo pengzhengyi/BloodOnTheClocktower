@@ -5,6 +5,7 @@ import type {
     ChefInformation,
     DemonInformation,
     EmpathInformation,
+    FortuneTellerInformation,
     Info,
     Information,
     InvestigatorInformation,
@@ -17,6 +18,7 @@ import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -328,4 +330,17 @@ class BaseEmpathInformationRequester<
 
 export const EmpathInformationRequester = IsAlive(
     EachNight(BaseEmpathInformationRequester)
+);
+
+class BaseFortuneTellerInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<FortuneTellerInformation>
+> extends CharacterInformationRequester<
+    FortuneTellerInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = FortuneTeller;
+}
+
+export const FortuneTellerInformationRequester = IsAlive(
+    EachNight(BaseFortuneTellerInformationRequester)
 );

@@ -1,6 +1,6 @@
 import roleData from './spiritofivory.json';
 import { Character } from '~/game/character';
 
-export abstract class Spiritofivory extends Character {}
+export abstract class SpiritOfIvory extends Character {}
 
-Spiritofivory.initialize(roleData);
+SpiritOfIvory.initialize(roleData);

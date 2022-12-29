@@ -1,6 +1,6 @@
 import roleData from './towncrier.json';
 import { Character } from '~/game/character';
 
-export abstract class Towncrier extends Character {}
+export abstract class TownCrier extends Character {}
 
-Towncrier.initialize(roleData);
+TownCrier.initialize(roleData);

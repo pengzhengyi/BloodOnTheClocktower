@@ -1,6 +1,6 @@
 import roleData from './nodashii.json';
 import { Character } from '~/game/character';
 
-export abstract class Nodashii extends Character {}
+export abstract class NoDashii extends Character {}
 
-Nodashii.initialize(roleData);
+NoDashii.initialize(roleData);

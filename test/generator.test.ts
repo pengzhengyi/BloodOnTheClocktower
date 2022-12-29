@@ -1,5 +1,5 @@
 import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
-import { Fanggu } from '~/content/characters/output/fanggu';
+import { FangGu } from '~/content/characters/output/fanggu';
 import { Demon, Minion, Outsider, Townsfolk } from '~/game/charactertype';
 import { Generator } from '~/game/collections';
 
@@ -186,6 +186,6 @@ describe('test Generator', () => {
             )
         );
         expect(characters.length).toBeGreaterThan(0);
-        expect(characters).toContain(Fanggu);
+        expect(characters).toContain(FangGu);
     });
 });

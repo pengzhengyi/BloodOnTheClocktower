@@ -1,6 +1,6 @@
 import roleData from './poppygrower.json';
 import { Character } from '~/game/character';
 
-export abstract class Poppygrower extends Character {}
+export abstract class PoppyGrower extends Character {}
 
-Poppygrower.initialize(roleData);
+PoppyGrower.initialize(roleData);

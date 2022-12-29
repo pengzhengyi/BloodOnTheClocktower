@@ -1,6 +1,6 @@
 import roleData from './scarletwoman.json';
 import { Character } from '~/game/character';
 
-export abstract class Scarletwoman extends Character {}
+export abstract class ScarletWoman extends Character {}
 
-Scarletwoman.initialize(roleData);
+ScarletWoman.initialize(roleData);

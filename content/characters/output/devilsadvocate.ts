@@ -1,6 +1,6 @@
 import roleData from './devilsadvocate.json';
 import { Character } from '~/game/character';
 
-export abstract class Devilsadvocate extends Character {}
+export abstract class DevilsAdvocate extends Character {}
 
-Devilsadvocate.initialize(roleData);
+DevilsAdvocate.initialize(roleData);

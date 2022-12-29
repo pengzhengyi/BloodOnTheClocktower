@@ -104,21 +104,28 @@ def _write_typescript(
     relative_json_filepath = f"./{path.with_suffix('.json').name}"
 
     character_id: str = definition["id"]
-    character_name = character_id.capitalize()
+    character_name: str = definition["name"]
+    stripped_character_name = "".join(c for c in character_name if c.isalpha())
+    class_name = (
+        stripped_character_name
+        if stripped_character_name.lower() == character_id.lower()
+        else character_id.capitalize()
+    )
+
     with open(typescript_filepath, "w", encoding="utf-8") as file_writer:
         file_writer.write(
             f"""import roleData from "{relative_json_filepath}";
 import {{ Character }} from "~/game/character";
 
-export abstract class {character_name} extends Character {{
+export abstract class {class_name} extends Character {{
 }}
 
-{character_name}.initialize(roleData);"""
+{class_name}.initialize(roleData);"""
         )
 
     return (
-        f'import {{ {character_name} }} from "./{path.stem}";',
-        f'ID_TO_CHARACTER.set("{character_id}", {character_name});',
+        f'import {{ {class_name} }} from "./{path.stem}";',
+        f'ID_TO_CHARACTER.set("{character_id}", {class_name});',
     )
 
 
@@ -138,6 +145,8 @@ def _write_typescript_export(filepath: str, imports: List[Tuple[str, str]]) -> N
         file_writer.writelines(
             mapset_statement + os.linesep for mapset_statement in mapset_statements
         )
+
+        file_writer.write("export const CHARACTERS = Array.from(ID_TO_CHARACTER.values());")
 
 
 def _write_enrichment(definitions: Iterable[CharacterDefinition], output_dirpath: str) -> None:

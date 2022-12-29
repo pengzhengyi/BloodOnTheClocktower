@@ -1,5 +1,5 @@
 import { Butler } from '~/content/characters/output/butler';
-import { Fortuneteller } from '~/content/characters/output/fortuneteller';
+import { FortuneTeller } from '~/content/characters/output/FortuneTeller';
 import { Imp } from '~/content/characters/output/imp';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Librarian } from '~/content/characters/output/librarian';
@@ -30,7 +30,7 @@ describe('Test basic functionalities', () => {
     test.concurrent('determine night acting order', async () => {
         const characters = [
             Librarian,
-            Fortuneteller,
+            FortuneTeller,
             Washerwoman,
             Monk,
             Investigator,
@@ -49,7 +49,7 @@ describe('Test basic functionalities', () => {
             Washerwoman, // 32
             Librarian, // 33
             Investigator, // 34
-            Fortuneteller, // 37
+            FortuneTeller, // 37
             Butler, // 38
             Spy, // 48
         ]);
@@ -63,7 +63,7 @@ describe('Test basic functionalities', () => {
             Poisoner, // 8
             Monk, // 13
             Imp, // 24
-            Fortuneteller, // 54
+            FortuneTeller, // 54
             Butler, // 55
             Spy, // 68
         ]);

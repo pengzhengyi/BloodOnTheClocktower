@@ -1,6 +1,6 @@
 import roleData from './bonecollector.json';
 import { Character } from '~/game/character';
 
-export abstract class Bonecollector extends Character {}
+export abstract class BoneCollector extends Character {}
 
-Bonecollector.initialize(roleData);
+BoneCollector.initialize(roleData);

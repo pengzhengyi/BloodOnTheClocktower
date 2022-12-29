@@ -15,7 +15,7 @@ import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
-import { Fortuneteller } from '~/content/characters/output/fortuneteller';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 /**
  * CharacterAct is when a player needs to perform some actions because of character ability. Such actions will usually affect the game.
@@ -29,7 +29,7 @@ export abstract class CharacterAct extends Influence {
                 return [MonkAct];
             case Slayer:
                 return [SlayerAct];
-            case Fortuneteller:
+            case FortuneTeller:
                 return [FortuneTellerAct];
             default:
                 return [];

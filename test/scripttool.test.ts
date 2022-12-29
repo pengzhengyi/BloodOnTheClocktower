@@ -3,7 +3,7 @@ import { ScriptConstraintsHelper, ScriptTool } from '~/game/scripttool';
 import { Generator } from '~/game/collections';
 import { EditionName } from '~/game/edition';
 import { EditionKeyName } from '~/game/types';
-import { Scarletwoman } from '~/content/characters/output/scarletwoman';
+import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Judge } from '~/content/characters/output/judge';
 import { Mathematician } from '~/content/characters/output/mathematician';
@@ -77,7 +77,7 @@ describe('Random CharacterSheet Generation', () => {
                 minion: 2,
                 demon: 1,
                 traveller: 1,
-                includes: [Scarletwoman.id, Judge.id],
+                includes: [ScarletWoman.id, Judge.id],
                 excludes: [Virgin.id],
             };
             const characterSheets = await ScriptTool.candidates(constraints, 3);
@@ -97,7 +97,7 @@ describe('Random CharacterSheet Generation', () => {
                 );
 
                 expect(characterSheet.townsfolk).not.toContain(Virgin);
-                expect(characterSheet.minion).toContain(Scarletwoman);
+                expect(characterSheet.minion).toContain(ScarletWoman);
                 expect(characterSheet.traveller).toContain(Judge);
 
                 if (lastCharacterSheet !== undefined) {

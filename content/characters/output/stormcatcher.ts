@@ -1,6 +1,6 @@
 import roleData from './stormcatcher.json';
 import { Character } from '~/game/character';
 
-export abstract class Stormcatcher extends Character {}
+export abstract class StormCatcher extends Character {}
 
-Stormcatcher.initialize(roleData);
+StormCatcher.initialize(roleData);
