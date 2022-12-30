@@ -16,6 +16,8 @@ import {
     OneOfTwoPlayersHasCharacterType,
     OneOfTwoPlayersIsOutsider,
     RavenkeeperInformation,
+    SpyInformation,
+    StoryTellerInformation,
     StoryTellerInformationOptions,
     TrueInformationOptions,
     UndertakerInformation,
@@ -32,6 +34,7 @@ import {
     LibrarianInformationRequester,
     MinionInformationRequester,
     RavenkeeperInformationRequester,
+    SpyInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
@@ -977,6 +980,25 @@ export class RavenkeeperInformationProvider<
     }
 }
 
+export class SpyInformationProvider<
+        TInfoProvideContext extends InfoProvideContext
+    >
+    extends InfoProvider<SpyInformation>
+    implements
+        IStoryTellerInformationProvider<TInfoProvideContext, SpyInformation>
+{
+    async getStoryTellerInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<StoryTellerInformationOptions<SpyInformation>> {
+        const grimoire = await context.storyteller.getGrimoire(
+            context.requestedPlayer
+        );
+
+        const info = new StoryTellerInformation({ grimoire });
+        return Generator.once([info]);
+    }
+}
+
 type InfoProviderConstructor<TInformation> = new (
     ...args: any[]
 ) => InfoProvider<TInformation>;
@@ -1048,6 +1070,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(UndertakerInformationProvider);
         } else if (requester instanceof RavenkeeperInformationRequester) {
             return this.providers.get(RavenkeeperInformationProvider);
+        } else if (requester instanceof SpyInformationRequester) {
+            return this.providers.get(SpyInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         } else if (requester instanceof MinionInformationRequester) {

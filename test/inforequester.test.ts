@@ -8,6 +8,7 @@ import {
     LibrarianInformationRequester,
     MinionInformationRequester,
     RavenkeeperInformationRequester,
+    SpyInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from '~/game/inforequester';
@@ -20,6 +21,7 @@ import type {
     LibrarianInformation,
     MinionInformation,
     RavenkeeperInformation,
+    SpyInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
@@ -34,6 +36,7 @@ import {
     mockContextForLibrarianInformation,
     mockContextForMinionInformation,
     mockContextForRavenkeeperInformation,
+    mockContextForSpyInformation,
     mockContextForUndertakerInformation,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
@@ -435,6 +438,27 @@ describe('test RavenkeeperInformationRequester', () => {
 
     test.concurrent('not eligible because requester is alive', async () => {
         const context = mockContextForRavenkeeperInformation(true, true, true);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+});
+
+describe('test SpyInformationRequester', () => {
+    const requester = new SpyInformationRequester<
+        InformationRequestContext<SpyInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForSpyInformation(true, true, true);
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because is not night', async () => {
+        const context = mockContextForSpyInformation(true, true, false);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because requester is dead', async () => {
+        const context = mockContextForSpyInformation(true, false, true);
         expect(await requester.isEligible(context)).toBeFalse();
     });
 });

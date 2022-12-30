@@ -16,6 +16,7 @@ import type {
     LibrarianInformation,
     MinionInformation,
     RavenkeeperInformation,
+    SpyInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
@@ -32,6 +33,7 @@ import { Empath } from '~/content/characters/output/empath';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
+import { Spy } from '~/content/characters/output/spy';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -292,6 +294,24 @@ export function mockContextForRavenkeeperInformation(
     context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
         ['isNight', 'today'],
         [isNight, today]
+    );
+    return context;
+}
+
+export function mockContextForSpyInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isNight: boolean
+): InformationRequestContext<SpyInformation> {
+    const context = mockContextForCharacterInformation<Spy, SpyInformation>(
+        willGetTrueInformation,
+        requestedPlayerIsAlive,
+        isNight,
+        Spy
+    );
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isNight',
+        isNight
     );
     return context;
 }

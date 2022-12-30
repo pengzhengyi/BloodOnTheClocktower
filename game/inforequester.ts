@@ -11,6 +11,7 @@ import type {
     LibrarianInformation,
     MinionInformation,
     RavenkeeperInformation,
+    SpyInformation,
     StoryTellerInformation,
     UndertakerInformation,
     WasherwomanInformation,
@@ -23,6 +24,7 @@ import { Empath } from '~/content/characters/output/empath';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
+import { Spy } from '~/content/characters/output/spy';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -424,4 +426,17 @@ class BaseRavenkeeperInformationRequester<
 
 export const RavenkeeperInformationRequester = OnceAtNight(
     BaseRavenkeeperInformationRequester
+);
+
+class BaseSpyInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<SpyInformation>
+> extends CharacterInformationRequester<
+    SpyInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Spy;
+}
+
+export const SpyInformationRequester = EachNight(
+    IsAlive(BaseSpyInformationRequester)
 );

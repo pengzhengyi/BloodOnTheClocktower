@@ -18,11 +18,12 @@ export class StoryTeller {
 
     protected infoProviders: InfoProviders = new InfoProviders();
 
-    async getGrimoire(): Promise<Grimoire> {
+    async getGrimoire(_requestedPlayer: Player): Promise<Grimoire> {
         await new BlankGrimoire(this).throwWhen(
             (error) => error.storyteller.grimoire === undefined
         );
 
+        // TODO
         return this.grimoire!;
     }
 

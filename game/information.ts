@@ -16,6 +16,7 @@
  */
 import { Generator } from './collections';
 import type { CharacterToken } from './character';
+import type { Grimoire } from './grimoire';
 import type {
     CharacterType,
     Demon,
@@ -186,4 +187,8 @@ export interface UndertakerInformation {
 export interface RavenkeeperInformation {
     chosenPlayer: Player;
     character: CharacterToken;
+}
+
+export interface SpyInformation {
+    grimoire: Grimoire;
 }
