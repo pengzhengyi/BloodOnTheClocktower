@@ -12,6 +12,8 @@ import {
     FortuneTellerInformationProviderContext,
     InvestigatorInformationProvider,
     LibrarianInformationProvider,
+    RavenkeeperInformationProvider,
+    RavenkeeperInformationProviderContext,
     UndertakerInformationProvider,
     UndertakerInformationProviderContext,
     WasherwomanInformationProvider,
@@ -113,6 +115,20 @@ function createUndertakerInfoProviderContext(
     (context as UndertakerInformationProviderContext).executedPlayer =
         executedPlayer;
     return context as UndertakerInformationProviderContext;
+}
+
+function createRavenkeeperInfoProviderContext(
+    ravenkeeperPlayer: Player,
+    chosenPlayer: Player,
+    otherPlayers: Array<Player>
+): RavenkeeperInformationProviderContext {
+    const context = createInfoProvideContext(ravenkeeperPlayer, [
+        chosenPlayer,
+        ...otherPlayers,
+    ]);
+    (context as RavenkeeperInformationProviderContext).chosenPlayer =
+        chosenPlayer;
+    return context as RavenkeeperInformationProviderContext;
 }
 
 beforeAll(() => {
@@ -713,6 +729,51 @@ describe('test UndertakerInformationProvider', () => {
      * {@link `undertaker["gameplay"][2]`}
      */
     test('The Spy is executed. Two Travellers are exiled. That night, the Undertaker is shown the Butler token, because the Spy is registering as the Butler, and because the exiles are not executions.', async () => {
+        // TODO
+    });
+});
+
+describe('True RavenkeeperInformationProvider info', () => {
+    const provider = new RavenkeeperInformationProvider();
+    let ravenkeeperPlayer: Player;
+
+    beforeAll(async () => {
+        ravenkeeperPlayer = await createBasicPlayer(undefined, Ravenkeeper);
+    });
+
+    /**
+     * {@link `ravenkeeper["gameplay"][0]`}
+     */
+    test('The Ravenkeeper is killed by the Imp, and then wakes to choose a player. After some deliberation, they choose Benjamin. Benjamin is the Empath, and the Ravenkeeper learns this.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const Benjamin = await playerFromDescription('Benjamin is the Empath');
+
+        const context = createRavenkeeperInfoProviderContext(
+            ravenkeeperPlayer,
+            Benjamin,
+            [impPlayer]
+        );
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.character).toBe(Empath);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
+    });
+
+    /**
+     * {@link `ravenkeeper["gameplay"][1]`}
+     */
+    test("The Imp attacks the Mayor. The Mayor doesn't die, but the Ravenkeeper dies instead, due to the Mayor's ability. The Ravenkeeper is woken and chooses Douglas, who is a dead Recluse. The Ravenkeeper learns that Douglas is the Scarlet Woman, since the Recluse registered as a Minion.", async () => {
         // TODO
     });
 });

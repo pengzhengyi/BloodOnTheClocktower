@@ -25,7 +25,6 @@ import { Players } from './players';
 import { Context, InfoProcessor } from './infoprocessor';
 import { Phase } from './gamephase';
 import { GAME_UI } from '~/interaction/gameui';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 /**
@@ -96,8 +95,6 @@ export abstract class InfoRequester<T, TInfoProvider extends InfoProvider<T>>
         switch (character) {
             case FortuneTeller:
                 return FortuneTellerInfoRequester;
-            case Ravenkeeper:
-                return RavenkeeperInfoRequester;
             default:
                 return undefined;
         }
@@ -169,39 +166,11 @@ export abstract class InfoRequester<T, TInfoProvider extends InfoProvider<T>>
     }
 }
 
-abstract class OnceInfoRequester<
-    T,
-    TInfoProvider extends InfoProvider<T>
-> extends InfoRequester<T, TInfoProvider> {
-    hasReceivedInfo = false;
-
-    async isEligible(_gameInfo: GameInfo): Promise<boolean> {
-        return await !this.hasReceivedInfo;
-    }
-
-    async _apply(gameInfo: GameInfo, context: Context): Promise<GameInfo> {
-        const _gameInfo = await super._apply(gameInfo, context);
-        this.hasReceivedInfo = true;
-        return _gameInfo;
-    }
-}
-
 abstract class NightInfoRequester<
     T,
     TInfoProvider extends InfoProvider<T>
 > extends InfoRequester<T, TInfoProvider> {
     applicablePhases: Phase = Phase.Night;
-}
-
-abstract class OnceNightInfoRequester<
-    T,
-    TInfoProvider extends InfoProvider<T>
-> extends OnceInfoRequester<T, TInfoProvider> {
-    applicablePhases: Phase = Phase.Night;
-
-    async isEligible(gameInfo: GameInfo): Promise<boolean> {
-        return (await super.isEligible(gameInfo)) && gameInfo.gamePhase.isNight;
-    }
 }
 
 abstract class EveryAliveNightInfoRequester<
@@ -311,82 +280,6 @@ export class FortuneTellerInfoRequester extends EveryAliveNightInfoRequester<
     constructor(targetPlayer: Player, isTrue: boolean) {
         super();
         this.infoProvider = new FortuneTellerInfoProvider(targetPlayer, isTrue);
-    }
-}
-
-/**
- * {@link `ravenkeeper["ability"]`}
- * "If you die at night, you are woken to choose a player: you learn their character."
- */
-export interface _RavenkeeperInfo {
-    player: Player;
-    character: CharacterToken;
-}
-
-export type RavenkeeperInfo = _RavenkeeperInfo | Record<string, never>;
-
-export class RavenkeeperInfoProvider extends InfoProvider<RavenkeeperInfo> {
-    protected chosenPlayerId?: string;
-
-    getChosenPlayer(gameInfo: GameInfo): Player | undefined {
-        return gameInfo._getPlayer(this.chosenPlayerId);
-    }
-
-    choosePlayer(player: Player) {
-        this.chosenPlayerId = player.id;
-    }
-
-    _trueInfoCandidates(gameInfo: GameInfo) {
-        const chosen = this.getChosenPlayer(gameInfo);
-
-        if (chosen === undefined) {
-            return InfoProvider.EMPTY_INFO;
-        } else {
-            return Generator.once([
-                {
-                    player: chosen,
-                    character: chosen.character,
-                } as RavenkeeperInfo,
-            ]);
-        }
-    }
-
-    _falseInfoCandidates(gameInfo: GameInfo) {
-        const chosen = this.getChosenPlayer(gameInfo);
-
-        if (chosen === undefined) {
-            return InfoProvider.EMPTY_INFO;
-        } else {
-            return Generator.once(gameInfo.characterSheet.characters).map(
-                (character) =>
-                    ({
-                        player: chosen,
-                        character,
-                    } as RavenkeeperInfo)
-            );
-        }
-    }
-}
-
-export class RavenkeeperInfoRequester extends OnceNightInfoRequester<
-    RavenkeeperInfo,
-    RavenkeeperInfoProvider
-> {
-    get description() {
-        return `${this.targetPlayer} is a Ravenkeeper who learns one player's character if dies at night.`;
-    }
-
-    async isEligible(gameInfo: GameInfo): Promise<boolean> {
-        if (await super.isEligible(gameInfo)) {
-            const player = await gameInfo.getPlayer(this.targetPlayer);
-            return player.dead;
-        }
-        return false;
-    }
-
-    constructor(targetPlayer: Player, isTrue: boolean) {
-        super();
-        this.infoProvider = new RavenkeeperInfoProvider(targetPlayer, isTrue);
     }
 }
 
