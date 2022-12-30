@@ -1,4 +1,9 @@
-import { clockwise, counterclockwise, shuffle } from '~/game/common';
+import {
+    binarySearch,
+    clockwise,
+    counterclockwise,
+    shuffle,
+} from '~/game/common';
 
 describe('test clockwise', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
@@ -84,4 +89,27 @@ describe('test shuffle', () => {
 
         expect(elements).toIncludeAllMembers(shuffled);
     });
+});
+
+describe('test binary search', () => {
+    const elements = [1, 3, 6, 9];
+
+    test.concurrent('find index of last element less than 2', () => {
+        expect(binarySearch(elements, (n) => n < 2)).toEqual(0);
+    });
+
+    test.concurrent('find index of last element less than 0', () => {
+        expect(binarySearch(elements, (n) => n < 0)).toEqual(-1);
+    });
+
+    test.concurrent('find index of last element less than 100', () => {
+        expect(binarySearch(elements, (n) => n < 100)).toEqual(3);
+    });
+
+    test.concurrent(
+        'find index of last element less than or equal with 6',
+        () => {
+            expect(binarySearch(elements, (n) => n <= 6)).toEqual(2);
+        }
+    );
 });

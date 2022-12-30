@@ -5,7 +5,7 @@ jest.mock('~/interaction/gameui', () => ({
 }));
 
 import { Clocktower } from '~/game/clocktower';
-import { Phase } from '~/game/gamephase';
+import { GamePhase, Phase } from '~/game/gamephase';
 import { RecallFutureDate } from '~/game/exception';
 
 async function createClocktower(phaseIndex: number): Promise<Clocktower> {
@@ -33,6 +33,13 @@ describe('test basic Clocktower functionality', () => {
     test('moment for phase is recorded', async () => {
         const clocktower = await createClocktower(5);
         expect(() => clocktower.today.getMoment(Phase.Day)).toBeDefined();
+    });
+
+    test('rewind through past events', async () => {
+        const clocktower = await createClocktower(4);
+        const firstDawn = clocktower.getMoment(GamePhase.of(2));
+        const events = Array.from(clocktower.rewind(firstDawn));
+        expect(events.length).toBeGreaterThanOrEqual(3);
     });
 });
 

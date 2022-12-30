@@ -1,3 +1,5 @@
+import type { Predicate } from './types';
+
 /**
  * Iterate from the element at specified index to last element and then from first element to the last element before specified index.
  * @param elements - An array of elements.
@@ -86,4 +88,52 @@ export function shuffle<T>(elements: Iterable<T>): Array<T> {
             elementWithPriority.priority - otherElementWithPriority.priority
     );
     return elementsWithPriority.map(({ value }) => value);
+}
+
+/**
+ * Binary search through existing tolls to find an index where the toll at this index has the predicate evaluates to true while the toll at next index has the predicate evaluates to false.
+ *
+ * @example
+ * find index of last element less than 2
+ *    @
+ * -1 0 1 2 3 4
+ *  [ 1 3 6 9 ]
+ *
+ * find index of last element less than 0
+ *  @
+ * -1 0 1 2 3 4
+ *  [ 1 3 6 9 ]
+ *
+ * find index of last element less than 100
+ *          @
+ * -1 0 1 2 3 4
+ *  [ 1 3 6 9 ]
+ *
+ * find index of last element less than or equal with 6
+ *        @
+ * -1 0 1 2 3 4
+ *  [ 1 3 6 9 ]
+ *
+ * @param predicate A boolean predicate on the toll.
+ * @returns An index where the toll at this index has the predicate evaluates to true while the toll at next index has the predicate evaluates to false.
+ */
+export function binarySearch<T>(
+    elements: Array<T>,
+    predicate: Predicate<T>
+): number {
+    let start = 0;
+    let end = elements.length - 1;
+    let index: number;
+
+    while (start <= end) {
+        index = Math.floor((start + end) / 2);
+        const toll = elements[index];
+        if (predicate(toll)) {
+            start = index + 1;
+        } else {
+            end = index - 1;
+        }
+    }
+
+    return end;
 }

@@ -642,6 +642,26 @@ export class RecallFutureDate extends RecoverableGameError {
 
     constructor(readonly requestedDate: number, readonly furthestDate: number) {
         super(RecallFutureDate.description);
+
+        this.requestedDate = requestedDate;
+        this.furthestDate = furthestDate;
+    }
+}
+
+export class RecallFutureEvent extends RecoverableGameError {
+    static description =
+        'Trying to recall a future event not experienced in game';
+
+    constructor(
+        readonly requestedDate: number,
+        readonly requestedEvent: ClocktowerEvent,
+        readonly furthestDate: number
+    ) {
+        super(RecallFutureEvent.description);
+
+        this.requestedDate = requestedDate;
+        this.requestedEvent = requestedEvent;
+        this.furthestDate = furthestDate;
     }
 }
 
@@ -660,6 +680,23 @@ export class PastMomentRewrite extends RecoverableGameError {
         this.event = event;
         this.recordedTimestamp = recordedTimestamp;
         this.newTimestamp = newTimestamp;
+    }
+}
+
+export class RecordUnknownEventInDiary extends RecoverableGameError {
+    static description =
+        'Attempt to record an event that is not one of known types';
+
+    constructor(
+        readonly diary: Diary,
+        readonly event: ClocktowerEvent,
+        readonly moment: Dayjs
+    ) {
+        super(RecordUnknownEventInDiary.description);
+
+        this.diary = diary;
+        this.event = event;
+        this.moment = moment;
     }
 }
 
