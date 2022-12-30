@@ -612,7 +612,7 @@ describe('True FortuneTeller info', () => {
         const imp = await playerFromDescription(
             `${faker.name.firstName()} is the Imp`
         );
-        expect(await imp.setDead()).toBeTrue();
+        await imp.setDead();
 
         const context = createFortuneTellerInfoProviderContext(
             fortuneTellerPlayer,

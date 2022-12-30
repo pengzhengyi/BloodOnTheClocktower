@@ -9,6 +9,7 @@ import type {
     Information,
     InvestigatorInformation,
     LibrarianInformation,
+    RavenkeeperInformation,
     StoryTellerInformation,
     UndertakerInformation,
     WasherwomanInformation,
@@ -20,6 +21,7 @@ import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Undertaker } from '~/content/characters/output/undertaker';
+import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -169,7 +171,6 @@ function AtNight<
     };
 }
 
-// eslint-disable-next-line unused-imports/no-unused-vars
 function OnceAtNight<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
@@ -365,4 +366,31 @@ class BaseUndertakerInformationRequester<
 
 export const UndertakerInformationRequester = IsAlive(
     EachNonfirstNight(BaseUndertakerInformationRequester)
+);
+
+class BaseRavenkeeperInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<RavenkeeperInformation>
+> extends CharacterInformationRequester<
+    RavenkeeperInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacter = Ravenkeeper;
+
+    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+        return (
+            (await super.isEligible(context)) && this.hasDiedAtNight(context)
+        );
+    }
+
+    protected hasDiedAtNight(context: TInformationRequestContext): boolean {
+        if (context.clocktower.isNight) {
+            return context.clocktower.today.hasDead(context.requestedPlayer);
+        }
+
+        return false;
+    }
+}
+
+export const RavenkeeperInformationRequester = OnceAtNight(
+    BaseRavenkeeperInformationRequester
 );

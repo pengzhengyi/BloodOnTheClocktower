@@ -169,3 +169,12 @@ export interface UndertakerInformation {
     executedPlayer: Player;
     character: CharacterToken;
 }
+
+/**
+ * {@link `ravenkeeper["ability"]`}
+ * "If you die at night, you are woken to choose a player: you learn their character."
+ */
+export interface RavenkeeperInformation {
+    chosenPlayer: Player;
+    character: CharacterToken;
+}

@@ -14,6 +14,7 @@ import type {
     FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
+    RavenkeeperInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
@@ -29,6 +30,7 @@ import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Undertaker } from '~/content/characters/output/undertaker';
+import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -235,6 +237,25 @@ export function mockContextForUndertakerInformation(
     context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
         ['isNonfirstNight', 'today'],
         [isNonfirstNight, today]
+    );
+    return context;
+}
+
+export function mockContextForRavenkeeperInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsAlive: boolean,
+    isNight: boolean
+): InformationRequestContext<RavenkeeperInformation> {
+    const context = mockContextForCharacterInformation<
+        Ravenkeeper,
+        RavenkeeperInformation
+    >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Ravenkeeper);
+    const today = mock<Diary>();
+    (today.hasDead as jest.Mock).mockReturnValue(!requestedPlayerIsAlive);
+
+    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
+        ['isNight', 'today'],
+        [isNight, today]
     );
     return context;
 }

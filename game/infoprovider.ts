@@ -14,6 +14,7 @@ import {
     LibrarianNoOutsiderInformation,
     OneOfTwoPlayersHasCharacterType,
     OneOfTwoPlayersIsOutsider,
+    RavenkeeperInformation,
     StoryTellerInformationOptions,
     TrueInformationOptions,
     UndertakerInformation,
@@ -26,7 +27,9 @@ import {
     FortuneTellerInformationRequester,
     IInfoRequester,
     InfoRequestContext,
+    InvestigatorInformationRequester,
     LibrarianInformationRequester,
+    RavenkeeperInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
@@ -38,7 +41,6 @@ import { Players } from './players';
 import type { Seating } from './seating';
 import type { StoryTeller } from './storyteller';
 import type { TravellerSheet } from './travellersheet';
-import { InvestigatorInfoRequester } from './info';
 import { GAME_UI } from '~/interaction/gameui';
 
 export interface InfoProvideContext {
@@ -770,6 +772,60 @@ export class UndertakerInformationProvider<
     }
 }
 
+export interface RavenkeeperInformationProviderContext
+    extends InfoProvideContext {
+    chosenPlayer: Player;
+}
+
+export class RavenkeeperInformationProvider<
+    TInfoProvideContext extends RavenkeeperInformationProviderContext
+> extends InformationProvider<TInfoProvideContext, RavenkeeperInformation> {
+    async getTrueInformationOptions(
+        context: RavenkeeperInformationProviderContext
+    ): Promise<TrueInformationOptions<RavenkeeperInformation>> {
+        await undefined;
+        const perceivedCharacter = context.chosenPlayer.from(
+            context.requestedPlayer
+        ).character;
+        return Generator.once([
+            Information.true({
+                chosenPlayer: context.chosenPlayer,
+                character: perceivedCharacter,
+            } as RavenkeeperInformation),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        context: RavenkeeperInformationProviderContext
+    ): Promise<FalseInformationOptions<RavenkeeperInformation>> {
+        await undefined;
+        return Generator.once(
+            Generator.map(
+                (character) =>
+                    Information.false({
+                        chosenPlayer: context.chosenPlayer,
+                        character,
+                    }) as FalseInformation<RavenkeeperInformation>,
+                context.characterSheet.characters
+            )
+        );
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 1 if actual character and provided character in information match , -1 otherwise.
+     */
+    async evaluateGoodness(
+        information: RavenkeeperInformation,
+        context: TInfoProvideContext,
+        _evaluationContext?: LazyMap<string, any>
+    ): Promise<number> {
+        await undefined;
+        return context.chosenPlayer.character === information.character
+            ? 1
+            : -1;
+    }
+}
+
 type InfoProviderConstructor<TInformation> = new (
     ...args: any[]
 ) => InfoProvider<TInformation>;
@@ -829,7 +885,7 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(WasherwomanInformationProvider);
         } else if (requester instanceof LibrarianInformationRequester) {
             return this.providers.get(LibrarianInformationProvider);
-        } else if (requester instanceof InvestigatorInfoRequester) {
+        } else if (requester instanceof InvestigatorInformationRequester) {
             return this.providers.get(InvestigatorInformationProvider);
         } else if (requester instanceof ChefInformationRequester) {
             return this.providers.get(ChefInformationProvider);
@@ -838,7 +894,9 @@ export class InfoProviders<TInformation = any> {
         } else if (requester instanceof FortuneTellerInformationRequester) {
             return this.providers.get(FortuneTellerInformationProvider);
         } else if (requester instanceof UndertakerInformationRequester) {
-            return this.providers.get(UndertakerInformationRequester);
+            return this.providers.get(UndertakerInformationProvider);
+        } else if (requester instanceof RavenkeeperInformationRequester) {
+            return this.providers.get(RavenkeeperInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
         }

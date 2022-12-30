@@ -92,7 +92,7 @@ export class Execution {
             this._toExecute = player;
             const executionResult = await player.setDead(DeadReason.Executed);
 
-            if (executionResult) {
+            if (executionResult !== undefined) {
                 this._executed = player;
                 return true;
             } else {

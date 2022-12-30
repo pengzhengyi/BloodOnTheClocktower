@@ -6,6 +6,7 @@ import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
 import { CharacterAct } from './characteract';
 import { DeadReason } from './deadreason';
+import { Death } from './death';
 import { EffectTarget } from './effecttarget';
 import { InfoRequester } from './info';
 import { Nomination } from './nomination';
@@ -266,16 +267,17 @@ export class Player extends EffectTarget<Player> {
         this.initializeEffects();
     }
 
-    async setDead(reason: DeadReason = DeadReason.Other): Promise<boolean> {
+    async setDead(reason: DeadReason = DeadReason.Other): Promise<Death> {
         this.deadReason = reason;
         this.state.dead = true;
         // TODO lose ability and influences
-        return await this.dead;
+        await undefined;
+        return new Death(this, reason);
     }
 
-    async attack(victim: Player) {
+    async attack(victim: Player): Promise<Death> {
         // TODO
-        await victim.setDead(DeadReason.DemonAttack);
+        return await victim.setDead(DeadReason.DemonAttack);
     }
 
     async nominate(nominated: Player): Promise<Nomination | undefined> {

@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { binarySearch } from './common';
+import { Death } from './death';
 import {
     PastMomentRewrite,
     RecallFutureDate,
@@ -10,11 +11,12 @@ import {
 import { Execution } from './execution';
 import { Exile } from './exile';
 import { GamePhase, Phase } from './gamephase';
+import type { Player } from './player';
 
 dayjs.extend(isSameOrBefore);
 
 type Moment = Dayjs;
-export type Event = Execution | Exile | Phase;
+export type Event = Execution | Exile | Phase | Death;
 
 export function moment(timestamp?: number): Moment {
     return dayjs(timestamp);
@@ -84,6 +86,8 @@ export class Diary {
 
     exiles: Array<Toll<Exile>> = [];
 
+    deaths: Map<Player, Toll<Death>> = new Map();
+
     phaseToMoment: Map<Phase, Toll<Phase>> = new Map();
 
     protected eventToMoment: Map<Event, Moment> = new Map();
@@ -98,16 +102,18 @@ export class Diary {
 
     record(event: Event): Toll<Event> {
         const moment = this.tryRecord(event);
+        const toll = new Toll(event, moment);
 
         if (event instanceof Execution) {
-            return (this.execution = new Toll(event, moment));
+            return (this.execution = toll as Toll<Execution>);
         } else if (event instanceof Exile) {
-            const toll = new Toll(event, moment);
-            this.exiles.push(toll);
+            this.exiles.push(toll as Toll<Exile>);
+            return toll;
+        } else if (event instanceof Death) {
+            this.deaths.set(event.player, toll as Toll<Death>);
             return toll;
         } else if (event in Phase) {
-            const toll = new Toll(event, moment);
-            this.phaseToMoment.set(event, toll);
+            this.phaseToMoment.set(event, toll as Toll<Phase>);
             return toll;
         }
 
@@ -116,6 +122,10 @@ export class Diary {
 
     getMoment(event: Event): Moment | undefined {
         return this.eventToMoment.get(event);
+    }
+
+    hasDead(player: Player): boolean {
+        return this.deaths.has(player);
     }
 
     hasRecorded(event: Event): boolean {

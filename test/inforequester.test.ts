@@ -6,6 +6,7 @@ import {
     InformationRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
+    RavenkeeperInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from '~/game/inforequester';
@@ -16,6 +17,7 @@ import type {
     FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
+    RavenkeeperInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
@@ -28,6 +30,7 @@ import {
     mockContextForFortuneTellerInformation,
     mockContextForInvestigatorInformation,
     mockContextForLibrarianInformation,
+    mockContextForRavenkeeperInformation,
     mockContextForUndertakerInformation,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
@@ -317,4 +320,29 @@ describe('test UndertakerInformationRequester', () => {
             expect(await requester.isEligible(context)).toBeFalse();
         }
     );
+});
+
+describe('test RavenkeeperInformationRequester', () => {
+    const requester = new RavenkeeperInformationRequester<
+        InformationRequestContext<RavenkeeperInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForRavenkeeperInformation(true, false, true);
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because is not night', async () => {
+        const context = mockContextForRavenkeeperInformation(
+            true,
+            false,
+            false
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because requester is alive', async () => {
+        const context = mockContextForRavenkeeperInformation(true, true, true);
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
 });
