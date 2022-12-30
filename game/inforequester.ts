@@ -1,3 +1,4 @@
+import { CharacterType, Demon, Minion, Traveller } from './charactertype';
 import type { CharacterToken } from './character';
 import type { InfoProvideContext } from './infoprovider';
 import type {
@@ -13,6 +14,7 @@ import type {
     RavenkeeperInformation,
     SpyInformation,
     StoryTellerInformation,
+    TravellerInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from './information';
@@ -239,6 +241,23 @@ function IsAlive<
     };
 }
 
+function IsEvil<
+    TInformation,
+    TInfoRequestContext extends InfoRequestContext<TInformation>,
+    TInfoRequesterConstructor extends InfoRequesterConstructor<
+        InfoRequester<TInformation, TInfoRequestContext>
+    >
+>(InfoRequesterClass: TInfoRequesterConstructor) {
+    return class IsEvil extends InfoRequesterClass {
+        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+            return (
+                (await super.isEligible(context)) &&
+                context.requestedPlayer.isEvil
+            );
+        }
+    };
+}
+
 function hasEnoughPlayerForDemonMinionInformation<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
@@ -255,15 +274,27 @@ function hasEnoughPlayerForDemonMinionInformation<
     };
 }
 
-class BaseDemonInformationRequester<
-    TInformationRequestContext extends InformationRequestContext<DemonInformation>
-> extends InformationRequester<DemonInformation, TInformationRequestContext> {
+abstract class CharacterTypeInformationRequester<
+    TInformation,
+    TInformationRequestContext extends InformationRequestContext<TInformation>
+> extends InformationRequester<TInformation, TInformationRequestContext> {
+    abstract readonly expectedCharacterType: typeof CharacterType;
+
     async isEligible(context: TInformationRequestContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
-            context.requestedPlayer.from(context.requestedPlayer).isDemon
+            context.requestedPlayer.characterType.is(this.expectedCharacterType)
         );
     }
+}
+
+class BaseDemonInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<DemonInformation>
+> extends CharacterTypeInformationRequester<
+    DemonInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacterType = Demon;
 }
 
 export const DemonInformationRequester = IsAlive(
@@ -274,13 +305,11 @@ export const DemonInformationRequester = IsAlive(
 
 class BaseMinionInformationRequester<
     TInformationRequestContext extends InformationRequestContext<MinionInformation>
-> extends InformationRequester<MinionInformation, TInformationRequestContext> {
-    async isEligible(context: TInformationRequestContext): Promise<boolean> {
-        return (
-            (await super.isEligible(context)) &&
-            context.requestedPlayer.from(context.requestedPlayer).isMinion
-        );
-    }
+> extends CharacterTypeInformationRequester<
+    MinionInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacterType = Minion;
 }
 
 export const MinionInformationRequester = IsAlive(
@@ -439,4 +468,17 @@ class BaseSpyInformationRequester<
 
 export const SpyInformationRequester = EachNight(
     IsAlive(BaseSpyInformationRequester)
+);
+
+class BaseTravellerInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<TravellerInformation>
+> extends CharacterTypeInformationRequester<
+    TravellerInformation,
+    TInformationRequestContext
+> {
+    readonly expectedCharacterType = Traveller;
+}
+
+export const TravellerInformationRequester = AtFirstNight(
+    IsEvil(IsAlive(BaseTravellerInformationRequester))
 );

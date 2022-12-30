@@ -1,5 +1,9 @@
 import { mock } from 'jest-mock-extended';
-import { mockWithPropertyValue, mockWithPropertyValues } from './common';
+import {
+    mockObject,
+    mockWithPropertyValue,
+    mockWithPropertyValues,
+} from './common';
 import type { CharacterSheet } from '~/game/charactersheet';
 import type { Clocktower, Diary } from '~/game/clocktower';
 import type { InfoProvideContext } from '~/game/infoprovider';
@@ -17,10 +21,11 @@ import type {
     MinionInformation,
     RavenkeeperInformation,
     SpyInformation,
+    TravellerInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
-import type { Player } from '~/game/player';
+import { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { Seating } from '~/game/seating';
 import type { StoryTeller } from '~/game/storyteller';
@@ -34,6 +39,14 @@ import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Spy } from '~/content/characters/output/spy';
+import {
+    CharacterType,
+    Demon,
+    Minion,
+    Outsider,
+    Townsfolk,
+    Traveller,
+} from '~/game/charactertype';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
@@ -81,20 +94,24 @@ export function mockContextForDemonInformation(
         'length',
         numPlayers
     );
-    context.requestedPlayer = mockWithPropertyValues<
+    context.requestedPlayer = mockObject<
         Player,
-        [boolean, boolean]
+        [boolean, boolean, typeof CharacterType]
     >(
-        ['isDemon', 'alive'],
-        [requestedPlayerIsTheDemon, requestedPlayerIsAlive]
+        ['isDemon', 'alive', 'characterType'],
+        [
+            requestedPlayerIsTheDemon,
+            requestedPlayerIsAlive,
+            requestedPlayerIsTheDemon ? Demon : Townsfolk,
+        ],
+        {
+            from: (mockFunction) =>
+                mockFunction.mockReturnValue(context.requestedPlayer),
+        }
     );
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isFirstNight',
         isFirstNight
-    );
-
-    (context.requestedPlayer.from as jest.Mock).mockReturnValue(
-        context.requestedPlayer
     );
 
     return context;
@@ -116,20 +133,25 @@ export function mockContextForMinionInformation(
         'length',
         numPlayers
     );
-    context.requestedPlayer = mockWithPropertyValues<
+    context.requestedPlayer = mockObject<
         Player,
-        [boolean, boolean]
+        [boolean, boolean, typeof CharacterType]
     >(
-        ['isMinion', 'alive'],
-        [requestedPlayerIsTheMinion, requestedPlayerIsAlive]
+        ['isMinion', 'alive', 'characterType'],
+        [
+            requestedPlayerIsTheMinion,
+            requestedPlayerIsAlive,
+            requestedPlayerIsTheMinion ? Minion : Outsider,
+        ],
+        {
+            from: (mockFunction) =>
+                mockFunction.mockReturnValue(context.requestedPlayer),
+        }
     );
+
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isFirstNight',
         isFirstNight
-    );
-
-    (context.requestedPlayer.from as jest.Mock).mockReturnValue(
-        context.requestedPlayer
     );
 
     return context;
@@ -146,17 +168,18 @@ export function mockContextForCharacterInformation<TCharacter, TInformation>(
         willGetTrueInformation
     );
 
-    context.requestedPlayer = mockWithPropertyValues<
-        Player,
-        [TCharacter, boolean]
-    >(['character', 'alive'], [character, requestedPlayerIsAlive]);
+    context.requestedPlayer = mockObject<Player, [TCharacter, boolean]>(
+        ['character', 'alive'],
+        [character, requestedPlayerIsAlive],
+        {
+            from: (mockFunction) =>
+                mockFunction.mockReturnValue(context.requestedPlayer),
+        }
+    );
+
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isFirstNight',
         isFirstNight
-    );
-
-    (context.requestedPlayer.from as jest.Mock).mockReturnValue(
-        context.requestedPlayer
     );
 
     return context;
@@ -313,5 +336,42 @@ export function mockContextForSpyInformation(
         'isNight',
         isNight
     );
+    return context;
+}
+
+export function mockContextForTravellerInformation(
+    willGetTrueInformation: boolean,
+    requestedPlayerIsTheTraveller: boolean,
+    requestedPlayerIsAlive: boolean,
+    isFirstNight: boolean,
+    isEvil: boolean
+): InformationRequestContext<TravellerInformation> {
+    const context = mockInformationRequestContext<TravellerInformation>(
+        false,
+        willGetTrueInformation
+    );
+
+    context.requestedPlayer = mockObject<
+        Player,
+        [boolean, boolean, boolean, typeof CharacterType]
+    >(
+        ['isTraveller', 'alive', 'isEvil', 'characterType'],
+        [
+            requestedPlayerIsTheTraveller,
+            requestedPlayerIsAlive,
+            isEvil,
+            requestedPlayerIsTheTraveller ? Traveller : Townsfolk,
+        ],
+        {
+            from: (mockFunction) =>
+                mockFunction.mockReturnValue(context.requestedPlayer),
+        }
+    );
+
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isFirstNight',
+        isFirstNight
+    );
+
     return context;
 }

@@ -9,6 +9,7 @@ import {
     MinionInformationRequester,
     RavenkeeperInformationRequester,
     SpyInformationRequester,
+    TravellerInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from '~/game/inforequester';
@@ -22,6 +23,7 @@ import type {
     MinionInformation,
     RavenkeeperInformation,
     SpyInformation,
+    TravellerInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from '~/game/information';
@@ -37,6 +39,7 @@ import {
     mockContextForMinionInformation,
     mockContextForRavenkeeperInformation,
     mockContextForSpyInformation,
+    mockContextForTravellerInformation,
     mockContextForUndertakerInformation,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
@@ -206,6 +209,95 @@ describe('test MinionInformationRequester', () => {
             const context = mockContextForMinionInformation(
                 true,
                 9,
+                true,
+                true,
+                true
+            );
+            context.requestedPlayer = mockWithPropertyValues<
+                Player,
+                [boolean, boolean]
+            >(['drunk', 'poisoned'], [false, false]);
+            expect(await requester.willGetTrueInformation(context)).toBeTrue();
+        }
+    );
+});
+
+describe('test TravellerInformationRequester', () => {
+    const requester = new TravellerInformationRequester<
+        InformationRequestContext<TravellerInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForTravellerInformation(
+            true,
+            true,
+            true,
+            true,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent(
+        'not eligible because player is not Traveller',
+        async () => {
+            const context = mockContextForTravellerInformation(
+                true,
+                false,
+                true,
+                true,
+                true
+            );
+            expect(await requester.isEligible(context)).toBeFalse();
+        }
+    );
+
+    test.concurrent('not eligible because is not first night', async () => {
+        const context = mockContextForTravellerInformation(
+            true,
+            true,
+            true,
+            false,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because is not evil', async () => {
+        const context = mockContextForTravellerInformation(
+            true,
+            true,
+            true,
+            true,
+            false
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent(
+        'willGetTrueInformation returns false when player is drunk',
+        async () => {
+            const context = mockContextForTravellerInformation(
+                true,
+                true,
+                true,
+                true,
+                true
+            );
+            context.requestedPlayer = mockWithPropertyValues<
+                Player,
+                [boolean, boolean]
+            >(['drunk', 'poisoned'], [true, false]);
+            expect(await requester.willGetTrueInformation(context)).toBeFalse();
+        }
+    );
+
+    test.concurrent(
+        'willGetTrueInformation returns true when player is normal',
+        async () => {
+            const context = mockContextForTravellerInformation(
+                true,
+                true,
                 true,
                 true,
                 true

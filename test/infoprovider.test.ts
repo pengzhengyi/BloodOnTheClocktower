@@ -16,6 +16,7 @@ import {
     MinionInformationProvider,
     RavenkeeperInformationProvider,
     RavenkeeperInformationProviderContext,
+    TravellerInformationProvider,
     UndertakerInformationProvider,
     UndertakerInformationProviderContext,
     WasherwomanInformationProvider,
@@ -856,5 +857,44 @@ describe('True RavenkeeperInformationProvider info', () => {
      */
     test("The Imp attacks the Mayor. The Mayor doesn't die, but the Ravenkeeper dies instead, due to the Mayor's ability. The Ravenkeeper is woken and chooses Douglas, who is a dead Recluse. The Ravenkeeper learns that Douglas is the Scarlet Woman, since the Recluse registered as a Minion.", async () => {
         // TODO
+    });
+});
+
+describe('True TravellerInformationProvider info', () => {
+    const provider = new TravellerInformationProvider();
+    let travellerPlayer: Player;
+
+    beforeAll(async () => {
+        travellerPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the evil Gunslinger`
+        );
+    });
+
+    /**
+     * {@link `traveller["gameplay"][0]`}
+     */
+    test('If travellers are evil, they learn who the Demon is; they do not learn any additional evil characters or receive any bluffs.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const Benjamin = await playerFromDescription('Benjamin is the Empath');
+
+        const context = createInfoProvideContext(travellerPlayer, [
+            impPlayer,
+            Benjamin,
+        ]);
+
+        const trueInfoOptions = Array.from(
+            await provider.getTrueInformationOptions(context)
+        );
+        expect(trueInfoOptions).toHaveLength(1);
+
+        for (const option of trueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.demon).toBe(impPlayer);
+            expect(
+                await provider.evaluateGoodness(option.info, context)
+            ).toEqual(1);
+        }
     });
 });

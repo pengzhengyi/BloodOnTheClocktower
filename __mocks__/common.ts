@@ -27,3 +27,25 @@ export function mockWithPropertyValues<O, T extends any[]>(
 
     return mockObject;
 }
+
+type ModifyMockFunction = (mockFunction: jest.Mock) => void;
+
+export function mockObject<O, T extends any[]>(
+    propertyNames: string[],
+    propertyValues: T,
+    functions: { [key: string]: ModifyMockFunction }
+) {
+    const mockObject = mockWithPropertyValues<O, T>(
+        propertyNames,
+        propertyValues
+    );
+
+    for (const [
+        functionName,
+        functionFactory,
+    ] of Object.entries<ModifyMockFunction>(functions)) {
+        functionFactory((mockObject as any)[functionName] as jest.Mock);
+    }
+
+    return mockObject;
+}

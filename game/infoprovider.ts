@@ -19,6 +19,7 @@ import {
     SpyInformation,
     StoryTellerInformation,
     StoryTellerInformationOptions,
+    TravellerInformation,
     TrueInformationOptions,
     UndertakerInformation,
     WasherwomanInformation,
@@ -35,6 +36,7 @@ import {
     MinionInformationRequester,
     RavenkeeperInformationRequester,
     SpyInformationRequester,
+    TravellerInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
@@ -397,6 +399,59 @@ export class MinionInformationProvider<
         score += information.demon.isDemon ? 5 : -5;
         await undefined;
         return score;
+    }
+}
+
+export class TravellerInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends InformationProvider<TInfoProvideContext, TravellerInformation> {
+    async getTrueInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<TrueInformationOptions<TravellerInformation>> {
+        const demon = context.players
+            .clone()
+            .from(context.requestedPlayer)
+            .isDemon.from()
+            .take(1) as Player;
+
+        await undefined;
+
+        return Generator.once([
+            Information.true({
+                demon,
+            }),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<FalseInformationOptions<TravellerInformation>> {
+        const hypotheticalCandidatesForDemon = context.players.isNot(
+            context.requestedPlayer
+        );
+
+        await undefined;
+
+        return Generator.once(
+            Generator.map(
+                (demon) =>
+                    Information.false({
+                        demon,
+                    }),
+                hypotheticalCandidatesForDemon
+            )
+        );
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 1 provided player is the demon, -1 otherwise.
+     */
+    async evaluateGoodness(
+        information: TravellerInformation,
+        _context: TInfoProvideContext
+    ): Promise<number> {
+        await undefined;
+        return information.demon.isDemon ? 1 : -1;
     }
 }
 
@@ -1076,6 +1131,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(DemonInformationProvider);
         } else if (requester instanceof MinionInformationRequester) {
             return this.providers.get(MinionInformationProvider);
+        } else if (requester instanceof TravellerInformationRequester) {
+            return this.providers.get(TravellerInformationProvider);
         }
     }
 }

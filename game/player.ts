@@ -88,7 +88,7 @@ export class Player extends EffectTarget<Player> {
         player: Player,
         characterType: typeof CharacterType
     ): boolean {
-        return Object.is(player.characterType, characterType);
+        return player.characterType.is(characterType);
     }
 
     @Expose({ toPlainOnly: true })

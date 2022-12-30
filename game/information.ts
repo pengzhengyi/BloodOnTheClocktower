@@ -192,3 +192,10 @@ export interface RavenkeeperInformation {
 export interface SpyInformation {
     grimoire: Grimoire;
 }
+
+/**
+ * If travellers are evil, they learn who the Demon is; they do not learn any additional evil characters or receive any bluffs.
+ */
+export interface TravellerInformation {
+    demon: DemonPlayer;
+}
