@@ -719,3 +719,31 @@ export class NoDefinedInfoProvider<
         this.infoProviders = infoProviders;
     }
 }
+
+export class GameHasTooManyPlayers extends RecoverableGameError {
+    static description = 'Game has too many players';
+
+    constructor(
+        readonly numPlayers: number,
+        readonly recommendedMaximum: number
+    ) {
+        super(GameHasTooManyPlayers.description);
+
+        this.numPlayers = numPlayers;
+        this.recommendedMaximum = recommendedMaximum;
+    }
+}
+
+export class GameHasTooFewPlayers extends RecoverableGameError {
+    static description = 'Game has too few players';
+
+    constructor(
+        readonly numPlayers: number,
+        readonly recommendedMinimum: number
+    ) {
+        super(GameHasTooFewPlayers.description);
+
+        this.numPlayers = numPlayers;
+        this.recommendedMinimum = recommendedMinimum;
+    }
+}

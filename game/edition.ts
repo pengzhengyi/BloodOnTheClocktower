@@ -77,6 +77,10 @@ export abstract class Edition {
 
     private static _characterSheet?: CharacterSheet;
 
+    static is(edition: typeof Edition): boolean {
+        return Object.is(this, edition);
+    }
+
     static getCanonicalName(name: string) {
         return onlyLetters(name);
     }
