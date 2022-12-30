@@ -12,6 +12,7 @@ import {
     InvestigatorInformation,
     LibrarianInformation,
     LibrarianNoOutsiderInformation,
+    MinionInformation,
     OneOfTwoPlayersHasCharacterType,
     OneOfTwoPlayersIsOutsider,
     RavenkeeperInformation,
@@ -29,11 +30,12 @@ import {
     InfoRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
+    MinionInformationRequester,
     RavenkeeperInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
-import { Player } from './player';
+import { MinionPlayer, Player } from './player';
 import type { CharacterToken } from './character';
 import type { CharacterSheet } from './charactersheet';
 import type { Clocktower } from './clocktower';
@@ -148,26 +150,48 @@ export abstract class InformationProvider<
     }
 }
 
-export class DemonInformationProvider<
-    TInfoProvideContext extends InfoProvideContext
-> extends InformationProvider<TInfoProvideContext, DemonInformation> {
-    async getTrueInformationOptions(
+export abstract class DemonMinionInformationProvider<
+    TInfoProvideContext extends InfoProvideContext,
+    TInformation
+> extends InformationProvider<TInfoProvideContext, TInformation> {
+    protected getMinionPlayers(
         context: TInfoProvideContext
-    ): Promise<TrueInformationOptions<DemonInformation>> {
-        const minionPlayers = context.players
+    ): Array<MinionPlayer> {
+        return context.players
             .clone()
+            .isNot(context.requestedPlayer)
             .from(context.requestedPlayer)
             .isMinion.from()
             .take() as Player[];
+    }
 
-        const goodCharactersInPlay = context.players
-            .clone()
-            .from(context.requestedPlayer)
-            .map((player) => player.character)
-            .filter((character) => character.isGoodCharacter);
+    protected getHypotheticalCombinationsForMinionPlayers(
+        context: TInfoProvideContext
+    ): Generator<Array<Player>> {
+        return context.players
+            .isNot(context.requestedPlayer)
+            .combinations(context.travellerSheet.actualAssignment.minion);
+    }
+}
 
-        const notInPlayGoodCharacters =
-            context.characterSheet.getCharactersNotInPlay(goodCharactersInPlay);
+export class DemonInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends DemonMinionInformationProvider<
+    TInfoProvideContext,
+    DemonInformation
+> {
+    protected static readonly cachedKeyForGoodCharactersNotInPlay =
+        'actualGoodCharactersNotInPlay';
+
+    async getTrueInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<TrueInformationOptions<DemonInformation>> {
+        const minionPlayers = this.getMinionPlayers(context);
+
+        const notInPlayGoodCharacters = this.getNotInPlayGoodCharacters(
+            context,
+            true
+        );
 
         const notInPlayGoodCharactersCombinations = Generator.combinations(
             3,
@@ -192,9 +216,8 @@ export class DemonInformationProvider<
     async getFalseInformationOptions(
         context: TInfoProvideContext
     ): Promise<FalseInformationOptions<DemonInformation>> {
-        const perceivedMinionPlayersCombinations = context.players
-            .isNot(context.requestedPlayer)
-            .combinations(context.travellerSheet.actualAssignment.minion);
+        const perceivedMinionPlayersCombinations =
+            this.getHypotheticalCombinationsForMinionPlayers(context);
 
         const perceivedNotInPlayerGoodCharacters = Generator.filter(
             (character) => character.isGoodCharacter,
@@ -226,8 +249,19 @@ export class DemonInformationProvider<
      */
     async evaluateGoodness(
         information: DemonInformation,
-        context: TInfoProvideContext
+        context: TInfoProvideContext,
+        evaluationContext?: LazyMap<string, any>
     ): Promise<number> {
+        evaluationContext = await this.buildEvaluationContext(
+            context,
+            evaluationContext
+        );
+        const goodCharactersNotInPlay: Set<CharacterToken> =
+            evaluationContext.getOrDefault(
+                DemonInformationProvider.cachedKeyForGoodCharactersNotInPlay,
+                new Set<CharacterToken>()
+            );
+
         let score = Generator.reduce(
             (score, minion) => score + (minion.isMinion ? 5 : -5),
             0,
@@ -235,14 +269,131 @@ export class DemonInformationProvider<
         );
 
         score += Generator.reduce(
-            (score, _character) => score + 6,
+            (score, character) =>
+                score + (goodCharactersNotInPlay.has(character) ? 6 : 0),
             -9,
-            Generator.exclude(
-                information.notInPlayGoodCharacters,
-                context.players.charactersInPlay
-            )
+            information.notInPlayGoodCharacters
         );
         return await score;
+    }
+
+    protected async buildEvaluationContextImpl(
+        context: TInfoProvideContext,
+        evaluationContext: LazyMap<string, any>
+    ) {
+        if (
+            !evaluationContext.has(
+                DemonInformationProvider.cachedKeyForGoodCharactersNotInPlay
+            )
+        ) {
+            const charactersNotInPlay = new Set<CharacterToken>();
+            const notInPlayGoodCharacters = this.getNotInPlayGoodCharacters(
+                context,
+                false
+            );
+
+            for (const character of notInPlayGoodCharacters) {
+                charactersNotInPlay.add(character);
+            }
+
+            evaluationContext.set(
+                DemonInformationProvider.cachedKeyForGoodCharactersNotInPlay,
+                charactersNotInPlay
+            );
+        }
+
+        await undefined;
+
+        return evaluationContext;
+    }
+
+    protected getNotInPlayGoodCharacters(
+        context: TInfoProvideContext,
+        shouldFromRequestedPlayerPerspective: boolean
+    ): Iterable<CharacterToken> {
+        const players = shouldFromRequestedPlayerPerspective
+            ? context.players.clone().from(context.requestedPlayer)
+            : context.players.clone();
+
+        const charactersInPlay = players.map((player) => player.character);
+
+        return Generator.filter(
+            (character) => character.isGoodCharacter,
+            context.characterSheet.getCharactersNotInPlay(charactersInPlay)
+        );
+    }
+}
+
+export class MinionInformationProvider<
+    TInfoProvideContext extends InfoProvideContext
+> extends DemonMinionInformationProvider<
+    TInfoProvideContext,
+    MinionInformation
+> {
+    async getTrueInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<TrueInformationOptions<MinionInformation>> {
+        const otherMinions = this.getMinionPlayers(context);
+
+        const demon = context.players
+            .clone()
+            .from(context.requestedPlayer)
+            .isDemon.from()
+            .take(1) as Player;
+
+        await undefined;
+
+        return Generator.once([
+            Information.true({
+                otherMinions,
+                demon,
+            }),
+        ]);
+    }
+
+    async getFalseInformationOptions(
+        context: TInfoProvideContext
+    ): Promise<FalseInformationOptions<MinionInformation>> {
+        const hypotheticalCombinationsForMinionPlayers =
+            this.getHypotheticalCombinationsForMinionPlayers(context);
+
+        const hypotheticalCandidatesForDemon = context.players.isNot(
+            context.requestedPlayer
+        );
+
+        await undefined;
+
+        const infoOptions = Generator.once(
+            Generator.cartesian_product(
+                hypotheticalCombinationsForMinionPlayers,
+                hypotheticalCandidatesForDemon
+            )
+        ).map(([otherMinions, demon]) =>
+            Information.false({
+                otherMinions,
+                demon,
+            })
+        );
+
+        return infoOptions;
+    }
+
+    /**
+     * @override Goodness is evaluated on the following criterion: 5 for each player that is a minion, -5 if not; 5 for provided player is the demon.
+     */
+    async evaluateGoodness(
+        information: MinionInformation,
+        _context: TInfoProvideContext
+    ): Promise<number> {
+        let score = Generator.reduce(
+            (score, minion) => score + (minion.isMinion ? 5 : -5),
+            0,
+            information.otherMinions
+        );
+
+        score += information.demon.isDemon ? 5 : -5;
+        await undefined;
+        return score;
     }
 }
 
@@ -899,6 +1050,8 @@ export class InfoProviders<TInformation = any> {
             return this.providers.get(RavenkeeperInformationProvider);
         } else if (requester instanceof DemonInformationRequester) {
             return this.providers.get(DemonInformationProvider);
+        } else if (requester instanceof MinionInformationRequester) {
+            return this.providers.get(MinionInformationProvider);
         }
     }
 }

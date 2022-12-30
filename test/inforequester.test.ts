@@ -6,6 +6,7 @@ import {
     InformationRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
+    MinionInformationRequester,
     RavenkeeperInformationRequester,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
@@ -17,6 +18,7 @@ import type {
     FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
+    MinionInformation,
     RavenkeeperInformation,
     UndertakerInformation,
     WasherwomanInformation,
@@ -30,6 +32,7 @@ import {
     mockContextForFortuneTellerInformation,
     mockContextForInvestigatorInformation,
     mockContextForLibrarianInformation,
+    mockContextForMinionInformation,
     mockContextForRavenkeeperInformation,
     mockContextForUndertakerInformation,
     mockContextForWasherwomanInformation,
@@ -109,6 +112,95 @@ describe('test DemonInformationRequester', () => {
         'willGetTrueInformation returns true when player is normal',
         async () => {
             const context = mockContextForDemonInformation(
+                true,
+                9,
+                true,
+                true,
+                true
+            );
+            context.requestedPlayer = mockWithPropertyValues<
+                Player,
+                [boolean, boolean]
+            >(['drunk', 'poisoned'], [false, false]);
+            expect(await requester.willGetTrueInformation(context)).toBeTrue();
+        }
+    );
+});
+
+describe('test MinionInformationRequester', () => {
+    const requester = new MinionInformationRequester<
+        InformationRequestContext<MinionInformation>
+    >();
+
+    test.concurrent('should be eligible', async () => {
+        const context = mockContextForMinionInformation(
+            true,
+            9,
+            true,
+            true,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeTrue();
+    });
+
+    test.concurrent('not eligible because player is not minion', async () => {
+        const context = mockContextForMinionInformation(
+            true,
+            12,
+            false,
+            true,
+            true
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent('not eligible because is not first night', async () => {
+        const context = mockContextForMinionInformation(
+            true,
+            15,
+            true,
+            true,
+            false
+        );
+        expect(await requester.isEligible(context)).toBeFalse();
+    });
+
+    test.concurrent(
+        'not eligible because number of players is less than 7',
+        async () => {
+            const context = mockContextForMinionInformation(
+                true,
+                6,
+                true,
+                true,
+                true
+            );
+            expect(await requester.isEligible(context)).toBeFalse();
+        }
+    );
+
+    test.concurrent(
+        'willGetTrueInformation returns false when player is drunk',
+        async () => {
+            const context = mockContextForMinionInformation(
+                true,
+                9,
+                true,
+                true,
+                true
+            );
+            context.requestedPlayer = mockWithPropertyValues<
+                Player,
+                [boolean, boolean]
+            >(['drunk', 'poisoned'], [true, false]);
+            expect(await requester.willGetTrueInformation(context)).toBeFalse();
+        }
+    );
+
+    test.concurrent(
+        'willGetTrueInformation returns true when player is normal',
+        async () => {
+            const context = mockContextForMinionInformation(
                 true,
                 9,
                 true,

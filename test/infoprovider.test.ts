@@ -7,11 +7,13 @@ import { playerFromDescription } from './utils';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import {
     ChefInformationProvider,
+    DemonInformationProvider,
     EmpathInformationProvider,
     FortuneTellerInformationProvider,
     FortuneTellerInformationProviderContext,
     InvestigatorInformationProvider,
     LibrarianInformationProvider,
+    MinionInformationProvider,
     RavenkeeperInformationProvider,
     RavenkeeperInformationProviderContext,
     UndertakerInformationProvider,
@@ -30,8 +32,10 @@ import { Seating } from '~/game/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
 import type {
+    DemonInformation,
     LibrarianNoOutsiderInformation,
     OneOfTwoPlayersIsOutsider,
+    TrueInformation,
 } from '~/game/information';
 import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
@@ -44,6 +48,8 @@ import { Soldier } from '~/content/characters/output/soldier';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Mayor } from '~/content/characters/output/mayor';
 import { Undertaker } from '~/content/characters/output/undertaker';
+import { Poisoner } from '~/content/characters/output/poisoner';
+import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
 async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
@@ -137,6 +143,81 @@ beforeAll(() => {
 
 afterAll(() => {
     storytellerConfirmMock.mockReset();
+});
+
+describe('test DemonInformationProvider and MinionInformationProvider', () => {
+    const demonInformationProvider = new DemonInformationProvider();
+    const minionInformationProvider = new MinionInformationProvider();
+
+    test('get correct minion and demon information', async () => {
+        const playerDescriptions = [
+            `${faker.name.firstName()} is the Ravenkeeper`,
+            `${faker.name.firstName()} is the Imp`,
+            `${faker.name.firstName()} is the Poisoner`,
+            `${faker.name.firstName()} is the Butler`,
+            `${faker.name.firstName()} is the Librarian`,
+            `${faker.name.firstName()} is the Monk`,
+            `${faker.name.firstName()} is the Empath`,
+            `${faker.name.firstName()} is the Recluse`,
+            `${faker.name.firstName()} is the Investigator`,
+        ];
+        const demonContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                (player) => player.character === Imp,
+                ...playerDescriptions
+            );
+        demonContext.characterSheet = TroubleBrewing.characterSheet;
+
+        const minionContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                (player) => player.character === Poisoner,
+                ...playerDescriptions
+            );
+        minionContext.characterSheet = TroubleBrewing.characterSheet;
+
+        const demonTrueInfoOptions = (
+            await demonInformationProvider.getTrueInformationOptions(
+                demonContext
+            )
+        ).take(3) as TrueInformation<DemonInformation>[];
+        expect(demonTrueInfoOptions).toHaveLength(3);
+
+        for (const option of demonTrueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(
+                option.info.minions.map((player) => player.character)
+            ).toIncludeSameMembers([Poisoner]);
+            expect(option.info.notInPlayGoodCharacters).toHaveLength(3);
+            expect(option.info.notInPlayGoodCharacters).not.toIncludeAnyMembers(
+                [Librarian, Monk, Empath, Investigator, Ravenkeeper]
+            );
+            expect(
+                await demonInformationProvider.evaluateGoodness(
+                    option.info,
+                    demonContext
+                )
+            ).toEqual(5 + 3 * 3);
+        }
+
+        const minionTrueInfoOptions = Array.from(
+            await minionInformationProvider.getTrueInformationOptions(
+                minionContext
+            )
+        );
+        expect(minionTrueInfoOptions).toHaveLength(1);
+
+        for (const option of minionTrueInfoOptions) {
+            expect(option.isTrueInfo).toBeTrue();
+            expect(option.info.otherMinions).toHaveLength(0);
+            expect(option.info.demon.character).toBe(Imp);
+            expect(
+                await minionInformationProvider.evaluateGoodness(
+                    option.info,
+                    minionContext
+                )
+            ).toEqual(0 + 5);
+        }
+    });
 });
 
 describe('test WasherwomanInformationProvider', () => {

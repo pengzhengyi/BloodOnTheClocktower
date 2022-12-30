@@ -14,6 +14,7 @@ import type {
     FortuneTellerInformation,
     InvestigatorInformation,
     LibrarianInformation,
+    MinionInformation,
     RavenkeeperInformation,
     UndertakerInformation,
     WasherwomanInformation,
@@ -82,8 +83,43 @@ export function mockContextForDemonInformation(
         Player,
         [boolean, boolean]
     >(
-        ['isTheDemon', 'alive'],
+        ['isDemon', 'alive'],
         [requestedPlayerIsTheDemon, requestedPlayerIsAlive]
+    );
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isFirstNight',
+        isFirstNight
+    );
+
+    (context.requestedPlayer.from as jest.Mock).mockReturnValue(
+        context.requestedPlayer
+    );
+
+    return context;
+}
+
+export function mockContextForMinionInformation(
+    willGetTrueInformation: boolean,
+    numPlayers: number,
+    requestedPlayerIsTheMinion: boolean,
+    requestedPlayerIsAlive: boolean,
+    isFirstNight: boolean
+): InformationRequestContext<MinionInformation> {
+    const context = mockInformationRequestContext<MinionInformation>(
+        false,
+        willGetTrueInformation
+    );
+
+    context.players = mockWithPropertyValue<Players, number>(
+        'length',
+        numPlayers
+    );
+    context.requestedPlayer = mockWithPropertyValues<
+        Player,
+        [boolean, boolean]
+    >(
+        ['isMinion', 'alive'],
+        [requestedPlayerIsTheMinion, requestedPlayerIsAlive]
     );
     context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
         'isFirstNight',

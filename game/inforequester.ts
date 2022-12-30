@@ -9,6 +9,7 @@ import type {
     Information,
     InvestigatorInformation,
     LibrarianInformation,
+    MinionInformation,
     RavenkeeperInformation,
     StoryTellerInformation,
     UndertakerInformation,
@@ -236,24 +237,54 @@ function IsAlive<
     };
 }
 
+function hasEnoughPlayerForDemonMinionInformation<
+    TInformation,
+    TInfoRequestContext extends InfoRequestContext<TInformation>,
+    TInfoRequesterConstructor extends InfoRequesterConstructor<
+        InfoRequester<TInformation, TInfoRequestContext>
+    >
+>(InfoRequesterClass: TInfoRequesterConstructor) {
+    return class HasEnoughPlayerForDemonMinionInformation extends InfoRequesterClass {
+        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+            return (
+                (await super.isEligible(context)) && context.players.length >= 7
+            );
+        }
+    };
+}
+
 class BaseDemonInformationRequester<
     TInformationRequestContext extends InformationRequestContext<DemonInformation>
 > extends InformationRequester<DemonInformation, TInformationRequestContext> {
     async isEligible(context: TInformationRequestContext): Promise<boolean> {
-        if ((await super.isEligible(context)) && context.players.length >= 7) {
-            const isTheDemon = context.requestedPlayer.from(
-                context.requestedPlayer
-            ).isTheDemon;
-            context.requestedPlayer.from();
-            return isTheDemon;
-        }
-
-        return false;
+        return (
+            (await super.isEligible(context)) &&
+            context.requestedPlayer.from(context.requestedPlayer).isDemon
+        );
     }
 }
 
 export const DemonInformationRequester = IsAlive(
-    AtFirstNight(BaseDemonInformationRequester)
+    hasEnoughPlayerForDemonMinionInformation(
+        AtFirstNight(BaseDemonInformationRequester)
+    )
+);
+
+class BaseMinionInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<MinionInformation>
+> extends InformationRequester<MinionInformation, TInformationRequestContext> {
+    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+        return (
+            (await super.isEligible(context)) &&
+            context.requestedPlayer.from(context.requestedPlayer).isMinion
+        );
+    }
+}
+
+export const MinionInformationRequester = IsAlive(
+    hasEnoughPlayerForDemonMinionInformation(
+        AtFirstNight(BaseMinionInformationRequester)
+    )
 );
 
 abstract class CharacterInformationRequester<

@@ -23,7 +23,7 @@ import type {
     Outsider,
     Townsfolk,
 } from './charactertype';
-import { MinionPlayer, Player } from './player';
+import { DemonPlayer, MinionPlayer, Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
 
 /**
@@ -95,6 +95,15 @@ export interface OneOfTwoPlayersHasCharacterType {
 export interface DemonInformation {
     minions: Array<MinionPlayer>;
     notInPlayGoodCharacters: [CharacterToken, CharacterToken, CharacterToken];
+}
+
+/**
+ * {@link `glossary["Minion info"]`}
+ * Shorthand on the night sheet, representing the information that the Minions receive on the first night if there are 7 or more players. The Minions learn which other players are Minions, and which player the Demon is.
+ */
+export interface MinionInformation {
+    otherMinions: Array<MinionPlayer>;
+    demon: DemonPlayer;
 }
 
 export type TrueInformation<T> = Information<T> & { isTrueInfo: true };
