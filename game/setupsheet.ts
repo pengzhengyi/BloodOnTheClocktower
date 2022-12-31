@@ -1,9 +1,21 @@
 import { Generator } from './collections';
+import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
+import { Grimoire } from './grimoire';
+import type { Player } from './player';
+import type { Players } from './players';
+import { Seating } from './seating';
+import { TownSquare } from './townsquare';
 import type { NumberOfCharacters } from './scripttool';
+import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
+import { GAME_UI } from '~/interaction/gameui';
 
 export abstract class SetupSheet {
     static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;
+
+    static readonly SUPPORTED_EDITIONS: Array<typeof Edition> = [
+        TroubleBrewing,
+    ];
 
     static readonly MAXIMUM_NUMBER_OF_PLAYERS_BEFORE_NECESSARY_TRAVELLER = 15;
 
@@ -122,6 +134,28 @@ export abstract class SetupSheet {
             },
         ],
     ]);
+
+    static setupSeating(numPlayers: number): Promise<Seating> {
+        return Seating.init(numPlayers);
+    }
+
+    static setupSeatingFromPlayers(
+        players: Array<Player> | Players
+    ): Promise<Seating> {
+        return Seating.from(players);
+    }
+
+    static setupGrimoire(players: Players): Grimoire {
+        return new Grimoire(players);
+    }
+
+    static setupEdition(): Promise<typeof Edition> {
+        return GAME_UI.storytellerChooseOne(this.SUPPORTED_EDITIONS);
+    }
+
+    static setupTownSquare(seating: Seating, players: Players): TownSquare {
+        return new TownSquare(seating, players);
+    }
 
     static recommend(numPlayers: number): NumberOfCharacters {
         if (

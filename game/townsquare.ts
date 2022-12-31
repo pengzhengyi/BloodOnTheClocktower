@@ -39,7 +39,7 @@ export class TownSquare {
         return new SeatAssignment(this.seating, this.players);
     }
 
-    protected constructor(seating: Seating, players: Players) {
+    constructor(seating: Seating, players: Players) {
         this.seating = seating;
         this.players = players;
     }

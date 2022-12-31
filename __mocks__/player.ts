@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { mock } from 'jest-mock-extended';
+import { randomCharacter } from './character';
 import { mockWithPropertyValue } from './common';
 import { storytellerConfirmMock } from './gameui';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
-import { CharacterLoader } from '~/game/characterloader';
 import { Player } from '~/game/player';
 
 export async function createBasicPlayer(
@@ -16,7 +16,7 @@ export async function createBasicPlayer(
     }
 
     if (character === undefined) {
-        character = CharacterLoader.randomLoad();
+        character = randomCharacter();
     }
 
     const alignment =
@@ -25,13 +25,21 @@ export async function createBasicPlayer(
     return await Player.init(name, character, alignment);
 }
 
+export async function createUnassignedPlayer(name?: string) {
+    if (name === undefined) {
+        name = faker.name.firstName();
+    }
+    return await Player.init(name);
+}
+
 export async function createBasicPlayers(
-    numPlayers: number
+    numPlayers: number,
+    factory: () => Promise<Player> = createBasicPlayer
 ): Promise<Array<Player>> {
     const basicPlayerCreations: Array<Promise<Player>> = [];
 
     for (let i = 0; i < numPlayers; i++) {
-        basicPlayerCreations.push(createBasicPlayer());
+        basicPlayerCreations.push(factory());
     }
 
     return await Promise.all(basicPlayerCreations);

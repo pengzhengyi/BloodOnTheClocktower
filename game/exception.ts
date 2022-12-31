@@ -7,8 +7,9 @@ import type { Exile } from './exile';
 import type { Vote } from './vote';
 import type { InfoRequestContext } from './inforequester';
 import type { InfoProviders } from './infoprovider';
-import type { Predicate, RoleData } from './types';
+import type { AsyncFactory, Predicate, RoleData, StaticThis } from './types';
 import type { Player } from './player';
+import type { Players } from './players';
 import type { Seat } from './seat';
 import type { CharacterToken } from './character';
 import type { StoryTeller } from './storyteller';
@@ -80,7 +81,29 @@ export class AggregateError<E extends Error = BaseError> extends Error {
 
 export class GameError extends BaseError {}
 
+// eslint-disable-next-line no-use-before-define
+export type RecoveryAction<TError extends RecoverableGameError, TResult> = (
+    error: TError
+) => Promise<TResult>;
+
 export class RecoverableGameError extends GameError {
+    static async catch<TError extends RecoverableGameError, TResult>(
+        this: StaticThis<TError>,
+        action: AsyncFactory<TResult>,
+        recovery: RecoveryAction<TError, TResult>
+    ): Promise<TResult> {
+        try {
+            return await action();
+        } catch (error) {
+            if (error instanceof this) {
+                await error.resolve();
+                return await recovery(error);
+            }
+
+            throw error;
+        }
+    }
+
     get handled(): boolean {
         return this.handled_;
     }
@@ -125,8 +148,6 @@ export class NoVoteInNomination extends RecoverableGameError {
 
     constructor(readonly nomination: Nomination) {
         super(NoVoteInNomination.description);
-
-        this.nomination = nomination;
     }
 }
 
@@ -139,10 +160,6 @@ export class AttemptMoreThanOneExecution extends RecoverableGameError {
         readonly attemptedToExecute: Player
     ) {
         super(AttemptMoreThanOneExecution.description);
-
-        this.execution = execution;
-        this.executed = executed;
-        this.attemptedToExecute = attemptedToExecute;
     }
 }
 
@@ -153,8 +170,6 @@ export class NoVoteInExile extends RecoverableGameError {
 
     constructor(readonly exile: Exile) {
         super(NoVoteInExile.description);
-
-        this.exile = exile;
     }
 }
 
@@ -163,9 +178,6 @@ export class NoVotesWhenCountingVote extends RecoverableGameError {
 
     constructor(readonly vote: Vote, public nomination?: Nomination) {
         super(NoVotesWhenCountingVote.description);
-
-        this.vote = vote;
-        this.nomination = nomination;
     }
 }
 
@@ -177,9 +189,6 @@ export class IncompleteCharacterRoleData extends RecoverableGameError {
         readonly missingKeyName: string
     ) {
         super(IncompleteCharacterRoleData.description);
-
-        this.roleData = roleData;
-        this.missingKeyName = missingKeyName;
     }
 }
 
@@ -191,9 +200,6 @@ export class IncompleteEditionData extends RecoverableGameError {
         readonly missingKeyName: string
     ) {
         super(IncompleteCharacterRoleData.description);
-
-        this.editionData = editionData;
-        this.missingKeyName = missingKeyName;
     }
 }
 
@@ -209,10 +215,6 @@ export class NominatorNominatedBefore extends RecoverableGameError {
         readonly nominator: Player
     ) {
         super(NominatorNominatedBefore.description);
-
-        this.failedNomination = failedNomination;
-        this.pastNomination = pastNomination;
-        this.nominator = nominator;
     }
 }
 
@@ -228,10 +230,6 @@ export class NominatedNominatedBefore extends RecoverableGameError {
         readonly nominated: Player
     ) {
         super(NominatedNominatedBefore.description);
-
-        this.failedNomination = failedNomination;
-        this.pastNomination = pastNomination;
-        this.nominated = nominated;
     }
 }
 
@@ -245,9 +243,6 @@ export class CannotFindPlayerInGame extends RecoverableGameError {
         readonly gameState: GameInfo
     ) {
         super(CannotFindPlayerInGame.description);
-
-        this.player = player;
-        this.gameState = gameState;
     }
 }
 
@@ -255,14 +250,13 @@ export class PlayerHasUnclearAlignment extends RecoverableGameError {
     static description =
         'Player does not have a clear alignment as alignment is neither specified nor inferrable';
 
+    declare correctedAlignment: Alignment;
+
     constructor(
         readonly player: Player,
         readonly specifiedAlignment?: Alignment
     ) {
         super(PlayerHasUnclearAlignment.description);
-
-        this.player = player;
-        this.specifiedAlignment = specifiedAlignment;
     }
 }
 
@@ -273,8 +267,6 @@ export class DeadPlayerCannotNominate extends RecoverableGameError {
 
     constructor(readonly player: Player) {
         super(DeadPlayerCannotNominate.description);
-
-        this.player = player;
     }
 }
 
@@ -285,8 +277,6 @@ export class NumberOfSeatNotPositive extends RecoverableGameError {
 
     constructor(readonly numSeats: number) {
         super(NumberOfSeatNotPositive.description);
-
-        this.numSeats = numSeats;
         this.correctedNumSeats = numSeats;
     }
 }
@@ -300,9 +290,6 @@ export class UnexpectedEmptySeat extends RecoverableGameError {
 
     constructor(readonly seating: Seating, readonly emptySeat: Seat) {
         super(UnexpectedEmptySeat.description);
-
-        this.seating = seating;
-        this.emptySeat = emptySeat;
     }
 }
 
@@ -311,8 +298,6 @@ export class PlayerNotSat extends RecoverableGameError {
 
     constructor(readonly player: Player) {
         super(PlayerNotSat.description);
-
-        this.player = player;
     }
 }
 
@@ -323,8 +308,6 @@ export class InvalidPlayerToSit extends RecoverableGameError {
 
     constructor(readonly player: Player) {
         super(PlayerNotSat.description);
-
-        this.player = player;
     }
 }
 
@@ -333,9 +316,6 @@ export class AccessInvalidSeatPosition extends RecoverableGameError {
 
     constructor(readonly position: number, readonly seating: Seating) {
         super(AccessInvalidSeatPosition.description);
-
-        this.position = position;
-        this.seating = seating;
     }
 }
 
@@ -349,10 +329,6 @@ export class PlayerNoNeighbors extends RecoverableGameError {
         readonly seating: Seating
     ) {
         super(PlayerNoNeighbors.description);
-
-        this.player = player;
-        this.neighbors = neighbors;
-        this.seating = seating;
     }
 }
 
@@ -375,8 +351,6 @@ export class ExileNonTraveller extends RecoverableGameError {
 
     constructor(readonly exile: Exile) {
         super(ExileNonTraveller.description);
-
-        this.exile = exile;
     }
 }
 
@@ -385,9 +359,6 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
 
     constructor(readonly character: CharacterToken, readonly type?: string) {
         super(CannotDetermineCharacterType.description);
-
-        this.character = character;
-        this.type = type;
     }
 }
 
@@ -396,9 +367,34 @@ export class CharacterLoadFailure extends RecoverableGameError {
 
     constructor(readonly id: string, readonly reason: Error) {
         super(CharacterLoadFailure.description);
-
-        this.id = id;
         this.from(reason);
+    }
+}
+
+export class ReassignCharacterToPlayer extends RecoverableGameError {
+    static description =
+        'player already has an assigned character, confirm to reassign';
+
+    shouldReassign = false;
+
+    constructor(
+        readonly player: Player,
+        readonly existingCharacter: CharacterToken,
+        readonly newCharacter: CharacterToken
+    ) {
+        super(ReassignCharacterToPlayer.description);
+    }
+}
+
+export class IncorrectNumberOfCharactersToAssign extends RecoverableGameError {
+    static description =
+        'the number of characters to assign does not match the number of players';
+
+    constructor(
+        readonly players: Players,
+        readonly characters: Array<CharacterToken>
+    ) {
+        super(IncorrectNumberOfCharactersToAssign.description);
     }
 }
 
@@ -410,7 +406,6 @@ export class NoEditionMatchingName extends RecoverableGameError {
     constructor(readonly editionName?: string) {
         super(NoEditionMatchingName.description);
 
-        this.editionName = editionName;
         if (editionName !== undefined) {
             this.correctedEditionName = editionName;
         }
@@ -422,8 +417,6 @@ export class EditionLoadFailure extends RecoverableGameError {
 
     constructor(readonly editionName: string, readonly reason: Error) {
         super(EditionLoadFailure.description);
-
-        this.editionName = editionName;
         this.from(reason);
     }
 }
@@ -446,7 +439,6 @@ export class CharacterLoadFailures<
         super(CharacterLoadFailures.description);
 
         this.aggregate(failures);
-        this.loadedCharacters = loadedCharacters;
     }
 }
 
@@ -457,8 +449,6 @@ export class NoCharacterMatchingId extends RecoverableGameError {
 
     constructor(readonly id?: string) {
         super(NoCharacterMatchingId.description);
-
-        this.id = id;
 
         if (id !== undefined) {
             this.correctedId = id;
@@ -474,7 +464,6 @@ export class NoMatchingCharacterType extends RecoverableGameError {
     constructor(readonly type?: string) {
         super(NoMatchingCharacterType.description);
 
-        this.type = type;
         if (type !== undefined) {
             this.correctedType = type;
         }
@@ -486,8 +475,6 @@ export class BlankGrimoire extends RecoverableGameError {
 
     constructor(readonly storyteller: StoryTeller) {
         super(BlankGrimoire.description);
-
-        this.storyteller = storyteller;
     }
 }
 
@@ -500,8 +487,6 @@ export class InvalidScriptConstraints extends RecoverableGameError {
         details = ''
     ) {
         super(InvalidScriptConstraints.description + details);
-
-        this.constraints = constraints;
 
         if (reason !== undefined) {
             this.from(reason);
@@ -521,9 +506,6 @@ export class CharacterSheetCreationFailure extends RecoverableGameError {
         >
     ) {
         super(CharacterSheetCreationFailure.description);
-
-        this.characters = characters;
-        this.characterTypes = characterTypes;
     }
 }
 
@@ -536,7 +518,6 @@ export class TooManyMustIncludedCharacters extends InvalidScriptConstraints {
     constructor(readonly constraintsHelper: ScriptConstraintsHelper) {
         super(constraintsHelper.constraints);
         this.message = TooManyMustIncludedCharacters.description;
-        this.constraintsHelper = constraintsHelper;
     }
 
     protected validate(): boolean {
@@ -589,8 +570,6 @@ export class NegativeNumberForCharacterTypeInScriptConstraint extends InvalidScr
         super(constraints);
         this.message =
             NegativeNumberForCharacterTypeInScriptConstraint.description;
-        this.characterType = characterType;
-        this.requiredNumber = requiredNumber;
     }
 }
 
@@ -604,8 +583,6 @@ export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
         readonly alignmentToRegisterAs?: Alignment
     ) {
         super(IncorrectAlignmentForSpyToRegisterAs.description);
-        this.characterToRegisterAs = characterToRegisterAs;
-        this.alignmentToRegisterAs = alignmentToRegisterAs;
 
         if (alignmentToRegisterAs !== undefined) {
             this.correctedAlignmentToRegisterAs = alignmentToRegisterAs;
@@ -621,8 +598,6 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
 
     constructor(readonly chosen: Array<Player> | undefined) {
         super(FortuneTellerChooseInvalidPlayers.description);
-
-        this.chosen = chosen;
     }
 }
 
@@ -631,8 +606,6 @@ export class NoPlayerForCharacterAct extends RecoverableGameError {
 
     constructor(readonly characterAct: CharacterAct) {
         super(NoPlayerForCharacterAct.description);
-
-        this.characterAct = characterAct;
     }
 }
 
@@ -642,9 +615,6 @@ export class RecallFutureDate extends RecoverableGameError {
 
     constructor(readonly requestedDate: number, readonly furthestDate: number) {
         super(RecallFutureDate.description);
-
-        this.requestedDate = requestedDate;
-        this.furthestDate = furthestDate;
     }
 }
 
@@ -658,10 +628,6 @@ export class RecallFutureEvent extends RecoverableGameError {
         readonly furthestDate: number
     ) {
         super(RecallFutureEvent.description);
-
-        this.requestedDate = requestedDate;
-        this.requestedEvent = requestedEvent;
-        this.furthestDate = furthestDate;
     }
 }
 
@@ -675,11 +641,6 @@ export class PastMomentRewrite extends RecoverableGameError {
         readonly newTimestamp: Dayjs
     ) {
         super(PastMomentRewrite.description);
-
-        this.diary = diary;
-        this.event = event;
-        this.recordedTimestamp = recordedTimestamp;
-        this.newTimestamp = newTimestamp;
     }
 }
 
@@ -693,10 +654,6 @@ export class RecordUnknownEventInDiary extends RecoverableGameError {
         readonly moment: Dayjs
     ) {
         super(RecordUnknownEventInDiary.description);
-
-        this.diary = diary;
-        this.event = event;
-        this.moment = moment;
     }
 }
 
@@ -714,9 +671,6 @@ export class NoDefinedInfoProvider<
         readonly infoProviders: InfoProviders
     ) {
         super(NoDefinedInfoProvider.description);
-
-        this.context = context;
-        this.infoProviders = infoProviders;
     }
 }
 
@@ -728,9 +682,6 @@ export class GameHasTooManyPlayers extends RecoverableGameError {
         readonly recommendedMaximum: number
     ) {
         super(GameHasTooManyPlayers.description);
-
-        this.numPlayers = numPlayers;
-        this.recommendedMaximum = recommendedMaximum;
     }
 }
 
@@ -742,8 +693,5 @@ export class GameHasTooFewPlayers extends RecoverableGameError {
         readonly recommendedMinimum: number
     ) {
         super(GameHasTooFewPlayers.description);
-
-        this.numPlayers = numPlayers;
-        this.recommendedMinimum = recommendedMinimum;
     }
 }

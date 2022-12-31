@@ -1,4 +1,5 @@
 import type { Player } from './player';
+export type StaticThis<T> = { new (...args: any[]): T };
 
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
@@ -11,6 +12,7 @@ export type Transform<T1, T2 = T1> = (value: T1) => T2;
 export type Reducer<T1, T2> = (previousValue: T1, currentValue: T2) => T1;
 export type Loader<K, V> = (key: K) => V | undefined;
 export type Factory<V> = () => V;
+export type AsyncFactory<V> = () => Promise<V>;
 
 export enum RoleDataKeyName {
     /**

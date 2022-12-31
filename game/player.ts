@@ -24,9 +24,18 @@ import {
 import {
     DeadPlayerCannotNominate,
     PlayerHasUnclearAlignment,
+    ReassignCharacterToPlayer,
 } from './exception';
 
 import { GAME_UI } from '~/interaction/gameui';
+
+export interface CharacterAssignmentResult {
+    player: Player;
+
+    character: CharacterToken;
+
+    result: boolean;
+}
 
 /**
  * {@link `glossary["Player"]`}
@@ -45,27 +54,44 @@ export class Player extends EffectTarget<Player> {
 
     static async init(
         username: string,
-        character: CharacterToken,
+        character?: CharacterToken,
         alignment?: Alignment,
-        id?: string,
+        _id?: string,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
     ) {
-        if (id === undefined) {
-            id = uuid();
-        }
+        const id = _id ?? uuid();
 
         if (enabledProxyHandlerPropertyNames === undefined) {
             enabledProxyHandlerPropertyNames =
                 this.defaultEnabledProxyHandlerPropertyNames;
         }
 
-        const player = new this(
-            id,
-            username,
-            character,
-            enabledProxyHandlerPropertyNames
+        const player = await PlayerHasUnclearAlignment.catch<
+            PlayerHasUnclearAlignment,
+            Player
+        >(
+            () =>
+                Promise.resolve(
+                    new this(
+                        id,
+                        username,
+                        character,
+                        alignment,
+                        enabledProxyHandlerPropertyNames
+                    )
+                ),
+            (error) =>
+                Promise.resolve(
+                    new this(
+                        id,
+                        username,
+                        character,
+                        error.correctedAlignment,
+                        enabledProxyHandlerPropertyNames
+                    )
+                )
         );
-        await player.initializeAlignment(alignment);
+
         return player.getProxy();
     }
 
@@ -257,14 +283,49 @@ export class Player extends EffectTarget<Player> {
     protected constructor(
         id: string,
         username: string,
-        character: CharacterToken,
+        character?: CharacterToken,
+        alignment?: Alignment,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
     ) {
         super(enabledProxyHandlerPropertyNames);
         this.id = id;
         this.username = username;
+
+        if (alignment !== undefined) {
+            this.alignment = alignment;
+        }
+
+        if (character !== undefined) {
+            this.initializeCharacter(character);
+        }
+    }
+
+    async assignCharacter(
+        character: CharacterToken
+    ): Promise<CharacterAssignmentResult> {
+        if (this.character !== undefined) {
+            const error = new ReassignCharacterToPlayer(
+                this,
+                this.character,
+                character
+            );
+            await error.resolve();
+
+            if (!error.shouldReassign) {
+                return {
+                    player: this,
+                    character,
+                    result: false,
+                };
+            }
+        }
+
         this.initializeCharacter(character);
-        this.initializeEffects();
+        return {
+            player: this,
+            character,
+            result: true,
+        };
     }
 
     async setDead(reason: DeadReason = DeadReason.Other): Promise<Death> {
@@ -352,27 +413,25 @@ export class Player extends EffectTarget<Player> {
 
     protected initializeCharacter(character: CharacterToken) {
         this.character = character;
+
+        if (this.alignment === undefined) {
+            const alignment = this.characterType.defaultAlignment;
+            if (alignment === undefined) {
+                throw new PlayerHasUnclearAlignment(this, alignment);
+            } else {
+                this.alignment = alignment;
+            }
+        }
+
         this.characterActs = CharacterAct.fromPlayer(this)[0];
         this.infoRequester = InfoRequester.of(this);
+
+        this.initializeEffects();
     }
 
     protected initializeEffects() {
         super.initializeEffects();
         // TODO initialize player specific effects
-    }
-
-    protected async initializeAlignment(alignment?: Alignment) {
-        if (alignment === undefined) {
-            alignment = this.characterType.defaultAlignment;
-
-            if (alignment === undefined) {
-                await new PlayerHasUnclearAlignment(this, alignment).throwWhen(
-                    (error) => error.player.alignment === undefined
-                );
-            }
-        }
-
-        this.alignment = alignment!;
     }
 }
 

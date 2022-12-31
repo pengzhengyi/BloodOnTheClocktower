@@ -10,8 +10,8 @@ import {
 } from './charactertype';
 import { Generator } from './collections';
 import type { InteractionInitiator } from './effect';
-import { PlayerNotSat } from './exception';
-import type { Player } from './player';
+import { IncorrectNumberOfCharactersToAssign } from './exception';
+import type { CharacterAssignmentResult, Player } from './player';
 
 export type PlayersModification = (players: Array<Player>) => void;
 
@@ -118,38 +118,24 @@ export class Players extends Generator<Player> {
         return this.filter((player) => player.character.is(characterType));
     }
 
-    /**
-     * @deprecated
-     */
-    async *getNeighbors(): AsyncGenerator<[Player, Player]> {
-        const reorderedPlayers: Array<Player> = [];
-
-        for (const player of this) {
-            // distance 1 neighbor
-            await new PlayerNotSat(player).throwWhen(
-                (error) => error.player.seatNumber === undefined
+    async assignCharacters(
+        characters: Array<CharacterToken>
+    ): Promise<Array<CharacterAssignmentResult>> {
+        if (characters.length !== this.length) {
+            const error = new IncorrectNumberOfCharactersToAssign(
+                this,
+                characters
             );
-
-            const seatNumber = player.seatNumber!;
-
-            reorderedPlayers[seatNumber] = player;
-
-            const prevNeighbor = reorderedPlayers[seatNumber - 1];
-            if (prevNeighbor !== undefined) {
-                yield [prevNeighbor, player];
-            }
-
-            const nextNeighbor = reorderedPlayers[seatNumber + 1];
-            if (nextNeighbor !== undefined) {
-                yield [player, nextNeighbor];
-            }
+            await error.throwWhen(
+                (error) => error.characters.length !== error.players.length
+            );
         }
 
-        const largestSeatNumber = reorderedPlayers.length - 1;
-        if (largestSeatNumber > 1) {
-            yield [reorderedPlayers[0], reorderedPlayers[largestSeatNumber]];
-        }
-
-        this.transform((_) => reorderedPlayers);
+        return await Promise.all(
+            Generator.map(
+                ([player, character]) => player.assignCharacter(character),
+                Generator.pair(this, characters)
+            )
+        );
     }
 }

@@ -282,7 +282,7 @@ export class DemonInformationProvider<
         return await score;
     }
 
-    protected async buildEvaluationContextImpl(
+    protected buildEvaluationContextImpl(
         context: TInfoProvideContext,
         evaluationContext: LazyMap<string, any>
     ) {
@@ -307,9 +307,7 @@ export class DemonInformationProvider<
             );
         }
 
-        await undefined;
-
-        return evaluationContext;
+        return Promise.resolve(evaluationContext);
     }
 
     protected getNotInPlayGoodCharacters(
@@ -335,7 +333,7 @@ export class MinionInformationProvider<
     TInfoProvideContext,
     MinionInformation
 > {
-    async getTrueInformationOptions(
+    getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<MinionInformation>> {
         const otherMinions = this.getMinionPlayers(context);
@@ -346,17 +344,17 @@ export class MinionInformationProvider<
             .isDemon.from()
             .take(1) as Player;
 
-        await undefined;
-
-        return Generator.once([
-            Information.true({
-                otherMinions,
-                demon,
-            }),
-        ]);
+        return Promise.resolve(
+            Generator.once([
+                Information.true({
+                    otherMinions,
+                    demon,
+                }),
+            ])
+        );
     }
 
-    async getFalseInformationOptions(
+    getFalseInformationOptions(
         context: TInfoProvideContext
     ): Promise<FalseInformationOptions<MinionInformation>> {
         const hypotheticalCombinationsForMinionPlayers =
@@ -365,8 +363,6 @@ export class MinionInformationProvider<
         const hypotheticalCandidatesForDemon = context.players.isNot(
             context.requestedPlayer
         );
-
-        await undefined;
 
         const infoOptions = Generator.once(
             Generator.cartesian_product(
@@ -380,13 +376,13 @@ export class MinionInformationProvider<
             })
         );
 
-        return infoOptions;
+        return Promise.resolve(infoOptions);
     }
 
     /**
      * @override Goodness is evaluated on the following criterion: 5 for each player that is a minion, -5 if not; 5 for provided player is the demon.
      */
-    async evaluateGoodness(
+    evaluateGoodness(
         information: MinionInformation,
         _context: TInfoProvideContext
     ): Promise<number> {
@@ -397,15 +393,14 @@ export class MinionInformationProvider<
         );
 
         score += information.demon.isDemon ? 5 : -5;
-        await undefined;
-        return score;
+        return Promise.resolve(score);
     }
 }
 
 export class TravellerInformationProvider<
     TInfoProvideContext extends InfoProvideContext
 > extends InformationProvider<TInfoProvideContext, TravellerInformation> {
-    async getTrueInformationOptions(
+    getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<TravellerInformation>> {
         const demon = context.players
@@ -414,31 +409,31 @@ export class TravellerInformationProvider<
             .isDemon.from()
             .take(1) as Player;
 
-        await undefined;
-
-        return Generator.once([
-            Information.true({
-                demon,
-            }),
-        ]);
+        return Promise.resolve(
+            Generator.once([
+                Information.true({
+                    demon,
+                }),
+            ])
+        );
     }
 
-    async getFalseInformationOptions(
+    getFalseInformationOptions(
         context: TInfoProvideContext
     ): Promise<FalseInformationOptions<TravellerInformation>> {
         const hypotheticalCandidatesForDemon = context.players.isNot(
             context.requestedPlayer
         );
 
-        await undefined;
-
-        return Generator.once(
-            Generator.map(
-                (demon) =>
-                    Information.false({
-                        demon,
-                    }),
-                hypotheticalCandidatesForDemon
+        return Promise.resolve(
+            Generator.once(
+                Generator.map(
+                    (demon) =>
+                        Information.false({
+                            demon,
+                        }),
+                    hypotheticalCandidatesForDemon
+                )
             )
         );
     }
@@ -446,12 +441,11 @@ export class TravellerInformationProvider<
     /**
      * @override Goodness is evaluated on the following criterion: 1 provided player is the demon, -1 otherwise.
      */
-    async evaluateGoodness(
+    evaluateGoodness(
         information: TravellerInformation,
         _context: TInfoProvideContext
     ): Promise<number> {
-        await undefined;
-        return information.demon.isDemon ? 1 : -1;
+        return Promise.resolve(information.demon.isDemon ? 1 : -1);
     }
 }
 
@@ -740,17 +734,18 @@ export class EmpathInformationProvider<
         ]);
     }
 
-    async getFalseInformationOptions(
+    getFalseInformationOptions(
         _context: TInfoProvideContext
     ): Promise<FalseInformationOptions<EmpathInformation>> {
-        await undefined;
-        return Generator.once(
-            Generator.map(
-                (numEvilAliveNeighbors) =>
-                    Information.false({
-                        numEvilAliveNeighbors,
-                    }) as FalseInformation<EmpathInformation>,
-                Generator.range(0, 3)
+        return Promise.resolve(
+            Generator.once(
+                Generator.map(
+                    (numEvilAliveNeighbors) =>
+                        Information.false({
+                            numEvilAliveNeighbors,
+                        }) as FalseInformation<EmpathInformation>,
+                    Generator.range(0, 3)
+                )
             )
         );
     }
@@ -851,18 +846,19 @@ export class FortuneTellerInformationProvider<
         ]);
     }
 
-    async getFalseInformationOptions(
+    getFalseInformationOptions(
         context: FortuneTellerInformationProviderContext
     ): Promise<FalseInformationOptions<FortuneTellerInformation>> {
-        await undefined;
-        return Generator.once(
-            Generator.map(
-                (hasDemon) =>
-                    Information.false({
-                        chosenPlayers: context.chosenPlayers,
-                        hasDemon,
-                    }) as FalseInformation<FortuneTellerInformation>,
-                [true, false]
+        return Promise.resolve(
+            Generator.once(
+                Generator.map(
+                    (hasDemon) =>
+                        Information.false({
+                            chosenPlayers: context.chosenPlayers,
+                            hasDemon,
+                        }) as FalseInformation<FortuneTellerInformation>,
+                    [true, false]
+                )
             )
         );
     }
@@ -935,33 +931,35 @@ export interface UndertakerInformationProviderContext
 export class UndertakerInformationProvider<
     TInfoProvideContext extends UndertakerInformationProviderContext
 > extends InformationProvider<TInfoProvideContext, UndertakerInformation> {
-    async getTrueInformationOptions(
+    getTrueInformationOptions(
         context: UndertakerInformationProviderContext
     ): Promise<TrueInformationOptions<UndertakerInformation>> {
-        await undefined;
         const perceivedCharacter = context.executedPlayer.from(
             context.requestedPlayer
         ).character;
-        return Generator.once([
-            Information.true({
-                executedPlayer: context.executedPlayer,
-                character: perceivedCharacter,
-            } as UndertakerInformation),
-        ]);
+        return Promise.resolve(
+            Generator.once([
+                Information.true({
+                    executedPlayer: context.executedPlayer,
+                    character: perceivedCharacter,
+                } as UndertakerInformation),
+            ])
+        );
     }
 
-    async getFalseInformationOptions(
+    getFalseInformationOptions(
         context: UndertakerInformationProviderContext
     ): Promise<FalseInformationOptions<UndertakerInformation>> {
-        await undefined;
-        return Generator.once(
-            Generator.map(
-                (character) =>
-                    Information.false({
-                        executedPlayer: context.executedPlayer,
-                        character,
-                    }) as FalseInformation<UndertakerInformation>,
-                context.characterSheet.characters
+        return Promise.resolve(
+            Generator.once(
+                Generator.map(
+                    (character) =>
+                        Information.false({
+                            executedPlayer: context.executedPlayer,
+                            character,
+                        }) as FalseInformation<UndertakerInformation>,
+                    context.characterSheet.characters
+                )
             )
         );
     }
@@ -969,15 +967,14 @@ export class UndertakerInformationProvider<
     /**
      * @override Goodness is evaluated on the following criterion: 1 if actual character and provided character in information match , -1 otherwise.
      */
-    async evaluateGoodness(
+    evaluateGoodness(
         information: UndertakerInformation,
         context: TInfoProvideContext,
         _evaluationContext?: LazyMap<string, any>
     ): Promise<number> {
-        await undefined;
-        return context.executedPlayer.character === information.character
-            ? 1
-            : -1;
+        return Promise.resolve(
+            context.executedPlayer.character === information.character ? 1 : -1
+        );
     }
 }
 
@@ -989,33 +986,35 @@ export interface RavenkeeperInformationProviderContext
 export class RavenkeeperInformationProvider<
     TInfoProvideContext extends RavenkeeperInformationProviderContext
 > extends InformationProvider<TInfoProvideContext, RavenkeeperInformation> {
-    async getTrueInformationOptions(
+    getTrueInformationOptions(
         context: RavenkeeperInformationProviderContext
     ): Promise<TrueInformationOptions<RavenkeeperInformation>> {
-        await undefined;
         const perceivedCharacter = context.chosenPlayer.from(
             context.requestedPlayer
         ).character;
-        return Generator.once([
-            Information.true({
-                chosenPlayer: context.chosenPlayer,
-                character: perceivedCharacter,
-            } as RavenkeeperInformation),
-        ]);
+        return Promise.resolve(
+            Generator.once([
+                Information.true({
+                    chosenPlayer: context.chosenPlayer,
+                    character: perceivedCharacter,
+                } as RavenkeeperInformation),
+            ])
+        );
     }
 
-    async getFalseInformationOptions(
+    getFalseInformationOptions(
         context: RavenkeeperInformationProviderContext
     ): Promise<FalseInformationOptions<RavenkeeperInformation>> {
-        await undefined;
-        return Generator.once(
-            Generator.map(
-                (character) =>
-                    Information.false({
-                        chosenPlayer: context.chosenPlayer,
-                        character,
-                    }) as FalseInformation<RavenkeeperInformation>,
-                context.characterSheet.characters
+        return Promise.resolve(
+            Generator.once(
+                Generator.map(
+                    (character) =>
+                        Information.false({
+                            chosenPlayer: context.chosenPlayer,
+                            character,
+                        }) as FalseInformation<RavenkeeperInformation>,
+                    context.characterSheet.characters
+                )
             )
         );
     }
@@ -1023,15 +1022,14 @@ export class RavenkeeperInformationProvider<
     /**
      * @override Goodness is evaluated on the following criterion: 1 if actual character and provided character in information match , -1 otherwise.
      */
-    async evaluateGoodness(
+    evaluateGoodness(
         information: RavenkeeperInformation,
         context: TInfoProvideContext,
         _evaluationContext?: LazyMap<string, any>
     ): Promise<number> {
-        await undefined;
-        return context.chosenPlayer.character === information.character
-            ? 1
-            : -1;
+        return Promise.resolve(
+            context.chosenPlayer.character === information.character ? 1 : -1
+        );
     }
 }
 
