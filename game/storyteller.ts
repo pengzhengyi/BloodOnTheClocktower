@@ -1,9 +1,13 @@
 import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
 import { Grimoire } from './grimoire';
 import { InfoProvider, InfoProviders } from './infoprovider';
-import type { InfoRequestContext } from './inforequester';
+import type {
+    InfoRequestContext,
+    InformationRequestContext,
+} from './inforequester';
 import type { Info } from './information';
 import { Player } from './player';
+import type { Players } from './players';
 import { AsyncTask } from './types';
 
 /**
@@ -35,7 +39,7 @@ export class StoryTeller {
         await action(player);
     }
 
-    initializeGrimoire(players: Iterable<Player>) {
+    initializeGrimoire(players: Players) {
         this.grimoire = new Grimoire(players);
     }
 
@@ -61,7 +65,8 @@ export class StoryTeller {
         const provideInfo = this.infoProviders.getInfoProviderMethod(
             context.requester,
             context.isStoryTellerInformation,
-            (context as any).willGetTrueInformation
+            (context as InformationRequestContext<TInformation>)
+                .willGetTrueInformation
         );
 
         if (provideInfo === undefined) {

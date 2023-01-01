@@ -60,8 +60,8 @@ export class InfoRequester<
         return this._request(context);
     }
 
-    async isEligible(_context: TInfoRequestContext): Promise<boolean> {
-        return await true;
+    isEligible(_context: TInfoRequestContext): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     createContext(..._args: any[]): Promise<TInfoRequestContext> {
@@ -78,7 +78,7 @@ export interface IInformationRequester<
     TInformationRequestContext extends InformationRequestContext<TInformation>
 > extends IInfoRequester<TInformation, TInformationRequestContext> {
     willGetTrueInformation(
-        context: TInformationRequestContext
+        context: Omit<TInformationRequestContext, 'willGetTrueInformation'>
     ): Promise<boolean>;
 
     request(
@@ -93,12 +93,11 @@ export class InformationRequester<
     extends InfoRequester<TInformation, TInformationRequestContext>
     implements IInformationRequester<TInformation, TInformationRequestContext>
 {
-    async willGetTrueInformation(
-        context: TInformationRequestContext
+    willGetTrueInformation(
+        context: Omit<TInformationRequestContext, 'willGetTrueInformation'>
     ): Promise<boolean> {
-        return (
-            (await !context.requestedPlayer.drunk) &&
-            !context.requestedPlayer.poisoned
+        return Promise.resolve(
+            !context.requestedPlayer.drunk && !context.requestedPlayer.poisoned
         );
     }
 
@@ -341,6 +340,11 @@ class BaseWasherwomanInformationRequester<
     readonly expectedCharacter = Washerwoman;
 }
 
+export interface WasherwomanInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<WasherwomanInformation>
+> extends BaseWasherwomanInformationRequester<TInformationRequestContext> {}
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WasherwomanInformationRequester = IsAlive(
     AtFirstNight(BaseWasherwomanInformationRequester)
 );
