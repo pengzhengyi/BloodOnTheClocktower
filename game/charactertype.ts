@@ -56,6 +56,10 @@ export abstract class CharacterType {
     static toJSON(): string {
         return this.id;
     }
+
+    static toString(): string {
+        return this.name;
+    }
 }
 
 /**

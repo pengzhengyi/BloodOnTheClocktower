@@ -158,7 +158,7 @@ export class Player extends EffectTarget<Player> {
     }
 
     get poisoned(): boolean {
-        return this.state.healthy;
+        return this.state.poisoned;
     }
 
     /**

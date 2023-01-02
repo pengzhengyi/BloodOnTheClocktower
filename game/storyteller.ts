@@ -1,6 +1,6 @@
 import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
 import { Grimoire } from './grimoire';
-import { InfoProvider, InfoProviders } from './infoprovider';
+import { InfoProviders } from './infoprovider';
 import type {
     InfoRequestContext,
     InformationRequestContext,
@@ -9,6 +9,7 @@ import type { Info } from './information';
 import { Player } from './player';
 import type { Players } from './players';
 import { AsyncTask } from './types';
+import { GAME_UI } from '~/interaction/gameui';
 
 /**
  * {@link `glossary["Storyteller"]`}
@@ -78,7 +79,7 @@ export class StoryTeller {
             return error.correctedInfo!;
         } else {
             const infoOptions = await provideInfo(context);
-            const info = (await InfoProvider.chooseOne(
+            const info = (await GAME_UI.storytellerChooseOne(
                 infoOptions,
                 context.reason
             )) as InfoType;

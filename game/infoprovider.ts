@@ -48,7 +48,6 @@ import { Players } from './players';
 import type { Seating } from './seating';
 import type { StoryTeller } from './storyteller';
 import type { TravellerSheet } from './travellersheet';
-import { GAME_UI } from '~/interaction/gameui';
 
 export interface InfoProvideContext {
     clocktower: Clocktower;
@@ -103,14 +102,7 @@ export type IInfoProvider<
     | IInformationProvider<TInfoProvideContext, TInformation>
     | IStoryTellerInformationProvider<TInfoProvideContext, TInformation>;
 
-export abstract class InfoProvider<_TInformation> {
-    static chooseOne<TInformation>(
-        infoOptions: InfoOptions<TInformation>,
-        reason?: string
-    ) {
-        return GAME_UI.storytellerChooseOne(infoOptions, reason);
-    }
-}
+export abstract class InfoProvider<_TInformation> {}
 
 export abstract class InformationProvider<
         TInfoProvideContext extends InfoProvideContext,
@@ -473,7 +465,7 @@ abstract class OneOfTwoPlayersHasCharacterTypeInformationProvider<
         }
     }
 
-    async getTrueInformationOptions(
+    getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<TInformation>> {
         const infoOptionsByPlayer = context.players
@@ -501,7 +493,7 @@ abstract class OneOfTwoPlayersHasCharacterTypeInformationProvider<
         const infoOptions: TrueInformationOptions<TInformation> =
             Generator.once(Generator.chain_from_iterable(infoOptionsByPlayer));
 
-        return await infoOptions;
+        return Promise.resolve(infoOptions);
     }
 
     async getFalseInformationOptions(
@@ -1083,8 +1075,11 @@ export class InfoProviders<TInformation = any> {
             return undefined;
         }
 
+        let method:
+            | InfoProviderMethod<TInformation, InfoRequestContext<TInformation>>
+            | undefined;
         if (isStoryTellerInformation) {
-            return (
+            method = (
                 infoProvider as IStoryTellerInformationProvider<
                     InfoRequestContext<TInformation>,
                     TInformation
@@ -1095,10 +1090,12 @@ export class InfoProviders<TInformation = any> {
                 InfoRequestContext<TInformation>,
                 TInformation
             >;
-            return willGetTrueInformation
+            method = willGetTrueInformation
                 ? informationProvider.getTrueInformationOptions
                 : informationProvider.getFalseInformationOptions;
         }
+
+        return method?.bind(infoProvider);
     }
 
     getInfoProvider(

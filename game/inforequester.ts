@@ -285,6 +285,10 @@ abstract class CharacterTypeInformationRequester<
             context.requestedPlayer.characterType.is(this.expectedCharacterType)
         );
     }
+
+    toString() {
+        return `RequestInfoAs${this.expectedCharacterType}`;
+    }
 }
 
 class BaseDemonInformationRequester<
@@ -328,6 +332,10 @@ abstract class CharacterInformationRequester<
             (await super.isEligible(context)) &&
             context.requestedPlayer.character === this.expectedCharacter
         );
+    }
+
+    toString() {
+        return `RequestInfoAs${this.expectedCharacter}`;
     }
 }
 

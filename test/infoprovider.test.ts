@@ -65,7 +65,10 @@ async function createSeatingAndPlayersFromDescriptions(
     return [seating, players];
 }
 
-function createInfoProvideContext(player: Player, otherPlayers: Player[]) {
+export function createInfoProvideContext(
+    player: Player,
+    otherPlayers: Player[]
+) {
     const context = mockInfoProvideContext();
     context.requestedPlayer = player;
     context.players = Players.of(player, ...otherPlayers);
@@ -139,7 +142,7 @@ function createRavenkeeperInfoProviderContext(
 }
 
 beforeAll(() => {
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 });
 
 afterAll(() => {
