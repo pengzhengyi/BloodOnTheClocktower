@@ -12,8 +12,30 @@ import {
     PlayerHasUnclearAlignment,
 } from '~/game/exception';
 import { Players } from '~/game/players';
+import type { CharacterToken, TravellerCharacterToken } from '~/game/character';
 import { randomCharacters } from '~/__mocks__/character';
 import { createBasicPlayers, createUnassignedPlayer } from '~/__mocks__/player';
+
+export function createRandomCharactersAndOptionalAlignmentForTraveller(
+    numCharacters: number
+): [Array<CharacterToken>, Map<TravellerCharacterToken, Alignment>] {
+    const characters = Array.from(randomCharacters(numCharacters));
+    const travellerToAlignment = new Map(
+        Generator.map(
+            (traveller) => [
+                traveller,
+                randomChoice([
+                    Alignment.Good,
+                    Alignment.Evil,
+                    Alignment.Neutral,
+                ]),
+            ],
+            Generator.filter((character) => character.isTraveller, characters)
+        )
+    );
+
+    return [characters, travellerToAlignment];
+}
 
 describe('test basic functionalities', () => {
     beforeAll(() => {
@@ -52,10 +74,11 @@ describe('test basic functionalities', () => {
             await createBasicPlayers(6, createUnassignedPlayer)
         );
 
-        const characters = Array.from(randomCharacters(6));
+        const [characters, travellerToAlignment] =
+            createRandomCharactersAndOptionalAlignmentForTraveller(6);
 
         for (const [i, assignmentResult] of Generator.enumerate(
-            await players.assignCharacters(characters)
+            await players.assignCharacters(characters, travellerToAlignment)
         )) {
             expect(assignmentResult.result).toBeTrue();
             expect(assignmentResult.character).toEqual(characters[i]);
@@ -80,10 +103,12 @@ describe('test edge cases', () => {
             await createBasicPlayers(4, createUnassignedPlayer)
         );
 
-        const characters = Array.from(randomCharacters(2));
+        const [characters, travellerToAlignment] =
+            createRandomCharactersAndOptionalAlignmentForTraveller(2);
 
         await expect(
-            async () => await players.assignCharacters(characters)
+            async () =>
+                await players.assignCharacters(characters, travellerToAlignment)
         ).rejects.toThrowError(IncorrectNumberOfCharactersToAssign);
     });
 
@@ -92,10 +117,12 @@ describe('test edge cases', () => {
             await createBasicPlayers(2, createUnassignedPlayer)
         );
 
-        const characters = Array.from(randomCharacters(4));
+        const [characters, travellerToAlignment] =
+            createRandomCharactersAndOptionalAlignmentForTraveller(4);
 
         await expect(
-            async () => await players.assignCharacters(characters)
+            async () =>
+                await players.assignCharacters(characters, travellerToAlignment)
         ).rejects.toThrowError(IncorrectNumberOfCharactersToAssign);
     });
 });

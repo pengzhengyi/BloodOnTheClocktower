@@ -300,7 +300,8 @@ export class Player extends EffectTarget<Player> {
     }
 
     async assignCharacter(
-        character: CharacterToken
+        character: CharacterToken,
+        alignment?: Alignment
     ): Promise<CharacterAssignmentResult> {
         if (this.character !== undefined) {
             const error = new ReassignCharacterToPlayer(
@@ -319,7 +320,12 @@ export class Player extends EffectTarget<Player> {
             }
         }
 
+        if (alignment !== undefined) {
+            this.alignment = alignment;
+        }
+
         this.initializeCharacter(character);
+
         return {
             player: this,
             character,

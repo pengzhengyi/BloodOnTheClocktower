@@ -1,5 +1,5 @@
 import type { Alignment } from './alignment';
-import type { CharacterToken } from './character';
+import type { CharacterToken, TravellerCharacterToken } from './character';
 import {
     CharacterType,
     Demon,
@@ -119,7 +119,8 @@ export class Players extends Generator<Player> {
     }
 
     async assignCharacters(
-        characters: Array<CharacterToken>
+        characters: Array<CharacterToken>,
+        travellerToAlignment?: Map<TravellerCharacterToken, Alignment>
     ): Promise<Array<CharacterAssignmentResult>> {
         if (characters.length !== this.length) {
             const error = new IncorrectNumberOfCharactersToAssign(
@@ -133,7 +134,11 @@ export class Players extends Generator<Player> {
 
         return await Promise.all(
             Generator.map(
-                ([player, character]) => player.assignCharacter(character),
+                ([player, character]) =>
+                    player.assignCharacter(
+                        character,
+                        travellerToAlignment?.get(character)
+                    ),
                 Generator.pair(this, characters)
             )
         );
