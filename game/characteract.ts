@@ -5,7 +5,6 @@ import { Influence } from './influence';
 import { Context } from './infoprocessor';
 import { Player } from './player';
 import {
-    FortuneTellerChooseInvalidPlayers,
     NoPlayerForCharacterAct,
 } from './exception';
 import type { GameInfo as GameState } from './gameinfo';
@@ -14,7 +13,6 @@ import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
 import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 /**
  * CharacterAct is when a player needs to perform some actions because of character ability. Such actions will usually affect the game.
@@ -28,8 +26,6 @@ export abstract class CharacterAct extends Influence {
                 return [MonkAct];
             case Slayer:
                 return [SlayerAct];
-            case FortuneTeller:
-                return [FortuneTellerAct];
             default:
                 return [];
         }
@@ -178,59 +174,6 @@ export class MonkAct extends NonfirstNightCharacterAct {
     }
 }
 
-export class FortuneTellerAct extends CharacterAct {
-    static description =
-        'The Fortune Teller detects who the Demon is, but sometimes thinks good players are Demons.';
-
-    static of(player: Player) {
-        return new this(player, FortuneTellerAct.description);
-    }
-
-    static isChoiceValid(players: Array<Player> | undefined): boolean {
-        return Array.isArray(players) && players.length === 2;
-    }
-
-    applicablePhases = Phase.Night;
-
-    async isEligible(gameState: GameState): Promise<boolean> {
-        return (
-            gameState.gamePhase.isNight &&
-            (await this.getPlayer(gameState)).alive
-        );
-    }
-
-    async choosePlayers(
-        fortuneTellerPlayer: Player,
-        players: Iterable<Player>
-    ): Promise<[Player, Player] | undefined> {
-        let chosen = (await GAME_UI.choose(
-            fortuneTellerPlayer,
-            players,
-            2,
-            FortuneTellerAct.description
-        )) as Array<Player> | undefined;
-
-        if (!FortuneTellerAct.isChoiceValid(chosen)) {
-            const error = new FortuneTellerChooseInvalidPlayers(chosen);
-            await error.resolve();
-            chosen = error.corrected;
-        }
-
-        return chosen as [Player, Player] | undefined;
-    }
-
-    async act(gameState: GameState, _context: Context): Promise<GameState> {
-        const fortuneTellerPlayer = await this.getPlayer(gameState);
-        const _chosen = await this.choosePlayers(
-            fortuneTellerPlayer,
-            gameState.players
-        );
-        // (
-        //     fortuneTellerPlayer.infoRequester as FortuneTellerInfoRequester
-        // ).setChosenPlayers(chosen);
-        return gameState;
-    }
-}
 
 export class SlayerAct extends NonfirstNightCharacterAct {
     static description =
