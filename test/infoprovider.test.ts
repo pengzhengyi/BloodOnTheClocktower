@@ -521,7 +521,7 @@ describe('test ChefInformationProvider', () => {
     });
 });
 
-describe('True EmpathInformationProvider', () => {
+describe('test EmpathInformationProvider', () => {
     const provider = new EmpathInformationProvider();
 
     /**
@@ -627,7 +627,7 @@ describe('True EmpathInformationProvider', () => {
     });
 });
 
-describe('True FortuneTeller info', () => {
+describe('test FortuneTellerInformationProvider', () => {
     const provider = new FortuneTellerInformationProvider();
     let fortuneTellerPlayer: Player;
 
@@ -736,13 +736,6 @@ describe('True FortuneTeller info', () => {
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);
         }
-    });
-
-    /**
-     * {@link `fortuneteller["gameplay"][3]`}
-     */
-    test("The Fortune Teller chooses themselves and a Saint. The Saint is the Red Herring. The Fortune Teller learns a 'yes'.", async () => {
-        // TODO
     });
 });
 
