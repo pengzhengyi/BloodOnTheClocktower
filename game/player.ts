@@ -8,7 +8,6 @@ import { CharacterAct } from './characteract';
 import { DeadReason } from './deadreason';
 import { Death } from './death';
 import { EffectTarget } from './effecttarget';
-import { InfoRequester } from './info';
 import { Nomination } from './nomination';
 import { PlayerState } from './playerstate';
 
@@ -424,7 +423,6 @@ export class Player extends EffectTarget<Player> {
         }
 
         this.characterActs = CharacterAct.fromPlayer(this)[0];
-        this.infoRequester = InfoRequester.of(this);
 
         this.initializeEffects();
     }

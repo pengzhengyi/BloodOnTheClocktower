@@ -9,7 +9,6 @@ import {
     NoPlayerForCharacterAct,
 } from './exception';
 import type { GameInfo as GameState } from './gameinfo';
-import type { FortuneTellerInfoRequester } from './info';
 import type { CharacterToken } from './character';
 import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
@@ -222,13 +221,13 @@ export class FortuneTellerAct extends CharacterAct {
 
     async act(gameState: GameState, _context: Context): Promise<GameState> {
         const fortuneTellerPlayer = await this.getPlayer(gameState);
-        const chosen = await this.choosePlayers(
+        const _chosen = await this.choosePlayers(
             fortuneTellerPlayer,
             gameState.players
         );
-        (
-            fortuneTellerPlayer.infoRequester as FortuneTellerInfoRequester
-        ).setChosenPlayers(chosen);
+        // (
+        //     fortuneTellerPlayer.infoRequester as FortuneTellerInfoRequester
+        // ).setChosenPlayers(chosen);
         return gameState;
     }
 }
