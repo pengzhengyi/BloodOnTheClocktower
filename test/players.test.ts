@@ -4,13 +4,35 @@ jest.mock('~/interaction/gameui', () => ({
     GAME_UI,
 }));
 
+import { randomChoice } from '~/game/common';
+import { Alignment } from '~/game/alignment';
 import { Generator } from '~/game/collections';
-import { IncorrectNumberOfCharactersToAssign } from '~/game/exception';
+import {
+    IncorrectNumberOfCharactersToAssign,
+    PlayerHasUnclearAlignment,
+} from '~/game/exception';
 import { Players } from '~/game/players';
 import { randomCharacters } from '~/__mocks__/character';
 import { createBasicPlayers, createUnassignedPlayer } from '~/__mocks__/player';
 
 describe('test basic functionalities', () => {
+    beforeAll(() => {
+        handleMock.mockImplementation((error) => {
+            expect(error).toBeInstanceOf(PlayerHasUnclearAlignment);
+            (error as PlayerHasUnclearAlignment).correctedAlignment =
+                randomChoice([
+                    Alignment.Good,
+                    Alignment.Evil,
+                    Alignment.Neutral,
+                ]);
+            return Promise.resolve(error);
+        });
+    });
+
+    afterAll(() => {
+        handleMock.mockReset();
+    });
+
     test.concurrent('get characters in player', async () => {
         const players = new Players(await createBasicPlayers(6));
 
@@ -46,7 +68,7 @@ describe('test basic functionalities', () => {
 
 describe('test edge cases', () => {
     beforeAll(() => {
-        handleMock.mockImplementation(async () => await false);
+        handleMock.mockImplementation(() => Promise.resolve(false));
     });
 
     afterAll(() => {
