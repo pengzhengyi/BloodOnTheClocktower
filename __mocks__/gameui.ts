@@ -7,6 +7,7 @@ export const storytellerDecideMock = jest.fn();
 export const confirmMock = jest.fn();
 export const storytellerConfirmMock = jest.fn();
 export const sendMock = jest.fn();
+export const callForNominationMock = jest.fn();
 
 export const GAME_UI = {
     hasRaisedHandForVote: hasRaisedHandForVoteMock,
@@ -18,4 +19,5 @@ export const GAME_UI = {
     confirm: confirmMock,
     storytellerConfirm: storytellerConfirmMock,
     send: sendMock,
+    callForNomination: callForNominationMock,
 };

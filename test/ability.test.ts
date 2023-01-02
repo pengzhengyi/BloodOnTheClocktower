@@ -1,6 +1,7 @@
 import {
     chooseMock,
     GAME_UI,
+    handleMock,
     sendMock,
     storytellerChooseOneMock,
 } from '~/__mocks__/gameui';
@@ -21,8 +22,12 @@ import {
     MonkAbilityUseResult,
     MonkProtectAbility,
     RedHerringEffect,
+    VirginAbility,
 } from '~/game/ability';
-import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
+import {
+    mockGetInfoAbilityUseContext,
+    mockVirginAbilityUseContext,
+} from '~/__mocks__/ability';
 import {
     mockClocktowerForUndertaker,
     mockClocktowerWithIsFirstNight,
@@ -41,6 +46,8 @@ import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Townsfolk } from '~/game/charactertype';
 import type { Player } from '~/game/player';
 import { DeadReason } from '~/game/deadreason';
+import { DeadPlayerCannotNominate } from '~/game/exception';
+import { Execution } from '~/game/execution';
 import { StoryTeller } from '~/game/storyteller';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Saint } from '~/content/characters/output/saint';
@@ -289,5 +296,104 @@ describe('test GetRavenkeeperInformationAbility', () => {
      */
     test("The Imp attacks the Mayor. The Mayor doesn't die, but the Ravenkeeper dies instead, due to the Mayor's ability. The Ravenkeeper is woken and chooses Douglas, who is a dead Recluse. The Ravenkeeper learns that Douglas is the Scarlet Woman, since the Recluse registered as a Minion.", async () => {
         // TODO
+    });
+});
+
+describe('test VirginAbility', () => {
+    let ability: VirginAbility;
+    let execution: Execution;
+    let virginPlayer: Player;
+
+    beforeEach(async () => {
+        ability = new VirginAbility();
+        execution = Execution.init();
+        virginPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Virgin`
+        );
+    });
+
+    /**
+     * {@link `virgin["gameplay"][0]`}
+     */
+    test('The Washerwoman nominates the Virgin. The Washerwoman is immediately executed and the day ends.', async () => {
+        const washerwomanPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Washerwoman`
+        );
+
+        const context = mockVirginAbilityUseContext(virginPlayer, execution);
+
+        expect(await ability.isEligible(context)).toBeTrue();
+        const result = await ability.use(context);
+
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.CausedEffect
+        );
+
+        expect(washerwomanPlayer.alive).toBeTrue();
+        const nomination = await washerwomanPlayer.nominate(
+            virginPlayer,
+            execution
+        );
+        expect(nomination).toBeDefined();
+        expect(washerwomanPlayer.dead).toBeTrue();
+
+        expect(await ability.isEligible(context)).toBeFalse();
+    });
+
+    /**
+     * {@link `virgin["gameplay"][1]`}
+     */
+    test('The Drunk, who thinks they are the Chef, nominates the Virgin. The Drunk remains alive, and the Virgin loses their ability. Players may now vote on whether or not to execute the Virgin. (This happens because the Drunk is not a Townsfolk.)', async () => {
+        const drunkPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Drunk`
+        );
+
+        const context = mockVirginAbilityUseContext(virginPlayer, execution);
+
+        expect(await ability.isEligible(context)).toBeTrue();
+        const result = await ability.use(context);
+
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.CausedEffect
+        );
+
+        expect(drunkPlayer.alive).toBeTrue();
+        const nomination = await drunkPlayer.nominate(virginPlayer, execution);
+        expect(nomination).toBeDefined();
+        expect(drunkPlayer.alive).toBeTrue();
+
+        expect(await ability.isEligible(context)).toBeFalse();
+    });
+
+    /**
+     * {@link `virgin["gameplay"][2]`}
+     */
+    test('A dead player nominates the Virgin. The dead, however, cannot nominate. The Storyteller declares that the nomination does not count. The Virgin does not lose their ability.', async () => {
+        const librarianPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Librarian`
+        );
+
+        const context = mockVirginAbilityUseContext(virginPlayer, execution);
+
+        expect(await ability.isEligible(context)).toBeTrue();
+        const result = await ability.use(context);
+
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.CausedEffect
+        );
+
+        await librarianPlayer.setDead(DeadReason.DemonAttack);
+        handleMock.mockImplementationOnce((error) => {
+            expect(error).toBeInstanceOf(DeadPlayerCannotNominate);
+            return Promise.resolve(true);
+        });
+        expect(librarianPlayer.dead).toBeTrue();
+        const nomination = await librarianPlayer.nominate(
+            virginPlayer,
+            execution
+        );
+        expect(nomination).toBeUndefined();
+
+        expect(await ability.isEligible(context)).toBeTrue();
     });
 });

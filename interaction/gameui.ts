@@ -129,6 +129,15 @@ class GameUI {
         // TODO
         throw new Error('Method not implemented.');
     }
+
+    callForNomination(
+        _alivePlayers: Iterable<Player>,
+        _reason?: string,
+        _timeout = GameUI.DEFAULT_TIMEOUT
+    ): Promise<Player | undefined> {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
 }
 
 const GAME_UI = new GameUI();

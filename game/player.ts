@@ -25,6 +25,7 @@ import {
     PlayerHasUnclearAlignment,
     ReassignCharacterToPlayer,
 } from './exception';
+import type { Execution } from './execution';
 
 import { GAME_UI } from '~/interaction/gameui';
 
@@ -346,7 +347,10 @@ export class Player extends EffectTarget<Player> {
         return await victim.setDead(DeadReason.DemonAttack);
     }
 
-    async nominate(nominated: Player): Promise<Nomination | undefined> {
+    async nominate(
+        nominated: Player,
+        execution: Execution
+    ): Promise<Nomination | undefined> {
         if (!this.canNominate) {
             const error = new DeadPlayerCannotNominate(this);
             await error.resolve();
@@ -355,7 +359,10 @@ export class Player extends EffectTarget<Player> {
             }
         }
 
-        return await Nomination.init(this, nominated);
+        const nomination = await Nomination.init(this, nominated);
+        if (await execution.addNomination(nomination)) {
+            return nomination;
+        }
     }
 
     async collectVote(forExile: boolean): Promise<boolean> {
@@ -429,8 +436,6 @@ export class Player extends EffectTarget<Player> {
         }
 
         this.characterActs = CharacterAct.fromPlayer(this)[0];
-
-        this.initializeEffects();
     }
 
     protected initializeEffects() {
@@ -444,4 +449,7 @@ export type MinionPlayer = Player & {
 };
 export type DemonPlayer = Player & {
     characterType: Demon;
+};
+export type TownsfolkPlayer = Player & {
+    characterType: Townsfolk;
 };

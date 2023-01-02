@@ -1,6 +1,8 @@
+/* eslint-disable no-use-before-define */
 import 'reflect-metadata';
 import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from './deadreason';
+import { EffectTarget } from './effecttarget';
 import { Nomination } from './nomination';
 import { Player } from './player';
 import { Predicate } from './types';
@@ -18,7 +20,24 @@ import { GAME_UI } from '~/interaction/gameui';
  * The group decision to kill a player other than a Traveller during the day. There is a maximum of one execution per day, but there may be none. A nominated player is executed if they got votes equal to at least half the number of alive players, and more votes than any other nominated player.
  */
 @Exclude()
-export class Execution {
+export class Execution extends EffectTarget<Execution> {
+    protected static defaultEnabledProxyHandlerPropertyNames: Array<
+        keyof ProxyHandler<Execution>
+    > = ['get'];
+
+    static init(
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Execution>>
+    ) {
+        if (enabledProxyHandlerPropertyNames === undefined) {
+            enabledProxyHandlerPropertyNames =
+                this.defaultEnabledProxyHandlerPropertyNames;
+        }
+
+        const execution = new this(enabledProxyHandlerPropertyNames);
+
+        return execution.getProxy();
+    }
+
     @Expose({ toPlainOnly: true })
     @Type(() => Nomination)
     readonly nominations: Array<Nomination> = [];
@@ -43,6 +62,13 @@ export class Execution {
 
     protected _toExecute?: Player;
 
+    // eslint-disable-next-line no-useless-constructor
+    protected constructor(
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
+    ) {
+        super(enabledProxyHandlerPropertyNames);
+    }
+
     /**
      * Set the player about to die as the one to be executed.
      *
@@ -62,7 +88,10 @@ export class Execution {
      * @param player A player to be executed. If provided, this player will be executed immediately regardless whether another player is set to be executed. When not provided, the execution will carry out as intended.
      * @returns Whether a player has been executed.
      */
-    async execute(player?: Player): Promise<boolean> {
+    async execute(
+        player?: Player,
+        deadReason: DeadReason = DeadReason.Executed
+    ): Promise<boolean> {
         if (this.executed !== undefined) {
             if (player === undefined && this.toExecute === undefined) {
                 return false;
@@ -90,7 +119,7 @@ export class Execution {
             )
         ) {
             this._toExecute = player;
-            const executionResult = await player.setDead(DeadReason.Executed);
+            const executionResult = await player.setDead(deadReason);
 
             if (executionResult !== undefined) {
                 this._executed = player;

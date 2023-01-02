@@ -62,7 +62,7 @@ async function* addNominations(
 async function createExecutionAndAddNominations(
     nominationPlayers: Array<[Player, Player]>
 ): Promise<[Execution, Array<boolean>]> {
-    const execution = new Execution();
+    const execution = Execution.init();
 
     const canAddNominations: Array<boolean> = [];
 

@@ -54,11 +54,11 @@ export class Vote {
     }
 
     hasEnoughVoteToExecute(numAlivePlayer: number): Promise<boolean> {
-        return this.hasEnoughVote(Math.floor(numAlivePlayer / 2));
+        return this.hasEnoughVote(numAlivePlayer / 2);
     }
 
     hasEnoughVoteToExile(numPlayer: number): Promise<boolean> {
-        return this.hasEnoughVote(Math.floor(numPlayer / 2));
+        return this.hasEnoughVote(numPlayer / 2);
     }
 
     getVoteOrder(players: PlayerOrdering): IterableIterator<Player> {
