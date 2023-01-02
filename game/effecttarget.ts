@@ -9,14 +9,14 @@ export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
         return this._enabledProxyHandlerPropertyNames;
     }
 
+    declare effects: Effects<TTarget>;
+
     protected _enabledProxyHandlerPropertyNames?: Array<
         keyof ProxyHandler<TTarget>
     >;
 
-    protected _effects!: Effects<TTarget>;
-
     protected get _pipeline(): Effects<TTarget> {
-        return this._effects;
+        return this.effects;
     }
 
     protected original?: this;
@@ -72,7 +72,7 @@ export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
     }
 
     protected initializeEffects() {
-        this._effects = Effects.init();
+        this.effects = Effects.init();
     }
 
     protected defineDefaultProxyHandlers() {
