@@ -4,9 +4,7 @@ import { Phase } from './gamephase';
 import { Influence } from './influence';
 import { Context } from './infoprocessor';
 import { Player } from './player';
-import {
-    NoPlayerForCharacterAct,
-} from './exception';
+import { NoPlayerForCharacterAct } from './exception';
 import type { GameInfo as GameState } from './gameinfo';
 import type { CharacterToken } from './character';
 import { GAME_UI } from '~/interaction/gameui';
@@ -173,7 +171,6 @@ export class MonkAct extends NonfirstNightCharacterAct {
         );
     }
 }
-
 
 export class SlayerAct extends NonfirstNightCharacterAct {
     static description =

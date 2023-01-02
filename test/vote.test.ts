@@ -28,8 +28,8 @@ async function collectVotesForExecution(
 ): Promise<Array<Player>> {
     const votedPlayers: Array<Player> = [];
 
-    hasRaisedHandForVoteMock.mockImplementation(async (player: Player) => {
-        return await playerToWillRaiseHand.get(player);
+    hasRaisedHandForVoteMock.mockImplementation((player: Player) => {
+        return Promise.resolve(playerToWillRaiseHand.get(player));
     });
 
     for await (const votedPlayer of vote.collectVotes(

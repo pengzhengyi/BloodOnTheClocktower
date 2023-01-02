@@ -2,6 +2,7 @@ import {
     ChefInformationRequester,
     DemonInformationRequester,
     EmpathInformationRequester,
+    FortuneTellerInformationRequestContext,
     FortuneTellerInformationRequester,
     InformationRequestContext,
     InvestigatorInformationRequester,
@@ -426,7 +427,7 @@ describe('test EmpathInformationRequester', () => {
 
 describe('test FortuneTellerInformationRequester', () => {
     const requester = new FortuneTellerInformationRequester<
-        InformationRequestContext<FortuneTellerInformation>
+        FortuneTellerInformationRequestContext<FortuneTellerInformation>
     >();
 
     test.concurrent('should be eligible', async () => {

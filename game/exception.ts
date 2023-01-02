@@ -596,7 +596,10 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
 
     declare corrected: [Player, Player];
 
-    constructor(readonly chosen: Array<Player> | undefined) {
+    constructor(
+        readonly fortuneTellerPlayer: Player,
+        readonly chosen: Array<Player> | undefined
+    ) {
         super(FortuneTellerChooseInvalidPlayers.description);
     }
 }

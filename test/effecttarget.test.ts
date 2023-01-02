@@ -34,9 +34,9 @@ class PrivilegedData<T> extends EffectTarget<PrivilegedData<T>> {
 
     protected initializeEffects() {
         super.initializeEffects();
-        this._effects.add(new RoleCanAccess(Role.Admin));
-        this._effects.add(new RoleCanAccess(Role.Contributor));
-        this._effects.add(new RoleCanAccess(Role.User));
+        this.effects.add(new RoleCanAccess(Role.Admin));
+        this.effects.add(new RoleCanAccess(Role.Contributor));
+        this.effects.add(new RoleCanAccess(Role.User));
     }
 }
 
@@ -52,7 +52,6 @@ class RoleCanAccess<T> extends Effect<PrivilegedData<T>> {
 
     constructor(readonly role: Role) {
         super();
-        this.role = role;
     }
 
     toString(): string {

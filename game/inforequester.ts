@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
 import { CharacterType, Demon, Minion, Traveller } from './charactertype';
 import type { CharacterToken } from './character';
-import type { FortuneTellerInformationProviderContext, InfoProvideContext } from './infoprovider';
+import type {
+    FortuneTellerInformationProviderContext,
+    InfoProvideContext,
+} from './infoprovider';
 import type {
     ChefInformation,
     DemonInformation,
@@ -78,9 +81,7 @@ export interface IInformationRequester<
     TInformation,
     TInformationRequestContext extends InformationRequestContext<TInformation>
 > extends IInfoRequester<TInformation, TInformationRequestContext> {
-    willGetTrueInformation(
-        context: InfoProvideContext
-    ): Promise<boolean>;
+    willGetTrueInformation(context: InfoProvideContext): Promise<boolean>;
 
     request(
         context: TInformationRequestContext
@@ -94,9 +95,7 @@ export class InformationRequester<
     extends InfoRequester<TInformation, TInformationRequestContext>
     implements IInformationRequester<TInformation, TInformationRequestContext>
 {
-    willGetTrueInformation(
-        context: InfoProvideContext
-    ): Promise<boolean> {
+    willGetTrueInformation(context: InfoProvideContext): Promise<boolean> {
         return Promise.resolve(
             !context.requestedPlayer.drunk && !context.requestedPlayer.poisoned
         );
@@ -426,10 +425,10 @@ export const EmpathInformationRequester = IsAlive(
 );
 
 export interface FortuneTellerInformationRequestContext<TInformation>
-    extends InformationRequestContext<TInformation>, FortuneTellerInformationProviderContext {
+    extends InformationRequestContext<TInformation>,
+        FortuneTellerInformationProviderContext {
     willGetTrueInformation: boolean;
 }
-
 
 class BaseFortuneTellerInformationRequester<
     TInformationRequestContext extends FortuneTellerInformationRequestContext<FortuneTellerInformation>

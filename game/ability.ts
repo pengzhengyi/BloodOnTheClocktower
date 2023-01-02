@@ -1,15 +1,35 @@
-import { RecoverableGameError } from './exception';
 import {
+    FortuneTellerChooseInvalidPlayers,
+    RecoverableGameError,
+} from './exception';
+import {
+    ChefInformationRequester,
+    EmpathInformationRequester,
+    FortuneTellerInformationRequestContext,
+    FortuneTellerInformationRequester,
     IInfoRequester,
     IInformationRequester,
     InfoRequestContext,
     InformationRequestContext,
+    InvestigatorInformationRequester,
+    LibrarianInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
+import { Effect, InteractionContext } from './effect';
+import type { NextFunction } from './middleware';
 import type { Player } from './player';
 import type { InfoProvideContext } from './infoprovider';
-import type { Info, WasherwomanInformation } from './information';
+import type {
+    ChefInformation,
+    EmpathInformation,
+    FortuneTellerInformation,
+    Info,
+    InvestigatorInformation,
+    LibrarianInformation,
+    WasherwomanInformation,
+} from './information';
 import { GAME_UI } from '~/interaction/gameui';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
@@ -145,6 +165,10 @@ abstract class GetInfoAbility<
     TAbilityUseResult extends GetInfoAbilityUseResult<TInformation>
 > extends Ability<TAbilityUseContext, TAbilityUseResult> {
     protected abstract infoRequester: TInfoRequester;
+
+    async isEligible(context: TAbilityUseContext): Promise<boolean> {
+        return await this.infoRequester.isEligible(context);
+    }
 
     async useWhenMalfunction(
         context: TAbilityUseContext
@@ -296,13 +320,8 @@ abstract class GetInformationAbility<
     TAbilityUseResult
 > {
     async willMalfunction(context: TAbilityUseContext): Promise<boolean> {
-        const infoRequestContext = await this.createRequestContext(context);
-
         const willGetTrueInformation =
-            infoRequestContext.willGetTrueInformation ??
-            (await this.infoRequester.willGetTrueInformation(
-                infoRequestContext
-            ));
+            await this.infoRequester.willGetTrueInformation(context);
 
         return !willGetTrueInformation;
     }
@@ -381,7 +400,219 @@ export class GetWasherwomanInformationAbility extends GetCharacterInformationAbi
         InformationRequestContext<WasherwomanInformation>
     >
 > {
+    /**
+     * {@link `washerwoman["ability"]`}
+     */
+    static readonly description =
+        'You start knowing that 1 of 2 players is a particular Townsfolk.';
+
     protected infoRequester = new WasherwomanInformationRequester<
         InformationRequestContext<WasherwomanInformation>
     >();
+}
+
+export class GetLibrarianInformationAbility extends GetCharacterInformationAbility<
+    LibrarianInformation,
+    LibrarianInformationRequester<
+        InformationRequestContext<LibrarianInformation>
+    >
+> {
+    /**
+     * {@link `librarian["ability"]`}
+     */
+    static readonly description =
+        'You start knowing that 1 of 2 players is a particular Outsider. (Or that zero are in play.)';
+
+    protected infoRequester = new LibrarianInformationRequester<
+        InformationRequestContext<LibrarianInformation>
+    >();
+}
+
+export class GetInvestigatorInformationAbility extends GetCharacterInformationAbility<
+    InvestigatorInformation,
+    InvestigatorInformationRequester<
+        InformationRequestContext<InvestigatorInformation>
+    >
+> {
+    /**
+     * {@link `investigator["ability"]`}
+     */
+    static readonly description =
+        'You start knowing that 1 of 2 players is a particular Minion.';
+
+    protected infoRequester = new InvestigatorInformationRequester<
+        InformationRequestContext<InvestigatorInformation>
+    >();
+}
+
+export class GetChefInformationAbility extends GetCharacterInformationAbility<
+    ChefInformation,
+    ChefInformationRequester<InformationRequestContext<ChefInformation>>
+> {
+    /**
+     * {@link `chef["ability"]`}
+     */
+    static readonly description =
+        'You start knowing how many pairs of evil players there are.';
+
+    protected infoRequester = new ChefInformationRequester<
+        InformationRequestContext<ChefInformation>
+    >();
+}
+
+export class GetEmpathInformationAbility extends GetCharacterInformationAbility<
+    EmpathInformation,
+    EmpathInformationRequester<InformationRequestContext<EmpathInformation>>
+> {
+    /**
+     * {@link `empath["ability"]`}
+     */
+    static readonly description =
+        'Each night, you learn how many of your 2 alive neighbours are evil.';
+
+    protected infoRequester = new EmpathInformationRequester<
+        InformationRequestContext<EmpathInformation>
+    >();
+}
+
+export type FortuneTellerPlayer = Player & {
+    character: FortuneTeller;
+};
+
+export class RedHerringEffect extends Effect<FortuneTellerPlayer> {
+    static readonly description =
+        'A good player that registers as a Demon to Fortune Teller';
+
+    constructor(protected readonly fortuneTellerPlayer: FortuneTellerPlayer) {
+        super();
+    }
+
+    isApplicable(context: InteractionContext<FortuneTellerPlayer>): boolean {
+        return (
+            super.isApplicable(context) &&
+            this.isGetProperty(context, 'isDemon') &&
+            this.matchNotNullInitiator<FortuneTellerPlayer>(
+                context,
+                (initiator) => this.fortuneTellerPlayer.equals(initiator)
+            )
+        );
+    }
+
+    apply(
+        context: InteractionContext<FortuneTellerPlayer>,
+        next: NextFunction<InteractionContext<FortuneTellerPlayer>>
+    ): InteractionContext<FortuneTellerPlayer> {
+        const updatedContext = next(context);
+        updatedContext.result = true;
+        return updatedContext;
+    }
+}
+
+export class GetFortuneTellerInformationAbility extends GetCharacterInformationAbility<
+    FortuneTellerInformation,
+    FortuneTellerInformationRequester<
+        FortuneTellerInformationRequestContext<FortuneTellerInformation>
+    >
+> {
+    /**
+     * {@link `fortuneteller["ability"]`}
+     */
+    static readonly description =
+        'Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you.';
+
+    protected static canChoose(players: Array<Player> | undefined): boolean {
+        return Array.isArray(players) && players.length === 2;
+    }
+
+    protected redHerringPlayer: Player | undefined;
+
+    protected infoRequester = new FortuneTellerInformationRequester<
+        FortuneTellerInformationRequestContext<FortuneTellerInformation>
+    >();
+
+    async use(
+        context: GetInfoAbilityUseContext
+    ): Promise<
+        | GetInformationAbilityUseResult<FortuneTellerInformation>
+        | AbilityUseResult
+    > {
+        if (this.redHerringPlayer === undefined) {
+            await this.setupRedHerring(
+                context.requestedPlayer,
+                context.players
+            );
+        }
+
+        return await super.use(context);
+    }
+
+    protected async createRequestContext(
+        context: GetInfoAbilityUseContext
+    ): Promise<
+        FortuneTellerInformationRequestContext<FortuneTellerInformation>
+    > {
+        const infoRequestContext = (await super.createRequestContext(
+            context
+        )) as Omit<
+            FortuneTellerInformationRequestContext<FortuneTellerInformation>,
+            'chosenPlayers'
+        >;
+        const chosenPlayers = await this.choosePlayers(
+            context.requestedPlayer,
+            context.players
+        );
+        (
+            infoRequestContext as FortuneTellerInformationRequestContext<FortuneTellerInformation>
+        ).chosenPlayers = chosenPlayers;
+        return infoRequestContext as FortuneTellerInformationRequestContext<FortuneTellerInformation>;
+    }
+
+    protected async choosePlayers(
+        fortuneTellerPlayer: FortuneTellerPlayer,
+        players: Iterable<Player>
+    ): Promise<[Player, Player]> {
+        let chosen = (await GAME_UI.choose(
+            fortuneTellerPlayer,
+            players,
+            2,
+            GetFortuneTellerInformationAbility.description
+        )) as Array<Player> | undefined;
+
+        if (!GetFortuneTellerInformationAbility.canChoose(chosen)) {
+            const error = new FortuneTellerChooseInvalidPlayers(
+                fortuneTellerPlayer,
+                chosen
+            );
+            await error.resolve();
+            chosen = error.corrected;
+        }
+
+        return chosen as [Player, Player];
+    }
+
+    protected async setupRedHerring(
+        fortuneTellerPlayer: FortuneTellerPlayer,
+        players: Iterable<Player>
+    ): Promise<void> {
+        const redHerringPlayer = await this.chooseRedHerring(players);
+        this.setRedHerring(fortuneTellerPlayer, redHerringPlayer);
+    }
+
+    protected async chooseRedHerring(
+        players: Iterable<Player>
+    ): Promise<Player> {
+        return await GAME_UI.storytellerChooseOne(
+            players,
+            RedHerringEffect.description
+        );
+    }
+
+    protected setRedHerring(
+        fortuneTellerPlayer: FortuneTellerPlayer,
+        redHerringPlayer: Player
+    ) {
+        this.redHerringPlayer = redHerringPlayer;
+        const effect = new RedHerringEffect(fortuneTellerPlayer);
+        redHerringPlayer.effects.add(effect);
+    }
 }
