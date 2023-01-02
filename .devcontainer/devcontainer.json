@@ -42,7 +42,7 @@
             "relativeUpLevel"
         ],
         "typescript.extension.sortImports.sortMethod": "path",
-        "jest.jestCommandLine": "yarn test%"
+        "jest.jestCommandLine": "yarn test:ci"
     },
 
     // Configure tool-specific properties.

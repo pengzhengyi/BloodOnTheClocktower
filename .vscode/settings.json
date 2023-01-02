@@ -81,5 +81,6 @@
         "proxied",
         "proxymiddleware",
         "unproxied"
-    ]
+    ],
+    "jest.jestCommandLine": "yarn test:ci"
 }
