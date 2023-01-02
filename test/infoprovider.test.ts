@@ -811,7 +811,7 @@ describe('test UndertakerInformationProvider', () => {
     });
 });
 
-describe('True RavenkeeperInformationProvider info', () => {
+describe('test RavenkeeperInformationProvider', () => {
     const provider = new RavenkeeperInformationProvider();
     let ravenkeeperPlayer: Player;
 
@@ -846,13 +846,6 @@ describe('True RavenkeeperInformationProvider info', () => {
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);
         }
-    });
-
-    /**
-     * {@link `ravenkeeper["gameplay"][1]`}
-     */
-    test("The Imp attacks the Mayor. The Mayor doesn't die, but the Ravenkeeper dies instead, due to the Mayor's ability. The Ravenkeeper is woken and chooses Douglas, who is a dead Recluse. The Ravenkeeper learns that Douglas is the Scarlet Woman, since the Recluse registered as a Minion.", async () => {
-        // TODO
     });
 });
 

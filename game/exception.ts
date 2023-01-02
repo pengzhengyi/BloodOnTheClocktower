@@ -619,6 +619,20 @@ export class MonkNotChoosePlayerToProtect extends RecoverableGameError {
     }
 }
 
+export class RavenkeeperNotChoosePlayerToProtect extends RecoverableGameError {
+    static description =
+        'The ravenkeeper has not chosen player to learn the character';
+
+    declare correctedPlayer: Player;
+
+    constructor(
+        readonly RavenkeeperPlayer: Player,
+        readonly context: AbilityUseContext
+    ) {
+        super(RavenkeeperNotChoosePlayerToProtect.description);
+    }
+}
+
 export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
     static description =
         'The undertaker cannot get information when there was no execution today';

@@ -1,6 +1,7 @@
 import {
     FortuneTellerChooseInvalidPlayers,
     MonkNotChoosePlayerToProtect,
+    RavenkeeperNotChoosePlayerToProtect,
     RecoverableGameError,
     UndertakerRequestInfoWhenNoExecution,
 } from './exception';
@@ -15,6 +16,8 @@ import {
     InformationRequestContext,
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
+    RavenkeeperInformationRequestContext,
+    RavenkeeperInformationRequester,
     UndertakerInformationRequestContext,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
@@ -32,12 +35,14 @@ import type {
     Info,
     InvestigatorInformation,
     LibrarianInformation,
+    RavenkeeperInformation,
     UndertakerInformation,
     WasherwomanInformation,
 } from './information';
 import { GAME_UI } from '~/interaction/gameui';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Monk } from '~/content/characters/output/monk';
+import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
@@ -809,5 +814,70 @@ export class MonkProtectAbility extends Ability<
         playerToProtect: Player
     ): string {
         return `Monk player ${context.requestedPlayer} choose to protect ${playerToProtect}`;
+    }
+}
+
+type RavenkeeperPlayer = Player & {
+    character: Ravenkeeper;
+};
+
+export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
+    RavenkeeperInformation,
+    RavenkeeperInformationRequester<
+        RavenkeeperInformationRequestContext<RavenkeeperInformation>
+    >
+> {
+    /**
+     * {@link `ravenkeeper["ability"]`}
+     */
+    static readonly description =
+        'If you die at night, you are woken to choose a player: you learn their character.';
+
+    protected infoRequester = new RavenkeeperInformationRequester<
+        RavenkeeperInformationRequestContext<RavenkeeperInformation>
+    >();
+
+    protected async createRequestContext(
+        context: GetInfoAbilityUseContext
+    ): Promise<RavenkeeperInformationRequestContext<RavenkeeperInformation>> {
+        const infoRequestContext = (await super.createRequestContext(
+            context
+        )) as Omit<
+            RavenkeeperInformationRequestContext<RavenkeeperInformation>,
+            'chosenPlayer'
+        >;
+        const chosenPlayer = await this.choosePlayer(
+            context.requestedPlayer,
+            context.players,
+            context
+        );
+        (
+            infoRequestContext as RavenkeeperInformationRequestContext<RavenkeeperInformation>
+        ).chosenPlayer = chosenPlayer;
+        return infoRequestContext as RavenkeeperInformationRequestContext<RavenkeeperInformation>;
+    }
+
+    protected async choosePlayer(
+        ravenkeeperPlayer: RavenkeeperPlayer,
+        players: Iterable<Player>,
+        context: GetInfoAbilityUseContext
+    ): Promise<Player> {
+        let chosen = (await GAME_UI.choose(
+            ravenkeeperPlayer,
+            players,
+            1,
+            GetRavenkeeperInformationAbility.description
+        )) as Player;
+
+        if (chosen === undefined) {
+            const error = new RavenkeeperNotChoosePlayerToProtect(
+                ravenkeeperPlayer,
+                context
+            );
+            await error.resolve();
+            chosen = error.correctedPlayer;
+        }
+
+        return chosen;
     }
 }

@@ -8,9 +8,11 @@ import {
     InvestigatorInformationRequester,
     LibrarianInformationRequester,
     MinionInformationRequester,
+    RavenkeeperInformationRequestContext,
     RavenkeeperInformationRequester,
     SpyInformationRequester,
     TravellerInformationRequester,
+    UndertakerInformationRequestContext,
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from '~/game/inforequester';
@@ -460,7 +462,7 @@ describe('test FortuneTellerInformationRequester', () => {
 
 describe('test UndertakerInformationRequester', () => {
     const requester = new UndertakerInformationRequester<
-        InformationRequestContext<UndertakerInformation>
+        UndertakerInformationRequestContext<UndertakerInformation>
     >();
 
     test.concurrent('should be eligible', async () => {
@@ -512,7 +514,7 @@ describe('test UndertakerInformationRequester', () => {
 
 describe('test RavenkeeperInformationRequester', () => {
     const requester = new RavenkeeperInformationRequester<
-        InformationRequestContext<RavenkeeperInformation>
+        RavenkeeperInformationRequestContext<RavenkeeperInformation>
     >();
 
     test.concurrent('should be eligible', async () => {

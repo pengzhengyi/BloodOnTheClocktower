@@ -4,6 +4,7 @@ import type { CharacterToken } from './character';
 import type {
     FortuneTellerInformationProviderContext,
     InfoProvideContext,
+    RavenkeeperInformationProviderContext,
     UndertakerInformationProviderContext,
 } from './infoprovider';
 import type {
@@ -451,7 +452,7 @@ export interface UndertakerInformationRequestContext<TInformation>
         UndertakerInformationProviderContext {}
 
 class BaseUndertakerInformationRequester<
-    TInformationRequestContext extends InformationRequestContext<UndertakerInformation>
+    TInformationRequestContext extends UndertakerInformationRequestContext<UndertakerInformation>
 > extends CharacterInformationRequester<
     UndertakerInformation,
     TInformationRequestContext
@@ -474,8 +475,12 @@ export const UndertakerInformationRequester = IsAlive(
     EachNonfirstNight(BaseUndertakerInformationRequester)
 );
 
+export interface RavenkeeperInformationRequestContext<TInformation>
+    extends InformationRequestContext<TInformation>,
+        RavenkeeperInformationProviderContext {}
+
 class BaseRavenkeeperInformationRequester<
-    TInformationRequestContext extends InformationRequestContext<RavenkeeperInformation>
+    TInformationRequestContext extends RavenkeeperInformationRequestContext<RavenkeeperInformation>
 > extends CharacterInformationRequester<
     RavenkeeperInformation,
     TInformationRequestContext
@@ -496,6 +501,10 @@ class BaseRavenkeeperInformationRequester<
         return false;
     }
 }
+
+export interface RavenkeeperInformationRequester<
+    TInformationRequestContext extends RavenkeeperInformationRequestContext<RavenkeeperInformation>
+> extends BaseRavenkeeperInformationRequester<TInformationRequestContext> {}
 
 export const RavenkeeperInformationRequester = OnceAtNight(
     BaseRavenkeeperInformationRequester
