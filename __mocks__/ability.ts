@@ -5,6 +5,7 @@ import type {
     GetInfoAbilityUseContext,
 } from '~/game/ability';
 import { Player } from '~/game/player';
+import type { Task } from '~/game/types';
 import type { InfoProvideContext } from '~/game/infoprovider';
 
 export function mockAbilityUseContext(): AbilityUseContext {
@@ -14,10 +15,14 @@ export function mockAbilityUseContext(): AbilityUseContext {
 }
 
 export function mockGetInfoAbilityUseContext(
-    mockInfoProvideContext: () => InfoProvideContext = _mockInfoProvideContext
+    mockInfoProvideContext: () => InfoProvideContext = _mockInfoProvideContext,
+    contextModifications: Array<Task<GetInfoAbilityUseContext>> = []
 ): GetInfoAbilityUseContext {
-    return {
-        ...mockAbilityUseContext(),
-        ...mockInfoProvideContext(),
-    };
+    const context = Object.assign(
+        {},
+        mockAbilityUseContext(),
+        mockInfoProvideContext()
+    );
+    contextModifications.forEach((modification) => modification(context));
+    return context;
 }

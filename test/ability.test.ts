@@ -17,7 +17,10 @@ import {
     GetWasherwomanInformationAbility,
 } from '~/game/ability';
 import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
-import { mockContextForWasherwomanInformation } from '~/__mocks__/information';
+import {
+    mockClocktowerWithIsFirstNight,
+    mockContextForWasherwomanInformation,
+} from '~/__mocks__/information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import type { WasherwomanInformation } from '~/game/information';
@@ -37,7 +40,11 @@ afterAll(() => {
 });
 
 describe('test GetWasherwomanInformationAbility', () => {
-    const ability = new GetWasherwomanInformationAbility();
+    let ability: GetWasherwomanInformationAbility;
+
+    beforeEach(() => {
+        ability = new GetWasherwomanInformationAbility();
+    });
 
     test('use when normal with mock storyteller', async () => {
         const context = mockGetInfoAbilityUseContext(() =>
@@ -61,8 +68,9 @@ describe('test GetWasherwomanInformationAbility', () => {
             Washerwoman
         );
 
-        const context = mockGetInfoAbilityUseContext(() =>
-            createInfoProvideContext(washerwomanPlayer, [Evin, Amy])
+        const context = mockGetInfoAbilityUseContext(
+            () => createInfoProvideContext(washerwomanPlayer, [Evin, Amy]),
+            [(context) => mockClocktowerWithIsFirstNight(context, true)]
         );
         context.storyteller = new StoryTeller();
 

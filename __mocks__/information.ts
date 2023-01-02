@@ -157,6 +157,16 @@ export function mockContextForMinionInformation(
     return context;
 }
 
+export function mockClocktowerWithIsFirstNight(
+    context: { clocktower: Clocktower },
+    isFirstNight: boolean
+) {
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isFirstNight',
+        isFirstNight
+    );
+}
+
 export function mockContextForCharacterInformation<TCharacter, TInformation>(
     willGetTrueInformation: boolean,
     requestedPlayerIsAlive: boolean,
@@ -177,10 +187,7 @@ export function mockContextForCharacterInformation<TCharacter, TInformation>(
         }
     );
 
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isFirstNight',
-        isFirstNight
-    );
+    mockClocktowerWithIsFirstNight(context, isFirstNight);
 
     return context;
 }
