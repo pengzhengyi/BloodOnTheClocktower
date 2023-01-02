@@ -9,7 +9,6 @@ import type { GameInfo as GameState } from './gameinfo';
 import type { CharacterToken } from './character';
 import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
-import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
 
 /**
@@ -20,8 +19,6 @@ export abstract class CharacterAct extends Influence {
         switch (character) {
             case Imp:
                 return [ImpAct];
-            case Monk:
-                return [MonkAct];
             case Slayer:
                 return [SlayerAct];
             default:
@@ -118,57 +115,6 @@ export class ImpAct extends NonfirstNightCharacterAct {
         );
         await impPlayer.attack(chosenPlayer);
         return gameState;
-    }
-}
-
-export class MonkAct extends NonfirstNightCharacterAct {
-    static description = 'The Monk protects other players from the Demon.';
-
-    static of(player: Player) {
-        return new this(player, MonkAct.description);
-    }
-
-    applicablePhases = Phase.Night;
-
-    addProtectionToPlayer(player: Player): Player {
-        return new Proxy(player, {
-            get: function (target, property, receiver) {
-                const original = Reflect.get(target, property, receiver);
-
-                switch (property) {
-                    case 'setDead':
-                        return (reason: DeadReason) => {
-                            if (reason === DeadReason.DemonAttack) {
-                                return;
-                            }
-
-                            return original(reason);
-                        };
-                    default:
-                        return original;
-                }
-            },
-        });
-    }
-
-    choosePlayerToProtect(monkPlayer: Player, players: Iterable<Player>) {
-        return GAME_UI.choose(
-            monkPlayer,
-            players,
-            1,
-            MonkAct.description
-        ) as Promise<Player>;
-    }
-
-    async act(gameState: GameState, _context: Context): Promise<GameState> {
-        const monkPlayer = await this.getPlayer(gameState);
-        const protectedPlayer = await this.choosePlayerToProtect(
-            monkPlayer,
-            gameState.players
-        );
-        return gameState.updatePlayer(protectedPlayer, (player) =>
-            this.addProtectionToPlayer(player)
-        );
     }
 }
 

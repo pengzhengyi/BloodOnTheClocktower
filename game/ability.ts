@@ -1,5 +1,6 @@
 import {
     FortuneTellerChooseInvalidPlayers,
+    MonkNotChoosePlayerToProtect,
     RecoverableGameError,
     UndertakerRequestInfoWhenNoExecution,
 } from './exception';
@@ -18,9 +19,11 @@ import {
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
+import type { DeadReason } from './deadreason';
 import { Effect, InteractionContext } from './effect';
 import type { NextFunction } from './middleware';
 import type { Player } from './player';
+import type { Players } from './players';
 import type { InfoProvideContext } from './infoprovider';
 import type {
     ChefInformation,
@@ -34,9 +37,11 @@ import type {
 } from './information';
 import { GAME_UI } from '~/interaction/gameui';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import { Monk } from '~/content/characters/output/monk';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
+    players: Players;
 }
 
 export enum AbilityUseStatus {
@@ -49,6 +54,8 @@ export enum AbilityUseStatus {
     HasInfo = 0b100,
 
     Communicated = 0b1000,
+
+    CausedEffect = 0b10000,
 }
 
 export interface AbilityUseResult {
@@ -479,7 +486,7 @@ export class GetEmpathInformationAbility extends GetCharacterInformationAbility<
     >();
 }
 
-export type FortuneTellerPlayer = Player & {
+type FortuneTellerPlayer = Player & {
     character: FortuneTeller;
 };
 
@@ -563,7 +570,8 @@ export class GetFortuneTellerInformationAbility extends GetCharacterInformationA
         >;
         const chosenPlayers = await this.choosePlayers(
             context.requestedPlayer,
-            context.players
+            context.players,
+            context
         );
         (
             infoRequestContext as FortuneTellerInformationRequestContext<FortuneTellerInformation>
@@ -573,7 +581,8 @@ export class GetFortuneTellerInformationAbility extends GetCharacterInformationA
 
     protected async choosePlayers(
         fortuneTellerPlayer: FortuneTellerPlayer,
-        players: Iterable<Player>
+        players: Iterable<Player>,
+        context: GetInfoAbilityUseContext
     ): Promise<[Player, Player]> {
         let chosen = (await GAME_UI.choose(
             fortuneTellerPlayer,
@@ -585,7 +594,8 @@ export class GetFortuneTellerInformationAbility extends GetCharacterInformationA
         if (!GetFortuneTellerInformationAbility.canChoose(chosen)) {
             const error = new FortuneTellerChooseInvalidPlayers(
                 fortuneTellerPlayer,
-                chosen
+                chosen,
+                context
             );
             await error.resolve();
             chosen = error.corrected;
@@ -661,5 +671,143 @@ export class GetUndertakerInformationAbility extends GetCharacterInformationAbil
         }
 
         return infoRequestContext as UndertakerInformationRequestContext<UndertakerInformation>;
+    }
+}
+
+type MonkPlayer = Player & {
+    character: Monk;
+};
+
+export class MonkProtectionEffect extends Effect<MonkPlayer> {
+    static readonly description =
+        'The Monk protects other players from the Demon.';
+
+    isApplicable(context: InteractionContext<MonkPlayer>): boolean {
+        return (
+            super.isApplicable(context) &&
+            this.isGetProperty(context, 'setDead') &&
+            this.matchNotNullInitiator<MonkPlayer>(
+                context,
+                (initiator) => initiator.isDemon
+            )
+        );
+    }
+
+    apply(
+        context: InteractionContext<MonkPlayer>,
+        next: NextFunction<InteractionContext<MonkPlayer>>
+    ): InteractionContext<MonkPlayer> {
+        const updatedContext = next(context);
+        updatedContext.result = (_reason: DeadReason) =>
+            Promise.resolve(undefined);
+        return updatedContext;
+    }
+}
+
+export interface MonkAbilityUseResult extends AbilityUseResult {
+    protectedPlayer?: Player;
+}
+
+export class MonkProtectAbility extends Ability<
+    AbilityUseContext,
+    MonkAbilityUseResult
+> {
+    /**
+     * {@link `monk["ability"]`}
+     */
+    static readonly description =
+        'Each night*, choose a player (not yourself): they are safe from the Demon tonight.';
+
+    protected protected: Array<Player | undefined> = [];
+
+    protected protection: MonkProtectionEffect = new MonkProtectionEffect();
+
+    async useWhenMalfunction(
+        context: AbilityUseContext
+    ): Promise<MonkAbilityUseResult> {
+        const _playerToProtect = await this.choosePlayerToProtect(
+            context.requestedPlayer,
+            context.players,
+            context
+        );
+        this.updatePlayerToProtect();
+
+        return {
+            status: AbilityUseStatus.Success,
+            description: this.formatDescriptionForMalfunction(context),
+        };
+    }
+
+    async useWhenNormal(
+        context: AbilityUseContext
+    ): Promise<MonkAbilityUseResult> {
+        const playerToProtect = await this.choosePlayerToProtect(
+            context.requestedPlayer,
+            context.players,
+            context
+        );
+        this.updatePlayerToProtect(playerToProtect);
+
+        return {
+            status: AbilityUseStatus.Success | AbilityUseStatus.CausedEffect,
+            description: this.formatDescriptionForNormal(
+                context,
+                playerToProtect
+            ),
+            protectedPlayer: playerToProtect,
+        };
+    }
+
+    createContext(..._args: any[]): Promise<AbilityUseContext> {
+        // TODO
+        throw new Error('Method not implemented.');
+    }
+
+    protected updatePlayerToProtect(playerToProtect?: Player) {
+        const previousPlayerToProtect = this.protected.at(-1);
+        if (
+            previousPlayerToProtect !== undefined &&
+            (playerToProtect === undefined ||
+                !playerToProtect.equals(previousPlayerToProtect))
+        ) {
+            previousPlayerToProtect.effects.delete(this.protection);
+        }
+
+        this.protected.push(playerToProtect);
+        playerToProtect?.effects.add(this.protection);
+    }
+
+    protected async choosePlayerToProtect(
+        monkPlayer: MonkPlayer,
+        players: Players,
+        context: AbilityUseContext
+    ): Promise<Player> {
+        let chosen = (await GAME_UI.choose(
+            monkPlayer,
+            players.isNot(monkPlayer),
+            1,
+            MonkProtectAbility.description
+        )) as Player | undefined;
+
+        if (chosen === undefined) {
+            const error = new MonkNotChoosePlayerToProtect(monkPlayer, context);
+            await error.resolve();
+            chosen = error.correctedPlayerToProtect;
+        }
+
+        return chosen as Player;
+    }
+
+    protected formatDescriptionForMalfunction(
+        context: AbilityUseContext
+    ): string {
+        return `Monk player ${context.requestedPlayer} cannot protect when ability malfunctions`;
+    }
+
+    protected formatDescriptionForNormal(
+        context: AbilityUseContext,
+        playerToProtect: Player
+    ): string {
+        return `Monk player ${context.requestedPlayer} choose to protect ${playerToProtect}`;
     }
 }

@@ -167,6 +167,16 @@ export function mockClocktowerWithIsFirstNight(
     );
 }
 
+export function mockClocktowerWithIsNonfirstNight(
+    context: { clocktower: Clocktower },
+    isNonfirstNight: boolean
+) {
+    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
+        'isNonfirstNight',
+        isNonfirstNight
+    );
+}
+
 export function mockClocktowerForUndertaker(
     context: { clocktower: Clocktower },
     isNonfirstNight: boolean,
@@ -174,7 +184,7 @@ export function mockClocktowerForUndertaker(
 ) {
     const today = mockWithPropertyValues<Diary, [boolean, Player | undefined]>(
         ['hasExecution', 'executed'],
-        [true, executedPlayer]
+        [executedPlayer !== undefined, executedPlayer]
     );
 
     context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(

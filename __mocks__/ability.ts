@@ -4,13 +4,15 @@ import type {
     AbilityUseContext,
     GetInfoAbilityUseContext,
 } from '~/game/ability';
-import { Player } from '~/game/player';
+import type { Player } from '~/game/player';
+import type { Players } from '~/game/players';
 import type { Task } from '~/game/types';
 import type { InfoProvideContext } from '~/game/infoprovider';
 
 export function mockAbilityUseContext(): AbilityUseContext {
     return {
         requestedPlayer: mock<Player>(),
+        players: mock<Players>(),
     };
 }
 

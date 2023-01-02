@@ -18,12 +18,15 @@ import {
     GetInformationAbilityUseResult,
     GetUndertakerInformationAbility,
     GetWasherwomanInformationAbility,
+    MonkAbilityUseResult,
+    MonkProtectAbility,
     RedHerringEffect,
 } from '~/game/ability';
 import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
 import {
     mockClocktowerForUndertaker,
     mockClocktowerWithIsFirstNight,
+    mockClocktowerWithIsNonfirstNight,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
@@ -37,10 +40,12 @@ import { Chef } from '~/content/characters/output/chef';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Townsfolk } from '~/game/charactertype';
 import type { Player } from '~/game/player';
+import { DeadReason } from '~/game/deadreason';
 import { StoryTeller } from '~/game/storyteller';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Saint } from '~/content/characters/output/saint';
 import { Undertaker } from '~/content/characters/output/undertaker';
+import { Monk } from '~/content/characters/output/monk';
 
 describe('test GetWasherwomanInformationAbility', () => {
     let ability: GetWasherwomanInformationAbility;
@@ -131,6 +136,7 @@ describe('test GetFortuneTellerInformationAbility', () => {
 
     afterAll(() => {
         storytellerChooseOneMock.mockReset();
+        chooseMock.mockReset();
     });
 
     /**
@@ -181,6 +187,98 @@ describe('test GetUndertakerInformationAbility', () => {
             [(context) => mockClocktowerForUndertaker(context, true, undefined)]
         );
 
-        expect(await ability.isEligible(context)).toBeTrue();
+        expect(await ability.isEligible(context)).toBeFalse();
+    });
+});
+
+describe('test MonkProtectAbility', () => {
+    let ability: MonkProtectAbility;
+
+    beforeEach(() => {
+        ability = new MonkProtectAbility();
+    });
+
+    /**
+     * {@link `monk["gameplay"][0]`}
+     */
+    test('The Monk protects the Fortune Teller. The Imp attacks the Fortune Teller. No deaths occur tonight.', async () => {
+        const fortuneTellerPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Fortune Teller`
+        );
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const monkPlayer = await createBasicPlayer(undefined, Monk);
+
+        const context = mockGetInfoAbilityUseContext(
+            () =>
+                createInfoProvideContext(monkPlayer, [
+                    impPlayer,
+                    fortuneTellerPlayer,
+                ]),
+            [(context) => mockClocktowerWithIsNonfirstNight(context, true)]
+        );
+        context.storyteller = new StoryTeller();
+
+        chooseMock.mockImplementation((_monkPlayer, _players) => {
+            expect(_monkPlayer.character).toEqual(Monk);
+            return Promise.resolve(fortuneTellerPlayer);
+        });
+        const result = await ability.use(context);
+        chooseMock.mockReset();
+
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.CausedEffect
+        );
+        expect((result as MonkAbilityUseResult).protectedPlayer).toEqual(
+            fortuneTellerPlayer
+        );
+
+        expect(fortuneTellerPlayer.alive).toBeTrue();
+        await fortuneTellerPlayer
+            .from(impPlayer)
+            .setDead(DeadReason.DemonAttack);
+        expect(fortuneTellerPlayer.alive).toBeTrue();
+    });
+
+    /**
+     * {@link `monk["gameplay"][1]`}
+     */
+    test(`The Monk protects the Mayor, and the Imp attacks the Mayor. The Mayor's "another player dies" ability does not trigger, because the Mayor is safe from the Imp. Nobody dies tonight.`, async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `monk["gameplay"][2]`}
+     */
+    test('The Monk protects the Imp . The Imp chooses to kill themself tonight, but nothing happens. The Imp stays alive and a new Imp is not created.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const monkPlayer = await createBasicPlayer(undefined, Monk);
+
+        const context = mockGetInfoAbilityUseContext(
+            () => createInfoProvideContext(monkPlayer, [impPlayer]),
+            [(context) => mockClocktowerWithIsNonfirstNight(context, true)]
+        );
+        context.storyteller = new StoryTeller();
+
+        chooseMock.mockImplementation((_monkPlayer, _players) => {
+            expect(_monkPlayer.character).toEqual(Monk);
+            return Promise.resolve(impPlayer);
+        });
+        const result = await ability.use(context);
+        chooseMock.mockReset();
+
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.CausedEffect
+        );
+        expect((result as MonkAbilityUseResult).protectedPlayer).toEqual(
+            impPlayer
+        );
+
+        expect(impPlayer.alive).toBeTrue();
+        await impPlayer.from(impPlayer).setDead(DeadReason.DemonAttack);
+        expect(impPlayer.alive).toBeTrue();
     });
 });

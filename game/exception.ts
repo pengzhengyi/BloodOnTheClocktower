@@ -26,7 +26,7 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import type { GetInfoAbilityUseContext } from './ability';
+import type { AbilityUseContext, GetInfoAbilityUseContext } from './ability';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
@@ -599,9 +599,23 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
 
     constructor(
         readonly fortuneTellerPlayer: Player,
-        readonly chosen: Array<Player> | undefined
+        readonly chosen: Array<Player> | undefined,
+        readonly context: GetInfoAbilityUseContext
     ) {
         super(FortuneTellerChooseInvalidPlayers.description);
+    }
+}
+
+export class MonkNotChoosePlayerToProtect extends RecoverableGameError {
+    static description = 'The monk has not chosen player to protect';
+
+    declare correctedPlayerToProtect: Player;
+
+    constructor(
+        readonly monkPlayer: Player,
+        readonly context: AbilityUseContext
+    ) {
+        super(MonkNotChoosePlayerToProtect.description);
     }
 }
 
