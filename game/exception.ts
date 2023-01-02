@@ -26,6 +26,7 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
+import type { GetInfoAbilityUseContext } from './ability';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
@@ -601,6 +602,20 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
         readonly chosen: Array<Player> | undefined
     ) {
         super(FortuneTellerChooseInvalidPlayers.description);
+    }
+}
+
+export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
+    static description =
+        'The undertaker cannot get information when there was no execution today';
+
+    declare corrected: [Player, Player];
+
+    constructor(
+        readonly undertakerPlayer: Player,
+        readonly context: GetInfoAbilityUseContext
+    ) {
+        super(UndertakerRequestInfoWhenNoExecution.description);
     }
 }
 

@@ -16,11 +16,13 @@ import {
     AbilityUseStatus,
     GetFortuneTellerInformationAbility,
     GetInformationAbilityUseResult,
+    GetUndertakerInformationAbility,
     GetWasherwomanInformationAbility,
     RedHerringEffect,
 } from '~/game/ability';
 import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
 import {
+    mockClocktowerForUndertaker,
     mockClocktowerWithIsFirstNight,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
@@ -38,6 +40,7 @@ import type { Player } from '~/game/player';
 import { StoryTeller } from '~/game/storyteller';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Saint } from '~/content/characters/output/saint';
+import { Undertaker } from '~/content/characters/output/undertaker';
 
 describe('test GetWasherwomanInformationAbility', () => {
     let ability: GetWasherwomanInformationAbility;
@@ -157,5 +160,27 @@ describe('test GetFortuneTellerInformationAbility', () => {
             saintPlayer,
             fortuneTellerPlayer,
         ]);
+    });
+});
+
+describe('test GetUndertakerInformationAbility', () => {
+    let ability: GetUndertakerInformationAbility;
+
+    beforeEach(() => {
+        ability = new GetUndertakerInformationAbility();
+    });
+
+    /**
+     * {@link `undertaker["gameplay"][3]`}
+     */
+    test('Nobody was executed today. That night, the Undertaker does not wake.', async () => {
+        const undertakerPlayer = await createBasicPlayer(undefined, Undertaker);
+
+        const context = mockGetInfoAbilityUseContext(
+            () => createInfoProvideContext(undertakerPlayer, []),
+            [(context) => mockClocktowerForUndertaker(context, true, undefined)]
+        );
+
+        expect(await ability.isEligible(context)).toBeTrue();
     });
 });

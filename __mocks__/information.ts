@@ -167,6 +167,22 @@ export function mockClocktowerWithIsFirstNight(
     );
 }
 
+export function mockClocktowerForUndertaker(
+    context: { clocktower: Clocktower },
+    isNonfirstNight: boolean,
+    executedPlayer?: Player
+) {
+    const today = mockWithPropertyValues<Diary, [boolean, Player | undefined]>(
+        ['hasExecution', 'executed'],
+        [true, executedPlayer]
+    );
+
+    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
+        ['isNonfirstNight', 'today'],
+        [isNonfirstNight, today]
+    );
+}
+
 export function mockContextForCharacterInformation<TCharacter, TInformation>(
     willGetTrueInformation: boolean,
     requestedPlayerIsAlive: boolean,

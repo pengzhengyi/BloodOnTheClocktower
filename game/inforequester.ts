@@ -4,6 +4,7 @@ import type { CharacterToken } from './character';
 import type {
     FortuneTellerInformationProviderContext,
     InfoProvideContext,
+    UndertakerInformationProviderContext,
 } from './infoprovider';
 import type {
     ChefInformation,
@@ -426,9 +427,7 @@ export const EmpathInformationRequester = IsAlive(
 
 export interface FortuneTellerInformationRequestContext<TInformation>
     extends InformationRequestContext<TInformation>,
-        FortuneTellerInformationProviderContext {
-    willGetTrueInformation: boolean;
-}
+        FortuneTellerInformationProviderContext {}
 
 class BaseFortuneTellerInformationRequester<
     TInformationRequestContext extends FortuneTellerInformationRequestContext<FortuneTellerInformation>
@@ -447,6 +446,10 @@ export const FortuneTellerInformationRequester = IsAlive(
     EachNight(BaseFortuneTellerInformationRequester)
 );
 
+export interface UndertakerInformationRequestContext<TInformation>
+    extends InformationRequestContext<TInformation>,
+        UndertakerInformationProviderContext {}
+
 class BaseUndertakerInformationRequester<
     TInformationRequestContext extends InformationRequestContext<UndertakerInformation>
 > extends CharacterInformationRequester<
@@ -462,6 +465,10 @@ class BaseUndertakerInformationRequester<
         );
     }
 }
+
+export interface UndertakerInformationRequester<
+    TInformationRequestContext extends UndertakerInformationRequestContext<UndertakerInformation>
+> extends BaseUndertakerInformationRequester<TInformationRequestContext> {}
 
 export const UndertakerInformationRequester = IsAlive(
     EachNonfirstNight(BaseUndertakerInformationRequester)

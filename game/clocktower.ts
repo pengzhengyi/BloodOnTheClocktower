@@ -100,6 +100,10 @@ export class Diary {
         return this.exiles.length > 0;
     }
 
+    get executed(): Player | undefined {
+        return this.execution?.forWhat.executed;
+    }
+
     record(event: Event): Toll<Event> {
         const moment = this.tryRecord(event);
         const toll = new Toll(event, moment);
