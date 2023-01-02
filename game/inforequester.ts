@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-redeclare */
 import { CharacterType, Demon, Minion, Traveller } from './charactertype';
 import type { CharacterToken } from './character';
-import type { InfoProvideContext } from './infoprovider';
+import type { FortuneTellerInformationProviderContext, InfoProvideContext } from './infoprovider';
 import type {
     ChefInformation,
     DemonInformation,
@@ -44,7 +45,7 @@ export interface IInfoRequester<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>
 > {
-    isEligible(context: TInfoRequestContext): Promise<boolean>;
+    isEligible(context: InfoProvideContext): Promise<boolean>;
 
     request(context: TInfoRequestContext): Promise<Info<TInformation>>;
 
@@ -60,7 +61,7 @@ export class InfoRequester<
         return this._request(context);
     }
 
-    isEligible(_context: TInfoRequestContext): Promise<boolean> {
+    isEligible(_context: InfoProvideContext): Promise<boolean> {
         return Promise.resolve(true);
     }
 
@@ -78,7 +79,7 @@ export interface IInformationRequester<
     TInformationRequestContext extends InformationRequestContext<TInformation>
 > extends IInfoRequester<TInformation, TInformationRequestContext> {
     willGetTrueInformation(
-        context: Omit<TInformationRequestContext, 'willGetTrueInformation'>
+        context: InfoProvideContext
     ): Promise<boolean>;
 
     request(
@@ -94,7 +95,7 @@ export class InformationRequester<
     implements IInformationRequester<TInformation, TInformationRequestContext>
 {
     willGetTrueInformation(
-        context: Omit<TInformationRequestContext, 'willGetTrueInformation'>
+        context: InfoProvideContext
     ): Promise<boolean> {
         return Promise.resolve(
             !context.requestedPlayer.drunk && !context.requestedPlayer.poisoned
@@ -145,7 +146,7 @@ function OncePerGame<
 
         protected _hasRequested = false;
 
-        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+        async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (await super.isEligible(context)) && !this._hasRequested;
         }
 
@@ -167,7 +168,7 @@ function AtNight<
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class AtNight extends InfoRequesterClass {
-        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+        async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (
                 (await super.isEligible(context)) && context.clocktower.isNight
             );
@@ -194,7 +195,7 @@ function AtFirstNight<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return OncePerGame(
         class AtFirstNight extends InfoRequesterClass {
-            async isEligible(context: TInfoRequestContext): Promise<boolean> {
+            async isEligible(context: InfoProvideContext): Promise<boolean> {
                 return (
                     (await super.isEligible(context)) &&
                     context.clocktower.isFirstNight
@@ -214,7 +215,7 @@ function EachNonfirstNight<
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class EachNonfirstNight extends InfoRequesterClass {
-        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+        async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (
                 (await super.isEligible(context)) &&
                 context.clocktower.isNonfirstNight
@@ -231,7 +232,7 @@ function IsAlive<
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsAlive extends InfoRequesterClass {
-        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+        async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (
                 (await super.isEligible(context)) &&
                 context.requestedPlayer.alive
@@ -248,7 +249,7 @@ function IsEvil<
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsEvil extends InfoRequesterClass {
-        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+        async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (
                 (await super.isEligible(context)) &&
                 context.requestedPlayer.isEvil
@@ -265,7 +266,7 @@ function hasEnoughPlayerForDemonMinionInformation<
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class HasEnoughPlayerForDemonMinionInformation extends InfoRequesterClass {
-        async isEligible(context: TInfoRequestContext): Promise<boolean> {
+        async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (
                 (await super.isEligible(context)) && context.players.length >= 7
             );
@@ -279,7 +280,7 @@ abstract class CharacterTypeInformationRequester<
 > extends InformationRequester<TInformation, TInformationRequestContext> {
     abstract readonly expectedCharacterType: typeof CharacterType;
 
-    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+    async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
             context.requestedPlayer.characterType.is(this.expectedCharacterType)
@@ -327,7 +328,7 @@ abstract class CharacterInformationRequester<
 > extends InformationRequester<TInformation, TInformationRequestContext> {
     abstract readonly expectedCharacter: CharacterToken;
 
-    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+    async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
             context.requestedPlayer.character === this.expectedCharacter
@@ -352,7 +353,6 @@ export interface WasherwomanInformationRequester<
     TInformationRequestContext extends InformationRequestContext<WasherwomanInformation>
 > extends BaseWasherwomanInformationRequester<TInformationRequestContext> {}
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WasherwomanInformationRequester = IsAlive(
     AtFirstNight(BaseWasherwomanInformationRequester)
 );
@@ -365,6 +365,10 @@ class BaseLibrarianInformationRequester<
 > {
     readonly expectedCharacter = Librarian;
 }
+
+export interface LibrarianInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<LibrarianInformation>
+> extends BaseLibrarianInformationRequester<TInformationRequestContext> {}
 
 export const LibrarianInformationRequester = IsAlive(
     AtFirstNight(BaseLibrarianInformationRequester)
@@ -379,6 +383,10 @@ class BaseInvestigatorInformationRequester<
     readonly expectedCharacter = Investigator;
 }
 
+export interface InvestigatorInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<InvestigatorInformation>
+> extends BaseInvestigatorInformationRequester<TInformationRequestContext> {}
+
 export const InvestigatorInformationRequester = IsAlive(
     AtFirstNight(BaseInvestigatorInformationRequester)
 );
@@ -391,6 +399,10 @@ class BaseChefInformationRequester<
 > {
     readonly expectedCharacter = Chef;
 }
+
+export interface ChefInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<ChefInformation>
+> extends BaseChefInformationRequester<TInformationRequestContext> {}
 
 export const ChefInformationRequester = IsAlive(
     AtFirstNight(BaseChefInformationRequester)
@@ -405,18 +417,32 @@ class BaseEmpathInformationRequester<
     readonly expectedCharacter = Empath;
 }
 
+export interface EmpathInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<EmpathInformation>
+> extends BaseEmpathInformationRequester<TInformationRequestContext> {}
+
 export const EmpathInformationRequester = IsAlive(
     EachNight(BaseEmpathInformationRequester)
 );
 
+export interface FortuneTellerInformationRequestContext<TInformation>
+    extends InformationRequestContext<TInformation>, FortuneTellerInformationProviderContext {
+    willGetTrueInformation: boolean;
+}
+
+
 class BaseFortuneTellerInformationRequester<
-    TInformationRequestContext extends InformationRequestContext<FortuneTellerInformation>
+    TInformationRequestContext extends FortuneTellerInformationRequestContext<FortuneTellerInformation>
 > extends CharacterInformationRequester<
     FortuneTellerInformation,
     TInformationRequestContext
 > {
     readonly expectedCharacter = FortuneTeller;
 }
+
+export interface FortuneTellerInformationRequester<
+    TInformationRequestContext extends FortuneTellerInformationRequestContext<FortuneTellerInformation>
+> extends BaseFortuneTellerInformationRequester<TInformationRequestContext> {}
 
 export const FortuneTellerInformationRequester = IsAlive(
     EachNight(BaseFortuneTellerInformationRequester)
@@ -430,7 +456,7 @@ class BaseUndertakerInformationRequester<
 > {
     readonly expectedCharacter = Undertaker;
 
-    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+    async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
             context.clocktower.today.hasExecution
@@ -450,13 +476,13 @@ class BaseRavenkeeperInformationRequester<
 > {
     readonly expectedCharacter = Ravenkeeper;
 
-    async isEligible(context: TInformationRequestContext): Promise<boolean> {
+    async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) && this.hasDiedAtNight(context)
         );
     }
 
-    protected hasDiedAtNight(context: TInformationRequestContext): boolean {
+    protected hasDiedAtNight(context: InfoProvideContext): boolean {
         if (context.clocktower.isNight) {
             return context.clocktower.today.hasDead(context.requestedPlayer);
         }
