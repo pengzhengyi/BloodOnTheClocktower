@@ -223,24 +223,6 @@ export class RecluseInfluence extends RegisterAsGoodInfluence {
     }
 }
 
-export class SoldierInfluence extends Influence {
-    static readonly description: string = 'Soldier is safe from the Demon.';
-
-    declare source: Player;
-
-    applicablePhases = Phase.__ALL__;
-
-    constructor(soldierPlayer: Player) {
-        super(soldierPlayer, SoldierInfluence.description);
-    }
-
-    async _apply(gameInfo: GameInfo, _context: Context) {
-        return await gameInfo.updatePlayer(this.source, (player) =>
-            Influence.immuneFromDemonAttack(player)
-        );
-    }
-}
-
 export class MayorDieInsteadInfluence extends Influence {
     static readonly description: string =
         'If mayor die at night, another player might die instead.';

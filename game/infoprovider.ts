@@ -48,6 +48,7 @@ import { Players } from './players';
 import type { Seating } from './seating';
 import type { StoryTeller } from './storyteller';
 import type { TravellerSheet } from './travellersheet';
+import type { Constructor } from './types';
 
 export interface InfoProvideContext {
     clocktower: Clocktower;
@@ -1044,9 +1045,9 @@ export class SpyInformationProvider<
     }
 }
 
-type InfoProviderConstructor<TInformation> = new (
-    ...args: any[]
-) => InfoProvider<TInformation>;
+type InfoProviderConstructor<TInformation> = Constructor<
+    InfoProvider<TInformation>
+>;
 
 export type InfoProviderMethod<
     TInformation,

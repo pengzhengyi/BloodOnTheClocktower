@@ -1,5 +1,7 @@
 import type { Player } from './player';
-export type StaticThis<T> = { new (...args: any[]): T };
+
+export type Constructor<T> = { new (...args: any[]): T };
+export type StaticThis<T> = Constructor<T>;
 
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;

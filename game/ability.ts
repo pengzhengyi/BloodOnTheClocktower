@@ -1,5 +1,7 @@
-import { Effect, InteractionContext } from './effect';
+/* eslint-disable @typescript-eslint/no-redeclare */
+import { Effect, InteractionContext, SafeFromDemonEffect } from './effect';
 import {
+    AbilityRequiresSetup,
     FortuneTellerChooseInvalidPlayers,
     MonkNotChoosePlayerToProtect,
     RavenkeeperNotChoosePlayerToProtect,
@@ -31,6 +33,7 @@ import type { Nomination } from './nomination';
 import type { NextFunction } from './middleware';
 import type { Player } from './player';
 import type { Players } from './players';
+import type { Constructor, StaticThis } from './types';
 import type { InfoProvideContext } from './infoprovider';
 import type {
     ChefInformation,
@@ -49,11 +52,14 @@ import { Monk } from '~/content/characters/output/monk';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Slayer } from '~/content/characters/output/slayer';
+import { Soldier } from '~/content/characters/output/soldier';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
     players: Players;
 }
+
+export type AbilitySetupContext = AbilityUseContext;
 
 export enum AbilityUseStatus {
     Failure = 0 /* 0 */,
@@ -71,8 +77,11 @@ export enum AbilityUseStatus {
     CausedEffect = 0b100000 /* 32 */,
 }
 
-const AbilitySuccessUseWhenMalfunction =
+export const AbilitySuccessUseWhenMalfunction =
     AbilityUseStatus.Success | AbilityUseStatus.Malfunction;
+
+export const AbilitySuccessUseWhenCausedEffect =
+    AbilityUseStatus.Success | AbilityUseStatus.CausedEffect;
 
 export interface AbilityUseResult {
     status: number;
@@ -84,11 +93,16 @@ export interface AbilityUseResult {
 
 export interface IAbility<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
 > {
+    hasSetup: boolean;
+
     isEligible(context: TAbilityUseContext): Promise<boolean>;
 
     willMalfunction(context: TAbilityUseContext): Promise<boolean>;
+
+    setup(context: TAbilitySetupContext): Promise<void>;
 
     use(
         context: TAbilityUseContext
@@ -105,7 +119,8 @@ export interface IAbility<
  */
 abstract class Ability<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
 > implements IAbility<TAbilityUseContext, TAbilityUseResult>
 {
     static readonly REASON_FOR_UNEXPECTED_ERROR =
@@ -113,6 +128,30 @@ abstract class Ability<
 
     static readonly REASON_FOR_HANDLED_ERROR =
         'Recoverable error encountered and handled during ability use';
+
+    static async init<
+        TAbilityUseContext extends AbilityUseContext,
+        TAbilityUseResult extends AbilityUseResult,
+        TAbilitySetupContext extends AbilitySetupContext,
+        TAbility extends Ability<
+            TAbilityUseContext,
+            TAbilityUseResult,
+            TAbilitySetupContext
+        >
+    >(
+        this: StaticThis<TAbility>,
+        context: TAbilitySetupContext
+    ): Promise<TAbility> {
+        const instance = new this();
+        await instance.setup(context);
+        return instance;
+    }
+
+    get hasSetup() {
+        return this._hasSetup;
+    }
+
+    protected _hasSetup = false;
 
     abstract useWhenMalfunction(
         context: TAbilityUseContext
@@ -126,6 +165,11 @@ abstract class Ability<
 
     isEligible(context: TAbilityUseContext): Promise<boolean> {
         return Promise.resolve(context.requestedPlayer.alive);
+    }
+
+    setup(_context: TAbilitySetupContext): Promise<void> {
+        this._hasSetup = true;
+        return Promise.resolve(undefined);
     }
 
     loseAbility(_reason?: string): Promise<void> {
@@ -179,6 +223,28 @@ abstract class Ability<
     toString(): string {
         return this.constructor.name;
     }
+}
+
+function RequireSetup<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext,
+    TAbility extends Constructor<
+        IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
+    >
+>(AbilityClass: TAbility) {
+    return class requireSetup extends AbilityClass {
+        async use(
+            context: TAbilityUseContext
+        ): Promise<TAbilityUseResult | AbilityUseResult> {
+            if (!this.hasSetup) {
+                const error = new AbilityRequiresSetup(this, context);
+                await error.resolve();
+            }
+
+            return await super.use(context);
+        }
+    };
 }
 
 export interface GetInfoAbilityUseContext
@@ -547,7 +613,7 @@ export class RedHerringEffect extends Effect<FortuneTellerPlayer> {
     }
 }
 
-export class GetFortuneTellerInformationAbility extends GetCharacterInformationAbility<
+class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbility<
     FortuneTellerInformation,
     FortuneTellerInformationRequester<
         FortuneTellerInformationRequestContext<FortuneTellerInformation>
@@ -569,20 +635,9 @@ export class GetFortuneTellerInformationAbility extends GetCharacterInformationA
         FortuneTellerInformationRequestContext<FortuneTellerInformation>
     >();
 
-    async use(
-        context: GetInfoAbilityUseContext
-    ): Promise<
-        | GetInformationAbilityUseResult<FortuneTellerInformation>
-        | AbilityUseResult
-    > {
-        if (this.redHerringPlayer === undefined) {
-            await this.setupRedHerring(
-                context.requestedPlayer,
-                context.players
-            );
-        }
-
-        return await super.use(context);
+    async setup(context: AbilitySetupContext): Promise<void> {
+        await super.setup(context);
+        this.setupRedHerring(context.requestedPlayer, context.players);
     }
 
     protected async createRequestContext(
@@ -616,10 +671,10 @@ export class GetFortuneTellerInformationAbility extends GetCharacterInformationA
             fortuneTellerPlayer,
             players,
             2,
-            GetFortuneTellerInformationAbility.description
+            BaseGetFortuneTellerInformationAbility.description
         )) as Array<Player> | undefined;
 
-        if (!GetFortuneTellerInformationAbility.canChoose(chosen)) {
+        if (!BaseGetFortuneTellerInformationAbility.canChoose(chosen)) {
             const error = new FortuneTellerChooseInvalidPlayers(
                 fortuneTellerPlayer,
                 chosen,
@@ -658,6 +713,18 @@ export class GetFortuneTellerInformationAbility extends GetCharacterInformationA
         redHerringPlayer.effects.add(effect);
     }
 }
+
+export interface GetFortuneTellerInformationAbility
+    extends GetCharacterInformationAbility<
+        FortuneTellerInformation,
+        FortuneTellerInformationRequester<
+            FortuneTellerInformationRequestContext<FortuneTellerInformation>
+        >
+    > {}
+
+export const GetFortuneTellerInformationAbility = RequireSetup(
+    BaseGetFortuneTellerInformationAbility
+);
 
 export class GetUndertakerInformationAbility extends GetCharacterInformationAbility<
     UndertakerInformation,
@@ -706,23 +773,9 @@ type MonkPlayer = Player & {
     character: Monk;
 };
 
-export class MonkProtectionEffect extends Effect<MonkPlayer> {
+export class MonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
     static readonly description =
         'The Monk protects other players from the Demon.';
-
-    isApplicable(context: InteractionContext<MonkPlayer>): boolean {
-        return super.isApplicable(context) && this.matchDemonKill(context);
-    }
-
-    apply(
-        context: InteractionContext<MonkPlayer>,
-        next: NextFunction<InteractionContext<MonkPlayer>>
-    ): InteractionContext<MonkPlayer> {
-        const updatedContext = next(context);
-        updatedContext.result = (_reason: DeadReason) =>
-            Promise.resolve(undefined);
-        return updatedContext;
-    }
 }
 
 export interface MonkAbilityUseResult extends AbilityUseResult {
@@ -775,7 +828,7 @@ export class MonkProtectAbility extends Ability<
         this.updatePlayerToProtect(playerToProtect);
 
         return {
-            status: AbilityUseStatus.Success | AbilityUseStatus.CausedEffect,
+            status: AbilitySuccessUseWhenCausedEffect,
             description: this.formatDescriptionForNormal(
                 context,
                 playerToProtect
@@ -999,7 +1052,7 @@ export class VirginAbility extends Ability<
         this.addPenaltyToExecution(context.execution, context.requestedPlayer);
 
         return Promise.resolve({
-            status: AbilityUseStatus.Success | AbilityUseStatus.CausedEffect,
+            status: AbilitySuccessUseWhenCausedEffect,
             description: this.formatDescriptionForNormal(context),
         });
     }
@@ -1091,7 +1144,7 @@ export class SlayerAbility extends Ability<
             status:
                 death === undefined
                     ? AbilityUseStatus.Success
-                    : AbilityUseStatus.Success | AbilityUseStatus.CausedEffect,
+                    : AbilitySuccessUseWhenCausedEffect,
             chosenPlayer,
             death,
             description: this.formatDescriptionForNormal(context),
@@ -1151,3 +1204,72 @@ export class SlayerAbility extends Ability<
         return `Slayer player ${context.requestedPlayer} may inadvertently execute their accuser`;
     }
 }
+
+type SoldierPlayer = Player & {
+    character: Soldier;
+};
+
+export class SoldierSafeFromDemonEffect extends SafeFromDemonEffect<SoldierPlayer> {
+    static readonly description = 'The Soldier can not be killed by the Demon.';
+
+    isApplicable(context: InteractionContext<SoldierPlayer>): boolean {
+        return (
+            super.isApplicable(context) &&
+            this.matchTarget(
+                context,
+                (soldierPlayer) =>
+                    !soldierPlayer.drunk && !soldierPlayer.poisoned
+            )
+        );
+    }
+}
+
+class BaseSoldierAbility extends Ability<AbilityUseContext, AbilityUseResult> {
+    /**
+     * {@link `Soldier["ability"]`}
+     */
+    static readonly description = 'You are safe from the Demon.';
+
+    protected power: SoldierSafeFromDemonEffect =
+        new SoldierSafeFromDemonEffect();
+
+    useWhenMalfunction(context: AbilityUseContext): Promise<AbilityUseResult> {
+        return Promise.resolve({
+            status: AbilitySuccessUseWhenMalfunction,
+            description: this.formatDescriptionForMalfunction(context),
+        });
+    }
+
+    useWhenNormal(context: AbilityUseContext): Promise<AbilityUseResult> {
+        return Promise.resolve({
+            status: AbilitySuccessUseWhenCausedEffect,
+            description: this.formatDescriptionForNormal(context),
+        });
+    }
+
+    async setup(context: AbilitySetupContext): Promise<void> {
+        await super.setup(context);
+
+        context.requestedPlayer.effects.add(this.power);
+    }
+
+    createContext(..._args: any[]): Promise<AbilityUseContext> {
+        // TODO choose player will be moved here
+        throw new Error('Method not implemented.');
+    }
+
+    protected formatDescriptionForMalfunction(
+        context: AbilityUseContext
+    ): string {
+        return `Soldier player ${context.requestedPlayer} is not safe from the demon when ability malfunctions`;
+    }
+
+    protected formatDescriptionForNormal(context: AbilityUseContext): string {
+        return `Soldier player ${context.requestedPlayer} is safe from the demon`;
+    }
+}
+
+export interface SoldierAbility
+    extends Ability<AbilityUseContext, AbilityUseResult> {}
+
+export const SoldierAbility = RequireSetup(BaseSoldierAbility);

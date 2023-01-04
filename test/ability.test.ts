@@ -24,9 +24,11 @@ import {
     RedHerringEffect,
     SlayerAbility,
     SlayerAbilityUseResult,
+    SoldierAbility,
     VirginAbility,
 } from '~/game/ability';
 import {
+    mockAbilitySetupContext,
     mockAbilityUseContext,
     mockGetInfoAbilityUseContext,
     mockVirginAbilityUseContext,
@@ -57,6 +59,7 @@ import { Saint } from '~/content/characters/output/saint';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
+import { Soldier } from '~/content/characters/output/soldier';
 
 describe('test GetWasherwomanInformationAbility', () => {
     let ability: GetWasherwomanInformationAbility;
@@ -113,12 +116,6 @@ describe('test GetWasherwomanInformationAbility', () => {
 });
 
 describe('test GetFortuneTellerInformationAbility', () => {
-    let ability: GetFortuneTellerInformationAbility;
-
-    beforeEach(() => {
-        ability = new GetFortuneTellerInformationAbility();
-    });
-
     beforeAll(() => {
         storytellerChooseOneMock.mockImplementation(
             (options: Generator<any>, reason?: string) => {
@@ -167,6 +164,7 @@ describe('test GetFortuneTellerInformationAbility', () => {
             [(context) => mockClocktowerWithIsFirstNight(context, true)]
         );
         context.storyteller = new StoryTeller();
+        const ability = await GetFortuneTellerInformationAbility.init(context);
 
         const result = (await ability.use(
             context
@@ -448,6 +446,48 @@ describe('test SlayerAbility', () => {
      * {@link `slayer["gameplay"][2]`}
      */
     test('The Imp is bluffing as the Slayer. They declare that they use their Slayer ability on the Scarlet Woman. Nothing happens.', async () => {
+        // TODO
+    });
+});
+
+describe('test SoldierAbility', () => {
+    let _ability: SoldierAbility;
+    let soldierPlayer: Player;
+    let impPlayer: Player;
+
+    beforeEach(async () => {
+        soldierPlayer = await createBasicPlayer(undefined, Soldier);
+        _ability = await SoldierAbility.init(
+            mockAbilitySetupContext(soldierPlayer)
+        );
+        impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+    });
+
+    /**
+     * {@link `soldier["gameplay"][0]`}
+     */
+    test('The Imp attacks the Soldier. The Soldier does not die, so nobody dies that night.', async () => {
+        expect(soldierPlayer.alive).toBeTrue();
+        const death = await soldierPlayer
+            .from(impPlayer)
+            .setDead(DeadReason.DemonAttack);
+        expect(death).toBeUndefined();
+        expect(soldierPlayer.alive).toBeTrue();
+    });
+
+    /**
+     * {@link `soldier["gameplay"][1]`}
+     */
+    test('The Poisoner poisons the Soldier, then the Imp attacks the Soldier. The Soldier dies, since they have no ability.', async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `soldier["gameplay"][2]`}
+     */
+    test('The Imp attacks the Soldier. The Soldier dies, because they are actually the Drunk.', async () => {
         // TODO
     });
 });

@@ -1,4 +1,5 @@
 import { Predicate } from './types';
+import type { DeadReason } from './deadreason';
 import type { Middleware, NextFunction } from './middleware';
 import type { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
@@ -107,6 +108,13 @@ export abstract class Effect<TTarget extends object> {
         return predicate(context.initiator);
     }
 
+    protected matchTarget(
+        context: InteractionContext<TTarget>,
+        predicate: Predicate<TTarget>
+    ) {
+        return predicate(context.interaction.target);
+    }
+
     protected matchNotNullInitiator<T = InteractionInitiator>(
         context: InteractionContext<TTarget>,
         predicate: Predicate<NonNullable<T>>
@@ -190,5 +198,23 @@ export class Forwarding<TTarget extends object> extends Effect<TTarget> {
         }
 
         return next(context);
+    }
+}
+
+export class SafeFromDemonEffect<
+    TPlayer extends object
+> extends Effect<TPlayer> {
+    isApplicable(context: InteractionContext<TPlayer>): boolean {
+        return super.isApplicable(context) && this.matchDemonKill(context);
+    }
+
+    apply(
+        context: InteractionContext<TPlayer>,
+        next: NextFunction<InteractionContext<TPlayer>>
+    ): InteractionContext<TPlayer> {
+        const updatedContext = next(context);
+        updatedContext.result = (_reason: DeadReason) =>
+            Promise.resolve(undefined);
+        return updatedContext;
     }
 }

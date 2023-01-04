@@ -21,6 +21,8 @@ export function mockAbilityUseContext(
     };
 }
 
+export const mockAbilitySetupContext = mockAbilityUseContext;
+
 export function mockGetInfoAbilityUseContext(
     mockInfoProvideContext: () => InfoProvideContext = _mockInfoProvideContext,
     contextModifications: Array<Task<GetInfoAbilityUseContext>> = []

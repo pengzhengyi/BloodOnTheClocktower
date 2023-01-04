@@ -26,7 +26,13 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import type { AbilityUseContext, GetInfoAbilityUseContext } from './ability';
+import type {
+    AbilitySetupContext,
+    AbilityUseContext,
+    AbilityUseResult,
+    GetInfoAbilityUseContext,
+    IAbility,
+} from './ability';
 import type { Alignment } from './alignment';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
@@ -588,6 +594,25 @@ export class IncorrectAlignmentForSpyToRegisterAs extends RecoverableGameError {
         if (alignmentToRegisterAs !== undefined) {
             this.correctedAlignmentToRegisterAs = alignmentToRegisterAs;
         }
+    }
+}
+
+export class AbilityRequiresSetup<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext
+> extends RecoverableGameError {
+    static description = 'Ability requires setup before use';
+
+    constructor(
+        readonly ability: IAbility<
+            TAbilityUseContext,
+            TAbilityUseResult,
+            TAbilitySetupContext
+        >,
+        readonly context: TAbilityUseContext
+    ) {
+        super(AbilityRequiresSetup.description);
     }
 }
 

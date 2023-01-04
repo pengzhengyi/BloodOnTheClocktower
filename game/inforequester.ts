@@ -24,6 +24,7 @@ import type {
     UndertakerInformation,
     WasherwomanInformation,
 } from './information';
+import type { Constructor } from './types';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
@@ -129,9 +130,7 @@ export interface IStoryTellerInformationRequester<
     ): Promise<StoryTellerInformation<TInformation>>;
 }
 
-type InfoRequesterConstructor<TInfoRequester> = new (
-    ...args: any[]
-) => TInfoRequester;
+type InfoRequesterConstructor<TInfoRequester> = Constructor<TInfoRequester>;
 
 function OncePerGame<
     TInformation,
