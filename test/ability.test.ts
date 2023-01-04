@@ -22,9 +22,12 @@ import {
     MonkAbilityUseResult,
     MonkProtectAbility,
     RedHerringEffect,
+    SlayerAbility,
+    SlayerAbilityUseResult,
     VirginAbility,
 } from '~/game/ability';
 import {
+    mockAbilityUseContext,
     mockGetInfoAbilityUseContext,
     mockVirginAbilityUseContext,
 } from '~/__mocks__/ability';
@@ -53,6 +56,7 @@ import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Saint } from '~/content/characters/output/saint';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Monk } from '~/content/characters/output/monk';
+import { Slayer } from '~/content/characters/output/slayer';
 
 describe('test GetWasherwomanInformationAbility', () => {
     let ability: GetWasherwomanInformationAbility;
@@ -395,5 +399,55 @@ describe('test VirginAbility', () => {
         expect(nomination).toBeUndefined();
 
         expect(await ability.isEligible(context)).toBeTrue();
+    });
+});
+
+describe('test SlayerAbility', () => {
+    let ability: SlayerAbility;
+    let slayerPlayer: Player;
+
+    beforeEach(async () => {
+        ability = new SlayerAbility();
+        slayerPlayer = await createBasicPlayer(undefined, Slayer);
+    });
+
+    /**
+     * {@link `slayer["gameplay"][0]`}
+     */
+    test('The Slayer chooses the Imp. The Imp dies, and good wins!', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+
+        const context = mockAbilityUseContext(slayerPlayer);
+        expect(await ability.isEligible(context)).toBeTrue();
+
+        chooseMock.mockImplementation((slayerPlayer, _players) => {
+            expect(slayerPlayer.character).toEqual(Slayer);
+            return Promise.resolve(impPlayer);
+        });
+        const result = (await ability.use(context)) as SlayerAbilityUseResult;
+        chooseMock.mockReset();
+
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.CausedEffect
+        );
+        expect(result.death?.deadReason).toBe(DeadReason.SlayerKill);
+        expect(result.chosenPlayer).toBe(impPlayer);
+        expect(await ability.isEligible(context)).toBeFalse();
+    });
+
+    /**
+     * {@link `slayer["gameplay"][1]`}
+     */
+    test('The Slayer chooses the Recluse. The Storyteller decides that the Recluse registers as the Imp, so the Recluse dies, but the game continues.', async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `slayer["gameplay"][2]`}
+     */
+    test('The Imp is bluffing as the Slayer. They declare that they use their Slayer ability on the Scarlet Woman. Nothing happens.', async () => {
+        // TODO
     });
 });

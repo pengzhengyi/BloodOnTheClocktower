@@ -1,5 +1,4 @@
 /** @deprecated */
-import { DeadReason } from './deadreason';
 import { Phase } from './gamephase';
 import { Influence } from './influence';
 import { Context } from './infoprocessor';
@@ -9,7 +8,6 @@ import type { GameInfo as GameState } from './gameinfo';
 import type { CharacterToken } from './character';
 import { GAME_UI } from '~/interaction/gameui';
 import { Imp } from '~/content/characters/output/imp';
-import { Slayer } from '~/content/characters/output/slayer';
 
 /**
  * CharacterAct is when a player needs to perform some actions because of character ability. Such actions will usually affect the game.
@@ -19,8 +17,6 @@ export abstract class CharacterAct extends Influence {
         switch (character) {
             case Imp:
                 return [ImpAct];
-            case Slayer:
-                return [SlayerAct];
             default:
                 return [];
         }
@@ -114,50 +110,6 @@ export class ImpAct extends NonfirstNightCharacterAct {
             gameState.players
         );
         await impPlayer.attack(chosenPlayer);
-        return gameState;
-    }
-}
-
-export class SlayerAct extends NonfirstNightCharacterAct {
-    static description =
-        'The Slayer can kill the Demon by guessing who they are.';
-
-    static of(player: Player) {
-        return new this(player, SlayerAct.description);
-    }
-
-    applicablePhases = Phase.Day;
-
-    async isEligible(gameState: GameState): Promise<boolean> {
-        return (await super.isEligible(gameState)) && gameState.gamePhase.isDay;
-    }
-
-    async killDemon(player: Player) {
-        if (player.isTheDemon) {
-            await player.setDead(DeadReason.SlayerKill);
-        }
-    }
-
-    chooseSuspectedDemon(slayerPlayer: Player, players: Iterable<Player>) {
-        return GAME_UI.choose(
-            slayerPlayer,
-            players,
-            1,
-            SlayerAct.description
-        ) as Promise<Player>;
-    }
-
-    async act(gameState: GameState, _context: Context): Promise<GameState> {
-        gameState = await super.act(gameState, _context);
-
-        const slayerPlayer = await this.getPlayer(gameState);
-        const suspectedDemon = await this.chooseSuspectedDemon(
-            slayerPlayer,
-            gameState.players
-        );
-
-        await this.killDemon(suspectedDemon);
-
         return gameState;
     }
 }

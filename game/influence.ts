@@ -10,9 +10,7 @@ import { Demon } from './charactertype';
 import type { Player } from './player';
 import { DeadReason } from './deadreason';
 import type { Context, InfoProcessor } from './infoprocessor';
-import type { Nomination } from './nomination';
-import { GamePhase, Phase } from './gamephase';
-import type { Execution } from './execution';
+import { Phase } from './gamephase';
 import { Spy } from '~/content/characters/output/spy';
 import { GAME_UI } from '~/interaction/gameui';
 import { Recluse } from '~/content/characters/output/recluse';
@@ -222,74 +220,6 @@ export class RecluseInfluence extends RegisterAsGoodInfluence {
 
     constructor(reclusePlayer: Player) {
         super(reclusePlayer, RecluseInfluence.description);
-    }
-}
-
-export class FortuneTellerRedHerringInfluence extends RegisterAsDemonInfluence {
-    static readonly description: string =
-        'There is a good player that registers as a Demon to the Fortune Teller.';
-
-    applicablePhases = Phase.__ALL__;
-
-    constructor(fortuneTellerPlayer: Player, playerAsRedHerring: Player) {
-        super(
-            fortuneTellerPlayer,
-            FortuneTellerRedHerringInfluence.description
-        );
-        this.playerToRegister = playerAsRedHerring;
-    }
-}
-
-export class VirginInfluence extends Influence {
-    static readonly description: string =
-        'The 1st time virgin is nominated, if the nominator is a Townsfolk, they are executed immediately.';
-
-    declare source: Player;
-
-    applicablePhases = Phase.Day;
-
-    hasBeenNominated = false;
-
-    constructor(virginPlayer: Player) {
-        super(virginPlayer, VirginInfluence.description);
-    }
-
-    addPenaltyToNominator(
-        execution: Execution,
-        gamePhase: GamePhase
-    ): Execution {
-        const proxyExecution = new Proxy(execution, {
-            get: function (target, property, receiver) {
-                const original = Reflect.get(target, property, receiver);
-
-                switch (property) {
-                    case 'addNomination':
-                        return async (nomination: Nomination) => {
-                            if (await original(nomination)) {
-                                if (nomination.nominator.isTownsfolk) {
-                                    (await proxyExecution.execute(
-                                        nomination.nominator
-                                    )) &&
-                                        (await gamePhase.forceTransition(
-                                            VirginInfluence.description
-                                        ));
-                                }
-
-                                return true;
-                            }
-                            return false;
-                        };
-                    default:
-                        return original;
-                }
-            },
-        });
-
-        return proxyExecution;
-    }
-
-    async isEligible(_gameInfo: GameInfo) {
-        return await !this.hasBeenNominated;
     }
 }
 

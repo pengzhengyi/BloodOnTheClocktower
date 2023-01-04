@@ -1,5 +1,6 @@
 import { Predicate } from './types';
 import type { Middleware, NextFunction } from './middleware';
+import type { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
 
 interface ProxyHandlerRequest<TTarget extends object> {
@@ -129,6 +130,16 @@ export abstract class Effect<TTarget extends object> {
         predicate: Predicate<T>
     ) {
         return predicate(context.interaction.args[0]);
+    }
+
+    protected matchDemonKill(context: InteractionContext<TTarget>) {
+        return (
+            this.isGetProperty(context, 'setDead' as keyof TTarget) &&
+            this.matchNotNullInitiator<Player>(
+                context,
+                (initiator) => initiator.isDemon
+            )
+        );
     }
 
     protected isGetProperty(

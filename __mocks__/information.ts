@@ -204,9 +204,12 @@ export function mockContextForCharacterInformation<TCharacter, TInformation>(
         willGetTrueInformation
     );
 
-    context.requestedPlayer = mockObject<Player, [TCharacter, boolean]>(
-        ['character', 'alive'],
-        [character, requestedPlayerIsAlive],
+    context.requestedPlayer = mockObject<
+        Player,
+        [TCharacter, boolean, boolean, boolean]
+    >(
+        ['character', 'alive', 'drunk', 'poisoned'],
+        [character, requestedPlayerIsAlive, false, false],
         {
             from: (mockFunction) =>
                 mockFunction.mockReturnValue(context.requestedPlayer),

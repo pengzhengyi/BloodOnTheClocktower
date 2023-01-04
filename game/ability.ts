@@ -4,6 +4,7 @@ import {
     MonkNotChoosePlayerToProtect,
     RavenkeeperNotChoosePlayerToProtect,
     RecoverableGameError,
+    SlayerNotChoosePlayerToKill,
     UndertakerRequestInfoWhenNoExecution,
 } from './exception';
 import {
@@ -24,6 +25,7 @@ import {
     WasherwomanInformationRequester,
 } from './inforequester';
 import { DeadReason } from './deadreason';
+import type { Death } from './death';
 import type { Execution } from './execution';
 import type { Nomination } from './nomination';
 import type { NextFunction } from './middleware';
@@ -46,6 +48,7 @@ import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Monk } from '~/content/characters/output/monk';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Virgin } from '~/content/characters/output/virgin';
+import { Slayer } from '~/content/characters/output/slayer';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
@@ -53,18 +56,23 @@ export interface AbilityUseContext {
 }
 
 export enum AbilityUseStatus {
-    Failure = 0,
+    Failure = 0 /* 0 */,
 
-    ErrorHandled = 0b1,
+    ErrorHandled = 0b1 /* 1 */,
 
-    Success = 0b10,
+    Success = 0b10 /* 2 */,
 
-    HasInfo = 0b100,
+    Malfunction = 0b100 /* 4 */,
 
-    Communicated = 0b1000,
+    HasInfo = 0b1000 /* 8 */,
 
-    CausedEffect = 0b10000,
+    Communicated = 0b10000 /* 16 */,
+
+    CausedEffect = 0b100000 /* 32 */,
 }
+
+const AbilitySuccessUseWhenMalfunction =
+    AbilityUseStatus.Success | AbilityUseStatus.Malfunction;
 
 export interface AbilityUseResult {
     status: number;
@@ -85,6 +93,8 @@ export interface IAbility<
     use(
         context: TAbilityUseContext
     ): Promise<TAbilityUseResult | AbilityUseResult>;
+
+    loseAbility(reason?: string): Promise<void>;
 
     createContext(...args: any[]): Promise<TAbilityUseContext>;
 }
@@ -116,6 +126,10 @@ abstract class Ability<
 
     isEligible(context: TAbilityUseContext): Promise<boolean> {
         return Promise.resolve(context.requestedPlayer.alive);
+    }
+
+    loseAbility(_reason?: string): Promise<void> {
+        return Promise.resolve(undefined);
     }
 
     async use(
@@ -194,7 +208,7 @@ abstract class GetInfoAbility<
     ): Promise<TAbilityUseResult | AbilityUseResult> {
         return await this.createRequestResult(
             {
-                status: AbilityUseStatus.Success,
+                status: AbilitySuccessUseWhenMalfunction,
                 description: await this.formatDescriptionForMalfunction(
                     context
                 ),
@@ -345,7 +359,13 @@ abstract class GetInformationAbility<
         return !willGetTrueInformation;
     }
 
-    useWhenMalfunction = this.useWhenNormal;
+    async useWhenMalfunction(
+        context: TAbilityUseContext
+    ): Promise<TAbilityUseResult | AbilityUseResult> {
+        const result = await this.useWhenNormal(context);
+        result.status |= AbilityUseStatus.Malfunction;
+        return result;
+    }
 
     protected async createRequestResult(
         result: GetInfoAbilityUseResult<TInformation>,
@@ -691,14 +711,7 @@ export class MonkProtectionEffect extends Effect<MonkPlayer> {
         'The Monk protects other players from the Demon.';
 
     isApplicable(context: InteractionContext<MonkPlayer>): boolean {
-        return (
-            super.isApplicable(context) &&
-            this.isGetProperty(context, 'setDead') &&
-            this.matchNotNullInitiator<MonkPlayer>(
-                context,
-                (initiator) => initiator.isDemon
-            )
-        );
+        return super.isApplicable(context) && this.matchDemonKill(context);
     }
 
     apply(
@@ -741,9 +754,14 @@ export class MonkProtectAbility extends Ability<
         this.updatePlayerToProtect();
 
         return {
-            status: AbilityUseStatus.Success,
+            status: AbilitySuccessUseWhenMalfunction,
             description: this.formatDescriptionForMalfunction(context),
         };
+    }
+
+    async loseAbility(reason?: string): Promise<void> {
+        await super.loseAbility(reason);
+        await this.protection.deactivate(reason);
     }
 
     async useWhenNormal(
@@ -767,7 +785,7 @@ export class MonkProtectAbility extends Ability<
     }
 
     createContext(..._args: any[]): Promise<AbilityUseContext> {
-        // TODO
+        // TODO choose player will be moved here
         throw new Error('Method not implemented.');
     }
 
@@ -972,7 +990,7 @@ export class VirginAbility extends Ability<
         context: VirginAbilityUseContext
     ): Promise<AbilityUseResult> {
         return Promise.resolve({
-            status: AbilityUseStatus.Success,
+            status: AbilitySuccessUseWhenMalfunction,
             description: this.formatDescriptionForMalfunction(context),
         });
     }
@@ -1016,5 +1034,120 @@ export class VirginAbility extends Ability<
         context: VirginAbilityUseContext
     ): string {
         return `Virgin player ${context.requestedPlayer} may inadvertently execute their accuser`;
+    }
+}
+
+type SlayerPlayer = Player & {
+    character: Slayer;
+};
+
+export interface SlayerAbilityUseResult extends AbilityUseResult {
+    chosenPlayer: Player;
+    death?: Death;
+}
+
+export class SlayerAbility extends Ability<
+    AbilityUseContext,
+    SlayerAbilityUseResult
+> {
+    /**
+     * {@link `Slayer["ability"]`}
+     */
+    static readonly description =
+        'Once per game, during the day, publicly choose a player: if they are the Demon, they die.';
+
+    protected hasUsedAbility = false;
+
+    async useWhenMalfunction(
+        context: AbilityUseContext
+    ): Promise<SlayerAbilityUseResult> {
+        const chosenPlayer = await this.chooseSuspectedDemon(
+            context.requestedPlayer,
+            context.players,
+            context
+        );
+
+        return Promise.resolve({
+            status: AbilitySuccessUseWhenMalfunction,
+            chosenPlayer,
+            description: this.formatDescriptionForMalfunction(context),
+        });
+    }
+
+    async useWhenNormal(
+        context: AbilityUseContext
+    ): Promise<SlayerAbilityUseResult> {
+        const chosenPlayer = await this.chooseSuspectedDemon(
+            context.requestedPlayer,
+            context.players,
+            context
+        );
+        const death = await this.attemptToKillDemon(
+            chosenPlayer,
+            context.requestedPlayer
+        );
+
+        return Promise.resolve({
+            status:
+                death === undefined
+                    ? AbilityUseStatus.Success
+                    : AbilityUseStatus.Success | AbilityUseStatus.CausedEffect,
+            chosenPlayer,
+            death,
+            description: this.formatDescriptionForNormal(context),
+        });
+    }
+
+    async isEligible(context: AbilityUseContext): Promise<boolean> {
+        return (await super.isEligible(context)) && !this.hasUsedAbility;
+    }
+
+    createContext(..._args: any[]): Promise<AbilityUseContext> {
+        // TODO choose player will be moved here
+        throw new Error('Method not implemented.');
+    }
+
+    protected async attemptToKillDemon(
+        player: Player,
+        slayerPlayer: Player
+    ): Promise<Death | undefined> {
+        this.hasUsedAbility = true;
+        if (player.from(slayerPlayer).isTheDemon) {
+            return await player.setDead(DeadReason.SlayerKill);
+        }
+    }
+
+    protected async chooseSuspectedDemon(
+        slayerPlayer: SlayerPlayer,
+        players: Iterable<Player>,
+        context: AbilityUseContext
+    ): Promise<Player> {
+        let chosen = (await GAME_UI.choose(
+            slayerPlayer,
+            players,
+            1,
+            SlayerAbility.description
+        )) as Player;
+
+        if (chosen === undefined) {
+            const error = new SlayerNotChoosePlayerToKill(
+                slayerPlayer,
+                context
+            );
+            await error.resolve();
+            chosen = error.correctedPlayerToKill;
+        }
+
+        return chosen;
+    }
+
+    protected formatDescriptionForMalfunction(
+        context: AbilityUseContext
+    ): string {
+        return `Slayer player ${context.requestedPlayer} can not kill the demon when ability malfunctions`;
+    }
+
+    protected formatDescriptionForNormal(context: AbilityUseContext): string {
+        return `Slayer player ${context.requestedPlayer} may inadvertently execute their accuser`;
     }
 }
