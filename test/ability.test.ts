@@ -3,15 +3,17 @@ import { createInfoProvideContext } from './infoprovider.test';
 import { playerFromDescription } from './utils';
 import {
     chooseMock,
+    expectSendMockToHaveBeenCalled,
     handleMock,
-    sendMock,
     storytellerChooseOneMock,
 } from '~/__mocks__/gameui';
 import {
+    AbilitySuccessCommunicatedInfo,
     AbilityUseStatus,
     GetFortuneTellerInformationAbility,
     GetInfoAbilityUseContext,
     GetInformationAbilityUseResult,
+    GetRavenkeeperInformationAbility,
     GetUndertakerInformationAbility,
     GetWasherwomanInformationAbility,
     MayorAbility,
@@ -31,6 +33,7 @@ import {
     mockVirginAbilityUseContext,
 } from '~/__mocks__/ability';
 import {
+    mockClocktowerForDeathAtNight,
     mockClocktowerForUndertaker,
     mockClocktowerWithIsFirstNight,
     mockClocktowerWithIsNonfirstNight,
@@ -38,8 +41,10 @@ import {
 } from '~/__mocks__/information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
 import type {
     FortuneTellerInformation,
+    RavenkeeperInformation,
     WasherwomanInformation,
 } from '~/game/information';
 import { Generator } from '~/game/collections';
@@ -47,6 +52,7 @@ import { Chef } from '~/content/characters/output/chef';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Townsfolk } from '~/game/charactertype';
 import type { Death } from '~/game/death';
+import type { NightSheet } from '~/game/nightsheet';
 import type { Player } from '~/game/player';
 import { DeadReason } from '~/game/deadreason';
 import { DeadPlayerCannotNominate } from '~/game/exception';
@@ -80,6 +86,32 @@ async function expectAfterDemonAttack(
     return death;
 }
 
+async function expectDieInsteadAfterDemonAttack(
+    mayorPlayer: Player,
+    demonPlayer: Player,
+    playerDieInstead: Player
+): Promise<Death> {
+    expect(mayorPlayer.alive).toBeTrue();
+    storytellerChooseOneMock.mockResolvedValue(playerDieInstead);
+    const death = await mayorPlayer
+        .from(demonPlayer)
+        .setDead(DeadReason.DemonAttack);
+    expect(mayorPlayer.alive).toBeTrue();
+    expect(storytellerChooseOneMock).toHaveBeenCalledOnce();
+    storytellerChooseOneMock.mockReset();
+    expect(death).toBeDefined();
+    expect(death.player.equals(playerDieInstead)).toBeTrue();
+    expect(playerDieInstead.dead).toBeTrue();
+
+    return death;
+}
+
+let troubleBrewingNightSheet: NightSheet;
+
+beforeAll(async () => {
+    troubleBrewingNightSheet = await getTroubleBrewingNightSheet();
+});
+
 describe('test GetWasherwomanInformationAbility', () => {
     let ability: GetWasherwomanInformationAbility;
 
@@ -103,7 +135,7 @@ describe('test GetWasherwomanInformationAbility', () => {
         );
 
         const result = await ability.use(context);
-        expect(sendMock).toHaveBeenCalledOnce();
+        expectSendMockToHaveBeenCalled();
         expect(result.status).toEqual(
             AbilityUseStatus.Success |
                 AbilityUseStatus.HasInfo |
@@ -183,7 +215,9 @@ describe('test GetFortuneTellerInformationAbility', () => {
             [(context) => mockClocktowerWithIsFirstNight(context, true)]
         );
         context.storyteller = new StoryTeller();
-        const ability = await GetFortuneTellerInformationAbility.init(context);
+        const ability = await GetFortuneTellerInformationAbility.init(
+            mockAbilitySetupContext(undefined, undefined, context)
+        );
 
         const result = (await ability.use(
             context
@@ -293,7 +327,12 @@ describe('test MonkProtectAbility', () => {
         context.storyteller = new StoryTeller();
 
         const mayorAbility = await MayorAbility.init(
-            mockMayorAbilitySetupContext(mayorPlayer, context.players)
+            mockMayorAbilitySetupContext(
+                mayorPlayer,
+                context.players,
+                undefined,
+                troubleBrewingNightSheet
+            )
         );
         expect(await mayorAbility.isEligible(context)).toBeTrue();
 
@@ -325,7 +364,64 @@ describe('test GetRavenkeeperInformationAbility', () => {
      * {@link `ravenkeeper["gameplay"][1]`}
      */
     test("The Imp attacks the Mayor. The Mayor doesn't die, but the Ravenkeeper dies instead, due to the Mayor's ability. The Ravenkeeper is woken and chooses Douglas, who is a dead Recluse. The Ravenkeeper learns that Douglas is the Scarlet Woman, since the Recluse registered as a Minion.", async () => {
-        // TODO
+        const mayorPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Mayor`
+        );
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const ravenkeeperPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Ravenkeeper`
+        );
+        const Douglas = await playerFromDescription(
+            `${faker.name.firstName()} is the Recluse`
+        );
+        await Douglas.setDead(DeadReason.Other);
+
+        const context = mockGetInfoAbilityUseContext(
+            () =>
+                createInfoProvideContext(ravenkeeperPlayer, [
+                    impPlayer,
+                    mayorPlayer,
+                    Douglas,
+                ]),
+            [
+                (context) =>
+                    mockClocktowerForDeathAtNight(context, ravenkeeperPlayer),
+            ]
+        );
+        const setupContext = mockMayorAbilitySetupContext(
+            mayorPlayer,
+            context.players,
+            undefined,
+            troubleBrewingNightSheet
+        );
+        const mayorAbility = await MayorAbility.init(setupContext);
+        expect(await mayorAbility.isEligible(context)).toBeTrue();
+
+        context.storyteller = new StoryTeller();
+        await expectDieInsteadAfterDemonAttack(
+            mayorPlayer,
+            impPlayer,
+            ravenkeeperPlayer
+        );
+
+        const ravenKeeperAbility = await GetRavenkeeperInformationAbility.init(
+            setupContext
+        );
+        expect(await ravenKeeperAbility.isEligible(context)).toBeTrue();
+
+        chooseMock.mockResolvedValue(Douglas);
+        const result = (await ravenKeeperAbility.use(
+            context
+        )) as GetInformationAbilityUseResult<RavenkeeperInformation>;
+        chooseMock.mockReset();
+
+        expect(result.status).toEqual(AbilitySuccessCommunicatedInfo);
+        expectSendMockToHaveBeenCalled();
+        expect(result.isTrueInformation).toBeTrue();
+
+        // TODO recluse ability registration and activation
     });
 });
 

@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
-import { Effect, InteractionContext, SafeFromDemonEffect } from './effect';
+import {
+    CharacterNightEffect,
+    Effect,
+    InteractionContext,
+    SafeFromDemonEffect,
+} from './effect';
 import {
     AbilityRequiresSetup,
     FortuneTellerChooseInvalidPlayers,
@@ -27,10 +32,12 @@ import {
     WasherwomanInformationRequester,
 } from './inforequester';
 import { Alignment } from './alignment';
+import type { CharacterToken } from './character';
 import { DeadReason } from './deadreason';
 import type { Death } from './death';
 import type { Execution } from './execution';
 import type { Game } from './game';
+import type { NightSheet } from './nightsheet';
 import type { Nomination } from './nomination';
 import type { NextFunction } from './middleware';
 import type { Player } from './player';
@@ -62,7 +69,9 @@ export interface AbilityUseContext {
     players: Players;
 }
 
-export type AbilitySetupContext = AbilityUseContext;
+export interface AbilitySetupContext extends AbilityUseContext {
+    nightSheet: NightSheet;
+}
 
 export enum AbilityUseStatus {
     Failure = 0 /* 0 */,
@@ -85,6 +94,11 @@ export const AbilitySuccessUseWhenMalfunction =
 
 export const AbilitySuccessUseWhenHasEffect =
     AbilityUseStatus.Success | AbilityUseStatus.HasEffect;
+
+export const AbilitySuccessCommunicatedInfo =
+    AbilityUseStatus.Success |
+    AbilityUseStatus.HasInfo |
+    AbilityUseStatus.Communicated;
 
 export interface AbilityUseResult {
     status: number;
@@ -322,10 +336,7 @@ abstract class GetInfoAbility<
 
         return await this.createRequestResult(
             {
-                status:
-                    AbilityUseStatus.Success |
-                    AbilityUseStatus.HasInfo |
-                    AbilityUseStatus.Communicated,
+                status: AbilitySuccessCommunicatedInfo,
                 description: await this.formatDescriptionForRequestAndSendInfo(
                     context,
                     infoRequestContext,
@@ -587,9 +598,11 @@ type FortuneTellerPlayer = Player & {
     character: FortuneTeller;
 };
 
-export class RedHerringEffect extends Effect<FortuneTellerPlayer> {
+class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =
         'A good player that registers as a Demon to Fortune Teller';
+
+    static readonly origin: CharacterToken = FortuneTeller;
 
     constructor(protected readonly fortuneTellerPlayer: FortuneTellerPlayer) {
         super();
@@ -616,6 +629,8 @@ export class RedHerringEffect extends Effect<FortuneTellerPlayer> {
     }
 }
 
+export const RedHerringEffect = CharacterNightEffect(BaseRedHerringEffect);
+
 class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbility<
     FortuneTellerInformation,
     FortuneTellerInformationRequester<
@@ -640,7 +655,11 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
 
     async setup(context: AbilitySetupContext): Promise<void> {
         await super.setup(context);
-        this.setupRedHerring(context.requestedPlayer, context.players);
+        this.setupRedHerring(
+            context.requestedPlayer,
+            context.players,
+            context.nightSheet
+        );
     }
 
     protected async createRequestContext(
@@ -692,10 +711,11 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
 
     protected async setupRedHerring(
         fortuneTellerPlayer: FortuneTellerPlayer,
-        players: Iterable<Player>
+        players: Iterable<Player>,
+        nightSheet: NightSheet
     ): Promise<void> {
         const redHerringPlayer = await this.chooseRedHerring(players);
-        this.setRedHerring(fortuneTellerPlayer, redHerringPlayer);
+        this.setRedHerring(fortuneTellerPlayer, redHerringPlayer, nightSheet);
     }
 
     protected async chooseRedHerring(
@@ -709,10 +729,12 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
 
     protected setRedHerring(
         fortuneTellerPlayer: FortuneTellerPlayer,
-        redHerringPlayer: Player
+        redHerringPlayer: Player,
+        nightSheet: NightSheet
     ) {
         this.redHerringPlayer = redHerringPlayer;
         const effect = new RedHerringEffect(fortuneTellerPlayer);
+        effect.setup(nightSheet);
         redHerringPlayer.effects.add(effect);
     }
 }
@@ -776,16 +798,22 @@ type MonkPlayer = Player & {
     character: Monk;
 };
 
-export class MonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
+class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
     static readonly description =
         'The Monk protects other players from the Demon.';
+
+    static readonly origin: CharacterToken = Monk;
 }
+
+export const MonkProtectionEffect = CharacterNightEffect(
+    BaseMonkProtectionEffect
+);
 
 export interface MonkAbilityUseResult extends AbilityUseResult {
     protectedPlayer?: Player;
 }
 
-export class MonkProtectAbility extends Ability<
+class BaseMonkProtectAbility extends Ability<
     AbilityUseContext,
     MonkAbilityUseResult
 > {
@@ -797,7 +825,12 @@ export class MonkProtectAbility extends Ability<
 
     protected protected: Array<Player | undefined> = [];
 
-    protected protection: MonkProtectionEffect = new MonkProtectionEffect();
+    protected protection = new MonkProtectionEffect();
+
+    async setup(context: AbilitySetupContext): Promise<void> {
+        await super.setup(context);
+        this.protection.setup(context.nightSheet);
+    }
 
     async useWhenMalfunction(
         context: AbilityUseContext
@@ -868,7 +901,7 @@ export class MonkProtectAbility extends Ability<
             monkPlayer,
             players.isNot(monkPlayer),
             1,
-            MonkProtectAbility.description
+            BaseMonkProtectAbility.description
         )) as Player | undefined;
 
         if (chosen === undefined) {
@@ -893,6 +926,11 @@ export class MonkProtectAbility extends Ability<
         return `Monk player ${context.requestedPlayer} choose to protect ${playerToProtect}`;
     }
 }
+
+export interface MonkProtectAbility
+    extends Ability<AbilityUseContext, MonkAbilityUseResult> {}
+
+export const MonkProtectAbility = RequireSetup(BaseMonkProtectAbility);
 
 type RavenkeeperPlayer = Player & {
     character: Ravenkeeper;

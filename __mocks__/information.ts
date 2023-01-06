@@ -177,6 +177,25 @@ export function mockClocktowerWithIsNonfirstNight(
     );
 }
 
+export function mockClocktowerForDeathAtNight(
+    context: { clocktower: Clocktower },
+    playerHasDied: Player
+) {
+    const mockHasDiedAtNight = jest.fn();
+    mockHasDiedAtNight.mockImplementation((player) =>
+        player.equals(playerHasDied)
+    );
+    const today = mockWithPropertyValue<Diary, Diary['hasDiedAtNight']>(
+        'hasDiedAtNight',
+        mockHasDiedAtNight
+    );
+
+    context.clocktower = mockWithPropertyValues<
+        Clocktower,
+        [boolean, boolean, Diary]
+    >(['isNonfirstNight', 'isNight', 'today'], [true, true, today]);
+}
+
 export function mockClocktowerForUndertaker(
     context: { clocktower: Clocktower },
     isNonfirstNight: boolean,
@@ -348,10 +367,12 @@ export function mockContextForRavenkeeperInformation(
         RavenkeeperInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Ravenkeeper);
     const today = mock<Diary>();
-    (today.hasDead as jest.Mock).mockReturnValue(!requestedPlayerIsAlive);
+    (today.hasDiedAtNight as jest.Mock).mockReturnValue(
+        !requestedPlayerIsAlive
+    );
 
     context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
-        ['isNight', 'today'],
+        ['isNight', 'today', 'isNonfirstNight'],
         [isNight, today]
     );
     return context;

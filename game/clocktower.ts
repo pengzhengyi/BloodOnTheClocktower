@@ -1,8 +1,10 @@
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { binarySearch } from './common';
 import { Death } from './death';
 import {
+    EventNotExistInDate,
     PastMomentRewrite,
     RecallFutureDate,
     RecallFutureEvent,
@@ -14,8 +16,15 @@ import { GamePhase, Phase } from './gamephase';
 import type { Player } from './player';
 
 dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 type Moment = Dayjs;
+type MomentQuery =
+    | 'isSameOrBefore'
+    | 'isSameOrAfter'
+    | 'isBefore'
+    | 'isSame'
+    | 'isAfter';
 export type Event = Execution | Exile | Phase | Death;
 
 export function moment(timestamp?: number): Moment {
@@ -132,8 +141,90 @@ export class Diary {
         return this.deaths.has(player);
     }
 
+    hasDiedAtNight(player: Player): boolean {
+        const death = this.deaths.get(player);
+
+        if (death === undefined) {
+            return false;
+        }
+
+        return this.isMomentAtNight(death.when);
+    }
+
     hasRecorded(event: Event): boolean {
         return this.eventToMoment.has(event);
+    }
+
+    isEventAtDay(event: Event): boolean {
+        const moment = this.getMoment(event);
+
+        if (moment === undefined) {
+            throw new EventNotExistInDate(event, this);
+        }
+
+        return this.isMomentAtDay(moment);
+    }
+
+    isEventAtNight(event: Event): boolean {
+        const moment = this.getMoment(event);
+
+        if (moment === undefined) {
+            throw new EventNotExistInDate(event, this);
+        }
+
+        return this.isMomentAtNight(moment);
+    }
+
+    isMomentAtDay(moment: Moment): boolean {
+        return (
+            this.isMomentSameOrAfterPhase(moment, Phase.Day) &&
+            this.isMomentBeforePhase(moment, Phase.Dusk)
+        );
+    }
+
+    isMomentAtNight(moment: Moment): boolean {
+        return this.isMomentSameOrAfterPhase(moment, Phase.Night);
+    }
+
+    isMomentBeforePhase(moment: Moment, phase: Phase): boolean {
+        return this.isMomentRelativeToPhase(moment, phase, 'isBefore', true);
+    }
+
+    isMomentSameOrBeforePhase(moment: Moment, phase: Phase): boolean {
+        return this.isMomentRelativeToPhase(
+            moment,
+            phase,
+            'isSameOrBefore',
+            true
+        );
+    }
+
+    isMomentAfterPhase(moment: Moment, phase: Phase): boolean {
+        return this.isMomentRelativeToPhase(moment, phase, 'isAfter', false);
+    }
+
+    isMomentSameOrAfterPhase(moment: Moment, phase: Phase): boolean {
+        return this.isMomentRelativeToPhase(
+            moment,
+            phase,
+            'isSameOrAfter',
+            false
+        );
+    }
+
+    protected isMomentRelativeToPhase(
+        moment: Moment,
+        phase: Phase,
+        query: MomentQuery,
+        defaultWhenPhaseMomentNotPresent: boolean
+    ) {
+        const phaseMoment = this.getMoment(phase);
+
+        if (phaseMoment === undefined) {
+            return defaultWhenPhaseMomentNotPresent;
+        }
+
+        return moment[query](phaseMoment);
     }
 
     protected tryRecord(event: Event): Moment {

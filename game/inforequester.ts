@@ -493,11 +493,7 @@ class BaseRavenkeeperInformationRequester<
     }
 
     protected hasDiedAtNight(context: InfoProvideContext): boolean {
-        if (context.clocktower.isNight) {
-            return context.clocktower.today.hasDead(context.requestedPlayer);
-        }
-
-        return false;
+        return context.clocktower.today.hasDiedAtNight(context.requestedPlayer);
     }
 }
 

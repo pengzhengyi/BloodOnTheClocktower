@@ -1,6 +1,9 @@
-import { Predicate } from './types';
-import type { DeadReason } from './deadreason';
+import { CharacterEffectOriginNotSetup } from './exception';
 import { GamePhaseKind } from './gamephase';
+import { Constructor, Predicate } from './types';
+import type { CharacterToken } from './character';
+import type { NightSheet } from './nightsheet';
+import type { DeadReason } from './deadreason';
 import type { Middleware, NextFunction } from './middleware';
 import type { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
@@ -92,10 +95,12 @@ export abstract class Effect<TTarget extends object> {
         return this.active;
     }
 
-    abstract apply(
-        context: InteractionContext<TTarget>,
-        next: NextFunction<InteractionContext<TTarget>>
-    ): InteractionContext<TTarget>;
+    apply(
+        _context: InteractionContext<TTarget>,
+        _next: NextFunction<InteractionContext<TTarget>>
+    ): InteractionContext<TTarget> {
+        throw new Error('Method not implemented.');
+    }
 
     toString(): string {
         return this.constructor.name;
@@ -263,4 +268,94 @@ export abstract class SafeFromDemonEffect<
             Promise.resolve(undefined);
         return updatedContext;
     }
+}
+
+interface WithOrigin {
+    origin: CharacterToken;
+}
+
+export type TCharacterEffect<TTarget extends object> = Effect<TTarget> &
+    WithOrigin;
+
+export interface TCharacterEffectConstructor<TTarget extends object>
+    extends Constructor<Effect<TTarget>>,
+        WithOrigin {}
+
+export function CharacterEffect<
+    TTarget extends object,
+    TEffectConstructor extends TCharacterEffectConstructor<TTarget>
+>(effectConstructor: TEffectConstructor) {
+    return class CharacterEffect
+        extends effectConstructor
+        implements TCharacterEffect<TTarget>
+    {
+        declare static readonly origin: CharacterToken;
+
+        apply(
+            context: InteractionContext<TTarget>,
+            next: NextFunction<InteractionContext<TTarget>>
+        ): InteractionContext<TTarget> {
+            return super.apply(context, next);
+        }
+
+        get origin(): CharacterToken {
+            const origin = (this.constructor as any).origin;
+            if (origin === undefined) {
+                throw new CharacterEffectOriginNotSetup(this);
+            }
+
+            return origin;
+        }
+    };
+}
+
+export function CharacterNightEffect<
+    TTarget extends object,
+    TEffectConstructor extends TCharacterEffectConstructor<TTarget>
+>(effectConstructor: TEffectConstructor) {
+    return class CharacterNightEffect extends CharacterEffect(
+        effectConstructor
+    ) {
+        protected firstNightPriority?: number;
+
+        protected otherNightPriority?: number;
+
+        apply(
+            context: InteractionContext<TTarget>,
+            next: NextFunction<InteractionContext<TTarget>>
+        ): InteractionContext<TTarget> {
+            return super.apply(context, next);
+        }
+
+        setup(nightSheet: NightSheet): [number, number] {
+            return this.setupNightPriority(nightSheet);
+        }
+
+        protected setupNightPriority(nightSheet: NightSheet): [number, number] {
+            this.firstNightPriority = nightSheet.getNightPriority(
+                this.origin,
+                true
+            );
+            this.otherNightPriority = nightSheet.getNightPriority(
+                this.origin,
+                false
+            );
+
+            return [this.firstNightPriority, this.otherNightPriority];
+        }
+
+        protected getPriorityForFirstNightGamePhaseKind(): number {
+            return (
+                this.firstNightPriority ??
+                super.getPriorityForFirstNightGamePhaseKind()
+            );
+        }
+
+        protected getPriorityForNonfirstNightGamePhaseKind(): number {
+            return (
+                this.otherNightPriority ??
+                super.getPriorityForNonfirstNightGamePhaseKind()
+            );
+        }
+    };
 }

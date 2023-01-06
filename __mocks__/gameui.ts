@@ -21,3 +21,8 @@ export const GAME_UI = {
     send: sendMock,
     callForNomination: callForNominationMock,
 };
+
+export function expectSendMockToHaveBeenCalled() {
+    expect(sendMock).toHaveBeenCalled();
+    sendMock.mockClear();
+}

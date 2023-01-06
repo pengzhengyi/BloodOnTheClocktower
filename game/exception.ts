@@ -33,6 +33,7 @@ import type {
     GetInfoAbilityUseContext,
     IAbility,
 } from './ability';
+import type { TCharacterEffect } from './effect';
 import type { Alignment } from './alignment';
 import type { Effects } from './effects';
 import type { Seating } from './seating';
@@ -717,6 +718,17 @@ export class EffectsNotSetup<
     }
 }
 
+export class CharacterEffectOriginNotSetup<
+    TTarget extends object
+> extends RecoverableGameError {
+    static description =
+        'Character effect has not setup its effect origin (the character that applied this effect)';
+
+    constructor(readonly effect: TCharacterEffect<TTarget>) {
+        super(CharacterEffectOriginNotSetup.description);
+    }
+}
+
 export class RecallFutureEvent extends RecoverableGameError {
     static description =
         'Trying to recall a future event not experienced in game';
@@ -753,6 +765,14 @@ export class RecordUnknownEventInDiary extends RecoverableGameError {
         readonly moment: Dayjs
     ) {
         super(RecordUnknownEventInDiary.description);
+    }
+}
+
+export class EventNotExistInDate extends RecoverableGameError {
+    static description = 'Provided event does not exist in given date';
+
+    constructor(readonly event: ClocktowerEvent, readonly diary: Diary) {
+        super(EventNotExistInDate.description);
     }
 }
 
