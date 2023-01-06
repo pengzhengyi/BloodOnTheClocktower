@@ -1,8 +1,3 @@
-import { GAME_UI } from '~/__mocks__/gameui';
-
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
 import { Washerwoman } from '~/content/characters/output/washerwoman';

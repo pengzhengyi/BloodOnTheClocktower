@@ -1,9 +1,4 @@
-import { GAME_UI, storytellerConfirmMock } from '~/__mocks__/gameui';
-
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
-
+import { storytellerConfirmMock } from '~/__mocks__/gameui';
 import { GamePhase, Phase } from '~/game/gamephase';
 
 async function createGamePhase(phaseIndex: number): Promise<GamePhase> {

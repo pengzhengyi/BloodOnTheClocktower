@@ -26,9 +26,11 @@ import {
     UndertakerInformationRequester,
     WasherwomanInformationRequester,
 } from './inforequester';
+import { Alignment } from './alignment';
 import { DeadReason } from './deadreason';
 import type { Death } from './death';
 import type { Execution } from './execution';
+import type { Game } from './game';
 import type { Nomination } from './nomination';
 import type { NextFunction } from './middleware';
 import type { Player } from './player';
@@ -53,6 +55,7 @@ import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Slayer } from '~/content/characters/output/slayer';
 import { Soldier } from '~/content/characters/output/soldier';
+import { Mayor } from '~/content/characters/output/mayor';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
@@ -74,14 +77,14 @@ export enum AbilityUseStatus {
 
     Communicated = 0b10000 /* 16 */,
 
-    CausedEffect = 0b100000 /* 32 */,
+    HasEffect = 0b100000 /* 32 */,
 }
 
 export const AbilitySuccessUseWhenMalfunction =
     AbilityUseStatus.Success | AbilityUseStatus.Malfunction;
 
-export const AbilitySuccessUseWhenCausedEffect =
-    AbilityUseStatus.Success | AbilityUseStatus.CausedEffect;
+export const AbilitySuccessUseWhenHasEffect =
+    AbilityUseStatus.Success | AbilityUseStatus.HasEffect;
 
 export interface AbilityUseResult {
     status: number;
@@ -828,7 +831,7 @@ export class MonkProtectAbility extends Ability<
         this.updatePlayerToProtect(playerToProtect);
 
         return {
-            status: AbilitySuccessUseWhenCausedEffect,
+            status: AbilitySuccessUseWhenHasEffect,
             description: this.formatDescriptionForNormal(
                 context,
                 playerToProtect
@@ -1052,7 +1055,7 @@ export class VirginAbility extends Ability<
         this.addPenaltyToExecution(context.execution, context.requestedPlayer);
 
         return Promise.resolve({
-            status: AbilitySuccessUseWhenCausedEffect,
+            status: AbilitySuccessUseWhenHasEffect,
             description: this.formatDescriptionForNormal(context),
         });
     }
@@ -1144,7 +1147,7 @@ export class SlayerAbility extends Ability<
             status:
                 death === undefined
                     ? AbilityUseStatus.Success
-                    : AbilitySuccessUseWhenCausedEffect,
+                    : AbilitySuccessUseWhenHasEffect,
             chosenPlayer,
             death,
             description: this.formatDescriptionForNormal(context),
@@ -1215,11 +1218,7 @@ export class SoldierSafeFromDemonEffect extends SafeFromDemonEffect<SoldierPlaye
     isApplicable(context: InteractionContext<SoldierPlayer>): boolean {
         return (
             super.isApplicable(context) &&
-            this.matchTarget(
-                context,
-                (soldierPlayer) =>
-                    !soldierPlayer.drunk && !soldierPlayer.poisoned
-            )
+            this.isNonDrunkNonPoisonedTarget(context)
         );
     }
 }
@@ -1242,7 +1241,7 @@ class BaseSoldierAbility extends Ability<AbilityUseContext, AbilityUseResult> {
 
     useWhenNormal(context: AbilityUseContext): Promise<AbilityUseResult> {
         return Promise.resolve({
-            status: AbilitySuccessUseWhenCausedEffect,
+            status: AbilitySuccessUseWhenHasEffect,
             description: this.formatDescriptionForNormal(context),
         });
     }
@@ -1273,3 +1272,170 @@ export interface SoldierAbility
     extends Ability<AbilityUseContext, AbilityUseResult> {}
 
 export const SoldierAbility = RequireSetup(BaseSoldierAbility);
+
+type MayorPlayer = Player & {
+    character: Mayor;
+};
+
+export class MayorPeacefulWinEffect extends Effect<Game> {
+    static readonly description =
+        'The Mayor can win by peaceful means on the final day.';
+
+    constructor(protected readonly mayorPlayer: MayorPlayer) {
+        super();
+    }
+
+    isApplicable(context: InteractionContext<Game>): boolean {
+        return (
+            super.isApplicable(context) &&
+            this.mayorPlayer.alive &&
+            !this.mayorPlayer.drunk &&
+            !this.mayorPlayer.poisoned &&
+            this.isGetProperty(context, 'getWinningTeam')
+        );
+    }
+
+    apply(
+        context: InteractionContext<Game>,
+        next: NextFunction<InteractionContext<Game>>
+    ): InteractionContext<Game> {
+        const updatedContext = next(context);
+
+        const game = context.interaction.target;
+        const getWinningTeamMethod = updatedContext.result.bind();
+
+        updatedContext.result = (players: Iterable<Player>) => {
+            const winningTeam = getWinningTeamMethod(players);
+
+            if (winningTeam === undefined && this.isPeacefulWin(game)) {
+                return Alignment.Good;
+            }
+
+            return winningTeam;
+        };
+        return updatedContext;
+    }
+
+    protected isPeacefulWin(game: Game) {
+        return game.hasExecution && game.alivePlayers.count() === 3;
+    }
+}
+
+export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
+    static readonly description =
+        'If mayor die at night, another player might die instead.';
+
+    constructor(protected readonly players: Players) {
+        super();
+    }
+
+    isApplicable(context: InteractionContext<MayorPlayer>): boolean {
+        return (
+            super.isApplicable(context) &&
+            this.isNonDrunkNonPoisonedTarget(context) &&
+            this.matchDemonKill(context)
+        );
+    }
+
+    apply(
+        context: InteractionContext<MayorPlayer>,
+        next: NextFunction<InteractionContext<MayorPlayer>>
+    ): InteractionContext<MayorPlayer> {
+        const updatedContext = next(context);
+
+        const killer = context.initiator;
+        const mayorPlayer = context.interaction.target;
+        const setDeadMethod = updatedContext.result.bind(mayorPlayer);
+
+        updatedContext.result = async (
+            reason: DeadReason = DeadReason.Other
+        ) => {
+            const chosenPlayerToDie = await this.choosePlayerToDieInstead(
+                this.players
+            );
+
+            if (chosenPlayerToDie.equals(mayorPlayer)) {
+                // storyteller still chooses mayor to die
+                return await setDeadMethod(reason);
+            } else {
+                return await chosenPlayerToDie.from(killer).setDead(reason);
+            }
+        };
+        return updatedContext;
+    }
+
+    protected async choosePlayerToDieInstead(
+        players: Iterable<Player>
+    ): Promise<Player> {
+        return (await GAME_UI.storytellerChooseOne(
+            players,
+            MayorDieInsteadEffect.description
+        )) as Player;
+    }
+}
+
+export interface MayorAbilitySetupContext extends AbilitySetupContext {
+    game: Game;
+}
+
+class BaseMayorAbility extends Ability<
+    AbilityUseContext,
+    AbilityUseResult,
+    MayorAbilitySetupContext
+> {
+    /**
+     * {@link `Mayor["ability"]`}
+     */
+    static readonly description =
+        'If only 3 players live & no execution occurs, your team wins. If you die at night, another player might die instead.';
+
+    protected declare mayorDieInsteadEffect: MayorDieInsteadEffect;
+
+    protected declare mayorPeacefulWinEffect: MayorPeacefulWinEffect;
+
+    useWhenMalfunction(context: AbilityUseContext): Promise<AbilityUseResult> {
+        return Promise.resolve({
+            status: AbilitySuccessUseWhenMalfunction,
+            description: this.formatDescriptionForMalfunction(context),
+        });
+    }
+
+    useWhenNormal(context: AbilityUseContext): Promise<AbilityUseResult> {
+        return Promise.resolve({
+            status: AbilitySuccessUseWhenHasEffect,
+            description: this.formatDescriptionForNormal(context),
+        });
+    }
+
+    async setup(context: MayorAbilitySetupContext): Promise<void> {
+        await super.setup(context);
+
+        this.mayorDieInsteadEffect = new MayorDieInsteadEffect(context.players);
+        context.requestedPlayer.effects.add(this.mayorDieInsteadEffect);
+
+        this.mayorPeacefulWinEffect = new MayorPeacefulWinEffect(
+            context.requestedPlayer
+        );
+        context.game.effects.add(this.mayorPeacefulWinEffect);
+    }
+
+    createContext(..._args: any[]): Promise<AbilityUseContext> {
+        // TODO choose player will be moved here
+        throw new Error('Method not implemented.');
+    }
+
+    protected formatDescriptionForMalfunction(
+        context: AbilityUseContext
+    ): string {
+        return `Mayor player ${context.requestedPlayer} cannot win by peaceful means and safe from dying at night when ability malfunctions`;
+    }
+
+    protected formatDescriptionForNormal(context: AbilityUseContext): string {
+        return `Mayor player ${context.requestedPlayer} can win by peaceful means and safe from dying at night`;
+    }
+}
+
+export interface MayorAbility
+    extends Ability<AbilityUseContext, AbilityUseResult> {}
+
+export const MayorAbility = RequireSetup(BaseMayorAbility);

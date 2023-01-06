@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs';
 import { fromError, StackFrame } from 'stacktrace-js';
-import { CharacterAct } from './characteract';
 import type { Execution } from './execution';
+import type { NightActOrdering } from './nightsheet';
 import type { Nomination } from './nomination';
 import type { Exile } from './exile';
 import type { Vote } from './vote';
@@ -34,6 +34,7 @@ import type {
     IAbility,
 } from './ability';
 import type { Alignment } from './alignment';
+import type { Effects } from './effects';
 import type { Seating } from './seating';
 import type { GameInfo } from './gameinfo';
 import type { Diary, Event as ClocktowerEvent } from './clocktower';
@@ -378,6 +379,17 @@ export class CharacterLoadFailure extends RecoverableGameError {
     }
 }
 
+export class CharacterNotInNightActOrdering extends RecoverableGameError {
+    static description = "character not in night sheet's acting order";
+
+    constructor(
+        readonly character: CharacterToken,
+        readonly nightActOrdering: NightActOrdering
+    ) {
+        super(CharacterNotInNightActOrdering.description);
+    }
+}
+
 export class ReassignCharacterToPlayer extends RecoverableGameError {
     static description =
         'player already has an assigned character, confirm to reassign';
@@ -685,20 +697,23 @@ export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
     }
 }
 
-export class NoPlayerForCharacterAct extends RecoverableGameError {
-    static description = 'The character act has not been bound to a player';
-
-    constructor(readonly characterAct: CharacterAct) {
-        super(NoPlayerForCharacterAct.description);
-    }
-}
-
 export class RecallFutureDate extends RecoverableGameError {
     static description =
         'Trying to recall a future date not experienced in game';
 
     constructor(readonly requestedDate: number, readonly furthestDate: number) {
         super(RecallFutureDate.description);
+    }
+}
+
+export class EffectsNotSetup<
+    TTarget extends object
+> extends RecoverableGameError {
+    static description =
+        'Effects has not setup game phase based priority ordering';
+
+    constructor(readonly effects: Effects<TTarget>) {
+        super(EffectsNotSetup.description);
     }
 }
 

@@ -1,7 +1,4 @@
-import { GAME_UI, storytellerConfirmMock } from '~/__mocks__/gameui';
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
+import { storytellerConfirmMock } from '~/__mocks__/gameui';
 import { clockwise, randomChoice } from '~/game/common';
 import { Player } from '~/game/player';
 import { Seating } from '~/game/seating';

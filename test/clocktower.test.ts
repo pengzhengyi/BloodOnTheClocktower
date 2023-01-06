@@ -1,9 +1,4 @@
-import { GAME_UI, storytellerConfirmMock } from '~/__mocks__/gameui';
-
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
-
+import { storytellerConfirmMock } from '~/__mocks__/gameui';
 import { Clocktower } from '~/game/clocktower';
 import { GamePhase, Phase } from '~/game/gamephase';
 import { RecallFutureDate } from '~/game/exception';

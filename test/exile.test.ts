@@ -1,14 +1,11 @@
-import { GAME_UI, handleMock } from '~/__mocks__/gameui';
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
+import { collectVotesForNomination as collectVotesForExile } from './execution.test';
+import { handleMock } from '~/__mocks__/gameui';
 import { Exile } from '~/game/exile';
 import { ExileNonTraveller } from '~/game/exception';
 import { Player } from '~/game/player';
 import { Scapegoat } from '~/content/characters/output/scapegoat';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer, setPlayerDead } from '~/__mocks__/player';
-import { collectVotesForNomination as collectVotesForExile } from './execution.test';
 
 async function createExileAndCollectVotes(
     nominated: Player,

@@ -1,13 +1,8 @@
+import { playerFromDescription } from './utils';
 import {
-    GAME_UI,
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
 } from '~/__mocks__/gameui';
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
-// eslint-disable-next-line import/order
-import { playerFromDescription } from './utils';
 import {
     createBasicPlayer,
     mockPlayer,

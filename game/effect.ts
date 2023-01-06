@@ -1,5 +1,6 @@
 import { Predicate } from './types';
 import type { DeadReason } from './deadreason';
+import { GamePhaseKind } from './gamephase';
 import type { Middleware, NextFunction } from './middleware';
 import type { Player } from './player';
 import { GAME_UI } from '~/interaction/gameui';
@@ -29,6 +30,15 @@ export interface Effect<TTarget extends object>
      * @param context The context under which the interaction request might trigger the effect.
      */
     isApplicable(context: InteractionContext<TTarget>): boolean;
+
+    /**
+     * Get the priority of an effect for a given game phase.
+     *
+     * For example, priority might differ for first night, during the day, and other nights.
+     * @param gamePhaseKind A category of game phase.
+     * @returns The priority of this effect in current game phase.
+     */
+    getPriority(gamePhaseKind: GamePhaseKind): number;
 }
 
 /**
@@ -67,6 +77,17 @@ export abstract class Effect<TTarget extends object> {
         return false;
     }
 
+    getPriority(gamePhaseKind: GamePhaseKind): number {
+        switch (gamePhaseKind) {
+            case GamePhaseKind.FirstNight:
+                return this.getPriorityForFirstNightGamePhaseKind();
+            case GamePhaseKind.NonfirstNight:
+                return this.getPriorityForNonfirstNightGamePhaseKind();
+            case GamePhaseKind.Other:
+                return this.getPriorityForOtherGamePhaseKind();
+        }
+    }
+
     isApplicable(_context: InteractionContext<TTarget>): boolean {
         return this.active;
     }
@@ -78,6 +99,18 @@ export abstract class Effect<TTarget extends object> {
 
     toString(): string {
         return this.constructor.name;
+    }
+
+    protected getPriorityForFirstNightGamePhaseKind() {
+        return Number.MIN_SAFE_INTEGER;
+    }
+
+    protected getPriorityForNonfirstNightGamePhaseKind() {
+        return Number.MIN_SAFE_INTEGER;
+    }
+
+    protected getPriorityForOtherGamePhaseKind() {
+        return Number.MIN_SAFE_INTEGER;
     }
 
     protected isTrap(
@@ -113,6 +146,15 @@ export abstract class Effect<TTarget extends object> {
         predicate: Predicate<TTarget>
     ) {
         return predicate(context.interaction.target);
+    }
+
+    protected isNonDrunkNonPoisonedTarget(
+        context: InteractionContext<Player>
+    ): boolean {
+        return (
+            !context.interaction.target.drunk &&
+            !context.interaction.target.poisoned
+        );
     }
 
     protected matchNotNullInitiator<T = InteractionInitiator>(
@@ -185,6 +227,10 @@ export class Forwarding<TTarget extends object> extends Effect<TTarget> {
             (this._instance = new this<TTarget>())) as Forwarding<TTarget>;
     }
 
+    getPriority(_gamePhaseKind: GamePhaseKind): number {
+        return Number.NEGATIVE_INFINITY;
+    }
+
     apply(
         context: InteractionContext<TTarget>,
         next: NextFunction<InteractionContext<TTarget>>
@@ -201,7 +247,7 @@ export class Forwarding<TTarget extends object> extends Effect<TTarget> {
     }
 }
 
-export class SafeFromDemonEffect<
+export abstract class SafeFromDemonEffect<
     TPlayer extends object
 > extends Effect<TPlayer> {
     isApplicable(context: InteractionContext<TPlayer>): boolean {

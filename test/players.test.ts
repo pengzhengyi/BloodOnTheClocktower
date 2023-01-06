@@ -1,9 +1,4 @@
-import { GAME_UI, handleMock } from '~/__mocks__/gameui';
-
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
-
+import { handleMock } from '~/__mocks__/gameui';
 import { randomChoice } from '~/game/common';
 import { Alignment } from '~/game/alignment';
 import { Generator } from '~/game/collections';

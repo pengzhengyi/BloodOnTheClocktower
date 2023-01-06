@@ -29,6 +29,7 @@ export async function createUnassignedPlayer(name?: string) {
     if (name === undefined) {
         name = faker.name.firstName();
     }
+
     return await Player.init(name);
 }
 
@@ -58,9 +59,9 @@ export function mockDeadPlayer(): Player {
 }
 
 export async function setPlayerDead(player: Player): Promise<void> {
-    storytellerConfirmMock.mockImplementationOnce(async (reason: string) => {
+    storytellerConfirmMock.mockImplementationOnce((reason: string) => {
         expect(reason).toContain(Player.revokeVoteTokenDefaultPrompt);
-        return await true;
+        return Promise.resolve(true);
     });
     await player.setDead();
 }

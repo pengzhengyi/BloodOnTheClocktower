@@ -1,9 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { GAME_UI, storytellerConfirmMock } from '~/__mocks__/gameui';
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
 import { playerFromDescription } from './utils';
+import { storytellerConfirmMock } from '~/__mocks__/gameui';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import {
     ChefInformationProvider,

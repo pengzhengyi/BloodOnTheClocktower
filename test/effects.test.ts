@@ -1,12 +1,3 @@
-import {
-    EffectPrecedence,
-    getPriorityMock,
-} from '~/__mocks__/effectprecedence';
-
-jest.mock('~/game/effectprecedence', () => ({
-    EffectPrecedence,
-}));
-
 import type { Effect, InteractionContext } from '~/game/effect';
 import { Effects } from '~/game/effects';
 import {
@@ -15,20 +6,22 @@ import {
 } from '~/__mocks__/effect';
 import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
 
+function createBasicEffects<TTarget extends object>(
+    enableForwarding?: boolean
+) {
+    return Effects.init<TTarget>(enableForwarding);
+}
+
 function createEffects<TTarget extends object>(
     effectToPriority: Map<Effect<TTarget>, number>
 ): Effects<TTarget> {
-    const effects: Effects<TTarget> = Effects.init(false);
+    const effects: Effects<TTarget> = createBasicEffects(false);
 
-    getPriorityMock.mockImplementation(
-        (effect: Effect<TTarget>) => effectToPriority.get(effect) || 0
-    );
-
-    for (const effect of effectToPriority.keys()) {
+    for (const [effect, priority] of effectToPriority.entries()) {
+        const mockGetPriority = jest.fn().mockReturnValue(priority);
+        effect.getPriority = mockGetPriority;
         effects.add(effect);
     }
-
-    getPriorityMock.mockReset();
 
     return effects;
 }
@@ -110,7 +103,7 @@ describe('Test Effects basic functionalities', () => {
 
 describe('Test Effects edge cases', () => {
     test('apply with no effect', async () => {
-        const effects = Effects.init(false);
+        const effects = createBasicEffects(false);
         const player = mockPlayer();
         const basicContext = createBasicContext(player);
         const result = await effects.apply(basicContext);
@@ -123,7 +116,7 @@ describe('Test Effects edge cases', () => {
 
         const effects = createEffects(effectToPriority);
         const player = await createBasicPlayer();
-        const result = await effects.apply(createBasicContext(player));
+        const result = effects.apply(createBasicContext(player));
         expect(result).toBeUndefined();
     });
 });

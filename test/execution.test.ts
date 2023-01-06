@@ -1,16 +1,9 @@
 import {
-    GAME_UI,
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
 } from '~/__mocks__/gameui';
-
-jest.mock('~/interaction/gameui', () => ({
-    GAME_UI,
-}));
-
 import { Execution } from '~/game/execution';
 import { Nomination } from '~/game/nomination';
-
 import {
     createBasicPlayers,
     mockPlayer,

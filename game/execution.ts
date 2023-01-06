@@ -64,7 +64,7 @@ export class Execution extends EffectTarget<Execution> {
 
     // eslint-disable-next-line no-useless-constructor
     protected constructor(
-        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Execution>>
     ) {
         super(enabledProxyHandlerPropertyNames);
     }

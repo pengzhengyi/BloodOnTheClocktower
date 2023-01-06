@@ -72,6 +72,10 @@ export class Players extends Generator<Player> {
         return this.isCharacterType(Fabled);
     }
 
+    get alive() {
+        return this.filter((player) => player.alive);
+    }
+
     constructor(players: Array<Player>) {
         super(players, [], false);
         this.players = players;

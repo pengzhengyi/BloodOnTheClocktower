@@ -1,5 +1,5 @@
 import { Butler } from '~/content/characters/output/butler';
-import { FortuneTeller } from '~/content/characters/output/FortuneTeller';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Imp } from '~/content/characters/output/imp';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Librarian } from '~/content/characters/output/librarian';

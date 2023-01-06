@@ -4,7 +4,6 @@ import 'reflect-metadata';
 import { v4 as uuid } from 'uuid';
 import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
-import { CharacterAct } from './characteract';
 import { DeadReason } from './deadreason';
 import { Death } from './death';
 import { EffectTarget } from './effecttarget';
@@ -127,11 +126,6 @@ export class Player extends EffectTarget<Player> {
     username: string;
 
     declare character: CharacterToken;
-
-    /**
-     * TODO should this be an array?
-     */
-    characterActs?: CharacterAct;
 
     infoRequester?: unknown;
 
@@ -434,8 +428,6 @@ export class Player extends EffectTarget<Player> {
                 this.alignment = alignment;
             }
         }
-
-        this.characterActs = CharacterAct.fromPlayer(this)[0];
     }
 
     protected initializeEffects() {
