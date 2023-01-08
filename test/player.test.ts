@@ -16,7 +16,7 @@ describe('test Player serialization', () => {
         expect(playerObj.username).toEqualCaseInsensitive(player.username);
         expect(playerObj.id).toEqualCaseInsensitive(player.id);
         expect(playerObj.character).toEqualCaseInsensitive(Washerwoman.id);
-        expect(playerObj.alignment).toEqual(player.alignment);
+        expect(await playerObj.alignment).toEqual(await player.alignment);
     });
 });
 

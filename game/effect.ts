@@ -1,3 +1,4 @@
+import { Alignment } from './alignment';
 import { CharacterEffectOriginNotSetup } from './exception';
 import { BasicGamePhaseKind, GamePhaseKind } from './gamephase';
 import { Constructor, Predicate } from './types';
@@ -166,6 +167,14 @@ export abstract class Effect<TTarget extends object> {
         }
 
         return predicate(context.initiator);
+    }
+
+    protected matchNotNullInitiatorDifferentThanTarget(
+        context: InteractionContext<TTarget>
+    ) {
+        return this.matchNotNullInitiator<Player>(context, (initiator) =>
+            initiator.equals(context.interaction.target as Player)
+        );
     }
 
     protected matchArgs(
@@ -353,4 +362,57 @@ export function CharacterNightEffect<
             );
         }
     };
+}
+
+export abstract class RegisterAsAlignmentEffect<
+    TPlayer extends Player
+> extends Effect<TPlayer> {
+    static readonly options = [Alignment.Good, Alignment.Evil];
+
+    abstract readonly alignment: Alignment;
+
+    isApplicable(context: InteractionContext<TPlayer>): boolean {
+        return (
+            super.isApplicable(context) &&
+            this.matchNotNullInitiatorDifferentThanTarget(context) &&
+            this.isGetProperty(context, 'alignment')
+        );
+    }
+
+    apply(
+        context: InteractionContext<TPlayer>,
+        next: NextFunction<InteractionContext<TPlayer>>
+    ): InteractionContext<TPlayer> {
+        const updatedContext = next(context);
+        const registerAsAlignment = this.chooseAlignment(context);
+        updatedContext.result = registerAsAlignment;
+        return updatedContext;
+    }
+
+    protected async chooseAlignment(
+        context: InteractionContext<TPlayer>
+    ): Promise<Alignment> {
+        return await GAME_UI.storytellerChooseOne(
+            RegisterAsAlignmentEffect.options,
+            this.formatPromptForChooseAlignment(context)
+        );
+    }
+
+    protected formatPromptForChooseAlignment(
+        context: InteractionContext<TPlayer>
+    ): string {
+        return `Choose an alignment for player ${context.interaction.target}. Player currently registers as ${this.alignment}.`;
+    }
+}
+
+export abstract class RegisterAsGoodAlignmentEffect<
+    TPlayer extends Player
+> extends RegisterAsAlignmentEffect<TPlayer> {
+    readonly alignment = Alignment.Good;
+}
+
+export abstract class RegisterAsEvilAlignmentEffect<
+    TPlayer extends Player
+> extends RegisterAsAlignmentEffect<TPlayer> {
+    readonly alignment = Alignment.Evil;
 }

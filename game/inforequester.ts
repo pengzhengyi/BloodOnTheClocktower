@@ -252,7 +252,7 @@ function IsEvil<
         async isEligible(context: InfoProvideContext): Promise<boolean> {
             return (
                 (await super.isEligible(context)) &&
-                context.requestedPlayer.isEvil
+                (await context.requestedPlayer.isEvil)
             );
         }
     };

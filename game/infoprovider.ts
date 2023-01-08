@@ -697,7 +697,7 @@ export class ChefInformationProvider<
                 ? _players.map((player) => player.from(context.requestedPlayer))
                 : _players;
 
-            if (Players.allEvil(players)) {
+            if (await Players.allEvil(players)) {
                 numPairEvilPlayers++;
             }
         }
@@ -805,14 +805,32 @@ export class EmpathInformationProvider<
             }
         );
 
-        return aliveNeighbors.reduce((accumulator, _player) => {
-            const player = shouldFromRequestedPlayerPerspective
-                ? _player.from(context.requestedPlayer)
-                : _player;
-            const newValue = accumulator + (player.isEvil ? 1 : 0);
+        const areNeighborsEvil = await Promise.all(
+            aliveNeighbors.map((aliveNeighbor) =>
+                this.isEvilAliveNeighbor(
+                    aliveNeighbor,
+                    context.requestedPlayer,
+                    shouldFromRequestedPlayerPerspective
+                )
+            )
+        );
 
-            return newValue;
-        }, 0);
+        return areNeighborsEvil.reduce(
+            (accumulator, isEvil) => accumulator + (isEvil ? 1 : 0),
+            0
+        );
+    }
+
+    protected async isEvilAliveNeighbor(
+        aliveNeighbor: Player,
+        empathPlayer: Player,
+        shouldFromRequestedPlayerPerspective: boolean
+    ): Promise<boolean> {
+        const player = shouldFromRequestedPlayerPerspective
+            ? aliveNeighbor.from(empathPlayer)
+            : aliveNeighbor;
+
+        return await player.isEvil;
     }
 }
 

@@ -20,22 +20,20 @@ export class Players extends Generator<Player> {
         return new this(players);
     }
 
-    static alGood(iterable: Iterable<Player>): boolean {
-        return Generator.every((player) => player.isGood, iterable);
+    static async allGood(players: Iterable<Player>): Promise<boolean> {
+        const areAlignmentsGood = await Promise.all(
+            Generator.map((player) => player.isGood, players)
+        );
+
+        return areAlignmentsGood.every((isGood) => isGood);
     }
 
-    static allEvil(iterable: Iterable<Player>): boolean {
-        return Generator.every((player) => player.isEvil, iterable);
-    }
+    static async allEvil(players: Iterable<Player>): Promise<boolean> {
+        const areAlignmentsEvil = await Promise.all(
+            Generator.map((player) => player.isEvil, players)
+        );
 
-    /**
-     * {@link `glossary["Team"]`}
-     * All players sharing an alignment. “Your team” means “You and all other players that have the same alignment as you.”
-     *
-     * @param players Players to find teammates in.
-     */
-    static getTeam(players: Iterable<Player>): Map<Alignment, Array<Player>> {
-        return Generator.groupBy(players, (player) => player.alignment);
+        return areAlignmentsEvil.every((isEvil) => isEvil);
     }
 
     protected readonly players: Array<Player>;

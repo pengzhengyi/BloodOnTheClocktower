@@ -94,21 +94,6 @@ export class Player extends EffectTarget<Player> {
         return player.getProxy();
     }
 
-    static isAlly(player: Player, otherPlayer: Player) {
-        return player.alignment === otherPlayer.alignment;
-    }
-
-    static *getAllies(
-        player: Player,
-        otherPlayers: Iterable<Player>
-    ): IterableIterator<Player> {
-        for (const other of otherPlayers) {
-            if (!Object.is(player, other) && this.isAlly(player, other)) {
-                yield other;
-            }
-        }
-    }
-
     static isCharacterType(
         player: Player,
         characterType: typeof CharacterType
@@ -116,8 +101,12 @@ export class Player extends EffectTarget<Player> {
         return player.characterType.is(characterType);
     }
 
-    @Expose({ toPlainOnly: true })
-    declare alignment: Alignment;
+    get alignment(): Promise<Alignment> {
+        return Promise.resolve(this._alignment);
+    }
+
+    @Expose({ name: 'alignment', toPlainOnly: true })
+    protected declare _alignment: Alignment;
 
     @Expose({ toPlainOnly: true })
     readonly id: string;
@@ -259,12 +248,12 @@ export class Player extends EffectTarget<Player> {
         return this.character.characterType;
     }
 
-    get isGood(): boolean {
-        return this.alignment === Alignment.Good;
+    get isGood(): Promise<boolean> {
+        return this.alignment.then((alignment) => alignment === Alignment.Good);
     }
 
-    get isEvil(): boolean {
-        return this.alignment === Alignment.Evil;
+    get isEvil(): Promise<boolean> {
+        return this.alignment.then((alignment) => alignment === Alignment.Evil);
     }
 
     /**
@@ -290,7 +279,7 @@ export class Player extends EffectTarget<Player> {
         this.username = username;
 
         if (alignment !== undefined) {
-            this.alignment = alignment;
+            this._alignment = alignment;
         }
 
         if (character !== undefined) {
@@ -320,7 +309,7 @@ export class Player extends EffectTarget<Player> {
         }
 
         if (alignment !== undefined) {
-            this.alignment = alignment;
+            this._alignment = alignment;
         }
 
         this.initializeCharacter(character);
@@ -424,12 +413,12 @@ export class Player extends EffectTarget<Player> {
     protected initializeCharacter(character: CharacterToken) {
         this.character = character;
 
-        if (this.alignment === undefined) {
+        if (this._alignment === undefined) {
             const alignment = this.characterType.defaultAlignment;
             if (alignment === undefined) {
                 throw new PlayerHasUnclearAlignment(this, alignment);
             } else {
-                this.alignment = alignment;
+                this._alignment = alignment;
             }
         }
     }

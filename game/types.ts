@@ -8,6 +8,7 @@ import type { Soldier } from '~/content/characters/output/soldier';
 import type { Virgin } from '~/content/characters/output/virgin';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Undertaker } from '~/content/characters/output/undertaker';
+import type { Recluse } from '~/content/characters/output/recluse';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -153,4 +154,8 @@ export type ButlerPlayer = Player & {
 
 export type UndertakerPlayer = Player & {
     character: Undertaker;
+};
+
+export type ReclusePlayer = Player & {
+    character: Recluse;
 };

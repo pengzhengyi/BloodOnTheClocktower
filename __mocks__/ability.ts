@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended';
+import { mockCharacterSheet } from './charactersheet';
 import { mockGame } from './game';
 import { mockInfoProvideContext as _mockInfoProvideContext } from './information';
 import { mockNightSheet } from './nightsheet';
@@ -16,6 +17,7 @@ import type { InfoProvideContext } from '~/game/infoprovider';
 import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
 import type { NightSheet } from '~/game/nightsheet';
+import type { CharacterSheet } from '~/game/charactersheet';
 
 export function mockAbilityUseContext(
     player?: Player,
@@ -69,10 +71,12 @@ export function mockMayorAbilitySetupContext(
     player?: Player,
     players?: Players,
     game?: Game,
-    nightSheet?: NightSheet
+    nightSheet?: NightSheet,
+    characterSheet?: CharacterSheet
 ): MayorAbilitySetupContext {
     return Object.assign({}, mockAbilityUseContext(player, players), {
         game: game ?? mockGame(),
         nightSheet: nightSheet ?? mockNightSheet(),
+        characterSheet: characterSheet ?? mockCharacterSheet(),
     });
 }

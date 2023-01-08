@@ -3,6 +3,7 @@ import {
     CharacterNightEffect,
     Effect,
     InteractionContext,
+    RegisterAsGoodAlignmentEffect,
     SafeFromDemonEffect,
 } from './effect';
 import {
@@ -35,6 +36,7 @@ import {
 import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
 import { DeadReason } from './deadreason';
+import type { CharacterSheet } from './charactersheet';
 import type { Death } from './death';
 import type { Execution } from './execution';
 import type { Game } from './game';
@@ -51,6 +53,7 @@ import type {
     MayorPlayer,
     MonkPlayer,
     RavenkeeperPlayer,
+    ReclusePlayer,
     SlayerPlayer,
     SoldierPlayer,
     StaticThis,
@@ -79,6 +82,7 @@ export interface AbilityUseContext {
 
 export interface AbilitySetupContext extends AbilityUseContext {
     nightSheet: NightSheet;
+    characterSheet: CharacterSheet;
 }
 
 export enum AbilityUseStatus {
@@ -1060,7 +1064,7 @@ export class VirginAbility extends Ability<
     AbilityUseResult
 > {
     /**
-     * {@link `Virgin["ability"]`}
+     * {@link `virgin["ability"]`}
      */
     static readonly description =
         'The 1st time you are nominated, if the nominator is a Townsfolk, they are executed immediately.';
@@ -1606,3 +1610,58 @@ export class ButlerAbility extends Ability<
         return `Butler player ${context.requestedPlayer} chooses player ${master} as master.`;
     }
 }
+
+class RecluseRegisterAsEvilAlignmentEffect extends RegisterAsGoodAlignmentEffect<ReclusePlayer> {
+    protected formatPromptForChooseAlignment(
+        context: InteractionContext<ReclusePlayer>
+    ): string {
+        return `Choose an alignment for recluse player ${context.interaction.target}.  Recluse might register as evil.`;
+    }
+}
+
+class BaseRecluseAbility extends Ability<AbilityUseContext, AbilityUseResult> {
+    /**
+     * {@link `recluse["ability"]`}
+     */
+    static readonly description =
+        'You might register as evil & as a Minion or Demon, even if dead.';
+
+    protected declare registerAsAlignment: RecluseRegisterAsEvilAlignmentEffect;
+
+    useWhenNormal(context: AbilityUseContext): Promise<AbilityUseResult> {
+        return Promise.resolve({
+            status: AbilityUseStatus.Success,
+            description: this.formatDescription(context),
+        });
+    }
+
+    useWhenMalfunction = this.useWhenNormal;
+
+    isEligible(_context: AbilityUseContext): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    async setup(context: AbilitySetupContext): Promise<void> {
+        await super.setup(context);
+
+        this.registerAsAlignment = new RecluseRegisterAsEvilAlignmentEffect();
+    }
+
+    willMalfunction(_context: AbilityUseContext): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    createContext(..._args: any[]): Promise<AbilityUseContext> {
+        // TODO choose player will be moved here
+        throw new Error('Method not implemented.');
+    }
+
+    protected formatDescription(context: AbilityUseContext): string {
+        return `The Recluse player ${context.requestedPlayer} might appear to be an evil character, but is actually good.`;
+    }
+}
+
+export interface RecluseAbility
+    extends Ability<AbilityUseContext, AbilityUseResult> {}
+
+export const RecluseAbility = RequireSetup(BaseRecluseAbility);
