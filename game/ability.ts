@@ -1355,7 +1355,7 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
     }
 
     protected isPeacefulWin(game: Game) {
-        return game.hasExecution && game.alivePlayers.count() === 3;
+        return !game.hasExecution && game.alivePlayers.count() === 3;
     }
 }
 

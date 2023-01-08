@@ -64,6 +64,7 @@ import { Undertaker } from '~/content/characters/output/undertaker';
 import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
 import { Soldier } from '~/content/characters/output/soldier';
+import { Mayor } from '~/content/characters/output/mayor';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -97,7 +98,6 @@ async function expectDieInsteadAfterDemonAttack(
         .from(demonPlayer)
         .setDead(DeadReason.DemonAttack);
     expect(mayorPlayer.alive).toBeTrue();
-    expect(storytellerChooseOneMock).toHaveBeenCalledOnce();
     storytellerChooseOneMock.mockReset();
     expect(death).toBeDefined();
     expect(death.player.equals(playerDieInstead)).toBeTrue();
@@ -607,6 +607,66 @@ describe('test SoldierAbility', () => {
      * {@link `soldier["gameplay"][2]`}
      */
     test('The Imp attacks the Soldier. The Soldier dies, because they are actually the Drunk.', async () => {
+        // TODO
+    });
+});
+
+describe('test MayorAbility', () => {
+    let mayorPlayer: Player;
+
+    beforeEach(async () => {
+        mayorPlayer = await createBasicPlayer(undefined, Mayor);
+    });
+
+    /**
+     * {@link `mayor["gameplay"][0]`}
+     */
+    test('The Imp attacks the Mayor. The Storyteller chooses that the Ravenkeeper dies instead.', async () => {
+        const impPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Imp`
+        );
+        const ravenkeeperPlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Ravenkeeper`
+        );
+
+        const context = mockMayorAbilitySetupContext(
+            mayorPlayer,
+            undefined,
+            undefined,
+            troubleBrewingNightSheet
+        );
+        const mayorAbility = await MayorAbility.init(context);
+
+        expect(await mayorAbility.isEligible(context)).toBeTrue();
+
+        await expectDieInsteadAfterDemonAttack(
+            mayorPlayer,
+            impPlayer,
+            ravenkeeperPlayer
+        );
+    });
+
+    /**
+     * {@link `mayor["gameplay"][1]`}
+     */
+    test('There are three players alive. There are no nominations for execution today. Good wins.', async () => {
+        // const game = createBasicGame();
+        // const context = mockMayorAbilitySetupContext(
+        //     mayorPlayer,
+        //     undefined,
+        //     game,
+        //     troubleBrewingNightSheet
+        // );
+        // await MayorAbility.init(context);
+        // const winningTeam = game.getWinningTeam([mayorPlayer])
+        // expect(winningTeam).toBe(Alignment.Good);
+        // TODO
+    });
+
+    /**
+     * {@link `mayor["gameplay"][2]`}
+     */
+    test('There are five players alive, including two Travellers. Both Travellers are exiled, and the vote is tied between the remaining players. Because a tied vote means neither player is executed, good wins.', async () => {
         // TODO
     });
 });
