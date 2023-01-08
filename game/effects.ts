@@ -140,6 +140,7 @@ export class Effects<TTarget extends object> extends Pipeline<
             )
         );
 
+        // TODO instead of adding to every phase, should restrict to current game phase
         this.hierarchy.forEvery((gamePhaseKind, priorityToEffects) => {
             const priority = this.getPriority(effect, gamePhaseKind);
             let samePriorityEffects =

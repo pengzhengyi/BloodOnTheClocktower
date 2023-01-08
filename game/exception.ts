@@ -7,7 +7,18 @@ import type { Exile } from './exile';
 import type { Vote } from './vote';
 import type { InfoRequestContext } from './inforequester';
 import type { InfoProviders } from './infoprovider';
-import type { AsyncFactory, Predicate, RoleData, StaticThis } from './types';
+import type {
+    AsyncFactory,
+    ButlerPlayer,
+    FortuneTellerPlayer,
+    MonkPlayer,
+    Predicate,
+    RoleData,
+    RavenkeeperPlayer,
+    SlayerPlayer,
+    StaticThis,
+    UndertakerPlayer,
+} from './types';
 import type { Player } from './player';
 import type { Players } from './players';
 import type { Seat } from './seat';
@@ -636,7 +647,7 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
     declare corrected: [Player, Player];
 
     constructor(
-        readonly fortuneTellerPlayer: Player,
+        readonly fortuneTellerPlayer: FortuneTellerPlayer,
         readonly chosen: Array<Player> | undefined,
         readonly context: GetInfoAbilityUseContext
     ) {
@@ -650,7 +661,7 @@ export class MonkNotChoosePlayerToProtect extends RecoverableGameError {
     declare correctedPlayerToProtect: Player;
 
     constructor(
-        readonly monkPlayer: Player,
+        readonly monkPlayer: MonkPlayer,
         readonly context: AbilityUseContext
     ) {
         super(MonkNotChoosePlayerToProtect.description);
@@ -663,10 +674,23 @@ export class SlayerNotChoosePlayerToKill extends RecoverableGameError {
     declare correctedPlayerToKill: Player;
 
     constructor(
-        readonly slayerPlayer: Player,
+        readonly slayerPlayer: SlayerPlayer,
         readonly context: AbilityUseContext
     ) {
         super(SlayerNotChoosePlayerToKill.description);
+    }
+}
+
+export class ButlerNotChooseMasterToFollow extends RecoverableGameError {
+    static description = 'The butler has not chosen master to follow on vote';
+
+    declare correctedMaster: Player;
+
+    constructor(
+        readonly butlerPlayer: ButlerPlayer,
+        readonly context: AbilityUseContext
+    ) {
+        super(ButlerNotChooseMasterToFollow.description);
     }
 }
 
@@ -677,7 +701,7 @@ export class RavenkeeperNotChoosePlayerToProtect extends RecoverableGameError {
     declare correctedPlayer: Player;
 
     constructor(
-        readonly RavenkeeperPlayer: Player,
+        readonly RavenkeeperPlayer: RavenkeeperPlayer,
         readonly context: AbilityUseContext
     ) {
         super(RavenkeeperNotChoosePlayerToProtect.description);
@@ -691,7 +715,7 @@ export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
     declare corrected: [Player, Player];
 
     constructor(
-        readonly undertakerPlayer: Player,
+        readonly undertakerPlayer: UndertakerPlayer,
         readonly context: GetInfoAbilityUseContext
     ) {
         super(UndertakerRequestInfoWhenNoExecution.description);

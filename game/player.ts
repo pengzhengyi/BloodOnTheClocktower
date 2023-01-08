@@ -207,8 +207,12 @@ export class Player extends EffectTarget<Player> {
         return this.alive;
     }
 
-    get canVote(): boolean {
-        return this.alive || this.hasVoteToken;
+    get canVote(): Promise<boolean> {
+        return Promise.resolve(this.alive || this.hasVoteToken);
+    }
+
+    get hasAbility(): boolean {
+        return !this.dead && !this.drunk && !this.poisoned;
     }
 
     get isMinion() {
@@ -361,7 +365,7 @@ export class Player extends EffectTarget<Player> {
 
     async collectVote(forExile: boolean): Promise<boolean> {
         const shouldCheckHandRaised =
-            (forExile && this.canSupportExile) || this.canVote;
+            (forExile && this.canSupportExile) || (await this.canVote);
         if (
             shouldCheckHandRaised &&
             (await GAME_UI.hasRaisedHandForVote(this))

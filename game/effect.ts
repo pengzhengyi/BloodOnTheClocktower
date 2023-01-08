@@ -153,13 +153,8 @@ export abstract class Effect<TTarget extends object> {
         return predicate(context.interaction.target);
     }
 
-    protected isNonDrunkNonPoisonedTarget(
-        context: InteractionContext<Player>
-    ): boolean {
-        return (
-            !context.interaction.target.drunk &&
-            !context.interaction.target.poisoned
-        );
+    protected isTargetHasAbility(context: InteractionContext<Player>) {
+        return context.interaction.target.hasAbility;
     }
 
     protected matchNotNullInitiator<T = InteractionInitiator>(

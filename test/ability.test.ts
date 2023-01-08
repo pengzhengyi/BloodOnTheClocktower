@@ -5,11 +5,14 @@ import {
     chooseMock,
     expectSendMockToHaveBeenCalled,
     handleMock,
+    hasRaisedHandForVoteMock,
     storytellerChooseOneMock,
 } from '~/__mocks__/gameui';
 import {
     AbilitySuccessCommunicatedInfo,
+    AbilityUseContext,
     AbilityUseStatus,
+    ButlerAbility,
     GetFortuneTellerInformationAbility,
     GetInfoAbilityUseContext,
     GetInformationAbilityUseResult,
@@ -65,6 +68,8 @@ import { Monk } from '~/content/characters/output/monk';
 import { Slayer } from '~/content/characters/output/slayer';
 import { Soldier } from '~/content/characters/output/soldier';
 import { Mayor } from '~/content/characters/output/mayor';
+import { Butler } from '~/content/characters/output/butler';
+import { Virgin } from '~/content/characters/output/virgin';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -104,6 +109,17 @@ async function expectDieInsteadAfterDemonAttack(
     expect(playerDieInstead.dead).toBeTrue();
 
     return death;
+}
+
+async function mockButlerChooseMaster(
+    ability: ButlerAbility,
+    master: Player,
+    context?: AbilityUseContext,
+    butlerPlayer?: Player
+) {
+    chooseMock.mockResolvedValue(master);
+    await ability.use(context ?? mockAbilityUseContext(butlerPlayer));
+    chooseMock.mockReset();
 }
 
 let troubleBrewingNightSheet: NightSheet;
@@ -668,5 +684,60 @@ describe('test MayorAbility', () => {
      */
     test('There are five players alive, including two Travellers. Both Travellers are exiled, and the vote is tied between the remaining players. Because a tied vote means neither player is executed, good wins.', async () => {
         // TODO
+    });
+});
+
+describe('test ButlerAbility', () => {
+    let butlerPlayer: Player;
+    let butlerAbility: ButlerAbility;
+
+    beforeEach(async () => {
+        butlerPlayer = await createBasicPlayer(undefined, Butler);
+        butlerAbility = new ButlerAbility();
+    });
+
+    /**
+     * {@link `butler["gameplay"][0]`}
+     */
+    test('The Butler chooses Filip to be their Master. Tomorrow, if Filip raises his hand to vote on an execution, then the Butler may too. If not, then the Butler may not raise their hand.', async () => {
+        const Filip = await createBasicPlayer('Filip', Virgin);
+
+        const context = mockAbilityUseContext(butlerPlayer);
+
+        expect(await butlerAbility.isEligible(context)).toBeTrue();
+
+        await mockButlerChooseMaster(butlerAbility, Filip, context);
+
+        hasRaisedHandForVoteMock.mockResolvedValue(true);
+        expect(await butlerPlayer.canVote).toBeTrue();
+        hasRaisedHandForVoteMock.mockReset();
+
+        hasRaisedHandForVoteMock.mockResolvedValue(false);
+        expect(await butlerPlayer.canVote).toBeFalse();
+        hasRaisedHandForVoteMock.mockReset();
+    });
+
+    /**
+     * {@link `butler["gameplay"][1]`}
+     */
+    test('A nomination is in progress. The Butler and their Master both have their hands raised to vote. As the Storyteller is counting votes, the Master lowers their hand at the last second. The Butler must lower their hand immediately.', async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `butler["gameplay"][2]`}
+     */
+    test('The Butler is dead. Because dead players have no ability, the Butler may vote with their vote token at any time.', async () => {
+        const Filip = await createBasicPlayer('Filip', Virgin);
+
+        await mockButlerChooseMaster(
+            butlerAbility,
+            Filip,
+            undefined,
+            butlerPlayer
+        );
+
+        await butlerPlayer.setDead(DeadReason.Other);
+        expect(await butlerPlayer.canVote).toBeTrue();
     });
 });

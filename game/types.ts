@@ -6,6 +6,8 @@ import type { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import type { Slayer } from '~/content/characters/output/slayer';
 import type { Soldier } from '~/content/characters/output/soldier';
 import type { Virgin } from '~/content/characters/output/virgin';
+import type { Butler } from '~/content/characters/output/butler';
+import type { Undertaker } from '~/content/characters/output/undertaker';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -143,4 +145,12 @@ export type SoldierPlayer = Player & {
 
 export type MayorPlayer = Player & {
     character: Mayor;
+};
+
+export type ButlerPlayer = Player & {
+    character: Butler;
+};
+
+export type UndertakerPlayer = Player & {
+    character: Undertaker;
 };
