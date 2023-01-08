@@ -1,4 +1,11 @@
 import type { Player } from './player';
+import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import type { Mayor } from '~/content/characters/output/mayor';
+import type { Monk } from '~/content/characters/output/monk';
+import type { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
+import type { Slayer } from '~/content/characters/output/slayer';
+import type { Soldier } from '~/content/characters/output/soldier';
+import type { Virgin } from '~/content/characters/output/virgin';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -109,3 +116,31 @@ export type Script = Array<ScriptCharacter>;
 export type Neighbor = [Player, Player];
 
 export type AnyObject = Record<string, any>;
+
+export type FortuneTellerPlayer = Player & {
+    character: FortuneTeller;
+};
+
+export type MonkPlayer = Player & {
+    character: Monk;
+};
+
+export type RavenkeeperPlayer = Player & {
+    character: Ravenkeeper;
+};
+
+export type VirginPlayer = Player & {
+    character: Virgin;
+};
+
+export type SlayerPlayer = Player & {
+    character: Slayer;
+};
+
+export type SoldierPlayer = Player & {
+    character: Soldier;
+};
+
+export type MayorPlayer = Player & {
+    character: Mayor;
+};

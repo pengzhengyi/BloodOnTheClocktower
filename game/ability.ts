@@ -42,7 +42,17 @@ import type { Nomination } from './nomination';
 import type { NextFunction } from './middleware';
 import type { Player } from './player';
 import type { Players } from './players';
-import type { Constructor, StaticThis } from './types';
+import type {
+    Constructor,
+    FortuneTellerPlayer,
+    MayorPlayer,
+    MonkPlayer,
+    RavenkeeperPlayer,
+    SlayerPlayer,
+    SoldierPlayer,
+    StaticThis,
+    VirginPlayer,
+} from './types';
 import type { InfoProvideContext } from './infoprovider';
 import type {
     ChefInformation,
@@ -58,11 +68,6 @@ import type {
 import { GAME_UI } from '~/interaction/gameui';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Monk } from '~/content/characters/output/monk';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Virgin } from '~/content/characters/output/virgin';
-import { Slayer } from '~/content/characters/output/slayer';
-import { Soldier } from '~/content/characters/output/soldier';
-import { Mayor } from '~/content/characters/output/mayor';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
@@ -594,10 +599,6 @@ export class GetEmpathInformationAbility extends GetCharacterInformationAbility<
     >();
 }
 
-type FortuneTellerPlayer = Player & {
-    character: FortuneTeller;
-};
-
 class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =
         'A good player that registers as a Demon to Fortune Teller';
@@ -794,10 +795,6 @@ export class GetUndertakerInformationAbility extends GetCharacterInformationAbil
     }
 }
 
-type MonkPlayer = Player & {
-    character: Monk;
-};
-
 class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
     static readonly description =
         'The Monk protects other players from the Demon.';
@@ -932,10 +929,6 @@ export interface MonkProtectAbility
 
 export const MonkProtectAbility = RequireSetup(BaseMonkProtectAbility);
 
-type RavenkeeperPlayer = Player & {
-    character: Ravenkeeper;
-};
-
 export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
     RavenkeeperInformation,
     RavenkeeperInformationRequester<
@@ -996,10 +989,6 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
         return chosen;
     }
 }
-
-type VirginPlayer = Player & {
-    character: Virgin;
-};
 
 export class NominateVirginPenalty extends Effect<Execution> {
     static readonly description =
@@ -1131,10 +1120,6 @@ export class VirginAbility extends Ability<
     }
 }
 
-type SlayerPlayer = Player & {
-    character: Slayer;
-};
-
 export interface SlayerAbilityUseResult extends AbilityUseResult {
     chosenPlayer: Player;
     death?: Death;
@@ -1245,11 +1230,6 @@ export class SlayerAbility extends Ability<
         return `Slayer player ${context.requestedPlayer} may inadvertently execute their accuser`;
     }
 }
-
-type SoldierPlayer = Player & {
-    character: Soldier;
-};
-
 export class SoldierSafeFromDemonEffect extends SafeFromDemonEffect<SoldierPlayer> {
     static readonly description = 'The Soldier can not be killed by the Demon.';
 
@@ -1310,10 +1290,6 @@ export interface SoldierAbility
     extends Ability<AbilityUseContext, AbilityUseResult> {}
 
 export const SoldierAbility = RequireSetup(BaseSoldierAbility);
-
-type MayorPlayer = Player & {
-    character: Mayor;
-};
 
 export class MayorPeacefulWinEffect extends Effect<Game> {
     static readonly description =
