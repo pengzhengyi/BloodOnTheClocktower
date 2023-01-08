@@ -45,6 +45,7 @@ import {
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
+import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import type {
     FortuneTellerInformation,
     RavenkeeperInformation,
@@ -57,6 +58,8 @@ import { Townsfolk } from '~/game/charactertype';
 import type { Death } from '~/game/death';
 import type { NightSheet } from '~/game/nightsheet';
 import type { Player } from '~/game/player';
+import type { GamePhase } from '~/game/gamephase';
+import type { Action } from '~/game/types';
 import { DeadReason } from '~/game/deadreason';
 import { DeadPlayerCannotNominate } from '~/game/exception';
 import { Execution } from '~/game/execution';
@@ -292,6 +295,14 @@ describe('test MonkProtectAbility', () => {
     let ability: MonkProtectAbility;
     let impPlayer: Player;
     let monkPlayer: Player;
+    let _gamePhase: GamePhase | undefined;
+    let recoverGamePhase: Action;
+
+    beforeAll(() => {
+        [_gamePhase, recoverGamePhase] = mockGamePhaseTemporarily(5);
+    });
+
+    afterAll(() => recoverGamePhase());
 
     beforeEach(async () => {
         ability = new MonkProtectAbility();
@@ -445,6 +456,15 @@ describe('test VirginAbility', () => {
     let ability: VirginAbility;
     let execution: Execution;
     let virginPlayer: Player;
+
+    let _gamePhase: GamePhase | undefined;
+    let recoverGamePhase: Action;
+
+    beforeAll(() => {
+        [_gamePhase, recoverGamePhase] = mockGamePhaseTemporarily(3);
+    });
+
+    afterAll(() => recoverGamePhase());
 
     beforeEach(async () => {
         ability = new VirginAbility();
@@ -690,6 +710,14 @@ describe('test MayorAbility', () => {
 describe('test ButlerAbility', () => {
     let butlerPlayer: Player;
     let butlerAbility: ButlerAbility;
+    let _gamePhase: GamePhase | undefined;
+    let recoverGamePhase: Action;
+
+    beforeAll(() => {
+        [_gamePhase, recoverGamePhase] = mockGamePhaseTemporarily(3);
+    });
+
+    afterAll(() => recoverGamePhase());
 
     beforeEach(async () => {
         butlerPlayer = await createBasicPlayer(undefined, Butler);

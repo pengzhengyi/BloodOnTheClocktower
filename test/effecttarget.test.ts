@@ -2,6 +2,7 @@
 import { faker } from '@faker-js/faker';
 import { Effect, InteractionContext } from '~/game/effect';
 import { EffectTarget } from '~/game/effecttarget';
+import { CompositeGamePhaseKind } from '~/game/gamephase';
 import type { NextFunction } from '~/game/middleware';
 
 enum Role {
@@ -34,9 +35,18 @@ class PrivilegedData<T> extends EffectTarget<PrivilegedData<T>> {
 
     protected initializeEffects() {
         super.initializeEffects();
-        this.effects.add(new RoleCanAccess(Role.Admin));
-        this.effects.add(new RoleCanAccess(Role.Contributor));
-        this.effects.add(new RoleCanAccess(Role.User));
+        this.effects.add(
+            new RoleCanAccess(Role.Admin),
+            CompositeGamePhaseKind.ALL
+        );
+        this.effects.add(
+            new RoleCanAccess(Role.Contributor),
+            CompositeGamePhaseKind.ALL
+        );
+        this.effects.add(
+            new RoleCanAccess(Role.User),
+            CompositeGamePhaseKind.ALL
+        );
     }
 }
 

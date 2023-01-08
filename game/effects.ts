@@ -2,7 +2,13 @@ import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator, LazyMap } from './collections';
 import { Effect, Forwarding, InteractionContext } from './effect';
 import { EffectsNotSetup } from './exception';
-import { ALL_GAME_PHASE_KINDS, GamePhase, GamePhaseKind } from './gamephase';
+import {
+    ALL_GAME_PHASE_KINDS,
+    BasicGamePhaseKind,
+    CompositeGamePhaseKind,
+    GamePhase,
+    GamePhaseKind,
+} from './gamephase';
 import { Pipeline } from './middleware';
 import type { Transform } from './types';
 
@@ -44,9 +50,9 @@ abstract class AbstractGamePhaseBased<
     }
 }
 
-class GamePhaseBased<V> extends AbstractGamePhaseBased<GamePhaseKind, V> {
+class GamePhaseBased<V> extends AbstractGamePhaseBased<BasicGamePhaseKind, V> {
     isGamePhaseKind(gamePhaseKind: any): boolean {
-        return gamePhaseKind in GamePhaseKind;
+        return gamePhaseKind in BasicGamePhaseKind;
     }
 
     getGamePhaseKinds() {
@@ -55,14 +61,14 @@ class GamePhaseBased<V> extends AbstractGamePhaseBased<GamePhaseKind, V> {
 
     getGamePhaseKind(gamePhase: GamePhase) {
         if (gamePhase.isFirstNight) {
-            return GamePhaseKind.FirstNight;
+            return BasicGamePhaseKind.FirstNight;
         }
 
         if (gamePhase.isNonfirstNight) {
-            return GamePhaseKind.NonfirstNight;
+            return BasicGamePhaseKind.NonfirstNight;
         }
 
-        return GamePhaseKind.Other;
+        return BasicGamePhaseKind.Other;
     }
 }
 
@@ -76,7 +82,10 @@ export class Effects<TTarget extends object> extends Pipeline<
         const effects = new this<TTarget>();
 
         if (enableForwarding) {
-            effects.add(Forwarding.instance<TTarget>());
+            effects.add(
+                Forwarding.instance<TTarget>(),
+                CompositeGamePhaseKind.ALL
+            );
         }
 
         return effects;
@@ -132,7 +141,7 @@ export class Effects<TTarget extends object> extends Pipeline<
         }
     }
 
-    add(effect: Effect<TTarget>) {
+    add(effect: Effect<TTarget>, gamePhaseKind: GamePhaseKind) {
         this.effectToPriority.set(
             effect,
             new GamePhaseBased((gamePhaseKind) =>
@@ -140,19 +149,32 @@ export class Effects<TTarget extends object> extends Pipeline<
             )
         );
 
-        // TODO instead of adding to every phase, should restrict to current game phase
-        this.hierarchy.forEvery((gamePhaseKind, priorityToEffects) => {
-            const priority = this.getPriority(effect, gamePhaseKind);
-            let samePriorityEffects =
-                priorityToEffects.getElementByKey(priority);
-
-            if (samePriorityEffects === undefined) {
-                samePriorityEffects = new LinkList<Effect<TTarget>>();
-                priorityToEffects.setElement(priority, samePriorityEffects);
+        if (gamePhaseKind === CompositeGamePhaseKind.ALL) {
+            this.hierarchy.forEvery((gamePhaseKind, priorityToEffects) =>
+                this.addEffectToPriorityStack(
+                    effect,
+                    gamePhaseKind,
+                    priorityToEffects
+                )
+            );
+        } else {
+            const gamePhaseKinds = (
+                gamePhaseKind === CompositeGamePhaseKind.EveryNight
+                    ? [
+                          BasicGamePhaseKind.FirstNight,
+                          BasicGamePhaseKind.NonfirstNight,
+                      ]
+                    : [gamePhaseKind]
+            ) as Array<BasicGamePhaseKind>;
+            for (const _gamePhaseKind of gamePhaseKinds) {
+                const priorityToEffects = this.hierarchy.get(_gamePhaseKind);
+                this.addEffectToPriorityStack(
+                    effect,
+                    gamePhaseKind,
+                    priorityToEffects
+                );
             }
-
-            samePriorityEffects.pushBack(effect);
-        });
+        }
     }
 
     has(effect: Effect<TTarget>): boolean {
@@ -180,6 +202,22 @@ export class Effects<TTarget extends object> extends Pipeline<
 
     values() {
         return this.effectToPriority.keys();
+    }
+
+    protected addEffectToPriorityStack(
+        effect: Effect<TTarget>,
+        gamePhaseKind: GamePhaseKind,
+        priorityToEffects: OrderedMap<number, LinkList<Effect<TTarget>>>
+    ) {
+        const priority = this.getPriority(effect, gamePhaseKind);
+        let samePriorityEffects = priorityToEffects.getElementByKey(priority);
+
+        if (samePriorityEffects === undefined) {
+            samePriorityEffects = new LinkList<Effect<TTarget>>();
+            priorityToEffects.setElement(priority, samePriorityEffects);
+        }
+
+        samePriorityEffects.pushBack(effect);
     }
 
     protected getApplicableMiddlewares(

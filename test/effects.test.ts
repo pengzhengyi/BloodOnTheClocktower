@@ -1,5 +1,6 @@
 import type { Effect, InteractionContext } from '~/game/effect';
 import { Effects } from '~/game/effects';
+import { CompositeGamePhaseKind } from '~/game/gamephase';
 import {
     mockApplicableEffect,
     mockInapplicableEffect,
@@ -20,7 +21,7 @@ function createEffects<TTarget extends object>(
     for (const [effect, priority] of effectToPriority.entries()) {
         const mockGetPriority = jest.fn().mockReturnValue(priority);
         effect.getPriority = mockGetPriority;
-        effects.add(effect);
+        effects.add(effect, CompositeGamePhaseKind.ALL);
     }
 
     return effects;

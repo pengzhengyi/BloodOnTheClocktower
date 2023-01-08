@@ -38,6 +38,7 @@ import { DeadReason } from './deadreason';
 import type { Death } from './death';
 import type { Execution } from './execution';
 import type { Game } from './game';
+import { BasicGamePhaseKind, CompositeGamePhaseKind } from './gamephase';
 import type { NightSheet } from './nightsheet';
 import type { Nomination } from './nomination';
 import type { NextFunction } from './middleware';
@@ -734,7 +735,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
         this.redHerringPlayer = redHerringPlayer;
         const effect = new RedHerringEffect(fortuneTellerPlayer);
         effect.setup(nightSheet);
-        redHerringPlayer.effects.add(effect);
+        redHerringPlayer.effects.add(effect, CompositeGamePhaseKind.EveryNight);
     }
 }
 
@@ -884,7 +885,10 @@ class BaseMonkProtectAbility extends Ability<
         }
 
         this.protected.push(playerToProtect);
-        playerToProtect?.effects.add(this.protection);
+        playerToProtect?.effects.add(
+            this.protection,
+            BasicGamePhaseKind.NonfirstNight
+        );
     }
 
     protected async choosePlayerToProtect(
@@ -1102,7 +1106,7 @@ export class VirginAbility extends Ability<
             this.penalty = new NominateVirginPenalty(virginPlayer);
         }
 
-        execution.effects.add(this.penalty);
+        execution.effects.add(this.penalty, BasicGamePhaseKind.Other);
     }
 
     protected formatDescriptionForMalfunction(
@@ -1262,7 +1266,10 @@ class BaseSoldierAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     async setup(context: AbilitySetupContext): Promise<void> {
         await super.setup(context);
 
-        context.requestedPlayer.effects.add(this.power);
+        context.requestedPlayer.effects.add(
+            this.power,
+            CompositeGamePhaseKind.EveryNight
+        );
     }
 
     createContext(..._args: any[]): Promise<AbilityUseContext> {
@@ -1418,12 +1425,18 @@ class BaseMayorAbility extends Ability<
         await super.setup(context);
 
         this.mayorDieInsteadEffect = new MayorDieInsteadEffect(context.players);
-        context.requestedPlayer.effects.add(this.mayorDieInsteadEffect);
+        context.requestedPlayer.effects.add(
+            this.mayorDieInsteadEffect,
+            CompositeGamePhaseKind.EveryNight
+        );
 
         this.mayorPeacefulWinEffect = new MayorPeacefulWinEffect(
             context.requestedPlayer
         );
-        context.game.effects.add(this.mayorPeacefulWinEffect);
+        context.game.effects.add(
+            this.mayorPeacefulWinEffect,
+            BasicGamePhaseKind.Other
+        );
     }
 
     createContext(..._args: any[]): Promise<AbilityUseContext> {
@@ -1540,7 +1553,7 @@ export class ButlerAbility extends Ability<
     protected async updateMaster(butlerPlayer: ButlerPlayer, master?: Player) {
         if (this.effect === undefined) {
             this.effect = new ButlerFollowMasterVoteEffect(butlerPlayer);
-            butlerPlayer.effects.add(this.effect);
+            butlerPlayer.effects.add(this.effect, BasicGamePhaseKind.Other);
         }
 
         this.effect.master = master;

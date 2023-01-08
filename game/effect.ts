@@ -1,5 +1,5 @@
 import { CharacterEffectOriginNotSetup } from './exception';
-import { GamePhaseKind } from './gamephase';
+import { BasicGamePhaseKind, GamePhaseKind } from './gamephase';
 import { Constructor, Predicate } from './types';
 import type { CharacterToken } from './character';
 import type { NightSheet } from './nightsheet';
@@ -80,13 +80,13 @@ export abstract class Effect<TTarget extends object> {
         return false;
     }
 
-    getPriority(gamePhaseKind: GamePhaseKind): number {
+    getPriority(gamePhaseKind: BasicGamePhaseKind): number {
         switch (gamePhaseKind) {
-            case GamePhaseKind.FirstNight:
+            case BasicGamePhaseKind.FirstNight:
                 return this.getPriorityForFirstNightGamePhaseKind();
-            case GamePhaseKind.NonfirstNight:
+            case BasicGamePhaseKind.NonfirstNight:
                 return this.getPriorityForNonfirstNightGamePhaseKind();
-            case GamePhaseKind.Other:
+            case BasicGamePhaseKind.Other:
                 return this.getPriorityForOtherGamePhaseKind();
         }
     }

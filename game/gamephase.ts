@@ -59,16 +59,27 @@ export function includePhase(phases: number, phase: Phase) {
     return (phases & phase) === phase;
 }
 
-export enum GamePhaseKind {
-    FirstNight,
-    NonfirstNight,
-    Other,
+export enum BasicGamePhaseKind {
+    FirstNight = 1,
+    NonfirstNight = 2,
+    Other = 4,
 }
 
+export enum CompositeGamePhaseKind {
+    // convenient utility
+    EveryNight = BasicGamePhaseKind.FirstNight |
+        BasicGamePhaseKind.NonfirstNight,
+    ALL = BasicGamePhaseKind.FirstNight |
+        BasicGamePhaseKind.NonfirstNight |
+        BasicGamePhaseKind.Other,
+}
+
+export type GamePhaseKind = BasicGamePhaseKind | CompositeGamePhaseKind;
+
 export const ALL_GAME_PHASE_KINDS = [
-    GamePhaseKind.FirstNight,
-    GamePhaseKind.NonfirstNight,
-    GamePhaseKind.Other,
+    BasicGamePhaseKind.FirstNight,
+    BasicGamePhaseKind.NonfirstNight,
+    BasicGamePhaseKind.Other,
 ];
 
 @Exclude()
@@ -116,16 +127,16 @@ export class GamePhase {
         return this._phase === Phase.Night;
     }
 
-    get gamePhaseKind(): GamePhaseKind {
+    get gamePhaseKind(): BasicGamePhaseKind {
         if (this.isFirstNight) {
-            return GamePhaseKind.FirstNight;
+            return BasicGamePhaseKind.FirstNight;
         }
 
         if (this.isNonfirstNight) {
-            return GamePhaseKind.NonfirstNight;
+            return BasicGamePhaseKind.NonfirstNight;
         }
 
-        return GamePhaseKind.Other;
+        return BasicGamePhaseKind.Other;
     }
 
     static format(phase: Phase, cycleIndex: number): string {

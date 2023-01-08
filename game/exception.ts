@@ -44,10 +44,11 @@ import type {
     GetInfoAbilityUseContext,
     IAbility,
 } from './ability';
-import type { TCharacterEffect } from './effect';
+import type { Effect, TCharacterEffect } from './effect';
 import type { Alignment } from './alignment';
 import type { Effects } from './effects';
 import type { Seating } from './seating';
+import type { GamePhaseKind } from './gamephase';
 import type { GameInfo } from './gameinfo';
 import type { Diary, Event as ClocktowerEvent } from './clocktower';
 import { GAME_UI } from '~/interaction/gameui';
@@ -728,6 +729,20 @@ export class RecallFutureDate extends RecoverableGameError {
 
     constructor(readonly requestedDate: number, readonly furthestDate: number) {
         super(RecallFutureDate.description);
+    }
+}
+
+export class CannotGetEffectPriority<
+    T extends object
+> extends RecoverableGameError {
+    static description =
+        'Cannot get priority of an effect for specified game phase';
+
+    constructor(
+        readonly effect: Effect<T>,
+        readonly gamePhaseKind: GamePhaseKind
+    ) {
+        super(CannotGetEffectPriority.description);
     }
 }
 
