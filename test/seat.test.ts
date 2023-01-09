@@ -3,7 +3,7 @@ import { Seat } from '~/game/seat';
 import { createBasicPlayer } from '~/__mocks__/player';
 
 beforeAll(() => {
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 });
 
 afterAll(() => {

@@ -14,7 +14,7 @@ import { Generator } from '~/game/collections';
 import { AttemptMoreThanOneExecution } from '~/game/exception';
 
 beforeAll(() => {
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 });
 
 afterAll(() => {
@@ -193,8 +193,8 @@ describe('Test Execution Edge Cases', () => {
         expect(await execution.execute()).toBeTrue();
         expect(execution.executed).toBe(players[1]);
 
-        await expect(
-            async () => await execution.execute()
-        ).rejects.toThrowError(AttemptMoreThanOneExecution);
+        await expect(() => execution.execute()).rejects.toThrowError(
+            AttemptMoreThanOneExecution
+        );
     });
 });

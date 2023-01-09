@@ -13,8 +13,8 @@ export class Exile extends Nomination {
     }
 
     async validate() {
-        await new ExileNonTraveller(this).throwWhen(
-            (error) => !error.exile.nominated.isTraveller
+        await new ExileNonTraveller(this).throwWhenAsync(
+            async (error) => !(await error.exile.nominated.isTraveller)
         );
     }
 

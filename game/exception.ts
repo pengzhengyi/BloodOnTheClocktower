@@ -18,6 +18,7 @@ import type {
     SlayerPlayer,
     StaticThis,
     UndertakerPlayer,
+    AsyncPredicate,
 } from './types';
 import type { Player } from './player';
 import type { Players } from './players';
@@ -136,6 +137,19 @@ export class RecoverableGameError extends GameError {
             if (await GAME_UI.handle(this)) {
                 this.handled_ = true;
                 if (condition(this)) {
+                    this.throw();
+                }
+            } else {
+                this.throw();
+            }
+        }
+    }
+
+    async throwWhenAsync(condition: AsyncPredicate<this>) {
+        if (await condition(this)) {
+            if (await GAME_UI.handle(this)) {
+                this.handled_ = true;
+                if (await condition(this)) {
                     this.throw();
                 }
             } else {
@@ -378,7 +392,11 @@ export class ExileNonTraveller extends RecoverableGameError {
 export class CannotDetermineCharacterType extends RecoverableGameError {
     static description = 'Cannot determine character type of a character';
 
-    constructor(readonly character: CharacterToken, readonly type?: string) {
+    constructor(
+        readonly player?: Player,
+        readonly character?: CharacterToken,
+        readonly type?: string
+    ) {
         super(CannotDetermineCharacterType.description);
     }
 }

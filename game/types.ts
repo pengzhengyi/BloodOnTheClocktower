@@ -15,6 +15,7 @@ export type StaticThis<T> = Constructor<T>;
 
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
+export type AsyncPredicate<T> = (value: T) => Promise<boolean>;
 export const TAUTOLOGY = () => true;
 
 export type Action = () => void;
@@ -22,9 +23,16 @@ export type Task<T = undefined> = (value: T) => void;
 export type AsyncTask<T = undefined> = (value: T) => Promise<void>;
 export type Transform<T1, T2 = T1> = (value: T1) => T2;
 export type Reducer<T1, T2> = (previousValue: T1, currentValue: T2) => T1;
+export type AsyncReducer<T1, T2> = (
+    previousValue: Promise<T1>,
+    currentValue: Promise<T2>
+) => Promise<T1>;
 export type Loader<K, V> = (key: K) => V | undefined;
 export type Factory<V> = () => V;
 export type AsyncFactory<V> = () => Promise<V>;
+
+export type ResolveCallback<T> = (value: T | PromiseLike<T>) => void;
+export type RejectCallback = (reason?: any) => void;
 
 export enum RoleDataKeyName {
     /**

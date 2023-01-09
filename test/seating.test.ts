@@ -21,7 +21,7 @@ async function createPlayersAndSeating(
 }
 
 beforeAll(() => {
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 });
 
 afterAll(() => {

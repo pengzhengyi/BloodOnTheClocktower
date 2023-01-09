@@ -194,9 +194,8 @@ export abstract class Effect<TTarget extends object> {
     protected matchDemonKill(context: InteractionContext<TTarget>) {
         return (
             this.isGetProperty(context, 'setDead' as keyof TTarget) &&
-            this.matchNotNullInitiator<Player>(
-                context,
-                (initiator) => initiator.isDemon
+            this.matchNotNullInitiator<Player>(context, (initiator) =>
+                initiator.storytellerGet('_isDemon')
             )
         );
     }

@@ -139,7 +139,7 @@ export abstract class Character {
 
         const characterType = CharacterType.unsafeFrom(type);
         if (characterType === undefined) {
-            throw new CannotDetermineCharacterType(this, type);
+            throw new CannotDetermineCharacterType(undefined, this, type);
         } else {
             this.characterType = characterType;
         }

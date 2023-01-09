@@ -6,7 +6,7 @@ import { RecallFutureDate } from '~/game/exception';
 async function createClocktower(phaseIndex: number): Promise<Clocktower> {
     const clocktower = new Clocktower();
 
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 
     for (let i = 0; i < phaseIndex; i++) {
         await clocktower.advance();

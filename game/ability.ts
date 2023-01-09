@@ -628,7 +628,7 @@ class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
         next: NextFunction<InteractionContext<FortuneTellerPlayer>>
     ): InteractionContext<FortuneTellerPlayer> {
         const updatedContext = next(context);
-        updatedContext.result = true;
+        updatedContext.result = Promise.resolve(true);
         return updatedContext;
     }
 }
@@ -1039,7 +1039,7 @@ export class NominateVirginPenalty extends Effect<Execution> {
             ) {
                 this._hasNominatedVirgin = true;
 
-                if (nomination.nominator.isTownsfolk) {
+                if (await nomination.nominator.isTownsfolk) {
                     await execution.execute(
                         nomination.nominator,
                         DeadReason.NominateVirgin
@@ -1197,7 +1197,7 @@ export class SlayerAbility extends Ability<
         slayerPlayer: Player
     ): Promise<Death | undefined> {
         this.hasUsedAbility = true;
-        if (player.from(slayerPlayer).isTheDemon) {
+        if (await player.from(slayerPlayer).isTheDemon) {
             return await player.setDead(DeadReason.SlayerKill);
         }
     }
@@ -1322,8 +1322,8 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         const game = context.interaction.target;
         const getWinningTeamMethod = updatedContext.result.bind();
 
-        updatedContext.result = (players: Iterable<Player>) => {
-            const winningTeam = getWinningTeamMethod(players);
+        updatedContext.result = async (players: Iterable<Player>) => {
+            const winningTeam = await getWinningTeamMethod(players);
 
             if (winningTeam === undefined && this.isPeacefulWin(game)) {
                 return Alignment.Good;

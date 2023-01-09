@@ -109,7 +109,9 @@ describe('Test Vote Edge Cases', () => {
         expect(playersAtFirstTimeVote).toEqual([player1, player2]);
 
         // revote denied
-        storytellerConfirmMock.mockImplementationOnce(async () => await false);
+        storytellerConfirmMock.mockImplementationOnce(() =>
+            Promise.resolve(false)
+        );
         const playersAtFirstTimeVoteReiterated = await collectVotesForExecution(
             vote,
             new Map([
@@ -120,7 +122,9 @@ describe('Test Vote Edge Cases', () => {
         expect(playersAtFirstTimeVoteReiterated).toEqual([player1, player2]);
 
         // revote approved
-        storytellerConfirmMock.mockImplementationOnce(async () => await true);
+        storytellerConfirmMock.mockImplementationOnce(() =>
+            Promise.resolve(true)
+        );
         const playersAtReVote = await collectVotesForExecution(
             vote,
             new Map([

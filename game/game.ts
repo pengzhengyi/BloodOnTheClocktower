@@ -66,17 +66,19 @@ export class Game extends EffectTarget<Game> {
         }
     }
 
-    getWinningTeam(players: Iterable<Player>): Alignment | undefined {
+    async getWinningTeam(
+        players: Iterable<Player>
+    ): Promise<Alignment | undefined> {
         let evilWinConditionReached = true;
         let goodWinConditionReached = true;
 
         let aliveNontravellerPlayerCount = 0;
         for (const player of players) {
-            if (goodWinConditionReached && player.isTheDemon) {
+            if (goodWinConditionReached && (await player.isTheDemon)) {
                 goodWinConditionReached = false;
             }
 
-            if (evilWinConditionReached && player.isAliveNontraveller) {
+            if (evilWinConditionReached && (await player.isAliveNontraveller)) {
                 aliveNontravellerPlayerCount++;
 
                 if (aliveNontravellerPlayerCount > 2) {

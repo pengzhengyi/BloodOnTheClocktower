@@ -30,7 +30,7 @@ describe('Test Exile Edge Cases', () => {
         const townsfolk = await createBasicPlayer(undefined, Washerwoman);
 
         handleMock.mockClear();
-        handleMock.mockImplementation(async () => await false);
+        handleMock.mockImplementation(() => Promise.resolve(false));
 
         await expect(
             async () => await Exile.init(traveller, townsfolk)

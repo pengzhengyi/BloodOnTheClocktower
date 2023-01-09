@@ -4,7 +4,7 @@ import { GamePhase, Phase } from '~/game/gamephase';
 async function createGamePhase(phaseIndex: number): Promise<GamePhase> {
     const gamePhase = GamePhase.setup();
 
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 
     for (let i = 0; i < phaseIndex; i++) {
         await gamePhase.forceTransition();

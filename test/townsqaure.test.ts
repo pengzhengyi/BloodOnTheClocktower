@@ -4,7 +4,7 @@ import { TownSquare } from '~/game/townsquare';
 import { createBasicPlayers } from '~/__mocks__/player';
 
 beforeAll(() => {
-    storytellerConfirmMock.mockImplementation(async () => await true);
+    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
 });
 
 afterAll(() => {

@@ -140,11 +140,11 @@ export abstract class InformationProvider<
         );
     }
 
-    protected async buildEvaluationContextImpl(
+    protected buildEvaluationContextImpl(
         _context: TInfoProvideContext,
         evaluationContext: LazyMap<string, any>
     ): Promise<LazyMap<string, any>> {
-        return await evaluationContext;
+        return Promise.resolve(evaluationContext);
     }
 }
 
@@ -170,6 +170,20 @@ export abstract class DemonMinionInformationProvider<
             .isNot(context.requestedPlayer)
             .combinations(context.travellerSheet.actualAssignment.minion);
     }
+
+    protected async evaluateGoodnessForMinions(
+        minions: Array<MinionPlayer>
+    ): Promise<number> {
+        const isMinions = await Generator.promiseAll(
+            Generator.toPromise((minion) => minion.isMinion, minions)
+        );
+
+        return Generator.reduce(
+            (score, isMinion) => score + (isMinion ? 5 : -5),
+            0,
+            isMinions
+        );
+    }
 }
 
 export class DemonInformationProvider<
@@ -181,7 +195,7 @@ export class DemonInformationProvider<
     protected static readonly cachedKeyForGoodCharactersNotInPlay =
         'actualGoodCharactersNotInPlay';
 
-    async getTrueInformationOptions(
+    getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<DemonInformation>> {
         const minionPlayers = this.getMinionPlayers(context);
@@ -208,7 +222,7 @@ export class DemonInformationProvider<
             })
         );
 
-        return await infoOptions;
+        return Promise.resolve(infoOptions);
     }
 
     async getFalseInformationOptions(
@@ -260,11 +274,7 @@ export class DemonInformationProvider<
                 new Set<CharacterToken>()
             );
 
-        let score = Generator.reduce(
-            (score, minion) => score + (minion.isMinion ? 5 : -5),
-            0,
-            information.minions
-        );
+        let score = await this.evaluateGoodnessForMinions(information.minions);
 
         score += Generator.reduce(
             (score, character) =>
@@ -272,7 +282,7 @@ export class DemonInformationProvider<
             -9,
             information.notInPlayGoodCharacters
         );
-        return await score;
+        return score;
     }
 
     protected buildEvaluationContextImpl(
@@ -375,18 +385,15 @@ export class MinionInformationProvider<
     /**
      * @override Goodness is evaluated on the following criterion: 5 for each player that is a minion, -5 if not; 5 for provided player is the demon.
      */
-    evaluateGoodness(
+    async evaluateGoodness(
         information: MinionInformation,
         _context: TInfoProvideContext
     ): Promise<number> {
-        let score = Generator.reduce(
-            (score, minion) => score + (minion.isMinion ? 5 : -5),
-            0,
+        let score = await this.evaluateGoodnessForMinions(
             information.otherMinions
         );
-
-        score += information.demon.isDemon ? 5 : -5;
-        return Promise.resolve(score);
+        score += (await information.demon.isDemon) ? 5 : -5;
+        return score;
     }
 }
 
@@ -434,11 +441,11 @@ export class TravellerInformationProvider<
     /**
      * @override Goodness is evaluated on the following criterion: 1 provided player is the demon, -1 otherwise.
      */
-    evaluateGoodness(
+    async evaluateGoodness(
         information: TravellerInformation,
         _context: TInfoProvideContext
     ): Promise<number> {
-        return Promise.resolve(information.demon.isDemon ? 1 : -1);
+        return (await information.demon.isDemon) ? 1 : -1;
     }
 }
 
@@ -549,7 +556,17 @@ export class LibrarianInformationProvider<
         context: TInfoProvideContext
     ): Promise<number> {
         if ((information as LibrarianNoOutsiderInformation).noOutsiders) {
-            return context.players.any((player) => player.isOutsider) ? -1 : 1;
+            // TODO .catch CannotDetermineCharacterType
+            return await context.players
+                .toPromise((player) => player.isOutsider)
+                .mapAsync((isOutsider) => (isOutsider ? -1 : 1))
+                .promiseAll()
+                .then((scores) =>
+                    scores.reduce(
+                        (prevValue, newValue) => prevValue + newValue,
+                        0
+                    )
+                );
         } else {
             return await super.evaluateGoodness(
                 information as OneOfTwoPlayersIsOutsider,
@@ -931,7 +948,15 @@ export class FortuneTellerInformationProvider<
               )
             : context.chosenPlayers;
 
-        return await players.some((player) => player.isDemon);
+        for await (const isDemon of Generator.promiseRaceAll(
+            Generator.toPromise((player) => player.isDemon, players)
+        )) {
+            if (isDemon) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 export interface UndertakerInformationProviderContext

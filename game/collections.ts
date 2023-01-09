@@ -1,9 +1,16 @@
-import {
+/* eslint-disable no-dupe-class-members */
+import { Deque } from 'js-sdsl';
+import type { RecoverableGameError, RecoveryAction } from './exception';
+import type {
+    AsyncReducer,
     Factory,
     Loader,
     Predicate,
     Prioritization,
     Reducer,
+    RejectCallback,
+    ResolveCallback,
+    StaticThis,
     Task,
     Transform,
 } from './types';
@@ -28,6 +35,89 @@ export class LazyMap<K, V> extends Map<K, V> {
 
     getOrDefault(key: K, defaultValue: V) {
         return super.get(key) ?? defaultValue;
+    }
+}
+
+export class TaskQueue<T> {
+    protected tasks: Deque<Promise<T>> = new Deque();
+
+    protected pending: Deque<[ResolveCallback<T>, RejectCallback]> =
+        new Deque();
+
+    constructor(tasks?: Iterable<Promise<T>>) {
+        if (tasks !== undefined) {
+            this.enqueueAll(tasks);
+        }
+    }
+
+    get numPending() {
+        return this.pending.length;
+    }
+
+    get numFinished() {
+        return this.numTasks - this.numPending;
+    }
+
+    get numTasks() {
+        return this.tasks.length;
+    }
+
+    get isEmpty() {
+        return this.numTasks === 0;
+    }
+
+    get isBusy() {
+        return this.numPending > 0;
+    }
+
+    get isIdle() {
+        return this.numPending === 0;
+    }
+
+    enqueue(task: Promise<T>) {
+        this.addWorker();
+
+        task.then((value) => {
+            const [resolve, _reject] = this.pending.popFront()!;
+            resolve(value);
+        }).catch((reason) => {
+            const [_resolve, reject] = this.pending.popFront()!;
+            reject(reason);
+        });
+    }
+
+    enqueueAll(tasks: Iterable<Promise<T>>) {
+        for (const task of tasks) {
+            this.enqueue(task);
+        }
+    }
+
+    dequeue(): Promise<T> | undefined {
+        if (this.isEmpty) {
+            return;
+        }
+
+        return this.tasks.popFront();
+    }
+
+    protected addWorker() {
+        this.tasks.pushBack(
+            new Promise((resolve, reject) =>
+                this.pending.pushBack([resolve, reject])
+            )
+        );
+    }
+
+    *[Symbol.iterator]() {
+        while (!this.isEmpty) {
+            yield this.dequeue()!;
+        }
+    }
+
+    async *[Symbol.asyncIterator]() {
+        while (!this.isEmpty) {
+            yield await this.dequeue()!;
+        }
     }
 }
 
@@ -138,6 +228,85 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static promiseAll<T>(iterable: Iterable<Promise<T>>) {
+        return Promise.all(iterable);
+    }
+
+    static promiseAllSettled<T>(iterable: Iterable<Promise<T>>) {
+        return Promise.allSettled(iterable);
+    }
+
+    static promiseAny<T>(iterable: Iterable<Promise<T>>) {
+        return Promise.any(iterable);
+    }
+
+    static promiseRace<T>(iterable: Iterable<Promise<T>>) {
+        return Promise.race(iterable);
+    }
+
+    static promiseRaceAll<T>(
+        iterable: Iterable<Promise<T>>
+    ): Iterable<Promise<T>> {
+        return new TaskQueue(iterable);
+    }
+
+    static toPromise<T1, T2 = T1>(
+        toPromise: Transform<T1, Promise<T2>>,
+        iterable: Iterable<T1>
+    ): Iterable<Promise<T2>>;
+
+    static toPromise<T1, TError extends RecoverableGameError, T2 = T1>(
+        toPromise: Transform<T1 | TError, Promise<T2>>,
+        iterable: Iterable<T1 | TError>
+    ): Iterable<Promise<T2>> {
+        return Generator.map(toPromise, iterable);
+    }
+
+    static catch<
+        T,
+        TError extends RecoverableGameError,
+        TErrorClassType extends typeof RecoverableGameError
+    >(
+        errorType: StaticThis<TError> & TErrorClassType,
+        iterable: Iterable<T | TError>,
+        recovery: RecoveryAction<TError, T>
+    ): Iterable<Promise<T>> {
+        const toPromise = (value: T | TError) =>
+            value instanceof Error
+                ? Promise.reject(value)
+                : Promise.resolve(value);
+        const promises = this.toPromise(toPromise, iterable) as Iterable<
+            Promise<T>
+        >;
+        return this.catchAsync(errorType, promises, recovery);
+    }
+
+    static catchAsync<
+        T,
+        TError extends RecoverableGameError,
+        TErrorClassType extends typeof RecoverableGameError
+    >(
+        errorType: StaticThis<TError> & TErrorClassType,
+        iterable: Iterable<Promise<T>>,
+        recovery: RecoveryAction<TError, T>
+    ): Iterable<Promise<T>> {
+        return this.map(
+            (action) => errorType.catch<TError, T>(() => action, recovery),
+            iterable
+        );
+    }
+
+    static *promiseThen<T1, T2>(
+        transform: Transform<T1, T2>,
+        iterable: Iterable<Promise<T1>>
+    ): Iterable<Promise<T2>> {
+        for (const element of iterable) {
+            yield element.then(transform);
+        }
+    }
+
+    static promiseMap = this.promiseThen;
+
     static *map<T1, T2>(
         transform: Transform<T1, T2>,
         iterable: Iterable<T1>
@@ -153,6 +322,18 @@ export class Generator<T> implements Iterable<T> {
         iterable: Iterable<T2>
     ): T1 {
         let reducedValue: T1 = initialValue;
+        for (const element of iterable) {
+            reducedValue = reducer(reducedValue, element);
+        }
+        return reducedValue;
+    }
+
+    static reduceAsync<T1, T2>(
+        reducer: AsyncReducer<T1, T2>,
+        initialValue: T1,
+        iterable: Iterable<Promise<T2>>
+    ): Promise<T1> {
+        let reducedValue: Promise<T1> = Promise.resolve(initialValue);
         for (const element of iterable) {
             reducedValue = reducer(reducedValue, element);
         }
@@ -651,6 +832,71 @@ export class Generator<T> implements Iterable<T> {
         );
     }
 
+    promiseAll<T1>(this: Generator<Promise<T1>>) {
+        return Generator.promiseAll(this);
+    }
+
+    promiseAllSettled<T1>(this: Generator<Promise<T1>>) {
+        return Generator.promiseAllSettled(this);
+    }
+
+    promiseAny<T1>(this: Generator<Promise<T1>>) {
+        return Generator.promiseAny(this);
+    }
+
+    promiseRace<T1>(this: Generator<Promise<T1>>) {
+        return Generator.promiseRace(this);
+    }
+
+    promiseRaceAll<T1>(this: Generator<Promise<T1>>) {
+        return this.become((iterable) => Generator.promiseRaceAll(iterable));
+    }
+
+    toPromise<T2 = T>(toPromise: Transform<T, Promise<T2>>) {
+        return this.become((iterable) =>
+            Generator.toPromise(toPromise, iterable)
+        );
+    }
+
+    catch<
+        TResult,
+        TError extends RecoverableGameError,
+        TErrorClassType extends typeof RecoverableGameError
+    >(
+        this: Generator<TResult | TError>,
+        errorType: StaticThis<TError> & TErrorClassType,
+        recovery: RecoveryAction<TError, TResult>
+    ) {
+        return this.become((iterable) =>
+            Generator.catch(errorType, iterable, recovery)
+        );
+    }
+
+    catchAsync<
+        TResult,
+        TError extends RecoverableGameError,
+        TErrorClassType extends typeof RecoverableGameError
+    >(
+        this: Generator<Promise<TResult>>,
+        errorType: StaticThis<TError> & TErrorClassType,
+        recovery: RecoveryAction<TError, TResult>
+    ) {
+        return this.become((iterable) =>
+            Generator.catchAsync(errorType, iterable, recovery)
+        );
+    }
+
+    promiseThen<T1, T2>(
+        this: Generator<Promise<T1>>,
+        transform: Transform<T1, T2>
+    ) {
+        return this.become((iterable) =>
+            Generator.promiseThen(transform, iterable)
+        );
+    }
+
+    mapAsync = this.promiseThen;
+
     map<T2 = T>(transform: Transform<T, T2>) {
         return this.become((iterable) => Generator.map(transform, iterable));
     }
@@ -768,6 +1014,14 @@ export class Generator<T> implements Iterable<T> {
 
     reduce<T1>(reducer: Reducer<T1, T>, initialValue: T1): T1 {
         return Generator.reduce(reducer, initialValue, this);
+    }
+
+    reduceAsync<T1>(
+        this: Generator<Promise<T>>,
+        reducer: AsyncReducer<T1, T>,
+        initialValue: T1
+    ): Promise<T1> {
+        return Generator.reduceAsync(reducer, initialValue, this);
     }
 }
 

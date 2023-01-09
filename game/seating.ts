@@ -106,7 +106,7 @@ export class Seating {
     }
 
     protected static async createSeats(numSeats: number): Promise<Array<Seat>> {
-        await this.validateNumSeats(numSeats);
+        numSeats = await this.validateNumSeats(numSeats);
 
         return this.createConsecutiveSeats(0, numSeats);
     }
@@ -123,12 +123,14 @@ export class Seating {
         );
     }
 
-    protected static async validateNumSeats(numSeats: number) {
+    protected static async validateNumSeats(numSeats: number): Promise<number> {
         if (numSeats <= 0) {
             const error = new NumberOfSeatNotPositive(numSeats);
             await error.throwWhen((error) => error.correctedNumSeats <= 0);
             numSeats = error.correctedNumSeats;
         }
+
+        return numSeats;
     }
 
     get allSat(): boolean {
@@ -160,7 +162,7 @@ export class Seating {
     }
 
     async changeNumSeats(newNumSeats: number) {
-        await Seating.validateNumSeats(newNumSeats);
+        newNumSeats = await Seating.validateNumSeats(newNumSeats);
 
         const numSeats = this.numSeats;
         if (newNumSeats < numSeats) {

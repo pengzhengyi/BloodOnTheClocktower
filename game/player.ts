@@ -94,11 +94,18 @@ export class Player extends EffectTarget<Player> {
         return player.getProxy();
     }
 
-    static isCharacterType(
+    static async isCharacterType(
+        player: Player,
+        characterType: typeof CharacterType
+    ): Promise<boolean> {
+        return (await player.characterType).is(characterType);
+    }
+
+    protected static _isCharacterType(
         player: Player,
         characterType: typeof CharacterType
     ): boolean {
-        return player.characterType.is(characterType);
+        return player._characterType.is(characterType);
     }
 
     get alignment(): Promise<Alignment> {
@@ -224,8 +231,32 @@ export class Player extends EffectTarget<Player> {
         return Player.isCharacterType(this, Fabled);
     }
 
-    get isTraveller(): boolean {
-        return this.characterType.is(Traveller);
+    get isTraveller() {
+        return Player.isCharacterType(this, Traveller);
+    }
+
+    protected get _isMinion() {
+        return Player._isCharacterType(this, Minion);
+    }
+
+    protected get _isDemon() {
+        return Player._isCharacterType(this, Demon);
+    }
+
+    protected get _isTownsfolk() {
+        return Player._isCharacterType(this, Townsfolk);
+    }
+
+    protected get _isOutsider() {
+        return Player._isCharacterType(this, Outsider);
+    }
+
+    protected get _isFabled() {
+        return Player._isCharacterType(this, Fabled);
+    }
+
+    protected get _isTraveller() {
+        return Player._isCharacterType(this, Traveller);
     }
 
     get willGetFalseInfo(): boolean {
@@ -236,16 +267,20 @@ export class Player extends EffectTarget<Player> {
      * {@link `glossary["Demon, The"]`}
      * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
      */
-    get isTheDemon(): boolean {
-        return this.alive && this.isDemon;
+    get isTheDemon(): Promise<boolean> {
+        return this.isDemon.then((isDemon) => this.alive && isDemon);
     }
 
-    get isAliveNontraveller(): boolean {
-        return this.alive && !this.isTraveller;
+    get isAliveNontraveller() {
+        if (!this.alive) {
+            return Promise.resolve(false);
+        }
+
+        return this.isTraveller.then((isTraveller) => !isTraveller);
     }
 
-    get characterType(): typeof CharacterType {
-        return this.character.characterType;
+    get characterType(): Promise<typeof CharacterType> {
+        return Promise.resolve(this.character.characterType);
     }
 
     get isGood(): Promise<boolean> {
@@ -256,6 +291,10 @@ export class Player extends EffectTarget<Player> {
         return this.alignment.then((alignment) => alignment === Alignment.Evil);
     }
 
+    protected get _characterType(): typeof CharacterType {
+        return this.character.characterType;
+    }
+
     /**
      * {@link `glossary["State"]`}
      * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
@@ -263,7 +302,7 @@ export class Player extends EffectTarget<Player> {
     protected readonly state: PlayerState = PlayerState.init();
 
     @Expose({ name: 'character', toPlainOnly: true })
-    protected characterId(): string {
+    protected _characterId(): string {
         return this.character.id;
     }
 
@@ -384,6 +423,10 @@ export class Player extends EffectTarget<Player> {
         }
     }
 
+    storytellerGet<K extends keyof Player | string, V>(key: K): V {
+        return (this as Record<K, any>)[key] as V;
+    }
+
     toJSON() {
         return instanceToPlain(this);
     }
@@ -414,7 +457,7 @@ export class Player extends EffectTarget<Player> {
         this.character = character;
 
         if (this._alignment === undefined) {
-            const alignment = this.characterType.defaultAlignment;
+            const alignment = this._characterType.defaultAlignment;
             if (alignment === undefined) {
                 throw new PlayerHasUnclearAlignment(this, alignment);
             } else {

@@ -283,7 +283,9 @@ abstract class CharacterTypeInformationRequester<
     async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
-            context.requestedPlayer.characterType.is(this.expectedCharacterType)
+            (await context.requestedPlayer.characterType).is(
+                this.expectedCharacterType
+            )
         );
     }
 
