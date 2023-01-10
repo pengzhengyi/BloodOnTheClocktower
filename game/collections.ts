@@ -2,6 +2,7 @@
 import { Deque } from 'js-sdsl';
 import type { RecoverableGameError, RecoveryAction } from './exception';
 import type {
+    AsyncPredicate,
     AsyncReducer,
     Factory,
     Loader,
@@ -175,6 +176,29 @@ export class Generator<T> implements Iterable<T> {
                 yield element;
             }
         }
+    }
+
+    static filterAsync<T>(
+        predicate: AsyncPredicate<T>,
+        iterable: Iterable<T>
+    ): Promise<Iterable<T>> {
+        const promises = Generator.promiseAll(
+            Generator.toPromise(
+                async (element) =>
+                    [element, await predicate(element)] as [T, boolean],
+                iterable
+            )
+        );
+
+        return promises.then((elementAndShouldKeeps) =>
+            Generator.map(
+                ([element, _shouldKeep]) => element,
+                Generator.filter(
+                    ([_element, shouldKeep]) => shouldKeep,
+                    elementAndShouldKeeps
+                )
+            )
+        );
     }
 
     static *exclude<T>(
@@ -812,6 +836,10 @@ export class Generator<T> implements Iterable<T> {
         return this.transform((iterable) =>
             Generator.filter(predicate, iterable)
         );
+    }
+
+    filterAsync(predicate: AsyncPredicate<T>) {
+        return Generator.filterAsync(predicate, this);
     }
 
     is = this.filter;

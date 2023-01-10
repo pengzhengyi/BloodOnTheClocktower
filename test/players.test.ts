@@ -53,15 +53,17 @@ describe('test basic functionalities', () => {
     test.concurrent('get characters in player', async () => {
         const players = new Players(await createBasicPlayers(6));
 
-        const existingCharacters = new Set(players.charactersInPlay);
-        expect(
-            Array.from(
-                Generator.map(
-                    (player) => existingCharacters.has(player.character),
-                    players
-                )
+        const existingCharacters = new Set(
+            await Generator.promiseAll(players.charactersInPlay)
+        );
+        const isPlayerCharacterExisting = await Generator.promiseAll(
+            Generator.toPromise(
+                async (player) =>
+                    existingCharacters.has(await player.character),
+                players
             )
-        ).toIncludeAllMembers([true]);
+        );
+        expect(isPlayerCharacterExisting).toIncludeAllMembers([true]);
     });
 
     test.concurrent('assign player characters', async () => {

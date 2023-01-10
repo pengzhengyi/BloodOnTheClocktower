@@ -46,8 +46,8 @@ export class Players extends Generator<Player> {
      * {@link `glossary["In play"]`}
      * A character that exists in the current game, either alive or dead.
      */
-    get charactersInPlay(): Iterable<CharacterToken> {
-        return Generator.map((player) => player.character, this.players);
+    get charactersInPlay(): Iterable<Promise<CharacterToken>> {
+        return Generator.toPromise((player) => player.character, this.players);
     }
 
     get isMinion() {
@@ -117,7 +117,9 @@ export class Players extends Generator<Player> {
     }
 
     isCharacterType(characterType: typeof CharacterType) {
-        return this.filter((player) => player.character.is(characterType));
+        return this.filterAsync(async (player) =>
+            (await player.character).is(characterType)
+        );
     }
 
     async assignCharacters(

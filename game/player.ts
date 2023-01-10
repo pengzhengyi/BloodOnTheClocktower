@@ -121,7 +121,11 @@ export class Player extends EffectTarget<Player> {
     @Expose({ toPlainOnly: true })
     username: string;
 
-    declare character: CharacterToken;
+    get character(): Promise<CharacterToken> {
+        return Promise.resolve(this._character);
+    }
+
+    protected declare _character: CharacterToken;
 
     infoRequester?: unknown;
 
@@ -280,7 +284,7 @@ export class Player extends EffectTarget<Player> {
     }
 
     get characterType(): Promise<typeof CharacterType> {
-        return Promise.resolve(this.character.characterType);
+        return this.character.then((character) => character.characterType);
     }
 
     get isGood(): Promise<boolean> {
@@ -292,7 +296,7 @@ export class Player extends EffectTarget<Player> {
     }
 
     protected get _characterType(): typeof CharacterType {
-        return this.character.characterType;
+        return this._character.characterType;
     }
 
     /**
@@ -303,7 +307,7 @@ export class Player extends EffectTarget<Player> {
 
     @Expose({ name: 'character', toPlainOnly: true })
     protected _characterId(): string {
-        return this.character.id;
+        return this._character.id;
     }
 
     protected constructor(
@@ -330,10 +334,10 @@ export class Player extends EffectTarget<Player> {
         character: CharacterToken,
         alignment?: Alignment
     ): Promise<CharacterAssignmentResult> {
-        if (this.character !== undefined) {
+        if (this._character !== undefined) {
             const error = new ReassignCharacterToPlayer(
                 this,
-                this.character,
+                this._character,
                 character
             );
             await error.resolve();
@@ -454,7 +458,7 @@ export class Player extends EffectTarget<Player> {
     }
 
     protected initializeCharacter(character: CharacterToken) {
-        this.character = character;
+        this._character = character;
 
         if (this._alignment === undefined) {
             const alignment = this._characterType.defaultAlignment;

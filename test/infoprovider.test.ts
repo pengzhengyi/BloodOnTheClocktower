@@ -24,6 +24,7 @@ import { Minion, Outsider, Townsfolk } from '~/game/charactertype';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Chef } from '~/content/characters/output/chef';
 import { Players } from '~/game/players';
+import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/deadreason';
 import { Player } from '~/game/player';
 import { Seating } from '~/game/seating';
@@ -73,7 +74,7 @@ export function createInfoProvideContext(
 }
 
 async function createInfoProvideContextFromPlayerDescriptions(
-    isRequestedPlayer: (player: Player) => boolean,
+    isRequestedPlayer: AsyncPredicate<Player>,
     ...playerDescriptions: Array<string>
 ) {
     const [seating, players] = await createSeatingAndPlayersFromDescriptions(
@@ -84,7 +85,7 @@ async function createInfoProvideContextFromPlayerDescriptions(
     const otherPlayers: Array<Player> = [];
 
     for (const player of players) {
-        if (isRequestedPlayer(player)) {
+        if (await isRequestedPlayer(player)) {
             requestedPlayer = player;
         } else {
             otherPlayers.push(player);
@@ -164,14 +165,14 @@ describe('test DemonInformationProvider and MinionInformationProvider', () => {
         ];
         const demonContext =
             await createInfoProvideContextFromPlayerDescriptions(
-                (player) => player.character === Imp,
+                async (player) => (await player.character) === Imp,
                 ...playerDescriptions
             );
         demonContext.characterSheet = TroubleBrewing.characterSheet;
 
         const minionContext =
             await createInfoProvideContextFromPlayerDescriptions(
-                (player) => player.character === Poisoner,
+                async (player) => (await player.character) === Poisoner,
                 ...playerDescriptions
             );
         minionContext.characterSheet = TroubleBrewing.characterSheet;
@@ -186,7 +187,9 @@ describe('test DemonInformationProvider and MinionInformationProvider', () => {
         for (const option of demonTrueInfoOptions) {
             expect(option.isTrueInfo).toBeTrue();
             expect(
-                option.info.minions.map((player) => player.character)
+                option.info.minions.map((player) =>
+                    player.storytellerGet('_character')
+                )
             ).toIncludeSameMembers([Poisoner]);
             expect(option.info.notInPlayGoodCharacters).toHaveLength(3);
             expect(option.info.notInPlayGoodCharacters).not.toIncludeAnyMembers(
@@ -210,7 +213,7 @@ describe('test DemonInformationProvider and MinionInformationProvider', () => {
         for (const option of minionTrueInfoOptions) {
             expect(option.isTrueInfo).toBeTrue();
             expect(option.info.otherMinions).toHaveLength(0);
-            expect(option.info.demon.character).toBe(Imp);
+            expect(await option.info.demon.character).toBe(Imp);
             expect(
                 await minionInformationProvider.evaluateGoodness(
                     option.info,
@@ -439,7 +442,7 @@ describe('test ChefInformationProvider', () => {
      */
     test("No evil players are sitting next to each other. The Chef learns a '0'.", async () => {
         const context = await createInfoProvideContextFromPlayerDescriptions(
-            (player) => player.character === Chef,
+            async (player) => (await player.character) === Chef,
             `${faker.name.firstName()} is the Chef`,
             `${faker.name.firstName()} is the Imp`,
             `${faker.name.firstName()} is the Empath`,
@@ -465,7 +468,7 @@ describe('test ChefInformationProvider', () => {
      */
     test("The Imp is sitting next to the Baron. Across the circle, the Poisoner is sitting next to the Scarlet Woman. The Chef learns a '2'.", async () => {
         const context = await createInfoProvideContextFromPlayerDescriptions(
-            (player) => player.character === Chef,
+            async (player) => (await player.character) === Chef,
             `${faker.name.firstName()} is the Chef`,
             `${faker.name.firstName()} is the Imp`,
             `${faker.name.firstName()} is the Baron`,
@@ -493,7 +496,7 @@ describe('test ChefInformationProvider', () => {
      */
     test("An evil Scapegoat is sitting between the Imp and a Minion. Across the circle, two other Minions are sitting next to each other. The Chef learns a '3'.", async () => {
         const context = await createInfoProvideContextFromPlayerDescriptions(
-            (player) => player.character === Chef,
+            async (player) => (await player.character) === Chef,
             `${faker.name.firstName()} is the Chef`,
             `${faker.name.firstName()} is the Imp`,
             `${faker.name.firstName()} is the evil Scapegoat`,
@@ -526,7 +529,7 @@ describe('test EmpathInformationProvider', () => {
      */
     test("The Empath neighbours two good players—a Soldier and a Monk . The Empath learns a '0'.", async () => {
         const context = await createInfoProvideContextFromPlayerDescriptions(
-            (player) => player.character === Empath,
+            async (player) => (await player.character) === Empath,
             `${faker.name.firstName()} is the Librarian`,
             `${faker.name.firstName()} is the Soldier`,
             `${faker.name.firstName()} is the Empath`,
@@ -552,7 +555,7 @@ describe('test EmpathInformationProvider', () => {
      */
     test("The next day, the Soldier is executed. That night, the Monk is killed by the Imp. The Empath now detects the players sitting next to the Soldier and the Monk, which are a Librarian and an evil Gunslinger. The Empath now learns a '1'.", async () => {
         const context = await createInfoProvideContextFromPlayerDescriptions(
-            (player) => player.character === Empath,
+            async (player) => (await player.character) === Empath,
             `${faker.name.firstName()} is the Librarian`,
             `${faker.name.firstName()} is the Soldier`,
             `${faker.name.firstName()} is the Empath`,
@@ -565,11 +568,13 @@ describe('test EmpathInformationProvider', () => {
             [Soldier, DeadReason.Executed],
             [Monk, DeadReason.DemonAttack],
         ]);
-        for (const playerShouldBeDead of context.players
+        for (const playerShouldBeDead of await context.players
             .clone()
-            .filter((player) => characterToDeadReason.has(player.character))) {
+            .filterAsync(async (player) =>
+                characterToDeadReason.has(await player.character)
+            )) {
             await playerShouldBeDead.setDead(
-                characterToDeadReason.get(playerShouldBeDead.character)
+                characterToDeadReason.get(await playerShouldBeDead.character)
             );
         }
 
@@ -592,7 +597,7 @@ describe('test EmpathInformationProvider', () => {
      */
     test("There are only three players left alive: the Empath, the Imp, and the Baron. No matter who is seated where, the Empath learns a '2'.", async () => {
         const context = await createInfoProvideContextFromPlayerDescriptions(
-            (player) => player.character === Empath,
+            async (player) => (await player.character) === Empath,
             `${faker.name.firstName()} is the evil Gunslinger`,
             `${faker.name.firstName()} is the Imp`,
             `${faker.name.firstName()} is the Monk`,
@@ -603,9 +608,11 @@ describe('test EmpathInformationProvider', () => {
         );
 
         const aliveCharacters = new Set([Empath, Imp, Baron]);
-        for (const playerShouldBeDead of context.players
+        for (const playerShouldBeDead of await context.players
             .clone()
-            .filter((player) => !aliveCharacters.has(player.character))) {
+            .filterAsync(
+                async (player) => !aliveCharacters.has(await player.character)
+            )) {
             await playerShouldBeDead.setDead();
         }
 
@@ -877,7 +884,7 @@ describe('True TravellerInformationProvider info', () => {
 
         for (const option of trueInfoOptions) {
             expect(option.isTrueInfo).toBeTrue();
-            expect(option.info.demon).toBe(impPlayer);
+            expect(await option.info.demon).toBe(impPlayer);
             expect(
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);

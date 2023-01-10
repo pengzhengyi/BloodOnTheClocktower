@@ -333,7 +333,7 @@ abstract class CharacterInformationRequester<
     async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (
             (await super.isEligible(context)) &&
-            context.requestedPlayer.character === this.expectedCharacter
+            (await context.requestedPlayer.character) === this.expectedCharacter
         );
     }
 

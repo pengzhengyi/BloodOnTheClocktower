@@ -188,27 +188,28 @@ describe('test GetWasherwomanInformationAbility', () => {
 describe('test GetFortuneTellerInformationAbility', () => {
     beforeAll(() => {
         storytellerChooseOneMock.mockImplementation(
-            (options: Generator<any>, reason?: string) => {
+            async (options: Generator<any>, reason?: string) => {
                 if (reason === RedHerringEffect.description) {
                     const players = options as Iterable<Player>;
+                    const saintPlayerCandidates = await Generator.filterAsync(
+                        async (player) => (await player.character) === Saint,
+                        players
+                    );
                     const saintPlayer = Generator.take(
                         1,
-                        Generator.filter(
-                            (player) => player.character === Saint,
-                            players
-                        )
+                        saintPlayerCandidates
                     );
                     expect(saintPlayer).toBeDefined();
-                    return Promise.resolve(saintPlayer);
+                    return saintPlayer;
                 }
 
                 return Promise.resolve(Generator.take(1, options));
             }
         );
 
-        chooseMock.mockImplementation((fortuneTellerPlayer, players) => {
-            expect(fortuneTellerPlayer.character).toEqual(FortuneTeller);
-            return Promise.resolve(Generator.take(2, players));
+        chooseMock.mockImplementation(async (fortuneTellerPlayer, players) => {
+            expect(await fortuneTellerPlayer.character).toEqual(FortuneTeller);
+            return Generator.take(2, players);
         });
     });
 
@@ -277,9 +278,9 @@ async function monkProtectPlayer(
     context: GetInfoAbilityUseContext,
     playerToProtect: Player
 ): Promise<MonkAbilityUseResult> {
-    chooseMock.mockImplementation((_monkPlayer, _players) => {
-        expect(_monkPlayer.character).toEqual(Monk);
-        return Promise.resolve(playerToProtect);
+    chooseMock.mockImplementation(async (_monkPlayer, _players) => {
+        expect(await _monkPlayer.character).toEqual(Monk);
+        return playerToProtect;
     });
     const result = (await ability.use(context)) as MonkAbilityUseResult;
     chooseMock.mockReset();
@@ -580,9 +581,9 @@ describe('test SlayerAbility', () => {
         const context = mockAbilityUseContext(slayerPlayer);
         expect(await ability.isEligible(context)).toBeTrue();
 
-        chooseMock.mockImplementation((slayerPlayer, _players) => {
-            expect(slayerPlayer.character).toEqual(Slayer);
-            return Promise.resolve(impPlayer);
+        chooseMock.mockImplementation(async (slayerPlayer, _players) => {
+            expect(await slayerPlayer.character).toEqual(Slayer);
+            return impPlayer;
         });
         const result = (await ability.use(context)) as SlayerAbilityUseResult;
         chooseMock.mockReset();
