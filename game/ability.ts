@@ -3,6 +3,7 @@ import {
     CharacterNightEffect,
     Effect,
     InteractionContext,
+    RegisterAsCharacterEffect,
     RegisterAsGoodAlignmentEffect,
     SafeFromDemonEffect,
 } from './effect';
@@ -35,6 +36,7 @@ import {
 } from './inforequester';
 import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
+import { CachingGenerator, Generator } from './collections';
 import { DeadReason } from './deadreason';
 import type { CharacterSheet } from './charactersheet';
 import type { Death } from './death';
@@ -1612,10 +1614,48 @@ export class ButlerAbility extends Ability<
 }
 
 class RecluseRegisterAsEvilAlignmentEffect extends RegisterAsGoodAlignmentEffect<ReclusePlayer> {
-    protected formatPromptForChooseAlignment(
+    protected formatPromptForChoose(
         context: InteractionContext<ReclusePlayer>
     ): string {
-        return `Choose an alignment for recluse player ${context.interaction.target}.  Recluse might register as evil.`;
+        const prompt = super.formatPromptForChoose(context);
+        return `${prompt} Recluse might register as evil.`;
+    }
+}
+
+class RecluseRegisterAsEvilCharacterEffect extends RegisterAsCharacterEffect<ReclusePlayer> {
+    readonly recommended = undefined;
+
+    static fromCharacterSheet(characterSheet: CharacterSheet) {
+        return this.from(characterSheet.minion, characterSheet.demon);
+    }
+
+    static from(minions: Array<CharacterToken>, demons: Array<CharacterToken>) {
+        const evilCharacters = Generator.cache(
+            Generator.chain(minions, demons)
+        );
+        return new this(evilCharacters as CachingGenerator<CharacterToken>);
+    }
+
+    get options() {
+        return this.evilCharacters;
+    }
+
+    protected readonly evilCharacters:
+        | Array<CharacterToken>
+        | CachingGenerator<CharacterToken>;
+
+    protected constructor(
+        evilCharacters: Array<CharacterToken> | CachingGenerator<CharacterToken>
+    ) {
+        super();
+        this.evilCharacters = evilCharacters;
+    }
+
+    protected formatPromptForChoose(
+        context: InteractionContext<ReclusePlayer>
+    ): string {
+        const prompt = super.formatPromptForChoose(context);
+        return `${prompt} Recluse might appear to be an evil character.`;
     }
 }
 
@@ -1627,6 +1667,8 @@ class BaseRecluseAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         'You might register as evil & as a Minion or Demon, even if dead.';
 
     protected declare registerAsAlignment: RecluseRegisterAsEvilAlignmentEffect;
+
+    protected declare registerAsCharacter: RecluseRegisterAsEvilCharacterEffect;
 
     useWhenNormal(context: AbilityUseContext): Promise<AbilityUseResult> {
         return Promise.resolve({
@@ -1645,6 +1687,19 @@ class BaseRecluseAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         await super.setup(context);
 
         this.registerAsAlignment = new RecluseRegisterAsEvilAlignmentEffect();
+        this.registerAsCharacter =
+            RecluseRegisterAsEvilCharacterEffect.fromCharacterSheet(
+                context.characterSheet
+            );
+
+        context.requestedPlayer.effects.add(
+            this.registerAsAlignment,
+            CompositeGamePhaseKind.ALL
+        );
+        context.requestedPlayer.effects.add(
+            this.registerAsCharacter,
+            CompositeGamePhaseKind.ALL
+        );
     }
 
     willMalfunction(_context: AbilityUseContext): Promise<boolean> {

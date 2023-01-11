@@ -13,9 +13,16 @@ import type { Recluse } from '~/content/characters/output/recluse';
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
 
+export type IterableLike<T> =
+    | Iterator<T>
+    | Iterable<T>
+    | AsyncIterable<T>
+    | AsyncIterator<T>;
+
 export type PlayerOrdering = Array<Player>;
 export type Predicate<T> = (value: T) => boolean;
 export type AsyncPredicate<T> = (value: T) => Promise<boolean>;
+export type AnyPredicate<T> = Predicate<T> | AsyncPredicate<T>;
 export const TAUTOLOGY = () => true;
 
 export type Action = () => void;

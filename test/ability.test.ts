@@ -9,6 +9,7 @@ import {
     storytellerChooseOneMock,
 } from '~/__mocks__/gameui';
 import {
+    AbilitySetupContext,
     AbilitySuccessCommunicatedInfo,
     AbilityUseContext,
     AbilityUseStatus,
@@ -22,6 +23,7 @@ import {
     MayorAbility,
     MonkAbilityUseResult,
     MonkProtectAbility,
+    RecluseAbility,
     RedHerringEffect,
     SlayerAbility,
     SlayerAbilityUseResult,
@@ -45,6 +47,7 @@ import {
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
+import { getTroubleBrewingCharacterSheet } from '~/__mocks__/charactersheet';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import type {
     FortuneTellerInformation,
@@ -58,8 +61,16 @@ import { Townsfolk } from '~/game/charactertype';
 import type { Death } from '~/game/death';
 import type { NightSheet } from '~/game/nightsheet';
 import type { Player } from '~/game/player';
+import type { Alignment } from '~/game/alignment';
 import type { GamePhase } from '~/game/gamephase';
-import type { Action } from '~/game/types';
+import type { CharacterToken } from '~/game/character';
+import type { CharacterSheet } from '~/game/charactersheet';
+import type {
+    Action,
+    AsyncFactory,
+    ReclusePlayer,
+    SlayerPlayer,
+} from '~/game/types';
 import { DeadReason } from '~/game/deadreason';
 import { DeadPlayerCannotNominate } from '~/game/exception';
 import { Execution } from '~/game/execution';
@@ -73,6 +84,8 @@ import { Soldier } from '~/content/characters/output/soldier';
 import { Mayor } from '~/content/characters/output/mayor';
 import { Butler } from '~/content/characters/output/butler';
 import { Virgin } from '~/content/characters/output/virgin';
+import { Imp } from '~/content/characters/output/imp';
+import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -123,6 +136,78 @@ async function mockButlerChooseMaster(
     chooseMock.mockResolvedValue(master);
     await ability.use(context ?? mockAbilityUseContext(butlerPlayer));
     chooseMock.mockReset();
+}
+
+async function mockRecluseRegisterAs<T>(
+    reclusePlayer: ReclusePlayer,
+    action: AsyncFactory<T>,
+    registerAsCharacter: CharacterToken,
+    registerAsAlignment?: Alignment,
+    recluseAbility?: RecluseAbility,
+    setupContext?: AbilitySetupContext,
+    characterSheet?: CharacterSheet
+): Promise<T> {
+    recluseAbility ??= new RecluseAbility();
+    characterSheet ??= getTroubleBrewingCharacterSheet();
+    setupContext ??= mockAbilitySetupContext(
+        reclusePlayer,
+        undefined,
+        undefined,
+        undefined,
+        characterSheet
+    );
+
+    registerAsAlignment ??= registerAsCharacter.characterType.defaultAlignment;
+
+    await recluseAbility.setup(setupContext);
+
+    storytellerChooseOneMock.mockImplementation(
+        (options: Generator<any>, reason?: string) => {
+            if (reason?.includes('character')) {
+                return Promise.resolve(registerAsCharacter);
+            } else if (reason?.includes('alignment')) {
+                return Promise.resolve(registerAsAlignment);
+            } else {
+                return Promise.resolve(options.take(1));
+            }
+        }
+    );
+    const result = await action();
+    storytellerChooseOneMock.mockReset();
+
+    return result;
+}
+
+async function expectAfterSlayerKill(
+    ability: SlayerAbility,
+    chosenPlayer: Player,
+    shouldBeDead: boolean,
+    context?: AbilityUseContext,
+    slayerPlayer?: SlayerPlayer
+) {
+    context ??= mockAbilityUseContext(slayerPlayer);
+    expect(await ability.isEligible(context)).toBeTrue();
+
+    chooseMock.mockImplementation(async (_slayerPlayer, _players) => {
+        expect(await _slayerPlayer.character).toEqual(Slayer);
+        return chosenPlayer;
+    });
+    const result = (await ability.use(context)) as SlayerAbilityUseResult;
+    chooseMock.mockReset();
+
+    if (shouldBeDead) {
+        expect(result.death?.deadReason).toBe(DeadReason.SlayerKill);
+        expect(result.status).toEqual(
+            AbilityUseStatus.Success | AbilityUseStatus.HasEffect
+        );
+        expect(chosenPlayer.dead).toBeTrue();
+    } else {
+        expect(result.death).toBeUndefined();
+        expect(chosenPlayer.dead).toBeFalse();
+    }
+
+    expect(result.chosenPlayer).toBe(chosenPlayer);
+    expect(await ability.isEligible(context)).toBeFalse();
 }
 
 let troubleBrewingNightSheet: NightSheet;
@@ -440,16 +525,19 @@ describe('test GetRavenkeeperInformationAbility', () => {
         expect(await ravenKeeperAbility.isEligible(context)).toBeTrue();
 
         chooseMock.mockResolvedValue(Douglas);
-        const result = (await ravenKeeperAbility.use(
-            context
+        const result = (await mockRecluseRegisterAs(
+            Douglas,
+            () => ravenKeeperAbility.use(context),
+            ScarletWoman
         )) as GetInformationAbilityUseResult<RavenkeeperInformation>;
+
         chooseMock.mockReset();
 
         expect(result.status).toEqual(AbilitySuccessCommunicatedInfo);
         expectSendMockToHaveBeenCalled();
         expect(result.isTrueInformation).toBeTrue();
-
-        // TODO recluse ability registration and activation
+        expect(result.info?.info?.chosenPlayer).toBe(Douglas);
+        expect(result.info?.info?.character).toBe(ScarletWoman);
     });
 });
 
@@ -578,29 +666,35 @@ describe('test SlayerAbility', () => {
             `${faker.name.firstName()} is the Imp`
         );
 
-        const context = mockAbilityUseContext(slayerPlayer);
-        expect(await ability.isEligible(context)).toBeTrue();
-
-        chooseMock.mockImplementation(async (slayerPlayer, _players) => {
-            expect(await slayerPlayer.character).toEqual(Slayer);
-            return impPlayer;
-        });
-        const result = (await ability.use(context)) as SlayerAbilityUseResult;
-        chooseMock.mockReset();
-
-        expect(result.status).toEqual(
-            AbilityUseStatus.Success | AbilityUseStatus.HasEffect
+        await expectAfterSlayerKill(
+            ability,
+            impPlayer,
+            true,
+            undefined,
+            slayerPlayer
         );
-        expect(result.death?.deadReason).toBe(DeadReason.SlayerKill);
-        expect(result.chosenPlayer).toBe(impPlayer);
-        expect(await ability.isEligible(context)).toBeFalse();
     });
 
     /**
      * {@link `slayer["gameplay"][1]`}
      */
     test('The Slayer chooses the Recluse. The Storyteller decides that the Recluse registers as the Imp, so the Recluse dies, but the game continues.', async () => {
-        // TODO
+        const reclusePlayer = await playerFromDescription(
+            `${faker.name.firstName()} is the Recluse`
+        );
+
+        await mockRecluseRegisterAs(
+            reclusePlayer,
+            () =>
+                expectAfterSlayerKill(
+                    ability,
+                    reclusePlayer,
+                    true,
+                    undefined,
+                    slayerPlayer
+                ),
+            Imp
+        );
     });
 
     /**

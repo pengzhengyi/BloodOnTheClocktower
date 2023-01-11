@@ -59,6 +59,7 @@ class GameUI {
         _n = 1,
         _reason?: string,
         _allowNotChoose = false,
+        _recommendation?: T | Iterable<T>,
         _timeout = GameUI.DEFAULT_TIMEOUT
     ): Promise<T> | Promise<T[]> | Promise<undefined> {
         // TODO
@@ -71,6 +72,7 @@ class GameUI {
     storytellerChooseOne<T>(
         options: Iterable<T>,
         reason?: string,
+        recommendation?: T,
         timeout = GameUI.DEFAULT_TIMEOUT
     ): Promise<T> {
         return this.storytellerChoose(
@@ -78,6 +80,7 @@ class GameUI {
             1,
             reason,
             false,
+            recommendation,
             timeout
         ) as Promise<T>;
     }

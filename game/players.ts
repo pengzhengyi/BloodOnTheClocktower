@@ -29,11 +29,10 @@ export class Players extends Generator<Player> {
     }
 
     static async allEvil(players: Iterable<Player>): Promise<boolean> {
-        const areAlignmentsEvil = await Promise.all(
-            Generator.map((player) => player.isEvil, players)
+        const isPlayerEvil = Generator.promiseRaceAll(
+            Generator.toPromise((player) => player.isEvil, players)
         );
-
-        return areAlignmentsEvil.every((isEvil) => isEvil);
+        return await Generator.everyAsync((isEvil) => isEvil, isPlayerEvil);
     }
 
     protected readonly players: Array<Player>;
@@ -48,6 +47,14 @@ export class Players extends Generator<Player> {
      */
     get charactersInPlay(): Iterable<Promise<CharacterToken>> {
         return Generator.toPromise((player) => player.character, this.players);
+    }
+
+    get isGood() {
+        return this.filterAsync((player) => player.isGood);
+    }
+
+    get isEvil() {
+        return this.filterAsync((player) => player.isEvil);
     }
 
     get isMinion() {

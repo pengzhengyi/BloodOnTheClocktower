@@ -169,11 +169,21 @@ export abstract class Effect<TTarget extends object> {
         return predicate(context.initiator);
     }
 
-    protected matchNotNullInitiatorDifferentThanTarget(
+    protected matchNotNullInitiatorSameAsTarget(
         context: InteractionContext<TTarget>
     ) {
         return this.matchNotNullInitiator<Player>(context, (initiator) =>
             initiator.equals(context.interaction.target as Player)
+        );
+    }
+
+    protected matchNotNullInitiatorDifferentThanTarget(
+        context: InteractionContext<TTarget>
+    ) {
+        return this.matchNotNullInitiator<Player>(
+            context,
+            (initiator) =>
+                !initiator.equals(context.interaction.target as Player)
         );
     }
 
@@ -363,18 +373,21 @@ export function CharacterNightEffect<
     };
 }
 
-export abstract class RegisterAsAlignmentEffect<
-    TPlayer extends Player
+export abstract class RegisterAsEffect<
+    TPlayer extends Player,
+    V
 > extends Effect<TPlayer> {
-    static readonly options = [Alignment.Good, Alignment.Evil];
+    abstract readonly propertyName: keyof TPlayer;
 
-    abstract readonly alignment: Alignment;
+    abstract readonly options: Iterable<V>;
+
+    abstract readonly recommended?: V;
 
     isApplicable(context: InteractionContext<TPlayer>): boolean {
         return (
             super.isApplicable(context) &&
             this.matchNotNullInitiatorDifferentThanTarget(context) &&
-            this.isGetProperty(context, 'alignment')
+            this.isGetProperty(context, this.propertyName)
         );
     }
 
@@ -383,24 +396,48 @@ export abstract class RegisterAsAlignmentEffect<
         next: NextFunction<InteractionContext<TPlayer>>
     ): InteractionContext<TPlayer> {
         const updatedContext = next(context);
-        const registerAsAlignment = this.chooseAlignment(context);
-        updatedContext.result = registerAsAlignment;
+        const registerAs = this.choose(context);
+        updatedContext.result = registerAs;
         return updatedContext;
     }
 
-    protected async chooseAlignment(
-        context: InteractionContext<TPlayer>
-    ): Promise<Alignment> {
+    protected async choose(context: InteractionContext<TPlayer>): Promise<V> {
         return await GAME_UI.storytellerChooseOne(
-            RegisterAsAlignmentEffect.options,
-            this.formatPromptForChooseAlignment(context)
+            this.options,
+            this.formatPromptForChoose(context),
+            this.recommended
         );
     }
 
-    protected formatPromptForChooseAlignment(
+    protected formatPromptForChoose(
         context: InteractionContext<TPlayer>
     ): string {
-        return `Choose an alignment for player ${context.interaction.target}. Player currently registers as ${this.alignment}.`;
+        const recommendation =
+            this.recommended === undefined
+                ? ''
+                : ` (recommended: ${this.recommended})`;
+
+        return `Choose ${this.propertyName as string} for player ${
+            context.interaction.target
+        }${recommendation}.`;
+    }
+}
+
+export abstract class RegisterAsAlignmentEffect<
+    TPlayer extends Player
+> extends RegisterAsEffect<TPlayer, Alignment> {
+    static readonly options = [Alignment.Good, Alignment.Evil];
+
+    abstract readonly alignment: Alignment;
+
+    readonly propertyName = 'alignment';
+
+    get recommended() {
+        return this.alignment;
+    }
+
+    get options(): Array<Alignment> {
+        return RegisterAsAlignmentEffect.options;
     }
 }
 
@@ -414,4 +451,10 @@ export abstract class RegisterAsEvilAlignmentEffect<
     TPlayer extends Player
 > extends RegisterAsAlignmentEffect<TPlayer> {
     readonly alignment = Alignment.Evil;
+}
+
+export abstract class RegisterAsCharacterEffect<
+    TPlayer extends Player
+> extends RegisterAsEffect<TPlayer, CharacterToken> {
+    readonly propertyName = 'character';
 }

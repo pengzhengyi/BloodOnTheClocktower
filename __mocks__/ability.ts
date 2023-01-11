@@ -33,7 +33,8 @@ export function mockAbilitySetupContext(
     player?: Player,
     players?: Players,
     context?: AbilityUseContext,
-    nightSheet?: NightSheet
+    nightSheet?: NightSheet,
+    characterSheet?: CharacterSheet
 ): AbilitySetupContext {
     if (context === undefined) {
         context = mockAbilityUseContext(player, players);
@@ -41,6 +42,9 @@ export function mockAbilitySetupContext(
 
     (context as AbilitySetupContext).nightSheet =
         nightSheet ?? mockNightSheet();
+
+    (context as AbilitySetupContext).characterSheet =
+        characterSheet ?? mockCharacterSheet();
 
     return context as AbilitySetupContext;
 }

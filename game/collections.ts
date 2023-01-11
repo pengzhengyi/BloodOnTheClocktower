@@ -1,7 +1,8 @@
 /* eslint-disable no-dupe-class-members */
 import { Deque } from 'js-sdsl';
-import type { RecoverableGameError, RecoveryAction } from './exception';
+import { RecoverableGameError, RecoveryAction } from './exception';
 import type {
+    AnyPredicate,
     AsyncPredicate,
     AsyncReducer,
     Factory,
@@ -15,6 +16,7 @@ import type {
     Task,
     Transform,
 } from './types';
+import { isIterable } from '~/utils/common';
 
 export class LazyMap<K, V> extends Map<K, V> {
     constructor(readonly loader: Loader<K, V>) {
@@ -40,9 +42,9 @@ export class LazyMap<K, V> extends Map<K, V> {
 }
 
 export class TaskQueue<T> {
-    protected tasks: Deque<Promise<T>> = new Deque();
+    protected readonly tasks: Deque<Promise<T>> = new Deque();
 
-    protected pending: Deque<[ResolveCallback<T>, RejectCallback]> =
+    protected readonly pending: Deque<[ResolveCallback<T>, RejectCallback]> =
         new Deque();
 
     constructor(tasks?: Iterable<Promise<T>>) {
@@ -154,6 +156,8 @@ export class DefaultDict<K, V, Vs = Array<V>> extends Map<K, Vs> {
         this.insert(value, this.get(key));
     }
 }
+
+export type StorageType = 'once' | 'cache';
 
 export class Generator<T> implements Iterable<T> {
     static *range(start: number, stop?: number, step = 1) {
@@ -562,9 +566,37 @@ export class Generator<T> implements Iterable<T> {
         return true;
     }
 
+    static async everyAsync<T>(
+        predicate: AnyPredicate<T>,
+        iterable: Iterable<Promise<T>>
+    ): Promise<boolean> {
+        for await (const element of iterable) {
+            const condition = await predicate(element);
+            if (!condition) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     static any<T>(predicate: Predicate<T>, iterable: Iterable<T>): boolean {
         for (const element of iterable) {
             if (predicate(element)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static async anyAsync<T>(
+        predicate: AnyPredicate<T>,
+        iterable: Iterable<Promise<T>>
+    ): Promise<boolean> {
+        for await (const element of iterable) {
+            const condition = await predicate(element);
+            if (condition) {
                 return true;
             }
         }
@@ -757,11 +789,29 @@ export class Generator<T> implements Iterable<T> {
         return new this(iterable, [], true);
     }
 
+    static wrap<T>(
+        iterableLike: Iterable<T> | Iterator<T>,
+        storageType: StorageType = 'once'
+    ): Generator<T> {
+        let iterable: Iterable<T>;
+        if (isIterable(iterableLike)) {
+            iterable = iterableLike;
+        } else {
+            iterable = {
+                [Symbol.iterator]() {
+                    return iterableLike;
+                },
+            };
+        }
+
+        return this[storageType](iterable);
+    }
+
     cached?: Array<T>;
 
     private initialIterable: Iterable<T>;
 
-    *[Symbol.iterator]() {
+    *[Symbol.iterator](): Iterator<T> {
         const supportMultipleIterations = this.supportMultipleIterations;
         if (this.cached === undefined) {
             if (supportMultipleIterations) {
@@ -782,6 +832,12 @@ export class Generator<T> implements Iterable<T> {
             }
         } else {
             yield* this.cached;
+        }
+    }
+
+    async *[Symbol.asyncIterator](this: Iterable<T> | Iterable<Promise<T>>) {
+        for await (const element of this) {
+            yield element;
         }
     }
 
@@ -1036,8 +1092,22 @@ export class Generator<T> implements Iterable<T> {
         return Generator.every(predicate, this);
     }
 
+    everyAsync(
+        this: Generator<Promise<T>>,
+        predicate: AnyPredicate<T>
+    ): Promise<boolean> {
+        return Generator.everyAsync(predicate, this);
+    }
+
     any(predicate: Predicate<T>): boolean {
         return Generator.any(predicate, this);
+    }
+
+    anyAsync(
+        this: Generator<Promise<T>>,
+        predicate: AnyPredicate<T>
+    ): Promise<boolean> {
+        return Generator.anyAsync(predicate, this);
     }
 
     reduce<T1>(reducer: Reducer<T1, T>, initialValue: T1): T1 {
