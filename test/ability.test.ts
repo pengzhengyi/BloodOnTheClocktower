@@ -330,10 +330,12 @@ describe('test GetFortuneTellerInformationAbility', () => {
             async (options: Generator<any>, reason?: string) => {
                 if (reason === RedHerringEffect.description) {
                     const players = options as Iterable<Player>;
-                    const saintPlayerCandidates = await Generator.filterAsync(
-                        async (player) => (await player.character) === Saint,
-                        players
-                    );
+                    const saintPlayerCandidates =
+                        await Generator.filterAllAsync(
+                            async (player) =>
+                                (await player.character) === Saint,
+                            players
+                        );
                     const saintPlayer = Generator.take(
                         1,
                         saintPlayerCandidates

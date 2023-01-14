@@ -570,7 +570,7 @@ describe('test EmpathInformationProvider', () => {
         ]);
         for (const playerShouldBeDead of await context.players
             .clone()
-            .filterAsync(async (player) =>
+            .filterAllAsync(async (player) =>
                 characterToDeadReason.has(await player.character)
             )) {
             await playerShouldBeDead.setDead(
@@ -610,7 +610,7 @@ describe('test EmpathInformationProvider', () => {
         const aliveCharacters = new Set([Empath, Imp, Baron]);
         for (const playerShouldBeDead of await context.players
             .clone()
-            .filterAsync(
+            .filterAllAsync(
                 async (player) => !aliveCharacters.has(await player.character)
             )) {
             await playerShouldBeDead.setDead();

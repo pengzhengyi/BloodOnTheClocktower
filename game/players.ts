@@ -50,11 +50,11 @@ export class Players extends Generator<Player> {
     }
 
     get isGood() {
-        return this.filterAsync((player) => player.isGood);
+        return this.filterAllAsync((player) => player.isGood);
     }
 
     get isEvil() {
-        return this.filterAsync((player) => player.isEvil);
+        return this.filterAllAsync((player) => player.isEvil);
     }
 
     get isMinion() {
@@ -124,7 +124,7 @@ export class Players extends Generator<Player> {
     }
 
     isCharacterType(characterType: typeof CharacterType) {
-        return this.filterAsync(async (player) =>
+        return this.filterAllAsync(async (player) =>
             (await player.character).is(characterType)
         );
     }

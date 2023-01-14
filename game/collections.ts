@@ -41,17 +41,11 @@ export class LazyMap<K, V> extends Map<K, V> {
     }
 }
 
-export class TaskQueue<T> {
+export abstract class AbstractTaskQueue<T> {
     protected readonly tasks: Deque<Promise<T>> = new Deque();
 
     protected readonly pending: Deque<[ResolveCallback<T>, RejectCallback]> =
         new Deque();
-
-    constructor(tasks?: Iterable<Promise<T>>) {
-        if (tasks !== undefined) {
-            this.enqueueAll(tasks);
-        }
-    }
 
     get numPending() {
         return this.pending.length;
@@ -77,21 +71,15 @@ export class TaskQueue<T> {
         return this.numPending === 0;
     }
 
-    enqueue(task: Promise<T>) {
-        this.addWorker();
-
-        task.then((value) => {
-            const [resolve, _reject] = this.pending.popFront()!;
-            resolve(value);
-        }).catch((reason) => {
-            const [_resolve, reject] = this.pending.popFront()!;
-            reject(reason);
-        });
+    *[Symbol.iterator]() {
+        while (!this.isEmpty) {
+            yield this.dequeue()!;
+        }
     }
 
-    enqueueAll(tasks: Iterable<Promise<T>>) {
-        for (const task of tasks) {
-            this.enqueue(task);
+    async *[Symbol.asyncIterator]() {
+        while (!this.isEmpty) {
+            yield await this.dequeue()!;
         }
     }
 
@@ -103,6 +91,11 @@ export class TaskQueue<T> {
         return this.tasks.popFront();
     }
 
+    protected startWork(task: Promise<T>) {
+        this.addWorker();
+        this.trackWork(task);
+    }
+
     protected addWorker() {
         this.tasks.pushBack(
             new Promise((resolve, reject) =>
@@ -111,16 +104,83 @@ export class TaskQueue<T> {
         );
     }
 
-    *[Symbol.iterator]() {
-        while (!this.isEmpty) {
-            yield this.dequeue()!;
+    protected trackWork(task: Promise<T>) {
+        task.then((value) => {
+            const [resolve, _reject] = this.pending.popFront()!;
+            resolve(value);
+        }).catch((reason) => {
+            const [_resolve, reject] = this.pending.popFront()!;
+            reject(reason);
+        });
+    }
+}
+
+export class TaskQueue<T> extends AbstractTaskQueue<T> {
+    constructor(tasks?: Iterable<Promise<T>>) {
+        super();
+
+        if (tasks !== undefined) {
+            this.enqueueAll(tasks);
         }
     }
 
-    async *[Symbol.asyncIterator]() {
-        while (!this.isEmpty) {
-            yield await this.dequeue()!;
+    enqueue(task: Promise<T>) {
+        this.startWork(task);
+    }
+
+    enqueueAll(tasks: Iterable<Promise<T>>) {
+        for (const task of tasks) {
+            this.enqueue(task);
         }
+    }
+}
+
+export class LimitTaskQueue<T> extends AbstractTaskQueue<T> {
+    static readonly DEFAULT_MAX_CONCURRENCY = 100;
+
+    protected hasDone = false;
+
+    constructor(
+        protected readonly taskFactory: Iterator<Promise<T>>,
+        protected readonly maxConcurrency: number = LimitTaskQueue.DEFAULT_MAX_CONCURRENCY
+    ) {
+        super();
+        this.enqueueMany(this.maxConcurrency);
+    }
+
+    protected enqueue(task: Promise<T>) {
+        this.startWork(task);
+    }
+
+    protected enqueueMany(n: number) {
+        for (let i = 0; i < n; i++) {
+            this.enqueueNext();
+        }
+    }
+
+    protected enqueueNext() {
+        if (this.hasDone) {
+            return;
+        }
+
+        const { done, value: task } = this.taskFactory.next();
+        if (done) {
+            this.hasDone = true;
+        } else {
+            this.enqueue(task);
+        }
+    }
+
+    protected trackWork(task: Promise<T>) {
+        task.then((value) => {
+            this.enqueueNext();
+            const [resolve, _reject] = this.pending.popFront()!;
+            resolve(value);
+        }).catch((reason) => {
+            this.enqueueNext();
+            const [_resolve, reject] = this.pending.popFront()!;
+            reject(reason);
+        });
     }
 }
 
@@ -182,7 +242,27 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
-    static filterAsync<T>(
+    static async *filterAsync<T>(
+        predicate: AsyncPredicate<T>,
+        iterable: Iterable<T>
+    ): AsyncGenerator<T> {
+        const promises = Generator.promiseRaceAll(
+            Generator.toPromise(
+                async (element) =>
+                    [element, await predicate(element)] as [T, boolean],
+                iterable
+            ),
+            LimitTaskQueue.DEFAULT_MAX_CONCURRENCY
+        );
+
+        for await (const [element, shouldKeep] of promises) {
+            if (shouldKeep) {
+                yield element;
+            }
+        }
+    }
+
+    static filterAllAsync<T>(
         predicate: AsyncPredicate<T>,
         iterable: Iterable<T>
     ): Promise<Iterable<T>> {
@@ -295,9 +375,17 @@ export class Generator<T> implements Iterable<T> {
     }
 
     static promiseRaceAll<T>(
-        iterable: Iterable<Promise<T>>
+        iterable: Iterable<Promise<T>>,
+        maxConcurrency?: number
     ): Iterable<Promise<T>> {
-        return new TaskQueue(iterable);
+        if (maxConcurrency === undefined) {
+            return new TaskQueue(iterable);
+        } else {
+            return new LimitTaskQueue(
+                iterable[Symbol.iterator](),
+                maxConcurrency
+            );
+        }
     }
 
     static toPromise<T1, T2 = T1>(
@@ -920,6 +1008,10 @@ export class Generator<T> implements Iterable<T> {
         return Generator.filterAsync(predicate, this);
     }
 
+    filterAllAsync(predicate: AsyncPredicate<T>) {
+        return Generator.filterAllAsync(predicate, this);
+    }
+
     find(predicate: Predicate<T>) {
         return Generator.find(predicate, this);
     }
@@ -962,8 +1054,10 @@ export class Generator<T> implements Iterable<T> {
         return Generator.promiseRace(this);
     }
 
-    promiseRaceAll<T1>(this: Generator<Promise<T1>>) {
-        return this.become((iterable) => Generator.promiseRaceAll(iterable));
+    promiseRaceAll<T1>(this: Generator<Promise<T1>>, maxConcurrency?: number) {
+        return this.become((iterable) =>
+            Generator.promiseRaceAll(iterable, maxConcurrency)
+        );
     }
 
     toPromise<T2 = T>(toPromise: Transform<T, Promise<T2>>) {
