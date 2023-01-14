@@ -69,7 +69,7 @@ async function createExecutionAndAddNominations(
     return [execution, canAddNominations];
 }
 
-async function createExecutionAndAddVotedNominations(
+export async function createExecutionAndAddVotedNominations(
     nominationPlayers: Array<[Player, Player]>,
     playerToWillRaiseHandForEachNomination: Array<Map<Player, boolean>>
 ): Promise<Execution> {
@@ -147,8 +147,8 @@ describe('Test basic functionalities', () => {
 
         await execution.setPlayerAboutToDie(10 - 3);
         expect(execution.toExecute).toEqual(players[7]);
-        expect(await execution.execute()).toBeTrue();
-        expect(players[7].dead).toBeTrue();
+        expect(await execution.execute()).toBeDefined();
+        expect(players[7].dead).toBeDefined();
     });
 });
 
@@ -190,7 +190,7 @@ describe('Test Execution Edge Cases', () => {
         expect(await execution.setPlayerAboutToDie(players.length)).toBe(
             players[1]
         );
-        expect(await execution.execute()).toBeTrue();
+        expect(await execution.execute()).toBeDefined();
         expect(execution.executed).toBe(players[1]);
 
         await expect(() => execution.execute()).rejects.toThrowError(

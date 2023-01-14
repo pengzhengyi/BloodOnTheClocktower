@@ -6,6 +6,7 @@ import { storytellerConfirmMock } from './gameui';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
 import { Player } from '~/game/player';
+import type { AsyncFactory } from '~/game/types';
 
 export async function createBasicPlayer(
     name?: string,
@@ -35,7 +36,7 @@ export async function createUnassignedPlayer(name?: string) {
 
 export async function createBasicPlayers(
     numPlayers: number,
-    factory: () => Promise<Player> = createBasicPlayer
+    factory: AsyncFactory<Player> = createBasicPlayer
 ): Promise<Array<Player>> {
     const basicPlayerCreations: Array<Promise<Player>> = [];
 

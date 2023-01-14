@@ -56,10 +56,12 @@ export class Game extends EffectTarget<Game> {
         super(enabledProxyHandlerPropertyNames);
     }
 
-    async setWinningTeam(winningTeam: Alignment) {
+    async setWinningTeam(winningTeam: Alignment, reason?: string) {
+        const reasonPrompt = reason === undefined ? '' : ` because ${reason}`;
+
         if (
             await GAME_UI.storytellerConfirm(
-                `${winningTeam} will be the winning team?`
+                `${winningTeam} will be the winning team${reasonPrompt}?`
             )
         ) {
             this.winningTeam = winningTeam;

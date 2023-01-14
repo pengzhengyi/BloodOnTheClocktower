@@ -6,6 +6,7 @@ import { EffectTarget } from './effecttarget';
 import { Nomination } from './nomination';
 import { Player } from './player';
 import { Predicate } from './types';
+import type { Death } from './death';
 import {
     AttemptMoreThanOneExecution,
     NominatedNominatedBefore,
@@ -91,45 +92,17 @@ export class Execution extends EffectTarget<Execution> {
     async execute(
         player?: Player,
         deadReason: DeadReason = DeadReason.Executed
-    ): Promise<boolean> {
-        if (this.executed !== undefined) {
-            if (player === undefined && this.toExecute === undefined) {
-                return false;
-            } else {
-                const attemptedToExecute = (player || this.toExecute) as Player;
-                throw new AttemptMoreThanOneExecution(
-                    this,
-                    this.executed,
-                    attemptedToExecute
-                );
-            }
+    ): Promise<Death | undefined> {
+        if (!this.willExecute(player)) {
+            return;
         }
 
+        player ??= this.toExecute;
         if (player === undefined) {
-            if (this.toExecute === undefined) {
-                return false;
-            } else {
-                player = this.toExecute;
-            }
+            return;
         }
 
-        if (
-            await GAME_UI.storytellerConfirm(
-                this.formatPromptForExecutePlayer(player)
-            )
-        ) {
-            this._toExecute = player;
-            const executionResult = await player.setDead(deadReason);
-
-            if (executionResult !== undefined) {
-                this._executed = player;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        return false;
+        return await this.tryExecute(player, deadReason);
     }
 
     /**
@@ -205,6 +178,42 @@ export class Execution extends EffectTarget<Execution> {
         }
 
         return false;
+    }
+
+    protected willExecute(player?: Player): boolean {
+        if (this.executed !== undefined) {
+            if (player === undefined && this.toExecute === undefined) {
+                return false;
+            } else {
+                const attemptedToExecute = (player || this.toExecute) as Player;
+                throw new AttemptMoreThanOneExecution(
+                    this,
+                    this.executed,
+                    attemptedToExecute
+                );
+            }
+        }
+
+        return true;
+    }
+
+    protected async tryExecute(
+        player: Player,
+        deadReason: DeadReason
+    ): Promise<Death | undefined> {
+        if (
+            await GAME_UI.storytellerConfirm(
+                this.formatPromptForExecutePlayer(player)
+            )
+        ) {
+            this._toExecute = player;
+            const executionResult = await player.setDead(deadReason);
+
+            if (executionResult !== undefined) {
+                this._executed = player;
+                return executionResult;
+            }
+        }
     }
 
     protected formatPromptForExecutePlayer(player: Player): string {

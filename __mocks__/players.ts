@@ -1,0 +1,18 @@
+import { createBasicPlayer, createBasicPlayers } from './player';
+import type { CharacterToken } from '~/game/character';
+import type { AsyncFactory } from '~/game/types';
+import type { Player } from '~/game/player';
+import { Players } from '~/game/players';
+
+export async function mockPlayers(
+    characters: Array<CharacterToken>
+): Promise<[Players, Array<Player>]> {
+    const numPlayers = characters.length;
+    let i = 0;
+    const factory: AsyncFactory<Player> = () =>
+        createBasicPlayer(undefined, characters[i++]);
+
+    const players = await createBasicPlayers(numPlayers, factory);
+
+    return [new Players(players), players];
+}

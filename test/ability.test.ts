@@ -5,6 +5,7 @@ import {
     createUndertakerInfoProviderContext,
 } from './infoprovider.test';
 import { playerFromDescription } from './utils';
+import { createExecutionAndAddVotedNominations } from './execution.test';
 import {
     chooseMock,
     expectSendMockToHaveBeenCalled,
@@ -15,6 +16,7 @@ import {
 import {
     AbilitySetupContext,
     AbilitySuccessCommunicatedInfo,
+    AbilitySuccessUseWhenHasEffect,
     AbilityUseContext,
     AbilityUseStatus,
     ButlerAbility,
@@ -33,6 +35,7 @@ import {
     MonkProtectAbility,
     RecluseAbility,
     RedHerringEffect,
+    SaintAbility,
     SlayerAbility,
     SlayerAbilityUseResult,
     SoldierAbility,
@@ -43,6 +46,8 @@ import {
     mockAbilityUseContext,
     mockGetInfoAbilityUseContext,
     mockMayorAbilitySetupContext,
+    mockSaintAbilitySetupContext,
+    mockSaintAbilityUseContext,
     mockVirginAbilityUseContext,
 } from '~/__mocks__/ability';
 import {
@@ -54,6 +59,7 @@ import {
 } from '~/__mocks__/information';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { mockPlayers } from '~/__mocks__/players';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/charactersheet';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
@@ -99,6 +105,8 @@ import {
     InformationRequestContext,
 } from '~/game/inforequester';
 import { Investigator } from '~/content/characters/output/investigator';
+import { Baron } from '~/content/characters/output/baron';
+import { Librarian } from '~/content/characters/output/librarian';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -121,6 +129,28 @@ async function expectAfterDemonAttack(
     return death;
 }
 
+async function expectAfterExecute(
+    execution: Execution,
+    numAlivePlayer: number,
+    expectPlayerToBeDead?: Player
+): Promise<Death | undefined> {
+    const toExecute = await execution.setPlayerAboutToDie(numAlivePlayer);
+    if (expectPlayerToBeDead === undefined) {
+        expect(toExecute).toBeUndefined();
+    } else {
+        expect(toExecute).toBe(expectPlayerToBeDead);
+    }
+
+    const death = await execution.execute();
+    if (expectPlayerToBeDead === undefined) {
+        expect(death).toBeUndefined();
+    } else {
+        expect(death?.isFor(expectPlayerToBeDead));
+    }
+
+    return death;
+}
+
 async function expectDieInsteadAfterDemonAttack(
     mayorPlayer: Player,
     demonPlayer: Player,
@@ -134,7 +164,7 @@ async function expectDieInsteadAfterDemonAttack(
     expect(mayorPlayer.alive).toBeTrue();
     storytellerChooseOneMock.mockReset();
     expect(death).toBeDefined();
-    expect(death.player.equals(playerDieInstead)).toBeTrue();
+    expect(death.isFor(playerDieInstead)).toBeTrue();
     expect(playerDieInstead.dead).toBeTrue();
 
     return death;
@@ -1093,5 +1123,91 @@ describe('test RecluseAbility', () => {
         );
 
         expect(info.numPairEvilPlayers).toEqual(0);
+    });
+});
+
+describe('test SaintAbility', () => {
+    let _gamePhase: GamePhase | undefined;
+    let recoverGamePhase: Action;
+
+    beforeAll(() => {
+        [_gamePhase, recoverGamePhase] = mockGamePhaseTemporarily(3);
+    });
+
+    afterAll(() => recoverGamePhase());
+
+    /**
+     * {@link `saint["gameplay"][0]`}
+     */
+    test('There are seven players alive and nominations are in progress. The Saint gets four votes and is about to die. Then, the Baron is nominated but only gets three votes. No more nominations occur today. The Saint is executed, and evil wins.', async () => {
+        const [players, _players] = await mockPlayers([
+            Saint,
+            Baron,
+            Imp,
+            Librarian,
+            Investigator,
+            Recluse,
+            Monk,
+        ]);
+        const saintPlayer = _players[0];
+
+        const execution = await createExecutionAndAddVotedNominations(
+            [
+                [_players[1], _players[0]], // baron nominates saint
+                [_players[0], _players[1]], // saint nominates baron
+            ],
+            [
+                new Map([
+                    [_players[1], true],
+                    [_players[2], true],
+                    [_players[3], true],
+                    [_players[4], true],
+                ]),
+                new Map([
+                    [_players[0], true],
+                    [_players[5], true],
+                    [_players[6], true],
+                ]),
+            ]
+        );
+
+        const setupContext = mockSaintAbilitySetupContext(
+            saintPlayer,
+            players,
+            undefined,
+            troubleBrewingNightSheet
+        );
+        const saintAbility = await SaintAbility.init(setupContext);
+
+        const useContext = mockSaintAbilityUseContext(saintPlayer, execution);
+        expect(await saintAbility.isEligible(useContext)).toBeTrue();
+        const result = await saintAbility.use(useContext);
+        expect(result.status).toBe(AbilitySuccessUseWhenHasEffect);
+
+        const _death = await expectAfterExecute(
+            execution,
+            _players.length,
+            saintPlayer
+        );
+
+        expect(setupContext.game.setWinningTeam).toHaveBeenCalledOnce();
+        expect(setupContext.game.setWinningTeam).toBeCalledWith(
+            Alignment.Good,
+            expect.any(String)
+        );
+    });
+
+    /**
+     * {@link `saint["gameplay"][1]`}
+     */
+    test('The Imp is nominated, and the players vote. The Gunslinger kills the Saint. The Saint dies, and the game continues.', async () => {
+        // TODO
+    });
+
+    /**
+     * {@link `saint["gameplay"][2]`}
+     */
+    test("The Saint is executed. However, the Scapegoat's ability is triggered, so the Scapegoat dies instead. The game continues, because the Saint did not die.", async () => {
+        // TODO
     });
 });

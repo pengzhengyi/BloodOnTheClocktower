@@ -8,11 +8,12 @@ import type {
     AbilityUseContext,
     GetInfoAbilityUseContext,
     MayorAbilitySetupContext,
+    SaintAbilitySetupContext,
     VirginAbilityUseContext,
 } from '~/game/ability';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
-import type { Task } from '~/game/types';
+import type { SaintPlayer, Task } from '~/game/types';
 import type { InfoProvideContext } from '~/game/infoprovider';
 import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
@@ -78,9 +79,48 @@ export function mockMayorAbilitySetupContext(
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet
 ): MayorAbilitySetupContext {
-    return Object.assign({}, mockAbilityUseContext(player, players), {
-        game: game ?? mockGame(),
-        nightSheet: nightSheet ?? mockNightSheet(),
-        characterSheet: characterSheet ?? mockCharacterSheet(),
+    return Object.assign(
+        {},
+        mockAbilitySetupContext(
+            player,
+            players,
+            undefined,
+            nightSheet,
+            characterSheet
+        ),
+        {
+            game: game ?? mockGame(),
+        }
+    );
+}
+
+export function mockSaintAbilitySetupContext(
+    player?: SaintPlayer,
+    players?: Players,
+    game?: Game,
+    nightSheet?: NightSheet,
+    characterSheet?: CharacterSheet
+): SaintAbilitySetupContext {
+    return Object.assign(
+        {},
+        mockAbilitySetupContext(
+            player,
+            players,
+            undefined,
+            nightSheet,
+            characterSheet
+        ),
+        {
+            game: game ?? mockGame(),
+        }
+    );
+}
+
+export function mockSaintAbilityUseContext(
+    player?: SaintPlayer,
+    execution?: Execution
+): VirginAbilityUseContext {
+    return Object.assign({}, mockAbilityUseContext(player), {
+        execution: execution ?? mock<Execution>(),
     });
 }

@@ -1,4 +1,6 @@
 import type { Player } from './player';
+import type { Execution } from './execution';
+import type { Game } from './game';
 import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import type { Mayor } from '~/content/characters/output/mayor';
 import type { Monk } from '~/content/characters/output/monk';
@@ -9,6 +11,7 @@ import type { Virgin } from '~/content/characters/output/virgin';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Undertaker } from '~/content/characters/output/undertaker';
 import type { Recluse } from '~/content/characters/output/recluse';
+import type { Saint } from '~/content/characters/output/saint';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -174,3 +177,15 @@ export type UndertakerPlayer = Player & {
 export type ReclusePlayer = Player & {
     character: Recluse;
 };
+
+export type SaintPlayer = Player & {
+    character: Saint;
+};
+
+export interface RequireGame {
+    game: Game;
+}
+
+export interface RequireExecution {
+    execution: Execution;
+}

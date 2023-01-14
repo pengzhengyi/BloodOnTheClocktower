@@ -9,4 +9,8 @@ export class Death {
         this.player = player;
         this.deadReason = deadReason;
     }
+
+    isFor(player: Player): boolean {
+        return this.player.equals(player);
+    }
 }
