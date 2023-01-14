@@ -1,5 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { createInfoProvideContext } from './infoprovider.test';
+import {
+    createInfoProvideContext,
+    createInfoProvideContextFromPlayerDescriptions,
+    createUndertakerInfoProviderContext,
+} from './infoprovider.test';
 import { playerFromDescription } from './utils';
 import {
     chooseMock,
@@ -14,9 +18,13 @@ import {
     AbilityUseContext,
     AbilityUseStatus,
     ButlerAbility,
+    GetCharacterInformationAbility,
+    GetChefInformationAbility,
+    GetEmpathInformationAbility,
     GetFortuneTellerInformationAbility,
     GetInfoAbilityUseContext,
     GetInformationAbilityUseResult,
+    GetInvestigatorInformationAbility,
     GetRavenkeeperInformationAbility,
     GetUndertakerInformationAbility,
     GetWasherwomanInformationAbility,
@@ -49,19 +57,15 @@ import { createBasicPlayer } from '~/__mocks__/player';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/charactersheet';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
-import type {
-    FortuneTellerInformation,
-    RavenkeeperInformation,
-    WasherwomanInformation,
-} from '~/game/information';
+import type { RavenkeeperInformation } from '~/game/information';
 import { Generator } from '~/game/collections';
 import { Chef } from '~/content/characters/output/chef';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Townsfolk } from '~/game/charactertype';
+import { Minion, Townsfolk } from '~/game/charactertype';
 import type { Death } from '~/game/death';
 import type { NightSheet } from '~/game/nightsheet';
 import type { Player } from '~/game/player';
-import type { Alignment } from '~/game/alignment';
+import { Alignment } from '~/game/alignment';
 import type { GamePhase } from '~/game/gamephase';
 import type { CharacterToken } from '~/game/character';
 import type { CharacterSheet } from '~/game/charactersheet';
@@ -70,6 +74,7 @@ import type {
     AsyncFactory,
     ReclusePlayer,
     SlayerPlayer,
+    Task,
 } from '~/game/types';
 import { DeadReason } from '~/game/deadreason';
 import { DeadPlayerCannotNominate } from '~/game/exception';
@@ -86,6 +91,14 @@ import { Butler } from '~/content/characters/output/butler';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Imp } from '~/content/characters/output/imp';
 import { ScarletWoman } from '~/content/characters/output/scarletwoman';
+import { Recluse } from '~/content/characters/output/recluse';
+import { Empath } from '~/content/characters/output/empath';
+import { InfoProvideContext } from '~/game/infoprovider';
+import {
+    IInformationRequester,
+    InformationRequestContext,
+} from '~/game/inforequester';
+import { Investigator } from '~/content/characters/output/investigator';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -145,21 +158,24 @@ async function mockRecluseRegisterAs<T>(
     registerAsAlignment?: Alignment,
     recluseAbility?: RecluseAbility,
     setupContext?: AbilitySetupContext,
-    characterSheet?: CharacterSheet
+    characterSheet?: CharacterSheet,
+    requireAbilitySetup = true
 ): Promise<T> {
-    recluseAbility ??= new RecluseAbility();
-    characterSheet ??= getTroubleBrewingCharacterSheet();
-    setupContext ??= mockAbilitySetupContext(
-        reclusePlayer,
-        undefined,
-        undefined,
-        undefined,
-        characterSheet
-    );
+    if (requireAbilitySetup) {
+        recluseAbility ??= new RecluseAbility();
+        characterSheet ??= getTroubleBrewingCharacterSheet();
+        setupContext ??= mockAbilitySetupContext(
+            reclusePlayer,
+            undefined,
+            undefined,
+            undefined,
+            characterSheet
+        );
+
+        await recluseAbility.setup(setupContext);
+    }
 
     registerAsAlignment ??= registerAsCharacter.characterType.defaultAlignment;
-
-    await recluseAbility.setup(setupContext);
 
     storytellerChooseOneMock.mockImplementation(
         (options: Generator<any>, reason?: string) => {
@@ -176,6 +192,47 @@ async function mockRecluseRegisterAs<T>(
     storytellerChooseOneMock.mockReset();
 
     return result;
+}
+
+async function expectCharacterGetInformation<
+    TInformation,
+    TInformationRequestContext extends InformationRequestContext<TInformation>,
+    TInformationRequester extends IInformationRequester<
+        TInformation,
+        TInformationRequestContext
+    >
+>(
+    ability?: GetCharacterInformationAbility<
+        TInformation,
+        TInformationRequester
+    >,
+    mockInfoProvideContext?: () => InfoProvideContext,
+    contextModifications?: Array<Task<GetInfoAbilityUseContext>>,
+    abilityInitializer?: (
+        context: GetInfoAbilityUseContext
+    ) => Promise<
+        GetCharacterInformationAbility<TInformation, TInformationRequester>
+    >
+): Promise<TInformation> {
+    const context = mockGetInfoAbilityUseContext(
+        mockInfoProvideContext,
+        contextModifications
+    );
+
+    context.storyteller = new StoryTeller();
+
+    if (ability === undefined) {
+        ability = await abilityInitializer!(context);
+    }
+
+    const result = (await ability.use(
+        context
+    )) as GetInformationAbilityUseResult<TInformation>;
+
+    expect(result.info).toBeDefined();
+    expect(result.status).toEqual(AbilitySuccessCommunicatedInfo);
+
+    return result.info?.info as TInformation;
 }
 
 async function expectAfterSlayerKill(
@@ -255,18 +312,15 @@ describe('test GetWasherwomanInformationAbility', () => {
             Washerwoman
         );
 
-        const context = mockGetInfoAbilityUseContext(
+        const info = await expectCharacterGetInformation(
+            ability,
             () => createInfoProvideContext(washerwomanPlayer, [Evin, Amy]),
             [(context) => mockClocktowerWithIsFirstNight(context, true)]
         );
-        context.storyteller = new StoryTeller();
 
-        const result = (await ability.use(
-            context
-        )) as GetInformationAbilityUseResult<WasherwomanInformation>;
-        expect(result.info?.info.characterType).toBe(Townsfolk);
-        expect(result.info?.info.players).toIncludeSameMembers([Evin, Amy]);
-        expect(result.info?.info.character).toBeOneOf([Chef, Ravenkeeper]);
+        expect(info.characterType).toBe(Townsfolk);
+        expect(info.players).toIncludeSameMembers([Evin, Amy]);
+        expect(info.character).toBeOneOf([Chef, Ravenkeeper]);
     });
 });
 
@@ -315,21 +369,18 @@ describe('test GetFortuneTellerInformationAbility', () => {
             FortuneTeller
         );
 
-        const context = mockGetInfoAbilityUseContext(
+        const info = await expectCharacterGetInformation(
+            undefined,
             () => createInfoProvideContext(fortuneTellerPlayer, [saintPlayer]),
-            [(context) => mockClocktowerWithIsFirstNight(context, true)]
-        );
-        context.storyteller = new StoryTeller();
-        const ability = await GetFortuneTellerInformationAbility.init(
-            mockAbilitySetupContext(undefined, undefined, context)
+            [(context) => mockClocktowerWithIsFirstNight(context, true)],
+            async (context) =>
+                await GetFortuneTellerInformationAbility.init(
+                    mockAbilitySetupContext(undefined, undefined, context)
+                )
         );
 
-        const result = (await ability.use(
-            context
-        )) as GetInformationAbilityUseResult<FortuneTellerInformation>;
-
-        expect(result.info?.info.hasDemon).toBeTrue();
-        expect(result.info?.info.chosenPlayers).toIncludeSameMembers([
+        expect(info.hasDemon).toBeTrue();
+        expect(info.chosenPlayers).toIncludeSameMembers([
             saintPlayer,
             fortuneTellerPlayer,
         ]);
@@ -862,5 +913,183 @@ describe('test ButlerAbility', () => {
 
         await butlerPlayer.setDead(DeadReason.Other);
         expect(await butlerPlayer.canVote).toBeTrue();
+    });
+});
+
+describe('test RecluseAbility', () => {
+    /**
+     * {@link `recluse["gameplay"][0]`}
+     */
+    test('The Slayer uses their ability on the Recluse . The Storyteller decides that the Recluse registers as the Imp, so the Recluse dies. The Slayer believes that they just killed the Imp.', async () => {
+        const reclusePlayer = await createBasicPlayer(undefined, Recluse);
+        const slayerPlayer = await createBasicPlayer(undefined, Slayer);
+
+        await mockRecluseRegisterAs(
+            reclusePlayer,
+            () =>
+                expectAfterSlayerKill(
+                    new SlayerAbility(),
+                    reclusePlayer,
+                    true,
+                    undefined,
+                    slayerPlayer
+                ),
+            Imp
+        );
+    });
+
+    /**
+     * {@link `recluse["gameplay"][1]`}
+     */
+    test('The Empath, who neighbours the Recluse and the Monk, learns she is neighbouring one evil player. The next night, the Empath learns they are neighbouring no evil players.', async () => {
+        const infoProvideContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                async (player) => (await player.character) === Empath,
+                `${faker.name.firstName()} is the Recluse`,
+                `${faker.name.firstName()} is the Empath`,
+                `${faker.name.firstName()} is the Monk`
+            );
+
+        const reclusePlayer = (await infoProvideContext.players.findAsync(
+            async (player) => (await player.character) === Recluse
+        ))!;
+
+        const ability = new GetEmpathInformationAbility();
+
+        const info = await mockRecluseRegisterAs(
+            reclusePlayer,
+            async () =>
+                await expectCharacterGetInformation(
+                    ability,
+                    () => infoProvideContext,
+                    [(context) => mockClocktowerWithIsFirstNight(context, true)]
+                ),
+            Imp
+        );
+
+        expect(info.numEvilAliveNeighbors).toEqual(1);
+
+        const infoNextNight = await mockRecluseRegisterAs(
+            reclusePlayer,
+            async () =>
+                await expectCharacterGetInformation(
+                    ability,
+                    () => infoProvideContext,
+                    [
+                        (context) =>
+                            mockClocktowerWithIsNonfirstNight(context, true),
+                    ]
+                ),
+            Recluse,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            false
+        );
+
+        expect(infoNextNight.numEvilAliveNeighbors).toEqual(0);
+    });
+
+    /**
+     * {@link `recluse["gameplay"][2]`}
+     */
+    test('The Investigator learns that either the Recluse or the Saint is the Scarlet Woman.', async () => {
+        const infoProvideContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                async (player) => (await player.character) === Investigator,
+                `${faker.name.firstName()} is the Recluse`,
+                `${faker.name.firstName()} is the Investigator`,
+                `${faker.name.firstName()} is the Saint`
+            );
+
+        const reclusePlayer = (await infoProvideContext.players.findAsync(
+            async (player) => (await player.character) === Recluse
+        ))!;
+
+        const ability = new GetInvestigatorInformationAbility();
+        const info = await mockRecluseRegisterAs(
+            reclusePlayer,
+            async () =>
+                await expectCharacterGetInformation(
+                    ability,
+                    () => infoProvideContext,
+                    [
+                        (context) =>
+                            mockClocktowerWithIsNonfirstNight(context, true),
+                    ]
+                ),
+            ScarletWoman
+        );
+
+        expect(info.characterType.is(Minion)).toBeTrue();
+        expect(info.character).toBe(ScarletWoman);
+    });
+
+    /**
+     * {@link `recluse["gameplay"][3]`}
+     */
+    test('The Recluse is executed. The Undertaker learns that the Imp was executed.', async () => {
+        const reclusePlayer = await createBasicPlayer(undefined, Recluse);
+        const undertakerPlayer = await createBasicPlayer(undefined, Undertaker);
+
+        const ability = new GetUndertakerInformationAbility();
+        const info = await mockRecluseRegisterAs(
+            reclusePlayer,
+            async () =>
+                await expectCharacterGetInformation(
+                    ability,
+                    () =>
+                        createUndertakerInfoProviderContext(
+                            undertakerPlayer,
+                            reclusePlayer,
+                            []
+                        ),
+                    [
+                        (context) =>
+                            mockClocktowerForUndertaker(
+                                context,
+                                true,
+                                reclusePlayer
+                            ),
+                    ]
+                ),
+            Imp
+        );
+
+        expect(info.character).toBe(Imp);
+        expect(info.executedPlayer).toBe(reclusePlayer);
+    });
+
+    /**
+     * {@link `recluse["gameplay"][4]`}
+     */
+    test('The Recluse neighbours the Imp and an Evil Traveller. Because showing a "2" to the Chef might be too revealing, the Chef learns true information, a "0,” instead.', async () => {
+        const infoProvideContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                async (player) => (await player.character) === Chef,
+                `${faker.name.firstName()} is the evil Scapegoat`,
+                `${faker.name.firstName()} is the Recluse`,
+                `${faker.name.firstName()} is the Imp`,
+                `${faker.name.firstName()} is the Chef`
+            );
+
+        const reclusePlayer = (await infoProvideContext.players.findAsync(
+            async (player) => (await player.character) === Recluse
+        ))!;
+
+        const ability = new GetChefInformationAbility();
+        const info = await mockRecluseRegisterAs(
+            reclusePlayer,
+            async () =>
+                await expectCharacterGetInformation(
+                    ability,
+                    () => infoProvideContext,
+                    [(context) => mockClocktowerWithIsFirstNight(context, true)]
+                ),
+            Recluse
+        );
+
+        expect(info.numPairEvilPlayers).toEqual(0);
     });
 });

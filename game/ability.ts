@@ -473,7 +473,7 @@ abstract class GetInformationAbility<
     }
 }
 
-abstract class GetCharacterInformationAbility<
+export abstract class GetCharacterInformationAbility<
     TInformation,
     TInformationRequester extends IInformationRequester<
         TInformation,

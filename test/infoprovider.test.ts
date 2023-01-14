@@ -73,7 +73,7 @@ export function createInfoProvideContext(
     return context;
 }
 
-async function createInfoProvideContextFromPlayerDescriptions(
+export async function createInfoProvideContextFromPlayerDescriptions(
     isRequestedPlayer: AsyncPredicate<Player>,
     ...playerDescriptions: Array<string>
 ) {
@@ -111,7 +111,7 @@ function createFortuneTellerInfoProviderContext(
     return context as FortuneTellerInformationProviderContext;
 }
 
-function createUndertakerInfoProviderContext(
+export function createUndertakerInfoProviderContext(
     undertakerPlayer: Player,
     executedPlayer: Player,
     otherPlayers: Array<Player>

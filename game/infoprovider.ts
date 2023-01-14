@@ -496,7 +496,8 @@ abstract class OneOfTwoPlayersHasCharacterTypeInformationProvider<
 
         const infoOptionsByPlayer = await Generator.promiseAll(
             Generator.toPromise(async (player) => {
-                const character = await player.character;
+                const character = await player.from(context.requestedPlayer)
+                    .character;
                 return Generator.once([player])
                     .cartesian_product(
                         context.players

@@ -205,6 +205,28 @@ export class Generator<T> implements Iterable<T> {
         );
     }
 
+    static find<T>(
+        predicate: Predicate<T>,
+        iterable: Iterable<T>
+    ): T | undefined {
+        for (const element of iterable) {
+            if (predicate(element)) {
+                return element;
+            }
+        }
+    }
+
+    static async findAsync<T>(
+        predicate: AnyPredicate<T>,
+        iterable: Iterable<T>
+    ): Promise<T | undefined> {
+        for (const element of iterable) {
+            if (await predicate(element)) {
+                return element;
+            }
+        }
+    }
+
     static *exclude<T>(
         iterable: Iterable<T>,
         excluded: Iterable<T>
@@ -896,6 +918,14 @@ export class Generator<T> implements Iterable<T> {
 
     filterAsync(predicate: AsyncPredicate<T>) {
         return Generator.filterAsync(predicate, this);
+    }
+
+    find(predicate: Predicate<T>) {
+        return Generator.find(predicate, this);
+    }
+
+    findAsync(predicate: AnyPredicate<T>) {
+        return Generator.findAsync(predicate, this);
     }
 
     is = this.filter;
