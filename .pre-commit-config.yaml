@@ -62,7 +62,7 @@ repos:
 
   # Markdown linter, see markdownlint.yaml for configuration
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.32.2
+    rev: v0.33.0
     hooks:
       - id: markdownlint
         stages: [commit]
@@ -80,7 +80,7 @@ repos:
   # Push hooks (runs on push because developers may commit incomplete changes)
   # Python files linter, see .pylintrc for configuration
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.9
+    rev: v2.16.0b0
     hooks:
       - id: pylint
         stages: [push]
