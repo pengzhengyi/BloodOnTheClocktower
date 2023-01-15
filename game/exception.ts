@@ -38,13 +38,6 @@ import {
     Townsfolk,
     Traveller,
 } from './charactertype';
-import type {
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
-    GetInfoAbilityUseContext,
-    IAbility,
-} from './ability';
 import type { Effect, TCharacterEffect } from './effect';
 import type { Alignment } from './alignment';
 import type { Effects } from './effects';
@@ -52,6 +45,13 @@ import type { Seating } from './seating';
 import type { GamePhaseKind } from './gamephase';
 import type { GameInfo } from './gameinfo';
 import type { Diary, Event as ClocktowerEvent } from './clocktower';
+import type {
+    AbilityUseContext,
+    AbilityUseResult,
+    AbilitySetupContext,
+    IAbility,
+    GetInfoAbilityUseContext,
+} from './ability/ability';
 import { GAME_UI } from '~/interaction/gameui';
 
 export class BaseError extends Error {

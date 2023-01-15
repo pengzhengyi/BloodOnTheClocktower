@@ -13,34 +13,7 @@ import {
     hasRaisedHandForVoteMock,
     storytellerChooseOneMock,
 } from '~/__mocks__/gameui';
-import {
-    AbilitySetupContext,
-    AbilitySuccessCommunicatedInfo,
-    AbilitySuccessUseWhenHasEffect,
-    AbilityUseContext,
-    AbilityUseStatus,
-    ButlerAbility,
-    GetCharacterInformationAbility,
-    GetChefInformationAbility,
-    GetEmpathInformationAbility,
-    GetFortuneTellerInformationAbility,
-    GetInfoAbilityUseContext,
-    GetInformationAbilityUseResult,
-    GetInvestigatorInformationAbility,
-    GetRavenkeeperInformationAbility,
-    GetUndertakerInformationAbility,
-    GetWasherwomanInformationAbility,
-    MayorAbility,
-    MonkAbilityUseResult,
-    MonkProtectAbility,
-    RecluseAbility,
-    RedHerringEffect,
-    SaintAbility,
-    SlayerAbility,
-    SlayerAbilityUseResult,
-    SoldierAbility,
-    VirginAbility,
-} from '~/game/ability';
+
 import {
     mockAbilitySetupContext,
     mockAbilityUseContext,
@@ -107,6 +80,36 @@ import {
 import { Investigator } from '~/content/characters/output/investigator';
 import { Baron } from '~/content/characters/output/baron';
 import { Librarian } from '~/content/characters/output/librarian';
+import {
+    AbilityUseContext,
+    AbilitySetupContext,
+    GetCharacterInformationAbility,
+    GetInfoAbilityUseContext,
+    GetInformationAbilityUseResult,
+} from '~/game/ability/ability';
+import { ButlerAbility } from '~/game/ability/butler';
+import { GetChefInformationAbility } from '~/game/ability/chef';
+import { GetEmpathInformationAbility } from '~/game/ability/empath';
+import {
+    RedHerringEffect,
+    GetFortuneTellerInformationAbility,
+} from '~/game/ability/fortuneteller';
+import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
+import { MayorAbility } from '~/game/ability/mayor';
+import { MonkProtectAbility, MonkAbilityUseResult } from '~/game/ability/monk';
+import { GetRavenkeeperInformationAbility } from '~/game/ability/ravenkeeper';
+import { RecluseAbility } from '~/game/ability/recluse';
+import { SaintAbility } from '~/game/ability/saint';
+import { SlayerAbility, SlayerAbilityUseResult } from '~/game/ability/slayer';
+import { SoldierAbility } from '~/game/ability/soldier';
+import {
+    AbilitySuccessCommunicatedInfo,
+    AbilityUseStatus,
+    AbilitySuccessUseWhenHasEffect,
+} from '~/game/ability/status';
+import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
+import { VirginAbility } from '~/game/ability/virgin';
+import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -194,15 +197,17 @@ async function mockRecluseRegisterAs<T>(
     if (requireAbilitySetup) {
         recluseAbility ??= new RecluseAbility();
         characterSheet ??= getTroubleBrewingCharacterSheet();
-        setupContext ??= mockAbilitySetupContext(
-            reclusePlayer,
-            undefined,
-            undefined,
-            undefined,
-            characterSheet
-        );
 
-        await recluseAbility.setup(setupContext);
+        await recluseAbility.setup(
+            setupContext ??
+                mockAbilitySetupContext(
+                    reclusePlayer,
+                    undefined,
+                    undefined,
+                    undefined,
+                    characterSheet
+                )
+        );
     }
 
     registerAsAlignment ??= registerAsCharacter.characterType.defaultAlignment;
@@ -269,10 +274,11 @@ async function expectAfterSlayerKill(
     ability: SlayerAbility,
     chosenPlayer: Player,
     shouldBeDead: boolean,
-    context?: AbilityUseContext,
+    _context?: AbilityUseContext,
     slayerPlayer?: SlayerPlayer
 ) {
-    context ??= mockAbilityUseContext(slayerPlayer);
+    const context = _context ?? mockAbilityUseContext(slayerPlayer);
+
     expect(await ability.isEligible(context)).toBeTrue();
 
     chooseMock.mockImplementation(async (_slayerPlayer, _players) => {

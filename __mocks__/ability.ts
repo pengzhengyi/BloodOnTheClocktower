@@ -3,14 +3,6 @@ import { mockCharacterSheet } from './charactersheet';
 import { mockGame } from './game';
 import { mockInfoProvideContext as _mockInfoProvideContext } from './information';
 import { mockNightSheet } from './nightsheet';
-import type {
-    AbilitySetupContext,
-    AbilityUseContext,
-    GetInfoAbilityUseContext,
-    MayorAbilitySetupContext,
-    SaintAbilitySetupContext,
-    VirginAbilityUseContext,
-} from '~/game/ability';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { SaintPlayer, Task } from '~/game/types';
@@ -19,6 +11,14 @@ import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
 import type { NightSheet } from '~/game/nightsheet';
 import type { CharacterSheet } from '~/game/charactersheet';
+import type {
+    AbilityUseContext,
+    AbilitySetupContext,
+    GetInfoAbilityUseContext,
+} from '~/game/ability/ability';
+import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
+import type { SaintAbilitySetupContext } from '~/game/ability/saint';
+import type { VirginAbilityUseContext } from '~/game/ability/virgin';
 
 export function mockAbilityUseContext(
     player?: Player,
