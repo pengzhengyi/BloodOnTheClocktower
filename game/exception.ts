@@ -43,7 +43,6 @@ import type { Alignment } from './alignment';
 import type { Effects } from './effects';
 import type { Seating } from './seating';
 import type { GamePhaseKind } from './gamephase';
-import type { GameInfo } from './gameinfo';
 import type { Diary, Event as ClocktowerEvent } from './clocktower';
 import type {
     AbilityUseContext,
@@ -265,19 +264,6 @@ export class NominatedNominatedBefore extends RecoverableGameError {
         readonly nominated: Player
     ) {
         super(NominatedNominatedBefore.description);
-    }
-}
-
-export class CannotFindPlayerInGame extends RecoverableGameError {
-    static description = 'Cannot find a matching player in current game';
-
-    declare matchingPlayer: Player;
-
-    constructor(
-        readonly player: string | Player | undefined,
-        readonly gameState: GameInfo
-    ) {
-        super(CannotFindPlayerInGame.description);
     }
 }
 
