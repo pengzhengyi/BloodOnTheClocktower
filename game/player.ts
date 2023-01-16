@@ -25,7 +25,7 @@ import {
     ReassignCharacterToPlayer,
 } from './exception';
 import type { Execution } from './execution';
-
+import { DrunkReason } from './drunkreason';
 import { GAME_UI } from '~/interaction/gameui';
 
 export interface CharacterAssignmentResult {
@@ -372,6 +372,11 @@ export class Player extends EffectTarget<Player> {
         return new Death(this, reason);
     }
 
+    setDrunk(_reason: DrunkReason = DrunkReason.Other): Promise<boolean> {
+        this.state.drunk = true;
+        return Promise.resolve(this.drunk);
+    }
+
     async attack(victim: Player): Promise<Death> {
         // TODO
         return await victim.setDead(DeadReason.DemonAttack);
@@ -427,7 +432,9 @@ export class Player extends EffectTarget<Player> {
         }
     }
 
-    storytellerGet<K extends keyof Player | string, V>(key: K): V {
+    storytellerGet<V, K extends keyof Player | string = keyof Player | string>(
+        key: K
+    ): V {
         return (this as Record<K, any>)[key] as V;
     }
 

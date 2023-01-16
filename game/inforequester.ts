@@ -331,10 +331,14 @@ abstract class CharacterInformationRequester<
     abstract readonly expectedCharacter: CharacterToken;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {
-        return (
-            (await super.isEligible(context)) &&
-            (await context.requestedPlayer.character) === this.expectedCharacter
-        );
+        if (await super.isEligible(context)) {
+            const character = await context.requestedPlayer.from(
+                context.requestedPlayer
+            ).character;
+            return character === this.expectedCharacter;
+        }
+
+        return false;
     }
 
     toString() {

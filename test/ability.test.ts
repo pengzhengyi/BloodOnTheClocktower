@@ -51,6 +51,7 @@ import type { CharacterSheet } from '~/game/charactersheet';
 import type {
     Action,
     AsyncFactory,
+    DrunkPlayer,
     ReclusePlayer,
     SlayerPlayer,
     Task,
@@ -110,6 +111,9 @@ import {
 import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import { VirginAbility } from '~/game/ability/virgin';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
+import { Drunk } from '~/content/characters/output/drunk';
+import { DrunkAbility } from '~/game/ability/drunk';
+import { AbilityLoader } from '~/game/ability/abilityloader';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,
@@ -464,6 +468,26 @@ async function monkProtectPlayer(
     );
     expect(result.protectedPlayer).toEqual(playerToProtect);
     return result;
+}
+
+async function setupDrunk(
+    drunkPlayer: DrunkPlayer,
+    thinkAsCharacter: CharacterToken,
+    context?: AbilitySetupContext
+): Promise<DrunkAbility> {
+    const drunkAbility = new DrunkAbility();
+    context ??= mockAbilitySetupContext(
+        drunkPlayer,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        new AbilityLoader()
+    );
+    storytellerChooseOneMock.mockResolvedValue(thinkAsCharacter);
+    await drunkAbility.setup(context);
+    storytellerChooseOneMock.mockReset();
+    return drunkAbility;
 }
 
 describe('test MonkProtectAbility', () => {
@@ -988,8 +1012,8 @@ describe('test RecluseAbility', () => {
                 `${faker.name.firstName()} is the Monk`
             );
 
-        const reclusePlayer = (await infoProvideContext.players.findAsync(
-            async (player) => (await player.character) === Recluse
+        const reclusePlayer = (await infoProvideContext.players.findByCharacter(
+            Recluse
         ))!;
 
         const ability = new GetEmpathInformationAbility();
@@ -1041,8 +1065,8 @@ describe('test RecluseAbility', () => {
                 `${faker.name.firstName()} is the Saint`
             );
 
-        const reclusePlayer = (await infoProvideContext.players.findAsync(
-            async (player) => (await player.character) === Recluse
+        const reclusePlayer = (await infoProvideContext.players.findByCharacter(
+            Recluse
         ))!;
 
         const ability = new GetInvestigatorInformationAbility();
@@ -1112,8 +1136,8 @@ describe('test RecluseAbility', () => {
                 `${faker.name.firstName()} is the Chef`
             );
 
-        const reclusePlayer = (await infoProvideContext.players.findAsync(
-            async (player) => (await player.character) === Recluse
+        const reclusePlayer = (await infoProvideContext.players.findByCharacter(
+            Recluse
         ))!;
 
         const ability = new GetChefInformationAbility();
@@ -1215,5 +1239,19 @@ describe('test SaintAbility', () => {
      */
     test("The Saint is executed. However, the Scapegoat's ability is triggered, so the Scapegoat dies instead. The game continues, because the Saint did not die.", async () => {
         // TODO
+    });
+});
+
+describe('test DrunkAbility', () => {
+    /**
+     * {@link `drunk["gameplay"][0]`}
+     */
+    test('The Drunk, who thinks they are the Soldier, is attacked by the Imp. The Drunk dies.', async () => {
+        const impPlayer = await createBasicPlayer(undefined, Imp);
+        const drunkPlayer = await createBasicPlayer(undefined, Drunk);
+
+        await setupDrunk(drunkPlayer, Soldier);
+
+        await expectAfterDemonAttack(drunkPlayer, impPlayer, true);
     });
 });

@@ -161,9 +161,9 @@ export function mockClocktowerWithIsFirstNight(
     context: { clocktower: Clocktower },
     isFirstNight: boolean
 ) {
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isFirstNight',
-        isFirstNight
+    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, boolean]>(
+        ['isFirstNight', 'isNight'],
+        [isFirstNight, isFirstNight]
     );
 }
 
@@ -171,9 +171,9 @@ export function mockClocktowerWithIsNonfirstNight(
     context: { clocktower: Clocktower },
     isNonfirstNight: boolean
 ) {
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isNonfirstNight',
-        isNonfirstNight
+    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, boolean]>(
+        ['isNonfirstNight', 'isNight'],
+        [isNonfirstNight, isNonfirstNight]
     );
 }
 
@@ -223,17 +223,20 @@ export function mockContextForCharacterInformation<TCharacter, TInformation>(
         willGetTrueInformation
     );
 
-    context.requestedPlayer = mockObject<
+    const mockPlayer = mockObject<
         Player,
-        [TCharacter, boolean, boolean, boolean]
+        [Promise<TCharacter>, boolean, boolean, boolean]
     >(
         ['character', 'alive', 'drunk', 'poisoned'],
-        [character, requestedPlayerIsAlive, false, false],
+        [Promise.resolve(character), requestedPlayerIsAlive, false, false],
         {
             from: (mockFunction) =>
-                mockFunction.mockReturnValue(context.requestedPlayer),
+                mockFunction.mockImplementation(function (this: Player) {
+                    return this;
+                }),
         }
     );
+    context.requestedPlayer = mockPlayer;
 
     mockClocktowerWithIsFirstNight(context, isFirstNight);
 

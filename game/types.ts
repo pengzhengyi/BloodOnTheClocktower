@@ -12,6 +12,7 @@ import type { Butler } from '~/content/characters/output/butler';
 import type { Undertaker } from '~/content/characters/output/undertaker';
 import type { Recluse } from '~/content/characters/output/recluse';
 import type { Saint } from '~/content/characters/output/saint';
+import type { Drunk } from '~/content/characters/output/drunk';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -180,6 +181,10 @@ export type ReclusePlayer = Player & {
 
 export type SaintPlayer = Player & {
     character: Saint;
+};
+
+export type DrunkPlayer = Player & {
+    character: Drunk;
 };
 
 export interface RequireGame {

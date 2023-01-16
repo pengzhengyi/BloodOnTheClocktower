@@ -1,6 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { mockCharacterSheet } from './charactersheet';
 import { mockGame } from './game';
+import { mockAbilityLoader } from './abilityloader';
 import { mockInfoProvideContext as _mockInfoProvideContext } from './information';
 import { mockNightSheet } from './nightsheet';
 import type { Player } from '~/game/player';
@@ -19,6 +20,7 @@ import type {
 import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
 import type { SaintAbilitySetupContext } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
+import type { AbilityLoader } from '~/game/ability/abilityloader';
 
 export function mockAbilityUseContext(
     player?: Player,
@@ -35,7 +37,8 @@ export function mockAbilitySetupContext(
     players?: Players,
     context?: AbilityUseContext,
     nightSheet?: NightSheet,
-    characterSheet?: CharacterSheet
+    characterSheet?: CharacterSheet,
+    abilityLoader?: AbilityLoader
 ): AbilitySetupContext {
     if (context === undefined) {
         context = mockAbilityUseContext(player, players);
@@ -46,6 +49,9 @@ export function mockAbilitySetupContext(
 
     (context as AbilitySetupContext).characterSheet =
         characterSheet ?? mockCharacterSheet();
+
+    (context as AbilitySetupContext).abilityLoader =
+        abilityLoader ?? mockAbilityLoader();
 
     return context as AbilitySetupContext;
 }

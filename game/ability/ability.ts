@@ -12,6 +12,7 @@ import type { CharacterSheet } from '../charactersheet';
 import type { NightSheet } from '../nightsheet';
 import type { Player } from '../player';
 import type { Players } from '../players';
+import type { AbilityLoader } from './abilityloader';
 import {
     AbilitySuccessCommunicatedInfo,
     AbilitySuccessUseWhenMalfunction,
@@ -27,6 +28,7 @@ export interface AbilityUseContext {
 export interface AbilitySetupContext extends AbilityUseContext {
     nightSheet: NightSheet;
     characterSheet: CharacterSheet;
+    abilityLoader: AbilityLoader;
 }
 
 export interface AbilityUseResult {

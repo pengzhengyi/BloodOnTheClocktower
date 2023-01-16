@@ -122,7 +122,7 @@ export class AbilityLoader {
         return abilities;
     }
 
-    protected loadCharacterAbility(
+    loadCharacterAbility(
         character: CharacterToken
     ): TCharacterAbility | undefined {
         return AbilityLoader.characterToAbility.get(character);

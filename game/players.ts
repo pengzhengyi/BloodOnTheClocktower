@@ -95,6 +95,12 @@ export class Players extends Generator<Player> {
         return this;
     }
 
+    findByCharacter(character: CharacterToken): Promise<Player | undefined> {
+        return this.findAsync(
+            async (player) => (await player.character) === character
+        );
+    }
+
     modify(modification: PlayersModification) {
         modification(this.players);
     }
