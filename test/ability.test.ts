@@ -36,7 +36,6 @@ import { mockPlayers } from '~/__mocks__/players';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/charactersheet';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
-import type { RavenkeeperInformation } from '~/game/information';
 import { Generator } from '~/game/collections';
 import { Chef } from '~/content/characters/output/chef';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
@@ -73,11 +72,6 @@ import { Imp } from '~/content/characters/output/imp';
 import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 import { Recluse } from '~/content/characters/output/recluse';
 import { Empath } from '~/content/characters/output/empath';
-import { InfoProvideContext } from '~/game/infoprovider';
-import {
-    IInformationRequester,
-    InformationRequestContext,
-} from '~/game/inforequester';
 import { Investigator } from '~/content/characters/output/investigator';
 import { Baron } from '~/content/characters/output/baron';
 import { Librarian } from '~/content/characters/output/librarian';
@@ -114,6 +108,12 @@ import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
 import { Drunk } from '~/content/characters/output/drunk';
 import { DrunkAbility } from '~/game/ability/drunk';
 import { AbilityLoader } from '~/game/ability/abilityloader';
+import type { InfoProvideContext } from '~/game/info/provider/provider';
+import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
+import type {
+    InformationRequestContext,
+    IInformationRequester,
+} from '~/game/info/requester/requester';
 
 async function expectAfterDemonAttack(
     playerToKill: Player,

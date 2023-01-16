@@ -1,8 +1,6 @@
-import {
-    InvestigatorInformationRequester,
-    InformationRequestContext,
-} from '../inforequester';
-import type { InvestigatorInformation } from '../information';
+import type { InvestigatorInformation } from '../info/provider/investigator';
+import { InvestigatorInformationRequester } from '../info/requester/investigator';
+import type { InformationRequestContext } from '../info/requester/requester';
 import { GetCharacterInformationAbility } from './ability';
 
 export class GetInvestigatorInformationAbility extends GetCharacterInformationAbility<

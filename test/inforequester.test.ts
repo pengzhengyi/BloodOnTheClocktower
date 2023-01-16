@@ -1,35 +1,37 @@
+import type { ChefInformation } from '~/game/info/provider/chef';
+import type { DemonInformation } from '~/game/info/provider/demon';
+import type { EmpathInformation } from '~/game/info/provider/empath';
+import type { FortuneTellerInformation } from '~/game/info/provider/fortuneteller';
+import type { InvestigatorInformation } from '~/game/info/provider/investigator';
+import type { LibrarianInformation } from '~/game/info/provider/librarian';
+import type { MinionInformation } from '~/game/info/provider/minion';
+import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
+import type { SpyInformation } from '~/game/info/provider/spy';
+import type { TravellerInformation } from '~/game/info/provider/traveller';
+import type { UndertakerInformation } from '~/game/info/provider/undertaker';
+import type { WasherwomanInformation } from '~/game/info/provider/washerwoman';
+import { ChefInformationRequester } from '~/game/info/requester/chef';
+import { DemonInformationRequester } from '~/game/info/requester/demon';
+import { EmpathInformationRequester } from '~/game/info/requester/empath';
 import {
-    ChefInformationRequester,
-    DemonInformationRequester,
-    EmpathInformationRequester,
-    FortuneTellerInformationRequestContext,
     FortuneTellerInformationRequester,
-    InformationRequestContext,
-    InvestigatorInformationRequester,
-    LibrarianInformationRequester,
-    MinionInformationRequester,
-    RavenkeeperInformationRequestContext,
+    FortuneTellerInformationRequestContext,
+} from '~/game/info/requester/fortuneteller';
+import { InvestigatorInformationRequester } from '~/game/info/requester/investigator';
+import { LibrarianInformationRequester } from '~/game/info/requester/librarian';
+import { MinionInformationRequester } from '~/game/info/requester/minion';
+import {
     RavenkeeperInformationRequester,
-    SpyInformationRequester,
-    TravellerInformationRequester,
-    UndertakerInformationRequestContext,
+    RavenkeeperInformationRequestContext,
+} from '~/game/info/requester/ravenkeeper';
+import { InformationRequestContext } from '~/game/info/requester/requester';
+import { SpyInformationRequester } from '~/game/info/requester/spy';
+import { TravellerInformationRequester } from '~/game/info/requester/traveller';
+import {
     UndertakerInformationRequester,
-    WasherwomanInformationRequester,
-} from '~/game/inforequester';
-import type {
-    ChefInformation,
-    DemonInformation,
-    EmpathInformation,
-    FortuneTellerInformation,
-    InvestigatorInformation,
-    LibrarianInformation,
-    MinionInformation,
-    RavenkeeperInformation,
-    SpyInformation,
-    TravellerInformation,
-    UndertakerInformation,
-    WasherwomanInformation,
-} from '~/game/information';
+    UndertakerInformationRequestContext,
+} from '~/game/info/requester/undertaker';
+import { WasherwomanInformationRequester } from '~/game/info/requester/washerwoman';
 import type { Player } from '~/game/player';
 import { mockWithPropertyValues } from '~/__mocks__/common';
 import {

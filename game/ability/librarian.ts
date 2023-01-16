@@ -1,8 +1,6 @@
-import {
-    LibrarianInformationRequester,
-    InformationRequestContext,
-} from '../inforequester';
-import type { LibrarianInformation } from '../information';
+import type { LibrarianInformation } from '../info/provider/librarian';
+import { LibrarianInformationRequester } from '../info/requester/librarian';
+import type { InformationRequestContext } from '../info/requester/requester';
 import { GetCharacterInformationAbility } from './ability';
 
 export class GetLibrarianInformationAbility extends GetCharacterInformationAbility<

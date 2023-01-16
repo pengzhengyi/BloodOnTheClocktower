@@ -2,22 +2,6 @@ import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
 import { storytellerConfirmMock } from '~/__mocks__/gameui';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
-import {
-    ChefInformationProvider,
-    DemonInformationProvider,
-    EmpathInformationProvider,
-    FortuneTellerInformationProvider,
-    FortuneTellerInformationProviderContext,
-    InvestigatorInformationProvider,
-    LibrarianInformationProvider,
-    MinionInformationProvider,
-    RavenkeeperInformationProvider,
-    RavenkeeperInformationProviderContext,
-    TravellerInformationProvider,
-    UndertakerInformationProvider,
-    UndertakerInformationProviderContext,
-    WasherwomanInformationProvider,
-} from '~/game/infoprovider';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
 import type { CharacterToken } from '~/game/character';
@@ -31,12 +15,6 @@ import { Player } from '~/game/player';
 import { Seating } from '~/game/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
-import type {
-    DemonInformation,
-    LibrarianNoOutsiderInformation,
-    OneOfTwoPlayersIsOutsider,
-    TrueInformation,
-} from '~/game/information';
 import { Saint } from '~/content/characters/output/saint';
 import { Drunk } from '~/content/characters/output/drunk';
 import { Investigator } from '~/content/characters/output/investigator';
@@ -50,6 +28,36 @@ import { Mayor } from '~/content/characters/output/mayor';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Poisoner } from '~/content/characters/output/poisoner';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
+import type {
+    TrueInformation,
+    OneOfTwoPlayersIsOutsider,
+} from '~/game/info/information';
+import { ChefInformationProvider } from '~/game/info/provider/chef';
+import {
+    DemonInformationProvider,
+    DemonInformation,
+} from '~/game/info/provider/demon';
+import { EmpathInformationProvider } from '~/game/info/provider/empath';
+import {
+    FortuneTellerInformationProviderContext,
+    FortuneTellerInformationProvider,
+} from '~/game/info/provider/fortuneteller';
+import { InvestigatorInformationProvider } from '~/game/info/provider/investigator';
+import {
+    LibrarianInformationProvider,
+    LibrarianNoOutsiderInformation,
+} from '~/game/info/provider/librarian';
+import { MinionInformationProvider } from '~/game/info/provider/minion';
+import {
+    RavenkeeperInformationProviderContext,
+    RavenkeeperInformationProvider,
+} from '~/game/info/provider/ravenkeeper';
+import { TravellerInformationProvider } from '~/game/info/provider/traveller';
+import {
+    UndertakerInformationProviderContext,
+    UndertakerInformationProvider,
+} from '~/game/info/provider/undertaker';
+import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman';
 
 async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>

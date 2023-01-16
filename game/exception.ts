@@ -5,8 +5,6 @@ import type { NightActOrdering } from './nightsheet';
 import type { Nomination } from './nomination';
 import type { Exile } from './exile';
 import type { Vote } from './vote';
-import type { InfoRequestContext } from './inforequester';
-import type { InfoProviders } from './infoprovider';
 import type {
     AsyncFactory,
     ButlerPlayer,
@@ -51,6 +49,8 @@ import type {
     IAbility,
     GetInfoAbilityUseContext,
 } from './ability/ability';
+import type { InfoRequestContext } from './info/requester/requester';
+import type { InfoProviderLoader } from './info/provider/loader';
 import { GAME_UI } from '~/interaction/gameui';
 
 export class BaseError extends Error {
@@ -830,7 +830,7 @@ export class NoDefinedInfoProvider<
 
     constructor(
         readonly context: InfoRequestContext<TInformation>,
-        readonly infoProviders: InfoProviders
+        readonly infoProviderLoader: InfoProviderLoader
     ) {
         super(NoDefinedInfoProvider.description);
     }

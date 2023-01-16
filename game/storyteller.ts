@@ -1,11 +1,11 @@
 import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
 import { Grimoire } from './grimoire';
-import { InfoProviders } from './infoprovider';
+import type { Info } from './info/info';
 import type {
     InfoRequestContext,
     InformationRequestContext,
-} from './inforequester';
-import type { Info } from './information';
+} from './info/requester/requester';
+import { InfoProviderLoader } from './info/provider/loader';
 import { Player } from './player';
 import type { Players } from './players';
 import { AsyncTask } from './types';
@@ -21,7 +21,7 @@ export class StoryTeller {
 
     protected grimoire?: Grimoire;
 
-    protected infoProviders: InfoProviders = new InfoProviders();
+    protected infoProviderLoader: InfoProviderLoader = new InfoProviderLoader();
 
     async getGrimoire(_requestedPlayer: Player): Promise<Grimoire> {
         await new BlankGrimoire(this).throwWhen(
@@ -63,7 +63,7 @@ export class StoryTeller {
     async giveInfo<TInformation, InfoType extends Info<TInformation>>(
         context: InfoRequestContext<TInformation>
     ): Promise<InfoType> {
-        const provideInfo = this.infoProviders.getInfoProviderMethod(
+        const provideInfo = this.infoProviderLoader.loadProvide(
             context.requester,
             context.isStoryTellerInformation,
             (context as InformationRequestContext<TInformation>)
@@ -73,7 +73,7 @@ export class StoryTeller {
         if (provideInfo === undefined) {
             const error = new NoDefinedInfoProvider<InfoType, TInformation>(
                 context,
-                this.infoProviders
+                this.infoProviderLoader
             );
             await error.throwWhen((error) => error.correctedInfo === undefined);
             return error.correctedInfo!;

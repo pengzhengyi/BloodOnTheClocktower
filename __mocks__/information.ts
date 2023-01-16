@@ -6,25 +6,6 @@ import {
 } from './common';
 import type { CharacterSheet } from '~/game/charactersheet';
 import type { Clocktower, Diary } from '~/game/clocktower';
-import type { InfoProvideContext } from '~/game/infoprovider';
-import type {
-    InformationRequestContext,
-    IInfoRequester,
-} from '~/game/inforequester';
-import type {
-    ChefInformation,
-    DemonInformation,
-    EmpathInformation,
-    FortuneTellerInformation,
-    InvestigatorInformation,
-    LibrarianInformation,
-    MinionInformation,
-    RavenkeeperInformation,
-    SpyInformation,
-    TravellerInformation,
-    UndertakerInformation,
-    WasherwomanInformation,
-} from '~/game/information';
 import { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { Seating } from '~/game/seating';
@@ -47,6 +28,23 @@ import {
     Townsfolk,
     Traveller,
 } from '~/game/charactertype';
+import type { ChefInformation } from '~/game/info/provider/chef';
+import type { DemonInformation } from '~/game/info/provider/demon';
+import type { EmpathInformation } from '~/game/info/provider/empath';
+import type { FortuneTellerInformation } from '~/game/info/provider/fortuneteller';
+import type { InvestigatorInformation } from '~/game/info/provider/investigator';
+import type { LibrarianInformation } from '~/game/info/provider/librarian';
+import type { MinionInformation } from '~/game/info/provider/minion';
+import type { InfoProvideContext } from '~/game/info/provider/provider';
+import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
+import type { SpyInformation } from '~/game/info/provider/spy';
+import type { TravellerInformation } from '~/game/info/provider/traveller';
+import type { UndertakerInformation } from '~/game/info/provider/undertaker';
+import type { WasherwomanInformation } from '~/game/info/provider/washerwoman';
+import type {
+    InformationRequestContext,
+    IInfoRequester,
+} from '~/game/info/requester/requester';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {

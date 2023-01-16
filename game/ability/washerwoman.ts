@@ -1,8 +1,6 @@
-import {
-    WasherwomanInformationRequester,
-    InformationRequestContext,
-} from '../inforequester';
-import type { WasherwomanInformation } from '../information';
+import type { WasherwomanInformation } from '../info/provider/washerwoman';
+import type { InformationRequestContext } from '../info/requester/requester';
+import { WasherwomanInformationRequester } from '../info/requester/washerwoman';
 import { GetCharacterInformationAbility } from './ability';
 
 export class GetWasherwomanInformationAbility extends GetCharacterInformationAbility<

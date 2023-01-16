@@ -1,8 +1,6 @@
-import {
-    EmpathInformationRequester,
-    InformationRequestContext,
-} from '../inforequester';
-import type { EmpathInformation } from '../information';
+import type { EmpathInformation } from '../info/provider/empath';
+import { EmpathInformationRequester } from '../info/requester/empath';
+import type { InformationRequestContext } from '../info/requester/requester';
 import { GetCharacterInformationAbility } from './ability';
 
 export class GetEmpathInformationAbility extends GetCharacterInformationAbility<

@@ -1,8 +1,6 @@
-import {
-    ChefInformationRequester,
-    InformationRequestContext,
-} from '../inforequester';
-import type { ChefInformation } from '../information';
+import type { ChefInformation } from '../info/provider/chef';
+import { ChefInformationRequester } from '../info/requester/chef';
+import type { InformationRequestContext } from '../info/requester/requester';
 import { GetCharacterInformationAbility } from './ability';
 
 export class GetChefInformationAbility extends GetCharacterInformationAbility<

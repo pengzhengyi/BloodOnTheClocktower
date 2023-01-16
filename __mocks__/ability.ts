@@ -7,7 +7,6 @@ import { mockNightSheet } from './nightsheet';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { SaintPlayer, Task } from '~/game/types';
-import type { InfoProvideContext } from '~/game/infoprovider';
 import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
 import type { NightSheet } from '~/game/nightsheet';
@@ -21,6 +20,7 @@ import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
 import type { SaintAbilitySetupContext } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
 import type { AbilityLoader } from '~/game/ability/abilityloader';
+import type { InfoProvideContext } from '~/game/info/provider/provider';
 
 export function mockAbilityUseContext(
     player?: Player,

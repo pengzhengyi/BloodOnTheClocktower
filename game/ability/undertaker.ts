@@ -1,9 +1,9 @@
 import { UndertakerRequestInfoWhenNoExecution } from '../exception';
+import type { UndertakerInformation } from '../info/provider/undertaker';
 import {
     UndertakerInformationRequester,
     UndertakerInformationRequestContext,
-} from '../inforequester';
-import type { UndertakerInformation } from '../information';
+} from '../info/requester/undertaker';
 import {
     GetCharacterInformationAbility,
     GetInfoAbilityUseContext,

@@ -1,17 +1,17 @@
 import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
-import type { InfoProvideContext } from '../infoprovider';
-import {
-    IInfoRequester,
-    IInformationRequester,
-    InfoRequestContext,
-    InformationRequestContext,
-} from '../inforequester';
-import type { Info } from '../information';
 import type { Constructor, StaticThis } from '../types';
 import type { CharacterSheet } from '../charactersheet';
 import type { NightSheet } from '../nightsheet';
 import type { Player } from '../player';
 import type { Players } from '../players';
+import type { Info } from '../info/info';
+import type { InfoProvideContext } from '../info/provider/provider';
+import type {
+    InfoRequestContext,
+    IInfoRequester,
+    InformationRequestContext,
+    IInformationRequester,
+} from '../info/requester/requester';
 import type { AbilityLoader } from './abilityloader';
 import {
     AbilitySuccessCommunicatedInfo,
