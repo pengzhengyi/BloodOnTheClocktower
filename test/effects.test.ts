@@ -1,6 +1,6 @@
 import type { Effect, InteractionContext } from '~/game/effect';
 import { Effects } from '~/game/effects';
-import { CompositeGamePhaseKind } from '~/game/gamephase';
+import { CompositeGamePhaseKind } from '~/game/game-phase-kind';
 import {
     mockApplicableEffect,
     mockInapplicableEffect,

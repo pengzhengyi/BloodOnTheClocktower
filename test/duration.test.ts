@@ -1,6 +1,6 @@
 import { Duration, IndefiniteDuration } from '~/game/duration';
 import { UnsupportedOperation } from '~/game/exception';
-import { GamePhase } from '~/game/gamephase';
+import { GamePhase } from '~/game/game-phase';
 
 describe('test basic Duration functionality', () => {
     test.concurrent('equality', () => {

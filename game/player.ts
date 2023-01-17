@@ -4,11 +4,11 @@ import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
 import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
-import { DeadReason } from './deadreason';
+import { DeadReason } from './dead-reason';
 import { Death } from './death';
-import { EffectTarget } from './effecttarget';
+import { EffectTarget } from './effect-target';
 import { Nomination } from './nomination';
-import { PlayerState } from './playerstate';
+import { PlayerState } from './player-state';
 
 import {
     CharacterType,
@@ -18,14 +18,14 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './charactertype';
+} from './character-type';
 import {
     DeadPlayerCannotNominate,
     PlayerHasUnclearAlignment,
     ReassignCharacterToPlayer,
 } from './exception';
 import type { Execution } from './execution';
-import { DrunkReason } from './drunkreason';
+import { DrunkReason } from './drunk-reason';
 import { GAME_UI } from './dependencies.config';
 
 export interface CharacterAssignmentResult {

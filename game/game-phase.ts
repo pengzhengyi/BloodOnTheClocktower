@@ -1,5 +1,6 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
+import { BasicGamePhaseKind } from './game-phase-kind';
 import { GAME_UI } from './dependencies.config';
 
 export enum Phase {
@@ -58,29 +59,6 @@ function getPhase(phaseCounter: number): Phase {
 export function includePhase(phases: number, phase: Phase) {
     return (phases & phase) === phase;
 }
-
-export enum BasicGamePhaseKind {
-    FirstNight = 1,
-    NonfirstNight = 2,
-    Other = 4,
-}
-
-export enum CompositeGamePhaseKind {
-    // convenient utility
-    EveryNight = BasicGamePhaseKind.FirstNight |
-        BasicGamePhaseKind.NonfirstNight,
-    ALL = BasicGamePhaseKind.FirstNight |
-        BasicGamePhaseKind.NonfirstNight |
-        BasicGamePhaseKind.Other,
-}
-
-export type GamePhaseKind = BasicGamePhaseKind | CompositeGamePhaseKind;
-
-export const ALL_GAME_PHASE_KINDS = [
-    BasicGamePhaseKind.FirstNight,
-    BasicGamePhaseKind.NonfirstNight,
-    BasicGamePhaseKind.Other,
-];
 
 @Exclude()
 export class GamePhase {

@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
 import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
-import { DeadReason } from './deadreason';
-import { EffectTarget } from './effecttarget';
+import { DeadReason } from './dead-reason';
+import { EffectTarget } from './effect-target';
 import { Nomination } from './nomination';
 import { Player } from './player';
 import { Predicate } from './types';

@@ -7,7 +7,7 @@ import {
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator } from '~/game/collections';
 import type { MinionPlayer, Player } from '~/game/player';
-import { CharacterType } from '~/game/charactertype';
+import { CharacterType } from '~/game/character-type';
 
 export abstract class DemonMinionInformationProvider<
     TInfoProvideContext extends InfoProvideContext,

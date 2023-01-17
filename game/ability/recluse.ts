@@ -1,12 +1,12 @@
 import type { CharacterToken } from '../character';
-import type { CharacterSheet } from '../charactersheet';
+import type { CharacterSheet } from '../character-sheet';
 import { CachingGenerator, Generator } from '../collections';
 import {
     RegisterAsGoodAlignmentEffect,
     InteractionContext,
     RegisterAsCharacterEffect,
 } from '../effect';
-import { CompositeGamePhaseKind } from '../gamephase';
+import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { ReclusePlayer } from '../types';
 import {
     Ability,

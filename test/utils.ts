@@ -1,5 +1,5 @@
 import { Alignment } from '~/game/alignment';
-import { CharacterLoader } from '~/game/characterloader';
+import { CharacterLoader } from '~/game/character-loader';
 import { Player } from '~/game/player';
 
 const regex = /(.*) is (?:the|a|an)\s(evil|good|)\s?(.*)/i;

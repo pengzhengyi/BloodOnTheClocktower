@@ -7,7 +7,7 @@ import {
     Minion,
     Outsider,
     Townsfolk,
-} from './charactertype';
+} from './character-type';
 import { Generator } from './collections';
 import type { InteractionInitiator } from './effect';
 import { IncorrectNumberOfCharactersToAssign } from './exception';

@@ -1,7 +1,7 @@
 import {
     StoryTellerInformationOptions,
     StoryTellerInformation,
-} from '../storytellerinformation';
+} from '../storyteller-information';
 import {
     InfoProvideContext,
     InfoProvider,

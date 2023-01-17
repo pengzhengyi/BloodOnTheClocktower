@@ -6,7 +6,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './charactertype';
+} from './character-type';
 import { lowercaseLetters } from './common';
 import {
     CannotDetermineCharacterType,

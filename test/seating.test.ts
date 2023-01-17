@@ -1,4 +1,4 @@
-import { storytellerConfirmMock } from '~/__mocks__/gameui';
+import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { clockwise, randomChoice } from '~/game/common';
 import { Player } from '~/game/player';
 import { Seating } from '~/game/seating';

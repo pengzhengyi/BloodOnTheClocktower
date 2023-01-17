@@ -2,15 +2,15 @@ import type {
     FalseInformationOptions,
     TrueInformationOptions,
 } from '../information';
-import type { StoryTellerInformationOptions } from '../storytellerinformation';
-import type { CharacterSheet } from '~/game/charactersheet';
+import type { StoryTellerInformationOptions } from '../storyteller-information';
+import type { CharacterSheet } from '~/game/character-sheet';
 import type { Clocktower } from '~/game/clocktower';
 import { LazyMap } from '~/game/collections';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { Seating } from '~/game/seating';
 import type { StoryTeller } from '~/game/storyteller';
-import type { TravellerSheet } from '~/game/travellersheet';
+import type { TravellerSheet } from '~/game/traveller-sheet';
 
 export interface InfoProvideContext {
     clocktower: Clocktower;

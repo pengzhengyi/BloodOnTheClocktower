@@ -1,5 +1,5 @@
 import { mock } from 'jest-mock-extended';
-import type { IGameUI } from '~/interaction/gameui';
+import type { IGameUI } from '~/interaction/game-ui';
 
 export const hasRaisedHandForVoteMock = jest.fn();
 export const handleMock = jest.fn();

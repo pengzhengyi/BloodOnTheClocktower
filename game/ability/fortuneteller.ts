@@ -1,7 +1,7 @@
 import type { CharacterToken } from '../character';
 import { CharacterNightEffect, Effect, InteractionContext } from '../effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
-import { CompositeGamePhaseKind } from '../gamephase';
+import { CompositeGamePhaseKind } from '../game-phase-kind';
 
 import { GAME_UI } from '../dependencies.config';
 import type { FortuneTellerInformation } from '../info/provider/fortuneteller';
@@ -10,7 +10,7 @@ import {
     FortuneTellerInformationRequester,
 } from '../info/requester/fortuneteller';
 import type { NextFunction } from '../middleware';
-import type { NightSheet } from '../nightsheet';
+import type { NightSheet } from '../night-sheet';
 import type { Player } from '../player';
 import type { FortuneTellerPlayer } from '../types';
 import {

@@ -1,5 +1,5 @@
-import { storytellerConfirmMock } from '~/__mocks__/gameui';
-import { GamePhase, Phase } from '~/game/gamephase';
+import { storytellerConfirmMock } from '~/__mocks__/game-ui';
+import { GamePhase, Phase } from '~/game/game-phase';
 
 async function createGamePhase(phaseIndex: number): Promise<GamePhase> {
     const gamePhase = GamePhase.setup();

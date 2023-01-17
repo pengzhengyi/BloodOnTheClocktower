@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs';
 import { fromError, StackFrame } from 'stacktrace-js';
 import type { Execution } from './execution';
-import type { NightActOrdering } from './nightsheet';
+import type { NightActOrdering } from './night-sheet';
 import type { Nomination } from './nomination';
 import type { Exile } from './exile';
 import type { Vote } from './vote';
@@ -27,7 +27,7 @@ import type {
     NumberOfCharacters,
     ScriptConstraints,
     ScriptConstraintsHelper,
-} from './scripttool';
+} from './script-tool';
 import {
     CharacterType,
     Demon,
@@ -35,12 +35,12 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './charactertype';
+} from './character-type';
 import type { Effect, TCharacterEffect } from './effect';
 import type { Alignment } from './alignment';
 import type { Effects } from './effects';
 import type { Seating } from './seating';
-import type { GamePhaseKind } from './gamephase';
+import { GamePhaseKind } from './game-phase-kind';
 import type { Diary, Event as ClocktowerEvent } from './clocktower';
 import type {
     AbilityUseContext,

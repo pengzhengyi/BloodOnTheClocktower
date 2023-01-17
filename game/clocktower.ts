@@ -12,7 +12,7 @@ import {
 } from './exception';
 import { Execution } from './execution';
 import { Exile } from './exile';
-import { GamePhase, Phase } from './gamephase';
+import { GamePhase, Phase } from './game-phase';
 import type { Player } from './player';
 
 dayjs.extend(isSameOrBefore);

@@ -1,4 +1,4 @@
-import type { DeadReason } from './deadreason';
+import type { DeadReason } from './dead-reason';
 import type { Player } from './player';
 
 export class Death {

@@ -1,10 +1,10 @@
 import { Alignment } from './alignment';
 import { CharacterEffectOriginNotSetup } from './exception';
-import { BasicGamePhaseKind, GamePhaseKind } from './gamephase';
+import { BasicGamePhaseKind, GamePhaseKind } from './game-phase-kind';
 import { Constructor, Predicate } from './types';
 import type { CharacterToken } from './character';
-import type { NightSheet } from './nightsheet';
-import type { DeadReason } from './deadreason';
+import type { NightSheet } from './night-sheet';
+import type { DeadReason } from './dead-reason';
 import type { Middleware, NextFunction } from './middleware';
 import type { Player } from './player';
 import { GAME_UI } from './dependencies.config';

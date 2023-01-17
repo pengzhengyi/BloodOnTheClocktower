@@ -1,10 +1,10 @@
 import type { CharacterToken, TownsfolkCharacterToken } from '../character';
-import type { CharacterSheet } from '../charactersheet';
+import type { CharacterSheet } from '../character-sheet';
 import { Generator } from '../collections';
 import { GAME_UI } from '../dependencies.config';
-import { DrunkReason } from '../drunkreason';
+import { DrunkReason } from '../drunk-reason';
 import { ThinkAsCharacterEffect } from '../effect';
-import { CompositeGamePhaseKind } from '../gamephase';
+import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { Player } from '../player';
 import type { Players } from '../players';
 import {

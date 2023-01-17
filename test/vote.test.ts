@@ -2,7 +2,7 @@ import { playerFromDescription } from './utils';
 import {
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
-} from '~/__mocks__/gameui';
+} from '~/__mocks__/game-ui';
 import {
     createBasicPlayer,
     mockPlayer,

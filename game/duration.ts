@@ -1,6 +1,6 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
-import { GamePhase } from './gamephase';
+import { GamePhase } from './game-phase';
 import { UnsupportedOperation } from './exception';
 
 export interface IDuration {

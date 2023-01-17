@@ -6,7 +6,7 @@ import {
     AtFirstNight,
 } from './common';
 import { InformationRequestContext } from './requester';
-import { Minion } from '~/game/charactertype';
+import { Minion } from '~/game/character-type';
 
 class BaseMinionInformationRequester<
     TInformationRequestContext extends InformationRequestContext<MinionInformation>

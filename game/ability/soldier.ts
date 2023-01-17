@@ -1,5 +1,5 @@
 import { SafeFromDemonEffect, InteractionContext } from '../effect';
-import { CompositeGamePhaseKind } from '../gamephase';
+import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { SoldierPlayer } from '../types';
 import {
     Ability,

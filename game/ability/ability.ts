@@ -1,7 +1,7 @@
 import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
 import type { Constructor, StaticThis } from '../types';
-import type { CharacterSheet } from '../charactersheet';
-import type { NightSheet } from '../nightsheet';
+import type { CharacterSheet } from '../character-sheet';
+import type { NightSheet } from '../night-sheet';
 import { GAME_UI } from '../dependencies.config';
 import type { Player } from '../player';
 import type { Players } from '../players';
@@ -13,7 +13,7 @@ import type {
     InformationRequestContext,
     IInformationRequester,
 } from '../info/requester/requester';
-import type { AbilityLoader } from './abilityloader';
+import type { AbilityLoader } from './loader';
 import {
     AbilitySuccessCommunicatedInfo,
     AbilitySuccessUseWhenMalfunction,

@@ -1,7 +1,7 @@
 import { GAME_UI } from '../dependencies.config';
 import { CharacterNightEffect, SafeFromDemonEffect } from '../effect';
 import { MonkNotChoosePlayerToProtect } from '../exception';
-import { BasicGamePhaseKind } from '../gamephase';
+import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { CharacterToken } from '../character';
 import type { Player } from '../player';
 import type { Players } from '../players';

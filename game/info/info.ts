@@ -4,7 +4,7 @@ import type {
     TrueInformationOptions,
     FalseInformationOptions,
 } from './information';
-import type { StoryTellerInformationOptions } from './storytellerinformation';
+import type { StoryTellerInformationOptions } from './storyteller-information';
 
 /**
  * There are two classifications for info:

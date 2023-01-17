@@ -1,5 +1,5 @@
 import { mock } from 'jest-mock-extended';
-import { GamePhase } from '~/game/gamephase';
+import { GamePhase } from '~/game/game-phase';
 
 export function mockGamePhase(): GamePhase {
     return mock<GamePhase>();

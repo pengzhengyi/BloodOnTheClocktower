@@ -1,4 +1,4 @@
-import { DeadReason } from '../deadreason';
+import { DeadReason } from '../dead-reason';
 import type { Death } from '../death';
 import { GAME_UI } from '../dependencies.config';
 import { SlayerNotChoosePlayerToKill } from '../exception';

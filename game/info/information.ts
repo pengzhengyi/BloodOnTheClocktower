@@ -5,7 +5,7 @@ import type {
     Minion,
     Demon,
     CharacterType,
-} from '../charactertype';
+} from '../character-type';
 import type { Generator } from '../collections';
 import type { Player } from '../player';
 import { Info } from './info';

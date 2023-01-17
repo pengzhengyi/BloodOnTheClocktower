@@ -1,5 +1,5 @@
 import { collectVotesForNomination as collectVotesForExile } from './execution.test';
-import { handleMock } from '~/__mocks__/gameui';
+import { handleMock } from '~/__mocks__/game-ui';
 import { Exile } from '~/game/exile';
 import { ExileNonTraveller } from '~/game/exception';
 import { Player } from '~/game/player';

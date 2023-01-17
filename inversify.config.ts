@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import { Container } from 'inversify';
 import { SERVICES } from './types';
-import { GameUI, IGameUI } from './interaction/gameui';
+import { GameUI, IGameUI } from './interaction/game-ui';
 
 const dependencyResolver = new Container();
 dependencyResolver.bind<IGameUI>(SERVICES.GameUI).to(GameUI).inSingletonScope();

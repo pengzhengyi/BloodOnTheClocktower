@@ -1,10 +1,10 @@
 import { EditionData, EditionKeyName } from './types';
 import { IncompleteEditionData } from './exception';
-import { CharacterSheet } from './charactersheet';
+import { CharacterSheet } from './character-sheet';
 import { Generator } from './collections';
 import type { CharacterToken } from './character';
 import { onlyLetters } from './common';
-import type { CharacterType } from './charactertype';
+import type { CharacterType } from './character-type';
 
 export enum EditionName {
     TroubleBrewing = 'Trouble Brewing',

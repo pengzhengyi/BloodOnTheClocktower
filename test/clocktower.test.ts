@@ -1,6 +1,6 @@
-import { storytellerConfirmMock } from '~/__mocks__/gameui';
+import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { Clocktower } from '~/game/clocktower';
-import { GamePhase, Phase } from '~/game/gamephase';
+import { GamePhase, Phase } from '~/game/game-phase';
 import { RecallFutureDate } from '~/game/exception';
 
 async function createClocktower(phaseIndex: number): Promise<Clocktower> {

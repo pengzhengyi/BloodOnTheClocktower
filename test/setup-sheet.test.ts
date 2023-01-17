@@ -1,5 +1,5 @@
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from '~/game/exception';
-import { SetupSheet } from '~/game/setupsheet';
+import { SetupSheet } from '~/game/setup-sheet';
 
 describe('Test validateNumberOfPlayers', () => {
     test.concurrent('3 players', () => {

@@ -3,7 +3,7 @@ import {
     createInfoProvideContext,
     createInfoProvideContextFromPlayerDescriptions,
     createUndertakerInfoProviderContext,
-} from './infoprovider.test';
+} from './info-provider.test';
 import { playerFromDescription } from './utils';
 import { createExecutionAndAddVotedNominations } from './execution.test';
 import {
@@ -12,7 +12,7 @@ import {
     handleMock,
     hasRaisedHandForVoteMock,
     storytellerChooseOneMock,
-} from '~/__mocks__/gameui';
+} from '~/__mocks__/game-ui';
 
 import {
     mockAbilitySetupContext,
@@ -33,20 +33,20 @@ import {
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockPlayers } from '~/__mocks__/players';
-import { getTroubleBrewingNightSheet } from '~/__mocks__/nightsheet';
-import { getTroubleBrewingCharacterSheet } from '~/__mocks__/charactersheet';
+import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
+import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { Generator } from '~/game/collections';
 import { Chef } from '~/content/characters/output/chef';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Minion, Townsfolk } from '~/game/charactertype';
+import { Minion, Townsfolk } from '~/game/character-type';
 import type { Death } from '~/game/death';
-import type { NightSheet } from '~/game/nightsheet';
+import type { NightSheet } from '~/game/night-sheet';
 import type { Player } from '~/game/player';
 import { Alignment } from '~/game/alignment';
-import type { GamePhase } from '~/game/gamephase';
+import type { GamePhase } from '~/game/game-phase';
 import type { CharacterToken } from '~/game/character';
-import type { CharacterSheet } from '~/game/charactersheet';
+import type { CharacterSheet } from '~/game/character-sheet';
 import type {
     Action,
     AsyncFactory,
@@ -55,7 +55,7 @@ import type {
     SlayerPlayer,
     Task,
 } from '~/game/types';
-import { DeadReason } from '~/game/deadreason';
+import { DeadReason } from '~/game/dead-reason';
 import { DeadPlayerCannotNominate } from '~/game/exception';
 import { Execution } from '~/game/execution';
 import { StoryTeller } from '~/game/storyteller';
@@ -107,7 +107,7 @@ import { VirginAbility } from '~/game/ability/virgin';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
 import { Drunk } from '~/content/characters/output/drunk';
 import { DrunkAbility } from '~/game/ability/drunk';
-import { AbilityLoader } from '~/game/ability/abilityloader';
+import { AbilityLoader } from '~/game/ability/loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
 import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
 import type {

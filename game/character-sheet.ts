@@ -7,7 +7,7 @@ import {
     instanceToPlain,
 } from 'class-transformer';
 import { CharactersToIDs, CharacterToken } from './character';
-import { CharacterLoader } from './characterloader';
+import { CharacterLoader } from './character-loader';
 import {
     CharacterType,
     Demon,
@@ -16,7 +16,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './charactertype';
+} from './character-type';
 import { Generator } from './collections';
 import { parsePromiseSettledResults } from './common';
 import {

@@ -1,4 +1,4 @@
-import { GAME_UI } from '~/__mocks__/gameui';
+import { GAME_UI } from '~/__mocks__/game-ui';
 
 jest.mock('~/game/dependencies.config', () => ({
     GAME_UI,

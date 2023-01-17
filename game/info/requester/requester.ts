@@ -1,7 +1,7 @@
 import type { Info } from '../info';
 import type { Information } from '../information';
 import type { InfoProvideContext } from '../provider/provider';
-import type { StoryTellerInformation } from '../storytellerinformation';
+import type { StoryTellerInformation } from '../storyteller-information';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define

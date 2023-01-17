@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { mock } from 'jest-mock-extended';
 import { randomCharacter } from './character';
 import { mockWithPropertyValue } from './common';
-import { storytellerConfirmMock } from './gameui';
+import { storytellerConfirmMock } from './game-ui';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
 import { Player } from '~/game/player';

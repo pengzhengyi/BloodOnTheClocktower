@@ -1,4 +1,4 @@
-import { PlayerState, State } from '~/game/playerstate';
+import { PlayerState, State } from '~/game/player-state';
 
 describe('Test basic functionalities', () => {
     test.concurrent('get and set player state', () => {

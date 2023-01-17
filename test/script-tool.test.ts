@@ -1,5 +1,5 @@
 import script from './custom-script.json';
-import { ScriptConstraintsHelper, ScriptTool } from '~/game/scripttool';
+import { ScriptConstraintsHelper, ScriptTool } from '~/game/script-tool';
 import { Generator } from '~/game/collections';
 import { EditionName } from '~/game/edition';
 import { EditionKeyName } from '~/game/types';

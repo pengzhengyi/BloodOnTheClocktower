@@ -1,4 +1,4 @@
-import { handleMock } from '~/__mocks__/gameui';
+import { handleMock } from '~/__mocks__/game-ui';
 import { randomChoice } from '~/game/common';
 import { Alignment } from '~/game/alignment';
 import { Generator } from '~/game/collections';

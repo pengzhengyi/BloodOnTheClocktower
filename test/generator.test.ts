@@ -1,6 +1,6 @@
 import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
 import { FangGu } from '~/content/characters/output/fanggu';
-import { Demon, Minion, Outsider, Townsfolk } from '~/game/charactertype';
+import { Demon, Minion, Outsider, Townsfolk } from '~/game/character-type';
 import { Generator } from '~/game/collections';
 
 describe('test Generator', () => {

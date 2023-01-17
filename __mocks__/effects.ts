@@ -1,6 +1,6 @@
-import { createGamePhase, mockGamePhase } from './gamephase';
+import { createGamePhase, mockGamePhase } from './game-phase';
 import { Effects } from '~/game/effects';
-import type { GamePhase } from '~/game/gamephase';
+import type { GamePhase } from '~/game/game-phase';
 import { Action } from '~/game/types';
 
 export function setupEffects(gamePhase?: GamePhase, force = false) {

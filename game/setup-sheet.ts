@@ -5,9 +5,9 @@ import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
 import type { Player } from './player';
 import type { Players } from './players';
-import type { NumberOfCharacters } from './scripttool';
+import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating';
-import { TownSquare } from './townsquare';
+import { TownSquare } from './town-square';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
 export abstract class SetupSheet {

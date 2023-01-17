@@ -1,4 +1,4 @@
-import type { NumberOfCharacters as Assignment } from './scripttool';
+import type { NumberOfCharacters as Assignment } from './script-tool';
 import type { TravellerCharacterToken } from './character';
 import { GAME_UI } from './dependencies.config';
 

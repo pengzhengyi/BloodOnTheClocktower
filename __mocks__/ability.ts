@@ -1,16 +1,16 @@
 import { mock } from 'jest-mock-extended';
-import { mockCharacterSheet } from './charactersheet';
+import { mockCharacterSheet } from './character-sheet';
 import { mockGame } from './game';
-import { mockAbilityLoader } from './abilityloader';
+import { mockAbilityLoader } from './ability-loader';
 import { mockInfoProvideContext as _mockInfoProvideContext } from './information';
-import { mockNightSheet } from './nightsheet';
+import { mockNightSheet } from './night-sheet';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
-import type { NightSheet } from '~/game/nightsheet';
-import type { CharacterSheet } from '~/game/charactersheet';
+import type { NightSheet } from '~/game/night-sheet';
+import type { CharacterSheet } from '~/game/character-sheet';
 import type {
     AbilityUseContext,
     AbilitySetupContext,
@@ -19,7 +19,7 @@ import type {
 import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
 import type { SaintAbilitySetupContext } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
-import type { AbilityLoader } from '~/game/ability/abilityloader';
+import type { AbilityLoader } from '~/game/ability/loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
 
 export function mockAbilityUseContext(

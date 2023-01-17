@@ -1,7 +1,7 @@
 import {
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
-} from '~/__mocks__/gameui';
+} from '~/__mocks__/game-ui';
 import { Execution } from '~/game/execution';
 import { Nomination } from '~/game/nomination';
 import {

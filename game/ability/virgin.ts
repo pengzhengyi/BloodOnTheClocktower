@@ -1,7 +1,7 @@
-import { DeadReason } from '../deadreason';
+import { DeadReason } from '../dead-reason';
 import { Effect, InteractionContext } from '../effect';
 import type { Execution } from '../execution';
-import { BasicGamePhaseKind } from '../gamephase';
+import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../middleware';
 import type { Nomination } from '../nomination';
 import type { VirginPlayer, RequireExecution } from '../types';

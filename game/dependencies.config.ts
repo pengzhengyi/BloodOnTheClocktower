@@ -1,4 +1,4 @@
-import type { IGameUI } from '~/interaction/gameui';
+import type { IGameUI } from '~/interaction/game-ui';
 import { dependencyResolver } from '~/inversify.config';
 import { SERVICES } from '~/types';
 

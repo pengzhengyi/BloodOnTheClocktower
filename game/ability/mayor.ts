@@ -1,8 +1,8 @@
 import { Alignment } from '../alignment';
-import { DeadReason } from '../deadreason';
+import { DeadReason } from '../dead-reason';
 import { GAME_UI } from '../dependencies.config';
 import { Effect, InteractionContext } from '../effect';
-import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../gamephase';
+import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { Game } from '../game';
 import type { NextFunction } from '../middleware';
 import type { Player } from '../player';

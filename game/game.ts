@@ -4,9 +4,9 @@ import type { Diary } from './clocktower';
 import { Player } from './player';
 import { Players } from './players';
 import { Edition } from './edition';
-import { EffectTarget } from './effecttarget';
+import { EffectTarget } from './effect-target';
 import { StoryTeller } from './storyteller';
-import { TownSquare } from './townsquare';
+import { TownSquare } from './town-square';
 import { GAME_UI } from './dependencies.config';
 
 export class Game extends EffectTarget<Game> {

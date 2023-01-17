@@ -2,13 +2,13 @@ import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator, LazyMap } from './collections';
 import { Effect, Forwarding, InteractionContext } from './effect';
 import { EffectsNotSetup } from './exception';
+import { GamePhase } from './game-phase';
 import {
     ALL_GAME_PHASE_KINDS,
     BasicGamePhaseKind,
     CompositeGamePhaseKind,
-    GamePhase,
     GamePhaseKind,
-} from './gamephase';
+} from './game-phase-kind';
 import { Pipeline } from './middleware';
 import type { Transform } from './types';
 

@@ -7,7 +7,7 @@ import {
     InformationRequester,
 } from './requester';
 import type { Constructor } from '~/game/types';
-import type { CharacterType } from '~/game/charactertype';
+import type { CharacterType } from '~/game/character-type';
 import type { CharacterToken } from '~/game/character';
 
 type InfoRequesterConstructor<TInfoRequester> = Constructor<TInfoRequester>;

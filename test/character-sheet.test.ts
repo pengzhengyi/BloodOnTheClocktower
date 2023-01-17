@@ -1,7 +1,7 @@
 import { Chef } from '~/content/characters/output/chef';
 import { Imp } from '~/content/characters/output/imp';
-import { CharacterSheet } from '~/game/charactersheet';
-import { Demon, Townsfolk } from '~/game/charactertype';
+import { CharacterSheet } from '~/game/character-sheet';
+import { Demon, Townsfolk } from '~/game/character-type';
 
 describe('test CharacterSheet serialization', () => {
     const characterSheet = CharacterSheet.from([Imp.id, Chef.id]);

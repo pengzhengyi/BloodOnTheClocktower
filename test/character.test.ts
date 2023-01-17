@@ -3,7 +3,7 @@ import { Imp } from '~/content/characters/output/imp';
 import { Spy } from '~/content/characters/output/spy';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
-import { Townsfolk } from '~/game/charactertype';
+import { Townsfolk } from '~/game/character-type';
 
 describe('test basic functionalities', () => {
     test.concurrent('determine good / evil', () => {

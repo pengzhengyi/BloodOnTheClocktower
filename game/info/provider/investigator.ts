@@ -1,7 +1,7 @@
 import type { OneOfTwoPlayersIsMinion } from '../information';
 import { OneOfTwoPlayersHasCharacterTypeInformationProvider } from './common';
 import type { InfoProvideContext } from './provider';
-import { CharacterType, Minion } from '~/game/charactertype';
+import { CharacterType, Minion } from '~/game/character-type';
 
 export type InvestigatorInformation = OneOfTwoPlayersIsMinion;
 

@@ -4,13 +4,13 @@ import {
     mockWithPropertyValue,
     mockWithPropertyValues,
 } from './common';
-import type { CharacterSheet } from '~/game/charactersheet';
+import type { CharacterSheet } from '~/game/character-sheet';
 import type { Clocktower, Diary } from '~/game/clocktower';
 import { Player } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { Seating } from '~/game/seating';
 import type { StoryTeller } from '~/game/storyteller';
-import type { TravellerSheet } from '~/game/travellersheet';
+import type { TravellerSheet } from '~/game/traveller-sheet';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Investigator } from '~/content/characters/output/investigator';
@@ -27,7 +27,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from '~/game/charactertype';
+} from '~/game/character-type';
 import type { ChefInformation } from '~/game/info/provider/chef';
 import type { DemonInformation } from '~/game/info/provider/demon';
 import type { EmpathInformation } from '~/game/info/provider/empath';
