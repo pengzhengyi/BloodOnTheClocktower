@@ -1,6 +1,6 @@
 import type { NumberOfCharacters as Assignment } from './scripttool';
 import type { TravellerCharacterToken } from './character';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 /**
  * {@link `glossary["Traveller Sheet"]`}

@@ -1,14 +1,14 @@
 import { Generator } from './collections';
+import { GAME_UI } from './dependencies.config';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
 import type { Player } from './player';
 import type { Players } from './players';
+import type { NumberOfCharacters } from './scripttool';
 import { Seating } from './seating';
 import { TownSquare } from './townsquare';
-import type { NumberOfCharacters } from './scripttool';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
-import { GAME_UI } from '~/interaction/gameui';
 
 export abstract class SetupSheet {
     static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;

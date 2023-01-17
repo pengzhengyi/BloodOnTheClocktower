@@ -1,10 +1,10 @@
+import { GAME_UI } from '../dependencies.config';
 import type { Player } from '../player';
 import type {
     TrueInformationOptions,
     FalseInformationOptions,
 } from './information';
 import type { StoryTellerInformationOptions } from './storytellerinformation';
-import { GAME_UI } from '~/interaction/gameui';
 
 /**
  * There are two classifications for info:

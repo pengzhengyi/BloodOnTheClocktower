@@ -9,7 +9,7 @@ import { InfoProviderLoader } from './info/provider/loader';
 import { Player } from './player';
 import type { Players } from './players';
 import { AsyncTask } from './types';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 /**
  * {@link `glossary["Storyteller"]`}

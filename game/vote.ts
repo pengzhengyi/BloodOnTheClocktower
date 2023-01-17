@@ -1,10 +1,9 @@
-import 'reflect-metadata';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { clockwise } from './common';
 import { NoVotesWhenCountingVote } from './exception';
 import { Player } from './player';
 import { PlayerOrdering } from './types';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 /**
  * {@link `glossary["Vote"]`}

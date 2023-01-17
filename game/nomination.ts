@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { Vote } from './vote';
 import { Player } from './player';

@@ -4,7 +4,7 @@ import {
     CharacterNotInNightActOrdering,
     IncompleteCharacterRoleData,
 } from './exception';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export enum NightActOrderNotDefinedHandleStrategy {
     NotAct,

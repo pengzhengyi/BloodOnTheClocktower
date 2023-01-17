@@ -7,7 +7,7 @@ import { Edition } from './edition';
 import { EffectTarget } from './effecttarget';
 import { StoryTeller } from './storyteller';
 import { TownSquare } from './townsquare';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export class Game extends EffectTarget<Game> {
     protected static defaultEnabledProxyHandlerPropertyNames: Array<

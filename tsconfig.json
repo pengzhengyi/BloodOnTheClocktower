@@ -25,6 +25,7 @@
             "@types/jest",
             "@pinia/nuxt",
             "@nuxtjs/dayjs",
+            "reflect-metadata",
             "dayjs/plugin/localizedFormat"
         ]
     },

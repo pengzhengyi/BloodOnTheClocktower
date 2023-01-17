@@ -39,6 +39,7 @@
         "gameui",
         "Grimoire",
         "hrefs",
+        "inversify",
         "isort",
         "KEYNAMES",
         "linebreak",

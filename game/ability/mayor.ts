@@ -1,8 +1,9 @@
 import { Alignment } from '../alignment';
 import { DeadReason } from '../deadreason';
+import { GAME_UI } from '../dependencies.config';
 import { Effect, InteractionContext } from '../effect';
-import type { Game } from '../game';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../gamephase';
+import type { Game } from '../game';
 import type { NextFunction } from '../middleware';
 import type { Player } from '../player';
 import type { Players } from '../players';
@@ -18,7 +19,6 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { GAME_UI } from '~/interaction/gameui';
 
 export class MayorPeacefulWinEffect extends Effect<Game> {
     static readonly description =

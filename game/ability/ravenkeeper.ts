@@ -1,3 +1,4 @@
+import { GAME_UI } from '../dependencies.config';
 import { RavenkeeperNotChoosePlayerToProtect } from '../exception';
 import type { RavenkeeperInformation } from '../info/provider/ravenkeeper';
 import {
@@ -10,7 +11,6 @@ import {
     GetCharacterInformationAbility,
     GetInfoAbilityUseContext,
 } from './ability';
-import { GAME_UI } from '~/interaction/gameui';
 
 export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
     RavenkeeperInformation,

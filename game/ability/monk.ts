@@ -1,7 +1,8 @@
-import type { CharacterToken } from '../character';
+import { GAME_UI } from '../dependencies.config';
 import { CharacterNightEffect, SafeFromDemonEffect } from '../effect';
 import { MonkNotChoosePlayerToProtect } from '../exception';
 import { BasicGamePhaseKind } from '../gamephase';
+import type { CharacterToken } from '../character';
 import type { Player } from '../player';
 import type { Players } from '../players';
 import type { MonkPlayer } from '../types';
@@ -17,7 +18,6 @@ import {
     AbilitySuccessUseWhenMalfunction,
 } from './status';
 import { Monk } from '~/content/characters/output/monk';
-import { GAME_UI } from '~/interaction/gameui';
 
 class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
     static readonly description =

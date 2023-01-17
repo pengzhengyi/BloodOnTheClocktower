@@ -2,6 +2,7 @@ import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
 import type { Constructor, StaticThis } from '../types';
 import type { CharacterSheet } from '../charactersheet';
 import type { NightSheet } from '../nightsheet';
+import { GAME_UI } from '../dependencies.config';
 import type { Player } from '../player';
 import type { Players } from '../players';
 import type { Info } from '../info/info';
@@ -18,7 +19,6 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
-import { GAME_UI } from '~/interaction/gameui';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;

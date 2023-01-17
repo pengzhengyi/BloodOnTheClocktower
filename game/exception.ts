@@ -51,7 +51,7 @@ import type {
 } from './ability/ability';
 import type { InfoRequestContext } from './info/requester/requester';
 import type { InfoProviderLoader } from './info/provider/loader';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export class BaseError extends Error {
     declare cause?: Error;

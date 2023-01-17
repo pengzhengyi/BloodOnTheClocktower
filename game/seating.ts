@@ -11,7 +11,7 @@ import {
     PlayerNotSat,
     UnexpectedEmptySeat,
 } from './exception';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export interface SyncResult {
     occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;

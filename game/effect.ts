@@ -7,7 +7,7 @@ import type { NightSheet } from './nightsheet';
 import type { DeadReason } from './deadreason';
 import type { Middleware, NextFunction } from './middleware';
 import type { Player } from './player';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 interface ProxyHandlerRequest<TTarget extends object> {
     trap: keyof ProxyHandler<TTarget>;

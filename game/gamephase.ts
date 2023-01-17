@@ -1,6 +1,6 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export enum Phase {
     /** before beginning a game */

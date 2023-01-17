@@ -1,20 +1,20 @@
+import type { CharacterToken, TownsfolkCharacterToken } from '../character';
+import type { CharacterSheet } from '../charactersheet';
 import { Generator } from '../collections';
+import { GAME_UI } from '../dependencies.config';
 import { DrunkReason } from '../drunkreason';
 import { ThinkAsCharacterEffect } from '../effect';
 import { CompositeGamePhaseKind } from '../gamephase';
-import type { CharacterToken, TownsfolkCharacterToken } from '../character';
-import type { CharacterSheet } from '../charactersheet';
 import type { Player } from '../player';
 import type { Players } from '../players';
 import {
     Ability,
+    AbilitySetupContext,
     AbilityUseContext,
     AbilityUseResult,
-    AbilitySetupContext,
     RequireSetup,
 } from './ability';
 import { AbilityUseStatus } from './status';
-import { GAME_UI } from '~/interaction/gameui';
 
 class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     /**

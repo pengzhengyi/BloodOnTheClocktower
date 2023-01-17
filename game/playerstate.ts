@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { Generator } from './collections';
 

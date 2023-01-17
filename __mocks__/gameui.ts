@@ -1,3 +1,6 @@
+import { mock } from 'jest-mock-extended';
+import type { IGameUI } from '~/interaction/gameui';
+
 export const hasRaisedHandForVoteMock = jest.fn();
 export const handleMock = jest.fn();
 export const chooseMock = jest.fn();
@@ -21,6 +24,10 @@ export const GAME_UI = {
     send: sendMock,
     callForNomination: callForNominationMock,
 };
+
+export function mockGameUI() {
+    return mock<IGameUI>();
+}
 
 export function expectSendMockToHaveBeenCalled() {
     expect(sendMock).toHaveBeenCalled();

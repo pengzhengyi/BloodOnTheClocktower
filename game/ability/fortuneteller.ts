@@ -3,15 +3,16 @@ import { CharacterNightEffect, Effect, InteractionContext } from '../effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
 import { CompositeGamePhaseKind } from '../gamephase';
 
+import { GAME_UI } from '../dependencies.config';
+import type { FortuneTellerInformation } from '../info/provider/fortuneteller';
+import {
+    FortuneTellerInformationRequestContext,
+    FortuneTellerInformationRequester,
+} from '../info/requester/fortuneteller';
 import type { NextFunction } from '../middleware';
 import type { NightSheet } from '../nightsheet';
 import type { Player } from '../player';
 import type { FortuneTellerPlayer } from '../types';
-import type { FortuneTellerInformation } from '../info/provider/fortuneteller';
-import {
-    FortuneTellerInformationRequester,
-    FortuneTellerInformationRequestContext,
-} from '../info/requester/fortuneteller';
 import {
     AbilitySetupContext,
     GetCharacterInformationAbility,
@@ -19,7 +20,6 @@ import {
     RequireSetup,
 } from './ability';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import { GAME_UI } from '~/interaction/gameui';
 class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =
         'A good player that registers as a Demon to Fortune Teller';

@@ -68,7 +68,7 @@
                 "ms-vscode.live-server",
                 "VisualStudioExptTeam.vscodeintellicode",
                 "VisualStudioExptTeam.intellicode-api-usage-examples",
-                "miclo.sort-typescript-imports"
+                "mike-co.import-sorter"
             ]
         }
     },

@@ -1,5 +1,6 @@
 import { DeadReason } from '../deadreason';
 import type { Death } from '../death';
+import { GAME_UI } from '../dependencies.config';
 import { SlayerNotChoosePlayerToKill } from '../exception';
 import type { Player } from '../player';
 import type { SlayerPlayer } from '../types';
@@ -9,7 +10,6 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
-import { GAME_UI } from '~/interaction/gameui';
 
 export interface SlayerAbilityUseResult extends AbilityUseResult {
     chosenPlayer: Player;

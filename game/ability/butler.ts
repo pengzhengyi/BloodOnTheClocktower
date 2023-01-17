@@ -1,3 +1,4 @@
+import { GAME_UI } from '../dependencies.config';
 import { Effect, InteractionContext } from '../effect';
 import { ButlerNotChooseMasterToFollow } from '../exception';
 import { BasicGamePhaseKind } from '../gamephase';
@@ -5,12 +6,11 @@ import type { NextFunction } from '../middleware';
 import type { Player } from '../player';
 import type { Players } from '../players';
 import type { ButlerPlayer } from '../types';
-import { AbilityUseResult, Ability, AbilityUseContext } from './ability';
+import { Ability, AbilityUseContext, AbilityUseResult } from './ability';
 import {
-    AbilitySuccessUseWhenMalfunction,
     AbilitySuccessUseWhenHasEffect,
+    AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { GAME_UI } from '~/interaction/gameui';
 
 export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
     static readonly description =

@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from './deadreason';
 import { EffectTarget } from './effecttarget';
@@ -14,7 +14,7 @@ import {
     NoVoteInNomination,
     NoVotesWhenCountingVote,
 } from './exception';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 /**
  * {@link `glossary["Execution"]`}

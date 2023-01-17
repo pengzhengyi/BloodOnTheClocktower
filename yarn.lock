@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@abraham/reflection@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@abraham/reflection/-/reflection-0.11.0.tgz#12dc627b8b719c5d102c3052b5648e56985dbb3f"
+  integrity sha512-lCPIgtjeiZ7ZWLPP5RiAmGAyw5I0dHMt0GzzKZVZiZ48lNC0sGnmTzKITEtOlZevylf0sf5vjhbEmByuQMQE9Q==
+
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -7654,6 +7659,11 @@ invariant@^2.2.2:
   dependencies:
     loose-envify "^1.0.0"
 
+inversify@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/inversify/-/inversify-6.0.1.tgz#b20d35425d5d8c5cd156120237aad0008d969f02"
+  integrity sha512-B3ex30927698TJENHR++8FfEaJGqoWOgI6ZY5Ht/nLUsFCwHn6akbwtnUAPCgUepAnTpe2qHxhDNjoKLyz6rgQ==
+
 ip@^1.1.5:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.8.tgz#ae05948f6b075435ed3307acce04629da8cdbf48"
@@ -11755,7 +11765,7 @@ redent@^3.0.0:
 reflect-metadata@^0.1.13:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
-  integrity "sha1-Z648pXyXKiqhZCsQ/jY/4y1J3Ag= sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg=="
+  integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
 
 regenerate-unicode-properties@^10.0.1:
   version "10.0.1"

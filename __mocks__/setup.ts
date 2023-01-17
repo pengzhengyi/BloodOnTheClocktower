@@ -1,6 +1,6 @@
 import { GAME_UI } from '~/__mocks__/gameui';
 
-jest.mock('~/interaction/gameui', () => ({
+jest.mock('~/game/dependencies.config', () => ({
     GAME_UI,
 }));
 

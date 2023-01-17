@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
+import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain } from 'class-transformer';
-import 'reflect-metadata';
 import { v4 as uuid } from 'uuid';
 import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
@@ -26,7 +26,7 @@ import {
 } from './exception';
 import type { Execution } from './execution';
 import { DrunkReason } from './drunkreason';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export interface CharacterAssignmentResult {
     player: Player;

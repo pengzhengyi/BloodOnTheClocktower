@@ -1,6 +1,6 @@
 import { InvalidPlayerToSit } from './exception';
 import { Player } from './player';
-import { GAME_UI } from '~/interaction/gameui';
+import { GAME_UI } from './dependencies.config';
 
 export interface SitResult {
     player: Player;
