@@ -1,18 +1,18 @@
-import type { Player } from './player';
 import type { Execution } from './execution';
 import type { Game } from './game';
+import type { Player } from './player';
+import type { Butler } from '~/content/characters/output/butler';
+import type { Drunk } from '~/content/characters/output/drunk';
 import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import type { Mayor } from '~/content/characters/output/mayor';
 import type { Monk } from '~/content/characters/output/monk';
 import type { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import type { Slayer } from '~/content/characters/output/slayer';
-import type { Soldier } from '~/content/characters/output/soldier';
-import type { Virgin } from '~/content/characters/output/virgin';
-import type { Butler } from '~/content/characters/output/butler';
-import type { Undertaker } from '~/content/characters/output/undertaker';
 import type { Recluse } from '~/content/characters/output/recluse';
 import type { Saint } from '~/content/characters/output/saint';
-import type { Drunk } from '~/content/characters/output/drunk';
+import type { Slayer } from '~/content/characters/output/slayer';
+import type { Soldier } from '~/content/characters/output/soldier';
+import type { Undertaker } from '~/content/characters/output/undertaker';
+import type { Virgin } from '~/content/characters/output/virgin';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
