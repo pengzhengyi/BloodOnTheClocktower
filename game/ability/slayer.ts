@@ -1,6 +1,5 @@
 import { DeadReason } from '../dead-reason';
 import type { Death } from '../death';
-import { GAME_UI } from '../dependencies.config';
 import { SlayerNotChoosePlayerToKill } from '../exception';
 import type { Player } from '../player';
 import type { SlayerPlayer } from '../types';
@@ -10,6 +9,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
+import { Environment } from '~/interaction/environment';
 
 export interface SlayerAbilityUseResult extends AbilityUseResult {
     chosenPlayer: Player;
@@ -92,7 +92,7 @@ export class SlayerAbility extends Ability<
         players: Iterable<Player>,
         context: AbilityUseContext
     ): Promise<Player> {
-        let chosen = (await GAME_UI.choose(
+        let chosen = (await Environment.current.gameUI.choose(
             slayerPlayer,
             players,
             1,

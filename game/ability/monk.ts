@@ -1,4 +1,3 @@
-import { GAME_UI } from '../dependencies.config';
 import { CharacterNightEffect, SafeFromDemonEffect } from '../effect';
 import { MonkNotChoosePlayerToProtect } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
@@ -17,6 +16,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
+import { Environment } from '~/interaction/environment';
 import { Monk } from '~/content/characters/output/monk';
 
 class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
@@ -121,7 +121,7 @@ class BaseMonkProtectAbility extends Ability<
         players: Players,
         context: AbilityUseContext
     ): Promise<Player> {
-        let chosen = (await GAME_UI.choose(
+        let chosen = (await Environment.current.gameUI.choose(
             monkPlayer,
             players.isNot(monkPlayer),
             1,

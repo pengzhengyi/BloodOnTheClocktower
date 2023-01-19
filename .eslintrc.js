@@ -27,6 +27,7 @@ module.exports = {
       { 'ts-ignore': 'allow-with-description' },
     ],
     'no-unused-vars': 'off',
+    'import/order': 'warn',
     '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/no-this-alias': [
       'error',

@@ -9,6 +9,7 @@ import { IStorytellerConfirm } from './storyteller-confirm';
 import { IStorytellerDecide } from './storyteller-decide';
 import type { IHasRaisedHandForVote } from './has-raised-hand-for-vote';
 import type { Player } from '~/game/player';
+import type { StaticThis } from '~/game/types';
 
 export type IGameUIInteractions = [
     IHasRaisedHandForVote,
@@ -42,7 +43,38 @@ export interface IGameUI
 
 export type IGameUIInteraction = IGameUIInteractions[number];
 
+export interface IGameUIFactory {
+    instance?: IGameUI;
+
+    init<TArgs extends any[]>(
+        this: StaticThis<IGameUI>,
+        ...args: TArgs
+    ): IGameUI;
+}
+
+export interface IGameUIProvider {
+    gameUI: IGameUI;
+}
+
 abstract class AbstractGameUI implements IGameUI {
+    protected static instance?: IGameUI;
+
+    static getInstance<TGameUI extends AbstractGameUI>(
+        this: StaticThis<TGameUI> & IGameUIFactory
+    ): IGameUI {
+        if (this.instance === undefined) {
+            this.instance = this.init();
+        }
+
+        return this.instance;
+    }
+
+    static init<TGameUI extends AbstractGameUI>(
+        this: StaticThis<TGameUI>
+    ): TGameUI {
+        return new this();
+    }
+
     providers: Map<keyof IGameUI, IGameUIInteraction> = new Map();
 
     hasRaisedHandForVote(

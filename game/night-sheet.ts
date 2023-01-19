@@ -4,7 +4,7 @@ import {
     CharacterNotInNightActOrdering,
     IncompleteCharacterRoleData,
 } from './exception';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 export enum NightActOrderNotDefinedHandleStrategy {
     NotAct,
@@ -185,7 +185,10 @@ export class NightSheet {
                     character,
                     isFirstNight
                 );
-                return (await GAME_UI.storytellerDecide(reason, false))!;
+                return (await Environment.current.gameUI.storytellerDecide(
+                    reason,
+                    false
+                ))!;
             }
         }
     }

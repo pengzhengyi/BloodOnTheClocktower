@@ -1,7 +1,6 @@
 import type { CharacterToken, TownsfolkCharacterToken } from '../character';
 import type { CharacterSheet } from '../character-sheet';
 import { Generator } from '../collections';
-import { GAME_UI } from '../dependencies.config';
 import { DrunkReason } from '../drunk-reason';
 import { ThinkAsCharacterEffect } from '../effect';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
@@ -15,6 +14,7 @@ import {
     RequireSetup,
 } from './ability';
 import { AbilityUseStatus } from './status';
+import { Environment } from '~/interaction/environment';
 
 class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     /**
@@ -84,7 +84,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         );
         const options = Generator.exclude(townsfolkOptions, inPlayCharacters);
 
-        return await GAME_UI.storytellerChooseOne(
+        return await Environment.current.gameUI.storytellerChooseOne(
             options,
             BaseDrunkAbility.description
         );

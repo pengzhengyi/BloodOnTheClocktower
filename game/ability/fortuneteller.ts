@@ -3,7 +3,6 @@ import { CharacterNightEffect, Effect, InteractionContext } from '../effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 
-import { GAME_UI } from '../dependencies.config';
 import type { FortuneTellerInformation } from '../info/provider/fortuneteller';
 import {
     FortuneTellerInformationRequestContext,
@@ -19,6 +18,7 @@ import {
     GetInfoAbilityUseContext,
     RequireSetup,
 } from './ability';
+import { Environment } from '~/interaction/environment';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =
@@ -111,7 +111,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
         players: Iterable<Player>,
         context: GetInfoAbilityUseContext
     ): Promise<[Player, Player]> {
-        let chosen = (await GAME_UI.choose(
+        let chosen = (await Environment.current.gameUI.choose(
             fortuneTellerPlayer,
             players,
             2,
@@ -143,7 +143,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     protected async chooseRedHerring(
         players: Iterable<Player>
     ): Promise<Player> {
-        return await GAME_UI.storytellerChooseOne(
+        return await Environment.current.gameUI.storytellerChooseOne(
             players,
             RedHerringEffect.description
         );

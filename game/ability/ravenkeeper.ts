@@ -1,4 +1,3 @@
-import { GAME_UI } from '../dependencies.config';
 import { RavenkeeperNotChoosePlayerToProtect } from '../exception';
 import type { RavenkeeperInformation } from '../info/provider/ravenkeeper';
 import {
@@ -11,6 +10,7 @@ import {
     GetCharacterInformationAbility,
     GetInfoAbilityUseContext,
 } from './ability';
+import { Environment } from '~/interaction/environment';
 
 export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
     RavenkeeperInformation,
@@ -53,7 +53,7 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
         players: Iterable<Player>,
         context: GetInfoAbilityUseContext
     ): Promise<Player> {
-        let chosen = (await GAME_UI.choose(
+        let chosen = (await Environment.current.gameUI.choose(
             ravenkeeperPlayer,
             players,
             1,

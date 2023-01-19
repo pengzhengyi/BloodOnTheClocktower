@@ -7,7 +7,7 @@ import { Edition } from './edition';
 import { EffectTarget } from './effect-target';
 import { StoryTeller } from './storyteller';
 import { TownSquare } from './town-square';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 export class Game extends EffectTarget<Game> {
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
@@ -60,7 +60,7 @@ export class Game extends EffectTarget<Game> {
         const reasonPrompt = reason === undefined ? '' : ` because ${reason}`;
 
         if (
-            await GAME_UI.storytellerConfirm(
+            await Environment.current.gameUI.storytellerConfirm(
                 `${winningTeam} will be the winning team${reasonPrompt}?`
             )
         ) {

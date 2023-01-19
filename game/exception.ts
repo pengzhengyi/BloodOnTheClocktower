@@ -51,7 +51,7 @@ import type {
 } from './ability/ability';
 import type { InfoRequestContext } from './info/requester/requester';
 import type { InfoProviderLoader } from './info/provider/loader';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 export class BaseError extends Error {
     declare cause?: Error;
@@ -133,7 +133,7 @@ export class RecoverableGameError extends GameError {
 
     async throwWhen(condition: Predicate<this>) {
         if (condition(this)) {
-            if (await GAME_UI.handle(this)) {
+            if (await Environment.current.gameUI.handle(this)) {
                 this.handled_ = true;
                 if (condition(this)) {
                     this.throw();
@@ -146,7 +146,7 @@ export class RecoverableGameError extends GameError {
 
     async throwWhenAsync(condition: AsyncPredicate<this>) {
         if (await condition(this)) {
-            if (await GAME_UI.handle(this)) {
+            if (await Environment.current.gameUI.handle(this)) {
                 this.handled_ = true;
                 if (await condition(this)) {
                     this.throw();
@@ -158,7 +158,7 @@ export class RecoverableGameError extends GameError {
     }
 
     async resolve() {
-        if (await GAME_UI.handle(this)) {
+        if (await Environment.current.gameUI.handle(this)) {
             this.handled_ = true;
         }
     }

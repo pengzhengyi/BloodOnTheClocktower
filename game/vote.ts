@@ -3,7 +3,7 @@ import { clockwise } from './common';
 import { NoVotesWhenCountingVote } from './exception';
 import { Player } from './player';
 import { PlayerOrdering } from './types';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 /**
  * {@link `glossary["Vote"]`}
@@ -73,9 +73,10 @@ export class Vote {
 
     async *collectVotes(players: Iterable<Player>) {
         if (this.hasVoted()) {
-            const shouldVoteAgain = await GAME_UI.storytellerConfirm(
-                Vote.RECOLLECT_VOTE_PROMPT
-            );
+            const shouldVoteAgain =
+                await Environment.current.gameUI.storytellerConfirm(
+                    Vote.RECOLLECT_VOTE_PROMPT
+                );
             if (!shouldVoteAgain) {
                 yield* this.votes;
                 return;

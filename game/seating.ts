@@ -11,7 +11,7 @@ import {
     PlayerNotSat,
     UnexpectedEmptySeat,
 } from './exception';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 export interface SyncResult {
     occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;
@@ -476,7 +476,7 @@ export class Seating {
         }
 
         if (
-            await GAME_UI.storytellerConfirm(
+            await Environment.current.gameUI.storytellerConfirm(
                 this.formatPromptForSeatIncrease(numPlayers)
             )
         ) {

@@ -7,7 +7,7 @@ import type { NightSheet } from './night-sheet';
 import type { DeadReason } from './dead-reason';
 import type { Middleware, NextFunction } from './middleware';
 import type { Player } from './player';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 interface ProxyHandlerRequest<TTarget extends object> {
     trap: keyof ProxyHandler<TTarget>;
@@ -57,7 +57,7 @@ export abstract class Effect<TTarget extends object> {
 
     async deactivate(reason?: string): Promise<boolean> {
         if (
-            await GAME_UI.storytellerConfirm(
+            await Environment.current.gameUI.storytellerConfirm(
                 this.formatDeactivatePrompt(reason)
             )
         ) {
@@ -70,7 +70,7 @@ export abstract class Effect<TTarget extends object> {
 
     async reactivate(reason?: string): Promise<boolean> {
         if (
-            await GAME_UI.storytellerConfirm(
+            await Environment.current.gameUI.storytellerConfirm(
                 this.formatReactivatePrompt(reason)
             )
         ) {
@@ -402,7 +402,7 @@ export abstract class RegisterAsEffect<
     }
 
     protected async choose(context: InteractionContext<TPlayer>): Promise<V> {
-        return await GAME_UI.storytellerChooseOne(
+        return await Environment.current.gameUI.storytellerChooseOne(
             this.options,
             this.formatPromptForChoose(context),
             this.recommended

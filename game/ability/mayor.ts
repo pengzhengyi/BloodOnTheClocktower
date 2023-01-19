@@ -1,6 +1,5 @@
 import { Alignment } from '../alignment';
 import { DeadReason } from '../dead-reason';
-import { GAME_UI } from '../dependencies.config';
 import { Effect, InteractionContext } from '../effect';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { Game } from '../game';
@@ -19,6 +18,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
+import { Environment } from '~/interaction/environment';
 
 export class MayorPeacefulWinEffect extends Effect<Game> {
     static readonly description =
@@ -108,7 +108,7 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
     protected async choosePlayerToDieInstead(
         players: Iterable<Player>
     ): Promise<Player> {
-        return (await GAME_UI.storytellerChooseOne(
+        return (await Environment.current.gameUI.storytellerChooseOne(
             players,
             MayorDieInsteadEffect.description
         )) as Player;

@@ -9,7 +9,7 @@ import { InfoProviderLoader } from './info/provider/loader';
 import { Player } from './player';
 import type { Players } from './players';
 import { AsyncTask } from './types';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 /**
  * {@link `glossary["Storyteller"]`}
@@ -79,7 +79,7 @@ export class StoryTeller {
             return error.correctedInfo!;
         } else {
             const infoOptions = await provideInfo(context);
-            const info = (await GAME_UI.storytellerChooseOne(
+            const info = (await Environment.current.gameUI.storytellerChooseOne(
                 infoOptions,
                 context.reason
             )) as InfoType;

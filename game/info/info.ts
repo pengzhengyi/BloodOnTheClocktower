@@ -1,10 +1,10 @@
-import { GAME_UI } from '../dependencies.config';
 import type { Player } from '../player';
 import type {
     TrueInformationOptions,
     FalseInformationOptions,
 } from './information';
 import type { StoryTellerInformationOptions } from './storyteller-information';
+import { Environment } from '~/interaction/environment';
 
 /**
  * There are two classifications for info:
@@ -35,7 +35,7 @@ export abstract class Info<T> {
     }
 
     send(player: Player, reason?: string): Promise<void> {
-        return GAME_UI.send(player, this, reason);
+        return Environment.current.gameUI.send(player, this, reason);
     }
 }
 

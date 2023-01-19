@@ -1,4 +1,3 @@
-import { GAME_UI } from '../dependencies.config';
 import { Effect, InteractionContext } from '../effect';
 import { ButlerNotChooseMasterToFollow } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
@@ -11,6 +10,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
+import { Environment } from '~/interaction/environment';
 
 export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
     static readonly description =
@@ -41,7 +41,7 @@ export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
     }
 
     protected canVote(): Promise<boolean> {
-        return GAME_UI.hasRaisedHandForVote(this.master!);
+        return Environment.current.gameUI.hasRaisedHandForVote(this.master!);
     }
 }
 
@@ -125,7 +125,7 @@ export class ButlerAbility extends Ability<
         players: Players,
         context: AbilityUseContext
     ): Promise<Player> {
-        let chosen = (await GAME_UI.choose(
+        let chosen = (await Environment.current.gameUI.choose(
             butlerPlayer,
             players.isNot(butlerPlayer),
             1,

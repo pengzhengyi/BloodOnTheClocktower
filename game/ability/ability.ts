@@ -2,7 +2,6 @@ import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
 import type { Constructor, StaticThis } from '../types';
 import type { CharacterSheet } from '../character-sheet';
 import type { NightSheet } from '../night-sheet';
-import { GAME_UI } from '../dependencies.config';
 import type { Player } from '../player';
 import type { Players } from '../players';
 import type { Info } from '../info/info';
@@ -19,6 +18,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
+import { Environment } from '~/interaction/environment';
 
 export interface AbilityUseContext {
     requestedPlayer: Player;
@@ -259,7 +259,11 @@ abstract class GetInfoAbility<
             context,
             infoRequestContext
         );
-        await GAME_UI.send(context.requestedPlayer, info, sendInfoReason);
+        await Environment.current.gameUI.send(
+            context.requestedPlayer,
+            info,
+            sendInfoReason
+        );
 
         return await this.createRequestResult(
             {

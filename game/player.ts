@@ -26,7 +26,7 @@ import {
 } from './exception';
 import type { Execution } from './execution';
 import { DrunkReason } from './drunk-reason';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 export interface CharacterAssignmentResult {
     player: Player;
@@ -405,7 +405,7 @@ export class Player extends EffectTarget<Player> {
             (forExile && this.canSupportExile) || (await this.canVote);
         if (
             shouldCheckHandRaised &&
-            (await GAME_UI.hasRaisedHandForVote(this))
+            (await Environment.current.gameUI.hasRaisedHandForVote(this))
         ) {
             if (this.dead) {
                 await this.revokeVoteToken(
@@ -421,7 +421,7 @@ export class Player extends EffectTarget<Player> {
 
     async revokeVoteToken(reason?: string): Promise<boolean> {
         if (
-            await GAME_UI.storytellerConfirm(
+            await Environment.current.gameUI.storytellerConfirm(
                 this.formatPromptForRevokeVoteToken(reason)
             )
         ) {

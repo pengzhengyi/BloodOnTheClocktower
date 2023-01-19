@@ -1,6 +1,6 @@
 import { InvalidPlayerToSit } from './exception';
 import { Player } from './player';
-import { GAME_UI } from './dependencies.config';
+import { Environment } from '~/interaction/environment';
 
 export interface SitResult {
     player: Player;
@@ -57,7 +57,7 @@ export class Seat {
         }
 
         if (
-            await GAME_UI.storytellerConfirm(
+            await Environment.current.gameUI.storytellerConfirm(
                 this.formatPromptForSitPlayer(player)
             )
         ) {
@@ -81,7 +81,7 @@ export class Seat {
         const satPlayer = this.player;
         if (
             satPlayer !== undefined &&
-            (await GAME_UI.storytellerConfirm(
+            (await Environment.current.gameUI.storytellerConfirm(
                 this.formatPromptForRemovePlayer(satPlayer)
             ))
         ) {

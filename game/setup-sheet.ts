@@ -1,5 +1,4 @@
 import { Generator } from './collections';
-import { GAME_UI } from './dependencies.config';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
@@ -8,6 +7,7 @@ import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating';
 import { TownSquare } from './town-square';
+import { Environment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
 export abstract class SetupSheet {
@@ -150,7 +150,9 @@ export abstract class SetupSheet {
     }
 
     static setupEdition(): Promise<typeof Edition> {
-        return GAME_UI.storytellerChooseOne(this.SUPPORTED_EDITIONS);
+        return Environment.current.gameUI.storytellerChooseOne(
+            this.SUPPORTED_EDITIONS
+        );
     }
 
     static setupTownSquare(seating: Seating, players: Players): TownSquare {
