@@ -12,8 +12,9 @@ import {
 } from './exception';
 import { Execution } from './execution';
 import { Exile } from './exile';
-import { GamePhase, Phase } from './game-phase';
+import { GamePhase } from './game-phase';
 import type { Player } from './player';
+import { Phase } from './phase';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
