@@ -1,67 +1,51 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { BasicGamePhaseKind } from './game-phase-kind';
+import { Phase, getPhase, getPhaseIndex } from './phase';
 import { GAME_UI } from './dependencies.config';
 
-export enum Phase {
-    /** before beginning a game */
-    Setup = 1,
+export interface IGamePhase {
+    /**
+     * The date index of current phase. Initial setup phase and first night is at date 0, while first day is at date 1, and each subsequent day the following date.
+     */
+    readonly dateIndex: number;
+
+    readonly phase: number;
+
+    readonly cycleIndex: number;
 
     /**
-     * {@link `glossary["Night"]`}
-     * The game phase in which players close their eyes, and certain characters wake to act or receive information. The game begins with the night phase. Each day is followed by a night. Each night is followed by a day.
+     * {@link `glossary["First night"]`}
+     * The night phase that begins the game. Some characters act only during the first night. Some characters act during each night except the first. Players may talk about their characters only after the first night.
      */
-    Night = 1 << 1,
-    /**
-     * {@link `glossary["Dawn"]`}
-     * The end of a night, just before the next day begins. Characters that act “at dawn” act after almost all other characters.
-     */
-    Dawn = 1 << 2,
+    readonly isFirstNight: boolean;
 
-    /**
-     * {@link `glossary["Day"]`}
-     * The game phase in which players have their eyes open, talk with each other, and vote for an execution. Each day is followed by a night. Each night is followed by a day.
-     */
-    Day = 1 << 3,
-    /**
-     * {@link `glossary["Dusk"]`}
-     * The start of a night, just after the players close their eyes. Characters that act “at dusk” act before almost all other characters. Abilities that last “until dusk” end as soon as the players go to sleep.
-     */
-    Dusk = 1 << 4,
+    readonly isNonfirstNight: boolean;
 
-    /** Night, Dawn, Day, Dusk */
-    __ALL__ = 0b11110,
+    readonly isDay: boolean;
 
-    /** The end of the game */
-    GameEnd = 1 << 5,
+    readonly isNight: boolean;
+
+    readonly gamePhaseKind: BasicGamePhaseKind;
+
+    forceTransition(reason?: string): Promise<boolean>;
+
+    toJSON(): Record<string, any>;
+
+    toString(): string;
+
+    valueOf(): number;
+
+    isBefore(other: IGamePhase): boolean;
+
+    equals(other: IGamePhase): boolean;
+
+    isAfter(other: IGamePhase): boolean;
 }
 
-function getPhaseIndex(phase: Phase): number {
-    let index = 0;
-    let bit = 1;
-
-    while ((bit & phase) === 0) {
-        bit <<= 1;
-        index++;
-    }
-
-    return index;
-}
-
-function getPhase(phaseCounter: number): Phase {
-    if (phaseCounter < 5) {
-        return 1 << phaseCounter;
-    } else {
-        return 1 << phaseCounter % 4;
-    }
-}
-
-export function includePhase(phases: number, phase: Phase) {
-    return (phases & phase) === phase;
-}
 
 @Exclude()
-export class GamePhase {
+export class GamePhase implements IGamePhase {
     protected _phase: Phase;
 
     /**
@@ -70,9 +54,6 @@ export class GamePhase {
     @Expose({ toPlainOnly: true })
     protected phaseCounter: number;
 
-    /**
-     * The date index of current phase. Initial setup phase and first night is at date 0, while first day is at date 1, and each subsequent day the following date.
-     */
     get dateIndex(): number {
         return Math.floor((this.phaseCounter + 2) / 4);
     }
@@ -85,10 +66,6 @@ export class GamePhase {
         return Math.floor((this.phaseCounter - 1) / 4);
     }
 
-    /**
-     * {@link `glossary["First night"]`}
-     * The night phase that begins the game. Some characters act only during the first night. Some characters act during each night except the first. Players may talk about their characters only after the first night.
-     */
     get isFirstNight(): boolean {
         return this._phase === Phase.Night && this.cycleIndex === 0;
     }
