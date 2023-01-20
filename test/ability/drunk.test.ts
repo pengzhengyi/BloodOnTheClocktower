@@ -11,9 +11,13 @@ import { Imp } from '~/content/characters/output/imp';
 import { Soldier } from '~/content/characters/output/soldier';
 import { GetEmpathInformationAbility } from '~/game/ability/empath';
 import { EmpathInformation } from '~/game/info/provider/empath';
-import { storytellerChooseOneMock } from '~/__mocks__/game-ui';
+import {
+    mockStorytellerChooseMatchingOne,
+    storytellerChooseOneMock,
+} from '~/__mocks__/game-ui';
 import { mockClocktowerWithIsNonfirstNight } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
+import type { Information } from '~/game/info/information';
 
 describe('test DrunkAbility', () => {
     /**
@@ -44,17 +48,14 @@ describe('test DrunkAbility', () => {
             Drunk
         ))!;
 
-        storytellerChooseOneMock.mockImplementation(
-            (options: Iterable<EmpathInformation>) => {
-                const optionsArray = Array.from(options);
-                expect(optionsArray).toHaveLength(3);
-                expect(optionsArray[0].numEvilAliveNeighbors).toEqual(0);
-                return Promise.resolve(optionsArray[0]);
-            }
-        );
-
         const drunkAbility = await setupDrunk(drunkPlayer, Empath);
         mockClocktowerWithIsNonfirstNight(infoProvideContext, true);
+
+        mockStorytellerChooseMatchingOne(
+            (information: Information<EmpathInformation>) =>
+                information.info.numEvilAliveNeighbors === 0,
+            3
+        );
 
         let info = await expectCharacterGetInformation(
             drunkAbility as GetEmpathInformationAbility,
@@ -63,15 +64,11 @@ describe('test DrunkAbility', () => {
         );
 
         expect(info.numEvilAliveNeighbors).toBe(0);
-        storytellerChooseOneMock.mockReset();
 
-        storytellerChooseOneMock.mockImplementation(
-            (options: Iterable<EmpathInformation>) => {
-                const optionsArray = Array.from(options);
-                expect(optionsArray).toHaveLength(3);
-                expect(optionsArray[1].numEvilAliveNeighbors).toEqual(1);
-                return Promise.resolve(optionsArray[1]);
-            }
+        mockStorytellerChooseMatchingOne(
+            (information: Information<EmpathInformation>) =>
+                information.info.numEvilAliveNeighbors === 1,
+            3
         );
 
         info = await expectCharacterGetInformation(

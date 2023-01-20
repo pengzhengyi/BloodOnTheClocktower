@@ -12,6 +12,7 @@ import type {
 } from '~/game/ability/monk';
 import { RecluseAbility } from '~/game/ability/recluse';
 import {
+    AbilitySuccessCommunicatedFalseInfo,
     AbilitySuccessCommunicatedInfo,
     AbilityUseStatus,
 } from '~/game/ability/status';
@@ -87,8 +88,14 @@ export async function expectCharacterGetInformation<
         context
     )) as GetInformationAbilityUseResult<TInformation>;
 
+    const willMalfunction = await ability.willMalfunction(context);
     expect(result.info).toBeDefined();
-    expect(result.status).toEqual(AbilitySuccessCommunicatedInfo);
+
+    if (willMalfunction) {
+        expect(result.status).toEqual(AbilitySuccessCommunicatedFalseInfo);
+    } else {
+        expect(result.status).toEqual(AbilitySuccessCommunicatedInfo);
+    }
 
     return result.info?.info as TInformation;
 }

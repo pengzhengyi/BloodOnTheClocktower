@@ -4,14 +4,14 @@ import { expectCharacterGetInformation } from './common';
 import { Chef } from '~/content/characters/output/chef';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
-import { Generator } from '~/game/collections';
 import { AbilityUseStatus } from '~/game/ability/status';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
 import { Townsfolk } from '~/game/character-type';
 import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
 import {
+    mockStorytellerChooseFirstOne,
+    sendMock,
     storytellerChooseOneMock,
-    expectSendMockToHaveBeenCalled,
 } from '~/__mocks__/game-ui';
 import {
     mockContextForWasherwomanInformation,
@@ -27,9 +27,7 @@ describe('test GetWasherwomanInformationAbility', () => {
     });
 
     beforeAll(() => {
-        storytellerChooseOneMock.mockImplementation((options: Generator<any>) =>
-            Promise.resolve(options.take(1))
-        );
+        mockStorytellerChooseFirstOne();
     });
 
     afterAll(() => {
@@ -42,7 +40,8 @@ describe('test GetWasherwomanInformationAbility', () => {
         );
 
         const result = await ability.use(context);
-        expectSendMockToHaveBeenCalled();
+        expect(sendMock).toHaveBeenCalled();
+        sendMock.mockClear();
         expect(result.status).toEqual(
             AbilityUseStatus.Success |
                 AbilityUseStatus.HasInfo |

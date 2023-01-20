@@ -24,3 +24,6 @@ export const AbilitySuccessCommunicatedInfo =
     AbilityUseStatus.Success |
     AbilityUseStatus.HasInfo |
     AbilityUseStatus.Communicated;
+
+export const AbilitySuccessCommunicatedFalseInfo =
+    AbilitySuccessCommunicatedInfo | AbilityUseStatus.Malfunction;

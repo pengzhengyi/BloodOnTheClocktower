@@ -17,10 +17,7 @@ import {
     mockGetInfoAbilityUseContext,
     mockMayorAbilitySetupContext,
 } from '~/__mocks__/ability';
-import {
-    chooseMock,
-    expectSendMockToHaveBeenCalled,
-} from '~/__mocks__/game-ui';
+import { chooseMock, sendMock } from '~/__mocks__/game-ui';
 import { mockClocktowerForDeathAtNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 
@@ -86,7 +83,8 @@ describe('test GetRavenkeeperInformationAbility', () => {
         chooseMock.mockReset();
 
         expect(result.status).toEqual(AbilitySuccessCommunicatedInfo);
-        expectSendMockToHaveBeenCalled();
+        expect(sendMock).toHaveBeenCalled();
+        sendMock.mockClear();
         expect(result.isTrueInformation).toBeTrue();
         expect(result.info?.info?.chosenPlayer).toBe(Douglas);
         expect(result.info?.info?.character).toBe(ScarletWoman);

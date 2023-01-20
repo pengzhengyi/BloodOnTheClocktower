@@ -8,8 +8,10 @@ export interface IEnvironmentProvider {
 }
 
 abstract class AbstractEnvironment implements IEnvironment {
+    protected static _current = mockEnvironment();
+
     static get current() {
-        return mockEnvironment();
+        return this._current;
     }
 
     abstract gameUI: IGameUI;
