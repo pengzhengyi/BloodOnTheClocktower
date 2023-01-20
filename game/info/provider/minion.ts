@@ -6,7 +6,7 @@ import {
 import { DemonMinionInformationProvider } from './common';
 import { InfoProvideContext } from './provider';
 import { Generator } from '~/game/collections';
-import type { DemonPlayer, MinionPlayer } from '~/game/player';
+import type { DemonPlayer, MinionPlayer } from '~/game/types';
 
 /**
  * {@link `glossary["Minion info"]`}

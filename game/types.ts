@@ -1,6 +1,7 @@
 import type { Execution } from './execution';
 import type { Game } from './game';
 import type { Player } from './player';
+import type { Minion, Demon, Townsfolk } from './character-type';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';
 import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
@@ -199,3 +200,13 @@ export interface RequireGame {
 export interface RequireExecution {
     execution: Execution;
 }
+
+export type MinionPlayer = Player & {
+    characterType: Minion;
+};
+export type DemonPlayer = Player & {
+    characterType: Demon;
+};
+export type TownsfolkPlayer = Player & {
+    characterType: Townsfolk;
+};

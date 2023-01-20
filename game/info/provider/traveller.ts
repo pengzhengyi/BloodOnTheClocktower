@@ -6,7 +6,7 @@ import {
 import { DemonMinionInformationProvider } from './common';
 import { InfoProvideContext } from './provider';
 import { Generator } from '~/game/collections';
-import type { DemonPlayer } from '~/game/player';
+import type { DemonPlayer } from '~/game/types';
 
 /**
  * If travellers are evil, they learn who the Demon is; they do not learn any additional evil characters or receive any bluffs.

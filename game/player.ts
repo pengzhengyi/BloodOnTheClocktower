@@ -482,13 +482,3 @@ export class Player extends EffectTarget<Player> {
         // TODO initialize player specific effects
     }
 }
-
-export type MinionPlayer = Player & {
-    characterType: Minion;
-};
-export type DemonPlayer = Player & {
-    characterType: Demon;
-};
-export type TownsfolkPlayer = Player & {
-    characterType: Townsfolk;
-};
