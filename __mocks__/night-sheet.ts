@@ -6,6 +6,13 @@ export function mockNightSheet(): NightSheet {
     return mock<NightSheet>();
 }
 
-export function getTroubleBrewingNightSheet(): Promise<NightSheet> {
-    return NightSheet.init(TroubleBrewing.characters);
+let troubleBrewingNightSheet: NightSheet;
+
+export async function getTroubleBrewingNightSheet(): Promise<NightSheet> {
+    if (troubleBrewingNightSheet === undefined) {
+        const nightSheet = await NightSheet.init(TroubleBrewing.characters);
+        troubleBrewingNightSheet = nightSheet;
+    }
+
+    return troubleBrewingNightSheet;
 }
