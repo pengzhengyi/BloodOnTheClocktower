@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { createInfoProvideContextFromPlayerDescriptions } from '../info-provider.test';
+import {
+    createInfoProvideContext,
+    createInfoProvideContextFromPlayerDescriptions,
+} from '../info-provider.test';
 import {
     setupDrunk,
     expectAfterDemonAttack,
@@ -9,15 +12,30 @@ import { Drunk } from '~/content/characters/output/drunk';
 import { Empath } from '~/content/characters/output/empath';
 import { Imp } from '~/content/characters/output/imp';
 import { Soldier } from '~/content/characters/output/soldier';
-import { GetEmpathInformationAbility } from '~/game/ability/empath';
-import { EmpathInformation } from '~/game/info/provider/empath';
+import type { GetEmpathInformationAbility } from '~/game/ability/empath';
+import type { EmpathInformation } from '~/game/info/provider/empath';
 import {
+    chooseMock,
     mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
 } from '~/__mocks__/game-ui';
-import { mockClocktowerWithIsNonfirstNight } from '~/__mocks__/information';
+import {
+    mockClocktowerWithIsNonfirstNight,
+    mockClocktowerForDeathAtNight,
+    mockClocktowerForUndertaker,
+} from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
 import type { Information } from '~/game/info/information';
+import { Saint } from '~/content/characters/output/saint';
+import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
+import type { GetRavenkeeperInformationAbility } from '~/game/ability/ravenkeeper';
+import { Poisoner } from '~/content/characters/output/poisoner';
+import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
+import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
+import { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import { Undertaker } from '~/content/characters/output/undertaker';
+import type { UndertakerInformation } from '~/game/info/provider/undertaker';
+import type { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 
 describe('test DrunkAbility', () => {
     /**
@@ -79,5 +97,87 @@ describe('test DrunkAbility', () => {
 
         expect(info.numEvilAliveNeighbors).toBe(1);
         storytellerChooseOneMock.mockReset();
+    });
+
+    /**
+     * {@link `drunk["gameplay"][2]`}
+     */
+    test('The Drunk, who thinks they are the Ravenkeeper, is killed at night. They choose the Saint, but learn that this player is the Poisoner.', async () => {
+        const saintPlayer = await createBasicPlayer(undefined, Saint);
+        const impPlayer = await createBasicPlayer(undefined, Imp);
+        const drunkPlayer = await createBasicPlayer(undefined, Drunk);
+
+        const infoProvideContext = createInfoProvideContext(drunkPlayer, [
+            impPlayer,
+            saintPlayer,
+        ]);
+
+        const drunkAbility = await setupDrunk(drunkPlayer, Ravenkeeper);
+
+        await expectAfterDemonAttack(drunkPlayer, impPlayer, true);
+
+        chooseMock.mockResolvedValue(saintPlayer);
+        mockStorytellerChooseMatchingOne(
+            (information: Information<RavenkeeperInformation>) =>
+                information.info.character === Poisoner
+        );
+
+        const info = await expectCharacterGetInformation(
+            drunkAbility as GetRavenkeeperInformationAbility,
+            () => infoProvideContext,
+            [
+                (context) =>
+                    mockClocktowerForDeathAtNight(context, drunkPlayer),
+                (context) => {
+                    context.characterSheet = getTroubleBrewingCharacterSheet();
+                },
+            ]
+        );
+
+        expect(info.character).toBe(Poisoner);
+        expect(info.chosenPlayer).toBe(saintPlayer);
+
+        storytellerChooseOneMock.mockReset();
+        chooseMock.mockReset();
+    });
+
+    /**
+     * {@link `drunk["gameplay"][3]`}
+     */
+    test('The Fortune Teller is executed. That night, the Drunk, who thinks they are Undertaker, learns that the Drunk died today.', async () => {
+        const fortuneTellerPlayer = await createBasicPlayer(
+            undefined,
+            FortuneTeller
+        );
+        const drunkPlayer = await createBasicPlayer(undefined, Drunk);
+
+        const drunkAbility = await setupDrunk(drunkPlayer, Undertaker);
+
+        mockStorytellerChooseMatchingOne(
+            (information: Information<UndertakerInformation>) =>
+                information.info.character === Drunk
+        );
+
+        const info = await expectCharacterGetInformation(
+            drunkAbility as GetUndertakerInformationAbility,
+            () => createInfoProvideContext(drunkPlayer, [fortuneTellerPlayer]),
+            [
+                (context) =>
+                    mockClocktowerForUndertaker(
+                        context,
+                        true,
+                        fortuneTellerPlayer
+                    ),
+                (context) => {
+                    context.characterSheet = getTroubleBrewingCharacterSheet();
+                },
+            ]
+        );
+
+        expect(info.character).toBe(Drunk);
+        expect(info.executedPlayer).toBe(fortuneTellerPlayer);
+
+        storytellerChooseOneMock.mockReset();
+        chooseMock.mockReset();
     });
 });

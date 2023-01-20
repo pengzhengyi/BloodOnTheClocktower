@@ -30,13 +30,16 @@ export function mockStorytellerChooseMatchingOne<T>(
     expectNumOptions?: number
 ) {
     storytellerChooseOneMock.mockImplementation((options: Iterable<T>) => {
-        const optionsArray = Array.from(options);
+        let _options: Iterable<T>;
 
-        if (expectNumOptions !== undefined) {
-            expect(optionsArray).toHaveLength(expectNumOptions);
+        if (expectNumOptions === undefined) {
+            _options = options;
+        } else {
+            _options = Array.from(options);
+            expect(_options).toHaveLength(expectNumOptions);
         }
 
-        const found = Generator.find(predicate, optionsArray);
+        const found = Generator.find(predicate, _options);
 
         expect(found).toBeDefined();
         return Promise.resolve(found);
