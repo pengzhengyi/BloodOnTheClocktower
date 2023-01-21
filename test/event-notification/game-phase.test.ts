@@ -3,26 +3,33 @@ import { GamePhaseNotification } from '~/game/event-notification/notification/ga
 import type { IGamePhase } from '~/game/game-phase';
 import { Phase } from '~/game/phase';
 import { mockWithPropertyValue } from '~/__mocks__/common';
-import { mockNonBlockingSubscriber } from '~/__mocks__/event-notification';
+import {
+    mockBlockingSubscriber,
+    mockNonBlockingSubscriber,
+} from '~/__mocks__/event-notification';
 import { mockGamePhaseAtPhase } from '~/__mocks__/game-phase';
 
 describe('test game phase EventNotification', () => {
-    test('subscribe and get notified', async () => {
-        const notification = new GamePhaseNotification();
+    let notification: GamePhaseNotification;
 
+    const dayEventCategory = GamePhaseNotification.getEventCategory(Phase.Day);
+
+    const nightEventCategory = GamePhaseNotification.getEventCategory(
+        Phase.Night
+    );
+
+    beforeEach(() => {
+        notification = new GamePhaseNotification();
+    });
+
+    test('subscribe and get notified', async () => {
         // first subscriber get notified for day
         const firstSubscriber = mockNonBlockingSubscriber();
-        const firstEventCategory = GamePhaseNotification.getEventCategory(
-            Phase.Day
-        );
-        notification.subscribe(firstEventCategory, firstSubscriber);
+        notification.subscribe(dayEventCategory, firstSubscriber);
 
         // second subscriber get notified at night
         const secondSubscriber = mockNonBlockingSubscriber();
-        const secondEventCategory = GamePhaseNotification.getEventCategory(
-            Phase.Night
-        );
-        notification.subscribe(secondEventCategory, secondSubscriber);
+        notification.subscribe(nightEventCategory, secondSubscriber);
 
         // notify a day event, first subscriber should get notified
         const mockDayGamePhase = mockGamePhaseAtPhase(Phase.Day);
@@ -36,7 +43,7 @@ describe('test game phase EventNotification', () => {
         expect(secondSubscriber.notify).not.toHaveBeenCalled();
 
         // unsubscribe first subscriber and notify a night event, second subscriber should get notified
-        notification.unsubscribe(firstEventCategory, firstSubscriber);
+        notification.unsubscribe(dayEventCategory, firstSubscriber);
 
         const mockNightGamePhase = mockGamePhaseAtPhase(Phase.Night);
         const secondEvent = mockWithPropertyValue<IGamePhaseEvent, IGamePhase>(
@@ -47,5 +54,32 @@ describe('test game phase EventNotification', () => {
 
         expect(firstSubscriber.notify).toHaveBeenCalledOnce();
         expect(secondSubscriber.notify).toHaveBeenCalledOnce();
+    });
+
+    test('blocking subscriber with different priority ', async () => {
+        // both subscriber get notified at night, but first subscriber has a higher priority
+        const firstSubscriber = mockBlockingSubscriber();
+        const secondSubscriber = mockBlockingSubscriber();
+
+        (firstSubscriber.notify as jest.Mock).mockImplementation(
+            (_event, notifyNext) => {
+                expect(firstSubscriber.notify).toHaveBeenCalledOnce();
+                expect(secondSubscriber.notify).not.toHaveBeenCalled();
+                notifyNext();
+            }
+        );
+        (secondSubscriber.notify as jest.Mock).mockImplementation(
+            (_event, notifyNext) => {
+                expect(firstSubscriber.notify).toHaveBeenCalledOnce();
+                expect(secondSubscriber.notify).toHaveBeenCalledOnce();
+                notifyNext();
+            }
+        );
+
+        // priority will determine which subscriber is first notified
+        notification.subscribe(nightEventCategory, secondSubscriber, 10);
+        notification.subscribe(nightEventCategory, firstSubscriber, 100);
+
+        await notification.notify(nightEventCategory);
     });
 });
