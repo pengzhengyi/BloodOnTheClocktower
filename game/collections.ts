@@ -24,16 +24,16 @@ export class LazyMap<K, V> extends Map<K, V> {
         this.loader = loader;
     }
 
-    get(key: K) {
+    get(key: K): V {
         if (!super.has(key)) {
             const value = this.loader(key);
             if (value !== undefined) {
                 super.set(key, value);
             }
-            return value;
+            return value!;
         }
 
-        return super.get(key);
+        return super.get(key)!;
     }
 
     getOrDefault(key: K, defaultValue: V) {

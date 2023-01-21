@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { BasicGamePhaseKind } from './game-phase-kind';
-import { Phase, getPhase, getPhaseIndex } from './phase';
+import { Phase, getPhase, getPhaseIndex, toString } from './phase';
 import { Environment } from '~/interaction/environment';
 
 export interface IGamePhase {
@@ -94,7 +94,7 @@ export class GamePhase implements IGamePhase {
     }
 
     static format(phase: Phase, cycleIndex: number): string {
-        return `${Phase[phase]} ${cycleIndex}`;
+        return `${toString(phase)} ${cycleIndex}`;
     }
 
     static setup() {

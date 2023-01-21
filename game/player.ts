@@ -263,10 +263,6 @@ export class Player extends EffectTarget<Player> {
         return Player._isCharacterType(this, Traveller);
     }
 
-    get willGetFalseInfo(): boolean {
-        return this.drunk || this.poisoned;
-    }
-
     /**
      * {@link `glossary["Demon, The"]`}
      * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
