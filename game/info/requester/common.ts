@@ -27,7 +27,10 @@ export function OncePerGame<
         protected _hasRequested = false;
 
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            return (await super.isEligible(context)) && !this._hasRequested;
+            if (this._hasRequested) {
+                return false;
+            }
+            return await super.isEligible(context);
         }
 
         async request(
@@ -49,9 +52,10 @@ export function AtNight<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class AtNight extends InfoRequesterClass {
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            return (
-                (await super.isEligible(context)) && context.clocktower.isNight
-            );
+            if (context.clocktower.gamePhase.isNight) {
+                return await super.isEligible(context);
+            }
+            return false;
         }
     };
 }
@@ -76,10 +80,10 @@ export function AtFirstNight<
     return OncePerGame(
         class AtFirstNight extends InfoRequesterClass {
             async isEligible(context: InfoProvideContext): Promise<boolean> {
-                return (
-                    (await super.isEligible(context)) &&
-                    context.clocktower.isFirstNight
-                );
+                if (context.clocktower.gamePhase.isFirstNight) {
+                    return await super.isEligible(context);
+                }
+                return false;
             }
         }
     );
@@ -96,10 +100,10 @@ export function EachNonfirstNight<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class EachNonfirstNight extends InfoRequesterClass {
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            return (
-                (await super.isEligible(context)) &&
-                context.clocktower.isNonfirstNight
-            );
+            if (context.clocktower.gamePhase.isNonfirstNight) {
+                return await super.isEligible(context);
+            }
+            return false;
         }
     };
 }
@@ -113,10 +117,10 @@ export function IsAlive<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsAlive extends InfoRequesterClass {
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            return (
-                (await super.isEligible(context)) &&
-                context.requestedPlayer.alive
-            );
+            if (context.requestedPlayer.alive) {
+                return await super.isEligible(context);
+            }
+            return false;
         }
     };
 }
@@ -130,10 +134,10 @@ export function IsEvil<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsEvil extends InfoRequesterClass {
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            return (
-                (await super.isEligible(context)) &&
-                (await context.requestedPlayer.isEvil)
-            );
+            if (await context.requestedPlayer.isEvil) {
+                return await super.isEligible(context);
+            }
+            return false;
         }
     };
 }
@@ -147,9 +151,10 @@ export function hasEnoughPlayerForDemonMinionInformation<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class HasEnoughPlayerForDemonMinionInformation extends InfoRequesterClass {
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            return (
-                (await super.isEligible(context)) && context.players.length >= 7
-            );
+            if (context.players.length >= 7) {
+                return await super.isEligible(context);
+            }
+            return false;
         }
     };
 }
@@ -161,12 +166,12 @@ export abstract class CharacterTypeInformationRequester<
     abstract readonly expectedCharacterType: typeof CharacterType;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {
-        return (
-            (await super.isEligible(context)) &&
-            (await context.requestedPlayer.characterType).is(
-                this.expectedCharacterType
-            )
-        );
+        const actualCharacterType = await context.requestedPlayer.characterType;
+        if (actualCharacterType.is(this.expectedCharacterType)) {
+            return await super.isEligible(context);
+        }
+
+        return false;
     }
 
     toString() {

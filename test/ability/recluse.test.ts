@@ -129,7 +129,7 @@ describe('test RecluseAbility', () => {
                     () => infoProvideContext,
                     [
                         (context) =>
-                            mockClocktowerWithIsNonfirstNight(context, true),
+                            mockClocktowerWithIsNonfirstNight(context, false),
                     ]
                 ),
             ScarletWoman

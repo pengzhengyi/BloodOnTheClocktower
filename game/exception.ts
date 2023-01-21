@@ -41,7 +41,6 @@ import type { Alignment } from './alignment';
 import type { Effects } from './effects';
 import type { Seating } from './seating';
 import { GamePhaseKind } from './game-phase-kind';
-import type { Diary, Event as ClocktowerEvent } from './clocktower';
 import type {
     AbilityUseContext,
     AbilityUseResult,
@@ -51,6 +50,7 @@ import type {
 } from './ability/ability';
 import type { InfoRequestContext } from './info/requester/requester';
 import type { InfoProviderLoader } from './info/provider/loader';
+import type { IDiary, Event as ClocktowerEvent } from './diary';
 import { Environment } from '~/interaction/environment';
 
 export class BaseError extends Error {
@@ -789,7 +789,7 @@ export class PastMomentRewrite extends RecoverableGameError {
     static description = "Attempt to rewrite a past event's moment";
 
     constructor(
-        readonly diary: Diary,
+        readonly diary: IDiary,
         readonly event: ClocktowerEvent,
         readonly recordedTimestamp: Dayjs,
         readonly newTimestamp: Dayjs
@@ -803,7 +803,7 @@ export class RecordUnknownEventInDiary extends RecoverableGameError {
         'Attempt to record an event that is not one of known types';
 
     constructor(
-        readonly diary: Diary,
+        readonly diary: IDiary,
         readonly event: ClocktowerEvent,
         readonly moment: Dayjs
     ) {
@@ -814,7 +814,7 @@ export class RecordUnknownEventInDiary extends RecoverableGameError {
 export class EventNotExistInDate extends RecoverableGameError {
     static description = 'Provided event does not exist in given date';
 
-    constructor(readonly event: ClocktowerEvent, readonly diary: Diary) {
+    constructor(readonly event: ClocktowerEvent, readonly diary: IDiary) {
         super(EventNotExistInDate.description);
     }
 }

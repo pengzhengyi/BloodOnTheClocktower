@@ -1,301 +1,61 @@
-import dayjs, { Dayjs } from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import { binarySearch } from './common';
-import { Death } from './death';
-import {
-    EventNotExistInDate,
-    PastMomentRewrite,
-    RecallFutureDate,
-    RecallFutureEvent,
-    RecordUnknownEventInDiary,
-} from './exception';
-import { Execution } from './execution';
-import { Exile } from './exile';
-import { GamePhase } from './game-phase';
-import type { Player } from './player';
+import { RecallFutureDate, RecallFutureEvent } from './exception';
+import { GamePhase, IGamePhase } from './game-phase';
 import { Phase } from './phase';
+import { Diary, Event, IDiary } from './diary';
+import { Chronology, IChronology } from './chronology';
+import type { IToll } from './toll';
+import type { Moment } from './moment';
 
-dayjs.extend(isSameOrBefore);
-dayjs.extend(isSameOrAfter);
+export interface IClocktower {
+    readonly gamePhase: IGamePhase;
+    readonly today: IDiary;
 
-type Moment = Dayjs;
-type MomentQuery =
-    | 'isSameOrBefore'
-    | 'isSameOrAfter'
-    | 'isBefore'
-    | 'isSame'
-    | 'isAfter';
-export type Event = Execution | Exile | Phase | Death;
+    record(event: Event): IToll<Event>;
+    recall(dateIndex: number): IDiary;
+    getMoment(gamePhase: IGamePhase): Moment;
 
-export function moment(timestamp?: number): Moment {
-    return dayjs(timestamp);
-}
-
-export class Toll<T> {
-    readonly when: Moment;
-
-    readonly forWhat: T;
-
-    constructor(forWhat: T, timestamp?: number | Moment) {
-        if (timestamp instanceof dayjs) {
-            this.when = timestamp as Moment;
-        } else {
-            this.when = moment(timestamp as number | undefined);
-        }
-
-        this.forWhat = forWhat;
-    }
-
-    isBefore<U = T>(other: Toll<U>): boolean {
-        return this.when.isBefore(other.when);
-    }
-
-    isAfter<U = T>(other: Toll<U>): boolean {
-        return this.when.isAfter(other.when);
-    }
-}
-
-export class Chronology<T> {
-    protected readonly tolls: Array<Toll<T>> = [];
-
-    add(toll: Toll<T>) {
-        let indexToInsertAfter = this.tolls.length - 1;
-        for (; indexToInsertAfter >= 0; indexToInsertAfter--) {
-            const existingToll = this.tolls[indexToInsertAfter];
-            if (toll.isBefore(existingToll)) {
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        this.tolls.splice(indexToInsertAfter + 1, 0, toll);
-    }
-
-    *rewind(start?: Moment, end?: Moment): Iterable<Toll<T>> {
-        const startIndexExclusive =
-            start === undefined
-                ? -1
-                : binarySearch(this.tolls, (toll) => toll.when.isBefore(start));
-        const endIndexInclusive =
-            end === undefined
-                ? this.tolls.length - 1
-                : binarySearch(this.tolls, (toll) =>
-                      toll.when.isSameOrBefore(end)
-                  );
-
-        for (let i = startIndexExclusive + 1; i <= endIndexInclusive; i++) {
-            yield this.tolls[i];
-        }
-    }
-}
-
-export class Diary {
-    execution?: Toll<Execution>;
-
-    exiles: Array<Toll<Exile>> = [];
-
-    deaths: Map<Player, Toll<Death>> = new Map();
-
-    phaseToMoment: Map<Phase, Toll<Phase>> = new Map();
-
-    protected eventToMoment: Map<Event, Moment> = new Map();
-
-    get hasExecution(): boolean {
-        return this.execution !== undefined;
-    }
-
-    get hasExile(): boolean {
-        return this.exiles.length > 0;
-    }
-
-    get executed(): Player | undefined {
-        return this.execution?.forWhat.executed;
-    }
-
-    record(event: Event): Toll<Event> {
-        const moment = this.tryRecord(event);
-        const toll = new Toll(event, moment);
-
-        if (event instanceof Execution) {
-            return (this.execution = toll as Toll<Execution>);
-        } else if (event instanceof Exile) {
-            this.exiles.push(toll as Toll<Exile>);
-            return toll;
-        } else if (event instanceof Death) {
-            this.deaths.set(event.player, toll as Toll<Death>);
-            return toll;
-        } else if (event in Phase) {
-            this.phaseToMoment.set(event, toll as Toll<Phase>);
-            return toll;
-        }
-
-        throw new RecordUnknownEventInDiary(this, event, moment);
-    }
-
-    getMoment(event: Event): Moment | undefined {
-        return this.eventToMoment.get(event);
-    }
-
-    hasDead(player: Player): boolean {
-        return this.deaths.has(player);
-    }
-
-    hasDiedAtNight(player: Player): boolean {
-        const death = this.deaths.get(player);
-
-        if (death === undefined) {
-            return false;
-        }
-
-        return this.isMomentAtNight(death.when);
-    }
-
-    hasRecorded(event: Event): boolean {
-        return this.eventToMoment.has(event);
-    }
-
-    isEventAtDay(event: Event): boolean {
-        const moment = this.getMoment(event);
-
-        if (moment === undefined) {
-            throw new EventNotExistInDate(event, this);
-        }
-
-        return this.isMomentAtDay(moment);
-    }
-
-    isEventAtNight(event: Event): boolean {
-        const moment = this.getMoment(event);
-
-        if (moment === undefined) {
-            throw new EventNotExistInDate(event, this);
-        }
-
-        return this.isMomentAtNight(moment);
-    }
-
-    isMomentAtDay(moment: Moment): boolean {
-        return (
-            this.isMomentSameOrAfterPhase(moment, Phase.Day) &&
-            this.isMomentBeforePhase(moment, Phase.Dusk)
-        );
-    }
-
-    isMomentAtNight(moment: Moment): boolean {
-        return this.isMomentSameOrAfterPhase(moment, Phase.Night);
-    }
-
-    isMomentBeforePhase(moment: Moment, phase: Phase): boolean {
-        return this.isMomentRelativeToPhase(moment, phase, 'isBefore', true);
-    }
-
-    isMomentSameOrBeforePhase(moment: Moment, phase: Phase): boolean {
-        return this.isMomentRelativeToPhase(
-            moment,
-            phase,
-            'isSameOrBefore',
-            true
-        );
-    }
-
-    isMomentAfterPhase(moment: Moment, phase: Phase): boolean {
-        return this.isMomentRelativeToPhase(moment, phase, 'isAfter', false);
-    }
-
-    isMomentSameOrAfterPhase(moment: Moment, phase: Phase): boolean {
-        return this.isMomentRelativeToPhase(
-            moment,
-            phase,
-            'isSameOrAfter',
-            false
-        );
-    }
-
-    protected isMomentRelativeToPhase(
-        moment: Moment,
-        phase: Phase,
-        query: MomentQuery,
-        defaultWhenPhaseMomentNotPresent: boolean
-    ) {
-        const phaseMoment = this.getMoment(phase);
-
-        if (phaseMoment === undefined) {
-            return defaultWhenPhaseMomentNotPresent;
-        }
-
-        return moment[query](phaseMoment);
-    }
-
-    protected tryRecord(event: Event): Moment {
-        if (this.hasRecorded(event)) {
-            throw new PastMomentRewrite(
-                this,
-                event,
-                this.getMoment(event)!,
-                dayjs()
-            );
-        }
-
-        const newMoment = moment();
-        this.eventToMoment.set(event, newMoment);
-
-        return newMoment;
-    }
+    /**
+     * Rewind in time to get past events during a time period.
+     *
+     * @param start The start of a time period. If undefined, it will be earlier than any potential events (like a timestamp of negative infinity).
+     * @param end The end of a time period. If undefined, it will be later than any potential events (like a timestamp of positive infinity).
+     * @returns All captured events during the defined time period.
+     */
+    rewind(start?: Moment, end?: Moment): Iterable<IToll<Event>>;
+    advance(reason?: string): Promise<boolean>;
 }
 
 /**
  * {@link `glossary["Clocktower"]`}
  * Blood on the Clocktower, the world’s greatest bluffing game!
  */
-export class Clocktower {
-    protected readonly diaries: Array<Diary> = [];
+export class Clocktower implements IClocktower {
+    readonly gamePhase: IGamePhase;
 
-    protected readonly chronology = new Chronology<Event>();
+    get today(): IDiary {
+        return this.diaries[this.dateIndex];
+    }
 
-    readonly gamePhase: GamePhase;
-
-    get dateIndex(): number {
+    protected get dateIndex(): number {
         return this.gamePhase.dateIndex;
     }
 
-    get phase(): Phase {
-        return this.gamePhase.phase;
-    }
+    protected readonly diaries: Array<IDiary> = [];
 
-    get isFirstNight(): boolean {
-        return this.gamePhase.isFirstNight;
-    }
-
-    get isNonfirstNight(): boolean {
-        return this.gamePhase.isNonfirstNight;
-    }
-
-    get isDay(): boolean {
-        return this.gamePhase.isDay;
-    }
-
-    get isNight(): boolean {
-        return this.gamePhase.isNight;
-    }
-
-    get today(): Diary {
-        return this.diaries[this.dateIndex];
-    }
+    protected readonly chronology: IChronology<Event> = new Chronology();
 
     constructor() {
         this.gamePhase = GamePhase.setup();
         this.prepareForFirstDate();
     }
 
-    record(event: Event): Toll<Event> | undefined {
+    record(event: Event): IToll<Event> {
         const toll = this.today.record(event);
         this.chronology.add(toll);
         return toll;
     }
 
-    recall(dateIndex: number): Diary {
+    recall(dateIndex: number): IDiary {
         if (dateIndex < this.diaries.length) {
             return this.diaries[dateIndex];
         }
@@ -303,7 +63,7 @@ export class Clocktower {
         throw new RecallFutureDate(dateIndex, this.dateIndex);
     }
 
-    getMoment(gamePhase: GamePhase): Moment {
+    getMoment(gamePhase: IGamePhase): Moment {
         const dateIndex = gamePhase.dateIndex;
         const diary = this.recall(dateIndex);
         const moment = diary.getMoment(gamePhase.phase);
@@ -319,14 +79,7 @@ export class Clocktower {
         return moment;
     }
 
-    /**
-     * Rewind in time to get past events during a time period.
-     *
-     * @param start The start of a time period. If undefined, it will be earlier than any potential events (like a timestamp of negative infinity).
-     * @param end The end of a time period. If undefined, it will be later than any potential events (like a timestamp of positive infinity).
-     * @returns All captured events during the defined time period.
-     */
-    rewind(start?: Moment, end?: Moment): Iterable<Toll<Event>> {
+    rewind(start?: Moment, end?: Moment): Iterable<IToll<Event>> {
         return this.chronology.rewind(start, end);
     }
 

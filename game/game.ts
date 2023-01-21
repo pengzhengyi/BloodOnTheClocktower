@@ -1,12 +1,12 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
-import type { Diary } from './clocktower';
 import { Player } from './player';
 import { Players } from './players';
 import { Edition } from './edition';
 import { EffectTarget } from './effect-target';
 import { StoryTeller } from './storyteller';
 import { TownSquare } from './town-square';
+import type { IDiary } from './diary';
 import { Environment } from '~/interaction/environment';
 
 export class Game extends EffectTarget<Game> {
@@ -41,7 +41,7 @@ export class Game extends EffectTarget<Game> {
         return this.players.clone().alive;
     }
 
-    get today(): Diary {
+    protected get today(): IDiary {
         return this.townSquare.clockTower.today;
     }
 

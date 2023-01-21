@@ -2,14 +2,14 @@ import { mock } from 'jest-mock-extended';
 import { Generator } from '~/game/collections';
 
 export function mockWithPropertyValue<O, T>(
-    propertyName: string,
+    propertyName: string & keyof O,
     propertyValue: T
 ): O {
     return mockWithPropertyValues<O, [T]>([propertyName], [propertyValue]);
 }
 
 export function mockWithPropertyValues<O, T extends any[]>(
-    propertyNames: string[],
+    propertyNames: (string & keyof O)[],
     propertyValues: T
 ): O {
     const baseMock = {};
@@ -31,7 +31,7 @@ export function mockWithPropertyValues<O, T extends any[]>(
 type ModifyMockFunction = (mockFunction: jest.Mock) => void;
 
 export function mockObject<O, T extends any[]>(
-    propertyNames: string[],
+    propertyNames: (string & keyof O)[],
     propertyValues: T,
     functions: { [key: string]: ModifyMockFunction }
 ) {

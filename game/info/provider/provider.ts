@@ -4,7 +4,7 @@ import type {
 } from '../information';
 import type { StoryTellerInformationOptions } from '../storyteller-information';
 import type { CharacterSheet } from '~/game/character-sheet';
-import type { Clocktower } from '~/game/clocktower';
+import type { IClocktower } from '~/game/clocktower';
 import { LazyMap } from '~/game/collections';
 import type { Player } from '~/game/player';
 import type { Players } from '~/game/players';
@@ -13,7 +13,7 @@ import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
 
 export interface InfoProvideContext {
-    clocktower: Clocktower;
+    clocktower: IClocktower;
     characterSheet: CharacterSheet;
     travellerSheet: TravellerSheet;
     requestedPlayer: Player;

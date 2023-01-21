@@ -1,4 +1,4 @@
-import { Clocktower } from './clocktower';
+import { IClocktower, Clocktower } from './clocktower';
 import { Player } from './player';
 import { Players, PlayersModification } from './players';
 import { Seat } from './seat';
@@ -29,7 +29,7 @@ export class TownSquare {
         return new this(seating, _players);
     }
 
-    readonly clockTower: Clocktower = new Clocktower();
+    readonly clockTower: IClocktower = new Clocktower();
 
     protected seating: Seating;
 

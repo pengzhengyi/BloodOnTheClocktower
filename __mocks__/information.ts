@@ -4,9 +4,10 @@ import {
     mockWithPropertyValue,
     mockWithPropertyValues,
 } from './common';
+import { mockGamePhaseForNight } from './game-phase';
 import type { CharacterSheet } from '~/game/character-sheet';
-import type { Clocktower, Diary } from '~/game/clocktower';
 import { Player } from '~/game/player';
+import type { IClocktower } from '~/game/clocktower';
 import type { Players } from '~/game/players';
 import type { Seating } from '~/game/seating';
 import type { StoryTeller } from '~/game/storyteller';
@@ -45,10 +46,12 @@ import type {
     InformationRequestContext,
     IInfoRequester,
 } from '~/game/info/requester/requester';
+import type { IDiary } from '~/game/diary';
+import type { IGamePhase } from '~/game/game-phase';
 
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
-        clocktower: mock<Clocktower>(),
+        clocktower: mock<IClocktower>(),
         characterSheet: mock<CharacterSheet>(),
         travellerSheet: mock<TravellerSheet>(),
         requestedPlayer: mock<Player>(),
@@ -107,9 +110,9 @@ export function mockContextForDemonInformation(
                 mockFunction.mockReturnValue(context.requestedPlayer),
         }
     );
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isFirstNight',
-        isFirstNight
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(!isFirstNight)
     );
 
     return context;
@@ -147,67 +150,67 @@ export function mockContextForMinionInformation(
         }
     );
 
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isFirstNight',
-        isFirstNight
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(!isFirstNight)
     );
 
     return context;
 }
 
 export function mockClocktowerWithIsFirstNight(
-    context: { clocktower: Clocktower },
+    context: { clocktower: IClocktower },
     isFirstNight: boolean
 ) {
-    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, boolean]>(
-        ['isFirstNight', 'isNight'],
-        [isFirstNight, isFirstNight]
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(!isFirstNight)
     );
 }
 
 export function mockClocktowerWithIsNonfirstNight(
-    context: { clocktower: Clocktower },
+    context: { clocktower: IClocktower },
     isNonfirstNight: boolean
 ) {
-    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, boolean]>(
-        ['isNonfirstNight', 'isNight'],
-        [isNonfirstNight, isNonfirstNight]
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(isNonfirstNight)
     );
 }
 
 export function mockClocktowerForDeathAtNight(
-    context: { clocktower: Clocktower },
+    context: { clocktower: IClocktower },
     playerHasDied: Player
 ) {
     const mockHasDiedAtNight = jest.fn();
     mockHasDiedAtNight.mockImplementation((player) =>
         player.equals(playerHasDied)
     );
-    const today = mockWithPropertyValue<Diary, Diary['hasDiedAtNight']>(
+    const today = mockWithPropertyValue<IDiary, IDiary['hasDiedAtNight']>(
         'hasDiedAtNight',
         mockHasDiedAtNight
     );
 
     context.clocktower = mockWithPropertyValues<
-        Clocktower,
-        [boolean, boolean, Diary]
-    >(['isNonfirstNight', 'isNight', 'today'], [true, true, today]);
+        IClocktower,
+        [IGamePhase, IDiary]
+    >(['gamePhase', 'today'], [mockGamePhaseForNight(true), today]);
 }
 
 export function mockClocktowerForUndertaker(
-    context: { clocktower: Clocktower },
+    context: { clocktower: IClocktower },
     isNonfirstNight: boolean,
     executedPlayer?: Player
 ) {
-    const today = mockWithPropertyValues<Diary, [boolean, Player | undefined]>(
+    const today = mockWithPropertyValues<IDiary, [boolean, Player | undefined]>(
         ['hasExecution', 'executed'],
         [executedPlayer !== undefined, executedPlayer]
     );
 
-    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
-        ['isNonfirstNight', 'today'],
-        [isNonfirstNight, today]
-    );
+    context.clocktower = mockWithPropertyValues<
+        IClocktower,
+        [IGamePhase, IDiary]
+    >(['gamePhase', 'today'], [mockGamePhaseForNight(isNonfirstNight), today]);
 }
 
 export function mockContextForCharacterInformation<TCharacter, TInformation>(
@@ -308,9 +311,9 @@ export function mockContextForEmpathInformation(
         Empath,
         EmpathInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Empath);
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isNight',
-        isNight
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(true, isNight)
     );
     return context;
 }
@@ -324,9 +327,9 @@ export function mockContextForFortuneTellerInformation(
         FortuneTeller,
         FortuneTellerInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, FortuneTeller);
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isNight',
-        isNight
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(true, isNight)
     );
     return context;
 }
@@ -343,18 +346,18 @@ export function mockContextForUndertakerInformation(
     >(
         willGetTrueInformation,
         requestedPlayerIsAlive,
-        isNonfirstNight,
+        !isNonfirstNight,
         Undertaker
     );
-    const today = mockWithPropertyValue<Diary, boolean>(
+    const today = mockWithPropertyValue<IDiary, boolean>(
         'hasExecution',
         hasExecution
     );
 
-    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
-        ['isNonfirstNight', 'today'],
-        [isNonfirstNight, today]
-    );
+    context.clocktower = mockWithPropertyValues<
+        IClocktower,
+        [IGamePhase, IDiary]
+    >(['gamePhase', 'today'], [mockGamePhaseForNight(isNonfirstNight), today]);
     return context;
 }
 
@@ -367,15 +370,15 @@ export function mockContextForRavenkeeperInformation(
         Ravenkeeper,
         RavenkeeperInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Ravenkeeper);
-    const today = mock<Diary>();
+    const today = mock<IDiary>();
     (today.hasDiedAtNight as jest.Mock).mockReturnValue(
         !requestedPlayerIsAlive
     );
 
-    context.clocktower = mockWithPropertyValues<Clocktower, [boolean, Diary]>(
-        ['isNight', 'today', 'isNonfirstNight'],
-        [isNight, today]
-    );
+    context.clocktower = mockWithPropertyValues<
+        IClocktower,
+        [IGamePhase, IDiary]
+    >(['gamePhase', 'today'], [mockGamePhaseForNight(true, isNight), today]);
     return context;
 }
 
@@ -390,9 +393,9 @@ export function mockContextForSpyInformation(
         isNight,
         Spy
     );
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isNight',
-        isNight
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(false, isNight)
     );
     return context;
 }
@@ -426,9 +429,9 @@ export function mockContextForTravellerInformation(
         }
     );
 
-    context.clocktower = mockWithPropertyValue<Clocktower, boolean>(
-        'isFirstNight',
-        isFirstNight
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForNight(!isFirstNight)
     );
 
     return context;

@@ -68,7 +68,8 @@
                 "ms-vscode.live-server",
                 "VisualStudioExptTeam.vscodeintellicode",
                 "VisualStudioExptTeam.intellicode-api-usage-examples",
-                "mike-co.import-sorter"
+                "mike-co.import-sorter",
+                "nicoespeon.abracadabra"
             ]
         }
     },

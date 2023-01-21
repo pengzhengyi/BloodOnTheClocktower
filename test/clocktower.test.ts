@@ -1,10 +1,10 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
-import { Clocktower } from '~/game/clocktower';
+import { Clocktower, IClocktower } from '~/game/clocktower';
 import { GamePhase } from '~/game/game-phase';
 import { RecallFutureDate } from '~/game/exception';
 import { Phase } from '~/game/phase';
 
-async function createClocktower(phaseIndex: number): Promise<Clocktower> {
+async function createClocktower(phaseIndex: number): Promise<IClocktower> {
     const clocktower = new Clocktower();
 
     storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
@@ -22,7 +22,7 @@ async function createClocktower(phaseIndex: number): Promise<Clocktower> {
 describe('test basic Clocktower functionality', () => {
     test.concurrent('initial clocktower state', () => {
         const clocktower = new Clocktower();
-        expect(clocktower.dateIndex).toEqual(0);
+        expect(clocktower.gamePhase.dateIndex).toEqual(0);
         expect(clocktower.today.getMoment(Phase.Setup)).toBeDefined();
     });
 
@@ -42,7 +42,7 @@ describe('test basic Clocktower functionality', () => {
 describe('test Clocktower edge cases', () => {
     test('recall a future date', async () => {
         const clocktower = await createClocktower(10);
-        expect(clocktower.dateIndex).toEqual(3);
+        expect(clocktower.gamePhase.dateIndex).toEqual(3);
         expect(() => clocktower.recall(8)).toThrowError(RecallFutureDate);
     });
 });
