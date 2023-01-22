@@ -4,7 +4,7 @@ import { Generator } from '../collections';
 import { DrunkReason } from '../drunk-reason';
 import { ThinkAsCharacterEffect } from '../effect';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import {
     Ability,
@@ -92,7 +92,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
 
     protected setupThinkAsCharacterEffect(
         character: CharacterToken,
-        player: Player
+        player: IPlayer
     ) {
         const effect = new ThinkAsCharacterEffect(character);
         player.effects.add(effect, CompositeGamePhaseKind.ALL);

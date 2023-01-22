@@ -4,7 +4,7 @@ import { Effect, InteractionContext } from '../effect';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { Game } from '../game';
 import type { NextFunction } from '../middleware';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { MayorPlayer, RequireGame } from '../types';
 import {
@@ -45,7 +45,7 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         const game = context.interaction.target;
         const getWinningTeamMethod = updatedContext.result.bind();
 
-        updatedContext.result = async (players: Iterable<Player>) => {
+        updatedContext.result = async (players: Iterable<IPlayer>) => {
             const winningTeam = await getWinningTeamMethod(players);
 
             if (winningTeam === undefined && this.isPeacefulWin(game)) {
@@ -106,12 +106,12 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
     }
 
     protected async choosePlayerToDieInstead(
-        players: Iterable<Player>
-    ): Promise<Player> {
+        players: Iterable<IPlayer>
+    ): Promise<IPlayer> {
         return (await Environment.current.gameUI.storytellerChooseOne(
             players,
             MayorDieInsteadEffect.description
-        )) as Player;
+        )) as IPlayer;
     }
 }
 

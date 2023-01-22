@@ -1,6 +1,6 @@
 import type { Execution } from './execution';
 import type { Game } from './game';
-import type { Player } from './player';
+import type { IPlayer } from './player';
 import type { Minion, Demon, Townsfolk } from './character-type';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';
@@ -25,7 +25,7 @@ export type IterableLike<T> =
     | AsyncIterable<T>
     | AsyncIterator<T>;
 
-export type PlayerOrdering = Array<Player>;
+export type PlayerOrdering = Array<IPlayer>;
 export type Predicate<T> = (value: T) => boolean;
 export type AsyncPredicate<T> = (value: T) => Promise<boolean>;
 export type AnyPredicate<T> = Predicate<T> | AsyncPredicate<T>;
@@ -137,59 +137,59 @@ export type Script = Array<ScriptCharacter>;
 /**
  * Two players, where one player is sitting one seat clockwise and counterclockwise from the other player.
  */
-export type Neighbor = [Player, Player];
+export type Neighbor = [IPlayer, IPlayer];
 
 export type AnyObject = Record<string, any>;
 
-export type FortuneTellerPlayer = Player & {
+export type FortuneTellerPlayer = IPlayer & {
     character: FortuneTeller;
 };
 
-export type MonkPlayer = Player & {
+export type MonkPlayer = IPlayer & {
     character: Monk;
 };
 
-export type RavenkeeperPlayer = Player & {
+export type RavenkeeperPlayer = IPlayer & {
     character: Ravenkeeper;
 };
 
-export type VirginPlayer = Player & {
+export type VirginPlayer = IPlayer & {
     character: Virgin;
 };
 
-export type SlayerPlayer = Player & {
+export type SlayerPlayer = IPlayer & {
     character: Slayer;
 };
 
-export type SoldierPlayer = Player & {
+export type SoldierPlayer = IPlayer & {
     character: Soldier;
 };
 
-export type MayorPlayer = Player & {
+export type MayorPlayer = IPlayer & {
     character: Mayor;
 };
 
-export type ButlerPlayer = Player & {
+export type ButlerPlayer = IPlayer & {
     character: Butler;
 };
 
-export type UndertakerPlayer = Player & {
+export type UndertakerPlayer = IPlayer & {
     character: Undertaker;
 };
 
-export type ReclusePlayer = Player & {
+export type ReclusePlayer = IPlayer & {
     character: Recluse;
 };
 
-export type SaintPlayer = Player & {
+export type SaintPlayer = IPlayer & {
     character: Saint;
 };
 
-export type DrunkPlayer = Player & {
+export type DrunkPlayer = IPlayer & {
     character: Drunk;
 };
 
-export type ImpPlayer = Player & {
+export type ImpPlayer = IPlayer & {
     character: Imp;
 };
 
@@ -201,12 +201,12 @@ export interface RequireExecution {
     execution: Execution;
 }
 
-export type MinionPlayer = Player & {
+export type MinionPlayer = IPlayer & {
     characterType: Minion;
 };
-export type DemonPlayer = Player & {
+export type DemonPlayer = IPlayer & {
     characterType: Demon;
 };
-export type TownsfolkPlayer = Player & {
+export type TownsfolkPlayer = IPlayer & {
     characterType: Townsfolk;
 };

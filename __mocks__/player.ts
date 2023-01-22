@@ -5,7 +5,7 @@ import { mockWithPropertyValue } from './common';
 import { storytellerConfirmMock } from './game-ui';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
-import { Player } from '~/game/player';
+import { Player, IPlayer } from '~/game/player';
 import type { AsyncFactory } from '~/game/types';
 
 export async function createBasicPlayer(
@@ -36,9 +36,9 @@ export async function createUnassignedPlayer(name?: string) {
 
 export async function createBasicPlayers(
     numPlayers: number,
-    factory: AsyncFactory<Player> = createBasicPlayer
-): Promise<Array<Player>> {
-    const basicPlayerCreations: Array<Promise<Player>> = [];
+    factory: AsyncFactory<IPlayer> = createBasicPlayer
+): Promise<Array<IPlayer>> {
+    const basicPlayerCreations: Array<Promise<IPlayer>> = [];
 
     for (let i = 0; i < numPlayers; i++) {
         basicPlayerCreations.push(factory());
@@ -48,20 +48,20 @@ export async function createBasicPlayers(
 }
 
 export function mockPlayer() {
-    return mock<Player>();
+    return mock<IPlayer>();
 }
 
-export function mockAlivePlayer(): Player {
+export function mockAlivePlayer(): IPlayer {
     return mockWithPropertyValue('alive', true);
 }
 
-export function mockDeadPlayer(): Player {
+export function mockDeadPlayer(): IPlayer {
     return mockWithPropertyValue('alive', false);
 }
 
-export async function setPlayerDead(player: Player): Promise<void> {
+export async function setPlayerDead(player: IPlayer): Promise<void> {
     storytellerConfirmMock.mockImplementationOnce((reason: string) => {
-        expect(reason).toContain(Player.revokeVoteTokenDefaultPrompt);
+        expect(reason).toContain((Player as any).revokeVoteTokenDefaultPrompt);
         return Promise.resolve(true);
     });
     await player.setDead();

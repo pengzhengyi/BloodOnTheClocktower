@@ -6,7 +6,7 @@ import {
 } from '../information';
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator } from '~/game/collections';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { CharacterType } from '~/game/character-type';
 import type { MinionPlayer } from '~/game/types';
 
@@ -25,12 +25,12 @@ export abstract class DemonMinionInformationProvider<
                 Generator.map((player) => player.from(), players)
             );
 
-        return Array.from(minionPlayers) as Player[];
+        return Array.from(minionPlayers) as IPlayer[];
     }
 
     protected async getDemonPlayer(
         context: TInfoProvideContext
-    ): Promise<Player> {
+    ): Promise<IPlayer> {
         const demonPlayer = await context.players
             .clone()
             .from(context.requestedPlayer)
@@ -38,12 +38,12 @@ export abstract class DemonMinionInformationProvider<
                 Generator.map((player) => player.from(), players)
             );
 
-        return Generator.take(1, demonPlayer) as Player;
+        return Generator.take(1, demonPlayer) as IPlayer;
     }
 
     protected getHypotheticalCombinationsForMinionPlayers(
         context: TInfoProvideContext
-    ): Generator<Array<Player>> {
+    ): Generator<Array<IPlayer>> {
         return context.players
             .isNot(context.requestedPlayer)
             .combinations(context.travellerSheet.actualAssignment.minion);

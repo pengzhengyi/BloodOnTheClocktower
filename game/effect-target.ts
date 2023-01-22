@@ -2,7 +2,36 @@ import type { InteractionContext, InteractionInitiator } from './effect';
 import { Effects } from './effects';
 import { SelfProxy } from './proxy';
 
-export abstract class EffectTarget<TTarget extends object> extends SelfProxy {
+/**
+ * IEffectTarget represents a proxy that intercept operations declared by `enabledProxyHandlerPropertyNames`. For example, if `get` is one of enabled proxy handler, then attempts to access properties in the target will be intercepted.
+ *
+ * Then IEffectTarget will use effects which is a series of middlewares to optionally redefine the operation behavior. For example, `EffectTarget` will redefine behavior using applicable effects.
+ */
+export interface IEffectTarget<TTarget extends object> extends SelfProxy {
+    readonly effects: Effects<TTarget>;
+
+    /**
+     * Handler names for which operations will be intercepted.
+     *
+     * For example, if `get` is one of enabled proxy handler, then attempts to access properties in the target will be intercepted.
+     */
+    readonly enabledProxyHandlerPropertyNames:
+        | Array<keyof ProxyHandler<TTarget>>
+        | undefined;
+
+    /**
+     * Create another version of proxy (the existing current proxy will be be impacted) which is exactly same as current version but with interaction initiator information tracked.
+     *
+     * For example, suppose target is a player Alice, when calling `setDead` on Alice, effects associated with Alice will have no context who is responsible for setting Alice dead. However, suppose we use `from` to create another version of proxy on player Alice tracking player Bob as interaction initiator. Then a `setDead` call on player Alice will be associated with player Bob. In other words, player Bob is responsible for setting player `Alice dead.
+     * @param initiator Anything that is responsible the subsequent interactions. If not provided, the original proxy will be returned (like unwrapping).
+     */
+    from(initiator?: InteractionInitiator): this;
+}
+
+export abstract class EffectTarget<TTarget extends object>
+    extends SelfProxy
+    implements IEffectTarget<TTarget>
+{
     get enabledProxyHandlerPropertyNames():
         | Array<keyof ProxyHandler<TTarget>>
         | undefined {

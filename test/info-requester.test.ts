@@ -32,7 +32,7 @@ import {
     UndertakerInformationRequestContext,
 } from '~/game/info/requester/undertaker';
 import { WasherwomanInformationRequester } from '~/game/info/requester/washerwoman';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { mockWithPropertyValues } from '~/__mocks__/common';
 import {
     mockContextForChefInformation,
@@ -112,7 +112,7 @@ describe('test DemonInformationRequester', () => {
                 true
             );
             context.requestedPlayer = mockWithPropertyValues<
-                Player,
+                IPlayer,
                 [boolean, boolean]
             >(['drunk', 'poisoned'], [true, false]);
             expect(await requester.willGetTrueInformation(context)).toBeFalse();
@@ -130,7 +130,7 @@ describe('test DemonInformationRequester', () => {
                 true
             );
             context.requestedPlayer = mockWithPropertyValues<
-                Player,
+                IPlayer,
                 [boolean, boolean]
             >(['drunk', 'poisoned'], [false, false]);
             expect(await requester.willGetTrueInformation(context)).toBeTrue();
@@ -201,7 +201,7 @@ describe('test MinionInformationRequester', () => {
                 true
             );
             context.requestedPlayer = mockWithPropertyValues<
-                Player,
+                IPlayer,
                 [boolean, boolean]
             >(['drunk', 'poisoned'], [true, false]);
             expect(await requester.willGetTrueInformation(context)).toBeFalse();
@@ -219,7 +219,7 @@ describe('test MinionInformationRequester', () => {
                 true
             );
             context.requestedPlayer = mockWithPropertyValues<
-                Player,
+                IPlayer,
                 [boolean, boolean]
             >(['drunk', 'poisoned'], [false, false]);
             expect(await requester.willGetTrueInformation(context)).toBeTrue();
@@ -290,7 +290,7 @@ describe('test TravellerInformationRequester', () => {
                 true
             );
             context.requestedPlayer = mockWithPropertyValues<
-                Player,
+                IPlayer,
                 [boolean, boolean]
             >(['drunk', 'poisoned'], [true, false]);
             expect(await requester.willGetTrueInformation(context)).toBeFalse();
@@ -308,7 +308,7 @@ describe('test TravellerInformationRequester', () => {
                 true
             );
             context.requestedPlayer = mockWithPropertyValues<
-                Player,
+                IPlayer,
                 [boolean, boolean]
             >(['drunk', 'poisoned'], [false, false]);
             expect(await requester.willGetTrueInformation(context)).toBeTrue();

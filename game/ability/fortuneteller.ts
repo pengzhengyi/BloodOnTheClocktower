@@ -10,7 +10,7 @@ import {
 } from '../info/requester/fortuneteller';
 import type { NextFunction } from '../middleware';
 import type { NightSheet } from '../night-sheet';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { FortuneTellerPlayer } from '../types';
 import {
     AbilitySetupContext,
@@ -65,11 +65,11 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     static readonly description =
         'Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you.';
 
-    protected static canChoose(players: Array<Player> | undefined): boolean {
+    protected static canChoose(players: Array<IPlayer> | undefined): boolean {
         return Array.isArray(players) && players.length === 2;
     }
 
-    protected redHerringPlayer: Player | undefined;
+    protected redHerringPlayer: IPlayer | undefined;
 
     protected infoRequester = new FortuneTellerInformationRequester<
         FortuneTellerInformationRequestContext<FortuneTellerInformation>
@@ -108,15 +108,15 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
 
     protected async choosePlayers(
         fortuneTellerPlayer: FortuneTellerPlayer,
-        players: Iterable<Player>,
+        players: Iterable<IPlayer>,
         context: GetInfoAbilityUseContext
-    ): Promise<[Player, Player]> {
+    ): Promise<[IPlayer, IPlayer]> {
         let chosen = (await Environment.current.gameUI.choose(
             fortuneTellerPlayer,
             players,
             2,
             BaseGetFortuneTellerInformationAbility.description
-        )) as Array<Player> | undefined;
+        )) as Array<IPlayer> | undefined;
 
         if (!BaseGetFortuneTellerInformationAbility.canChoose(chosen)) {
             const error = new FortuneTellerChooseInvalidPlayers(
@@ -128,12 +128,12 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
             chosen = error.corrected;
         }
 
-        return chosen as [Player, Player];
+        return chosen as [IPlayer, IPlayer];
     }
 
     protected async setupRedHerring(
         fortuneTellerPlayer: FortuneTellerPlayer,
-        players: Iterable<Player>,
+        players: Iterable<IPlayer>,
         nightSheet: NightSheet
     ): Promise<void> {
         const redHerringPlayer = await this.chooseRedHerring(players);
@@ -141,8 +141,8 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     }
 
     protected async chooseRedHerring(
-        players: Iterable<Player>
-    ): Promise<Player> {
+        players: Iterable<IPlayer>
+    ): Promise<IPlayer> {
         return await Environment.current.gameUI.storytellerChooseOne(
             players,
             RedHerringEffect.description
@@ -151,7 +151,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
 
     protected setRedHerring(
         fortuneTellerPlayer: FortuneTellerPlayer,
-        redHerringPlayer: Player,
+        redHerringPlayer: IPlayer,
         nightSheet: NightSheet
     ) {
         this.redHerringPlayer = redHerringPlayer;

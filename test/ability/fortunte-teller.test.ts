@@ -9,7 +9,7 @@ import {
     RedHerringEffect,
     GetFortuneTellerInformationAbility,
 } from '~/game/ability/fortuneteller';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { mockAbilitySetupContext } from '~/__mocks__/ability';
 import { storytellerChooseOneMock, chooseMock } from '~/__mocks__/game-ui';
 import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
@@ -20,7 +20,7 @@ describe('test GetFortuneTellerInformationAbility', () => {
         storytellerChooseOneMock.mockImplementation(
             async (options: Generator<any>, reason?: string) => {
                 if (reason === RedHerringEffect.description) {
-                    const players = options as Iterable<Player>;
+                    const players = options as Iterable<IPlayer>;
                     const saintPlayerCandidates =
                         await Generator.filterAllAsync(
                             async (player) =>

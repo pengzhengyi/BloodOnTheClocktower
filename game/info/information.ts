@@ -7,7 +7,7 @@ import type {
     CharacterType,
 } from '../character-type';
 import type { Generator } from '../collections';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import { Info } from './info';
 
 /**
@@ -58,7 +58,7 @@ export type FalseInformationOptions<T> =
     | Generator<never>;
 
 export interface OneOfTwoPlayersHasCharacterType {
-    players: [Player, Player];
+    players: [IPlayer, IPlayer];
     character: CharacterToken;
     characterType: typeof CharacterType;
 }

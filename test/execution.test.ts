@@ -9,7 +9,7 @@ import {
     mockPlayer,
     setPlayerDead,
 } from '~/__mocks__/player';
-import { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { Generator } from '~/game/collections';
 import { AttemptMoreThanOneExecution } from '~/game/exception';
 
@@ -23,11 +23,11 @@ afterAll(() => {
 
 export async function collectVotesForNomination(
     nomination: Nomination,
-    playerToWillRaiseHand: Map<Player, boolean>
-): Promise<Array<Player>> {
-    const votedPlayers: Array<Player> = [];
+    playerToWillRaiseHand: Map<IPlayer, boolean>
+): Promise<Array<IPlayer>> {
+    const votedPlayers: Array<IPlayer> = [];
 
-    hasRaisedHandForVoteMock.mockImplementation(async (player: Player) => {
+    hasRaisedHandForVoteMock.mockImplementation(async (player: IPlayer) => {
         return (await playerToWillRaiseHand.get(player)) === true;
     });
 
@@ -44,7 +44,7 @@ export async function collectVotesForNomination(
 
 async function* addNominations(
     execution: Execution,
-    nominationPlayers: Array<[Player, Player]>
+    nominationPlayers: Array<[IPlayer, IPlayer]>
 ): AsyncIterable<boolean> {
     for (const [nominator, nominated] of nominationPlayers) {
         const nomination = await Nomination.init(nominator, nominated);
@@ -53,7 +53,7 @@ async function* addNominations(
 }
 
 async function createExecutionAndAddNominations(
-    nominationPlayers: Array<[Player, Player]>
+    nominationPlayers: Array<[IPlayer, IPlayer]>
 ): Promise<[Execution, Array<boolean>]> {
     const execution = Execution.init();
 
@@ -70,8 +70,8 @@ async function createExecutionAndAddNominations(
 }
 
 export async function createExecutionAndAddVotedNominations(
-    nominationPlayers: Array<[Player, Player]>,
-    playerToWillRaiseHandForEachNomination: Array<Map<Player, boolean>>
+    nominationPlayers: Array<[IPlayer, IPlayer]>,
+    playerToWillRaiseHandForEachNomination: Array<Map<IPlayer, boolean>>
 ): Promise<Execution> {
     const [execution, canAddNominations] =
         await createExecutionAndAddNominations(nominationPlayers);
@@ -94,7 +94,7 @@ describe('Test basic functionalities', () => {
         /**
          * Voted = V; Nominator = *; Nominated = @; Dead = #
          *             #     # #
-         *   0 1 2 3 4 5 6 7 8 9 | Player Index
+         *   0 1 2 3 4 5 6 7 8 9 | player Index
          * 0 @ V*V V V
          * 1 V*@         V V V
          * 2   V V*V V V   @   V

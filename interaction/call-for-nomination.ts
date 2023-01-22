@@ -1,9 +1,9 @@
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 export interface ICallForNomination {
     callForNomination(
-        alivePlayers: Iterable<Player>,
+        alivePlayers: Iterable<IPlayer>,
         reason?: string,
         timeout?: number
-    ): Promise<Player | undefined>;
+    ): Promise<IPlayer | undefined>;
 }

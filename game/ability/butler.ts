@@ -2,7 +2,7 @@ import { Effect, InteractionContext } from '../effect';
 import { ButlerNotChooseMasterToFollow } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../middleware';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { ButlerPlayer } from '../types';
 import { Ability, AbilityUseContext, AbilityUseResult } from './ability';
@@ -16,7 +16,7 @@ export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
     static readonly description =
         'The Butler may only vote when their Master (another player) votes.';
 
-    declare master?: Player;
+    declare master?: IPlayer;
 
     constructor(protected readonly butlerPlayer: ButlerPlayer) {
         super();
@@ -46,7 +46,7 @@ export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
 }
 
 export interface ButlerAbilityUseResult extends AbilityUseResult {
-    master: Player;
+    master: IPlayer;
 }
 
 export class ButlerAbility extends Ability<
@@ -102,7 +102,7 @@ export class ButlerAbility extends Ability<
         throw new Error('Method not implemented.');
     }
 
-    protected async updateMaster(butlerPlayer: ButlerPlayer, master?: Player) {
+    protected async updateMaster(butlerPlayer: ButlerPlayer, master?: IPlayer) {
         if (this.effect === undefined) {
             this.effect = new ButlerFollowMasterVoteEffect(butlerPlayer);
             butlerPlayer.effects.add(this.effect, BasicGamePhaseKind.Other);
@@ -124,13 +124,13 @@ export class ButlerAbility extends Ability<
         butlerPlayer: ButlerPlayer,
         players: Players,
         context: AbilityUseContext
-    ): Promise<Player> {
+    ): Promise<IPlayer> {
         let chosen = (await Environment.current.gameUI.choose(
             butlerPlayer,
             players.isNot(butlerPlayer),
             1,
             ButlerAbility.description
-        )) as Player;
+        )) as IPlayer;
 
         if (chosen === undefined) {
             const error = new ButlerNotChooseMasterToFollow(
@@ -146,14 +146,14 @@ export class ButlerAbility extends Ability<
 
     protected formatDescriptionForMalfunction(
         context: AbilityUseContext,
-        master: Player
+        master: IPlayer
     ): string {
         return `Butler player ${context.requestedPlayer} chooses player ${master} as master. But due to ability malfunction, Butler player's vote will be counted normally`;
     }
 
     protected formatDescriptionForNormal(
         context: AbilityUseContext,
-        master: Player
+        master: IPlayer
     ): string {
         return `Butler player ${context.requestedPlayer} chooses player ${master} as master.`;
     }

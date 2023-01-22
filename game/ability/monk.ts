@@ -2,7 +2,7 @@ import { CharacterNightEffect, SafeFromDemonEffect } from '../effect';
 import { MonkNotChoosePlayerToProtect } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { CharacterToken } from '../character';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { MonkPlayer } from '../types';
 import {
@@ -31,7 +31,7 @@ export const MonkProtectionEffect = CharacterNightEffect(
 );
 
 export interface MonkAbilityUseResult extends AbilityUseResult {
-    protectedPlayer?: Player;
+    protectedPlayer?: IPlayer;
 }
 
 class BaseMonkProtectAbility extends Ability<
@@ -44,7 +44,7 @@ class BaseMonkProtectAbility extends Ability<
     static readonly description =
         'Each night*, choose a player (not yourself): they are safe from the Demon tonight.';
 
-    protected protected: Array<Player | undefined> = [];
+    protected protected: Array<IPlayer | undefined> = [];
 
     protected protection = new MonkProtectionEffect();
 
@@ -99,7 +99,7 @@ class BaseMonkProtectAbility extends Ability<
         throw new Error('Method not implemented.');
     }
 
-    protected updatePlayerToProtect(playerToProtect?: Player) {
+    protected updatePlayerToProtect(playerToProtect?: IPlayer) {
         const previousPlayerToProtect = this.protected.at(-1);
         if (
             previousPlayerToProtect !== undefined &&
@@ -120,13 +120,13 @@ class BaseMonkProtectAbility extends Ability<
         monkPlayer: MonkPlayer,
         players: Players,
         context: AbilityUseContext
-    ): Promise<Player> {
+    ): Promise<IPlayer> {
         let chosen = (await Environment.current.gameUI.choose(
             monkPlayer,
             players.isNot(monkPlayer),
             1,
             BaseMonkProtectAbility.description
-        )) as Player | undefined;
+        )) as IPlayer | undefined;
 
         if (chosen === undefined) {
             const error = new MonkNotChoosePlayerToProtect(monkPlayer, context);
@@ -134,7 +134,7 @@ class BaseMonkProtectAbility extends Ability<
             chosen = error.correctedPlayerToProtect;
         }
 
-        return chosen as Player;
+        return chosen as IPlayer;
     }
 
     protected formatDescriptionForMalfunction(
@@ -145,7 +145,7 @@ class BaseMonkProtectAbility extends Ability<
 
     protected formatDescriptionForNormal(
         context: AbilityUseContext,
-        playerToProtect: Player
+        playerToProtect: IPlayer
     ): string {
         return `Monk player ${context.requestedPlayer} choose to protect ${playerToProtect}`;
     }

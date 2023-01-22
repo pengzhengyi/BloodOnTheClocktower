@@ -1,8 +1,8 @@
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 export interface IHasRaisedHandForVote {
     /**
      * Check whether a player has raised a hand for voting.
      */
-    hasRaisedHandForVote(player: Player, timeout?: number): Promise<boolean>;
+    hasRaisedHandForVote(player: IPlayer, timeout?: number): Promise<boolean>;
 }

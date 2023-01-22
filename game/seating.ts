@@ -1,6 +1,6 @@
 import { Generator } from './collections';
 import { clockwise, counterclockwise, shuffle } from './common';
-import { Player } from './player';
+import type { IPlayer } from './player';
 import { Players } from './players';
 import { Seat, SitResult } from './seat';
 import { Direction, Predicate, TAUTOLOGY } from './types';
@@ -15,25 +15,25 @@ import { Environment } from '~/interaction/environment';
 
 export interface SyncResult {
     occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;
-    assignedPlayerMismatchUnoccupiedSeats: Set<Player>;
+    assignedPlayerMismatchUnoccupiedSeats: Set<IPlayer>;
 }
 
 export class SeatAssignment {
     unoccupied: Set<Seat> = new Set();
 
-    unassigned: Set<Player> = new Set();
+    unassigned: Set<IPlayer> = new Set();
 
     occupied: Set<Seat> = new Set();
 
-    assigned: Set<Player> = new Set();
+    assigned: Set<IPlayer> = new Set();
 
-    constructor(seats: Iterable<Seat>, players: Iterable<Player>) {
+    constructor(seats: Iterable<Seat>, players: Iterable<IPlayer>) {
         this.getSeatAssignment(seats, players);
     }
 
     protected getSeatAssignment(
         seats: Iterable<Seat>,
-        players: Iterable<Player>
+        players: Iterable<IPlayer>
     ) {
         for (const seat of seats) {
             if (seat.isEmpty) {
@@ -66,7 +66,7 @@ export class Seating {
      * @param players Players with assigned seat numbers. If a player does not have assigned seat number, storyteller will decide on the spot.
      * @returns A Seating where players with assigned seat will be sat and empty seats will be created when there are spaces between assigned seats.
      */
-    static async of(players: Iterable<Player>) {
+    static async of(players: Iterable<IPlayer>) {
         const seats: Array<Seat> = [];
 
         for (const player of players) {
@@ -92,7 +92,7 @@ export class Seating {
     }
 
     static async from(
-        players: Array<Player> | Players,
+        players: Array<IPlayer> | Players,
         seatAssignmentMode: SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
     ) {
         const seating = await Seating.init(players.length);
@@ -157,7 +157,7 @@ export class Seating {
         return this.seats[position];
     }
 
-    getPlayerOnSeat(position: number): Player | undefined {
+    getPlayerOnSeat(position: number): IPlayer | undefined {
         return this.getSeat(position).player;
     }
 
@@ -179,7 +179,7 @@ export class Seating {
         }
     }
 
-    async *getVoteOrder(nominatedPosition: number): AsyncGenerator<Player> {
+    async *getVoteOrder(nominatedPosition: number): AsyncGenerator<IPlayer> {
         const clockwiseSeats = this.iterateSeatsExcludingStart(
             nominatedPosition,
             Direction.Clockwise
@@ -255,7 +255,7 @@ export class Seating {
         }
     }
 
-    tryGetSeatByPlayer(player: Player): Seat | undefined {
+    tryGetSeatByPlayer(player: IPlayer): Seat | undefined {
         const seatNum = player.seatNumber;
 
         if (seatNum === undefined) {
@@ -265,7 +265,7 @@ export class Seating {
         return this.seats[seatNum];
     }
 
-    async *iterateNeighbors(): AsyncIterable<[Player, Player]> {
+    async *iterateNeighbors(): AsyncIterable<[IPlayer, IPlayer]> {
         for (const seats of this.iterateNeighboringSeats()) {
             for (const seat of seats) {
                 await new UnexpectedEmptySeat(this, seat).throwWhen(
@@ -274,7 +274,7 @@ export class Seating {
                 );
             }
 
-            yield seats.map((seat) => seat.player!) as [Player, Player];
+            yield seats.map((seat) => seat.player!) as [IPlayer, IPlayer];
         }
     }
 
@@ -283,9 +283,9 @@ export class Seating {
      * The two players, whether dead or alive, sitting one seat clockwise and counterclockwise from the player in question.
      */
     async getNeighbors(
-        player: Player,
+        player: IPlayer,
         predicate?: Predicate<Seat>
-    ): Promise<[Player, Player]> {
+    ): Promise<[IPlayer, IPlayer]> {
         const seat = this.getSeatByPlayer(player);
 
         const neighbors = await Promise.all([
@@ -305,14 +305,14 @@ export class Seating {
      * The two alive players that are sitting closest—one clockwise, one counterclockwise—to the player in question, not including any dead players sitting between them.
      */
     async getAliveNeighbors(
-        player: Player,
+        player: IPlayer,
         isAlive: Predicate<Seat> = (seat) => seat.player?.alive ?? false
-    ): Promise<[Player, Player]> {
+    ): Promise<[IPlayer, IPlayer]> {
         return await this.getNeighbors(player, isAlive);
     }
 
     async assign(
-        players: Players | Array<Player>,
+        players: Players | Array<IPlayer>,
         seatAssignmentMode: SeatAssignmentMode
     ): Promise<Array<SitResult>> {
         const sitResults: Array<SitResult> = [];
@@ -328,13 +328,13 @@ export class Seating {
     }
 
     async *assignEach(
-        players: Players | Array<Player>,
+        players: Players | Array<IPlayer>,
         seatAssignmentMode: SeatAssignmentMode
     ): AsyncGenerator<SitResult> {
         await this.fit(players.length);
 
         let unoccupied: Iterable<Seat>;
-        let unassigned: Iterable<Player>;
+        let unassigned: Iterable<IPlayer>;
 
         if (seatAssignmentMode < SeatAssignmentMode.NaturalOverwrite) {
             await this.sync(players);
@@ -390,7 +390,7 @@ export class Seating {
         return await Promise.all(willSit);
     }
 
-    protected getSeatByPlayer(player: Player): Seat {
+    protected getSeatByPlayer(player: IPlayer): Seat {
         const seat = this.tryGetSeatByPlayer(player);
 
         if (seat === undefined) {
@@ -401,11 +401,11 @@ export class Seating {
     }
 
     protected async *assignPlayersToSeats(
-        unassigned: Iterable<Player>,
+        unassigned: Iterable<IPlayer>,
         unoccupied: Iterable<Seat>,
         shouldRandomlyAssign: boolean
     ): AsyncGenerator<SitResult> {
-        let unassignedPlayers: Iterable<Player>;
+        let unassignedPlayers: Iterable<IPlayer>;
 
         if (shouldRandomlyAssign) {
             unassignedPlayers = shuffle(unassigned);
@@ -435,9 +435,9 @@ export class Seating {
      * @param players
      * @returns The result of syncing which describes the mismatches.
      */
-    protected async sync(players: Iterable<Player>): Promise<SyncResult> {
+    protected async sync(players: Iterable<IPlayer>): Promise<SyncResult> {
         const occupiedSeatsMismatchUnassignedPlayer = new Set<Seat>();
-        const assignedPlayerMismatchUnoccupiedSeats = new Set<Player>();
+        const assignedPlayerMismatchUnoccupiedSeats = new Set<IPlayer>();
 
         const willSit: Array<Promise<SitResult>> = [];
         for (const player of players) {
@@ -531,7 +531,7 @@ export class Seating {
     protected async getClockwisePlayer(
         seatPosition: number,
         filterSeat?: Predicate<Seat>
-    ): Promise<Player | undefined> {
+    ): Promise<IPlayer | undefined> {
         const nextSeat = this.tryGetNextSeat(seatPosition, filterSeat);
 
         if (nextSeat !== undefined) {
@@ -558,7 +558,7 @@ export class Seating {
     protected async getCounterclockwisePlayer(
         seatPosition: number,
         filterSeat?: Predicate<Seat>
-    ): Promise<Player | undefined> {
+    ): Promise<IPlayer | undefined> {
         const prevSeat = this.tryGetPrevSeat(seatPosition, filterSeat);
 
         if (prevSeat !== undefined) {

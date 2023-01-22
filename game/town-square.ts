@@ -1,5 +1,5 @@
 import { IClocktower, Clocktower } from './clocktower';
-import { Player } from './player';
+import type { IPlayer } from './player';
 import { Players, PlayersModification } from './players';
 import { Seat } from './seat';
 import { SeatAssignment, SeatAssignmentMode, Seating } from './seating';
@@ -21,7 +21,7 @@ export class TownSquare {
     }
 
     static async from(
-        players: Array<Player>,
+        players: Array<IPlayer>,
         seatAssignmentMode: SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
     ) {
         const _players = new Players(players);
@@ -44,7 +44,7 @@ export class TownSquare {
         this.players = players;
     }
 
-    getPlayerOnSeat(position: number): Player | undefined {
+    getPlayerOnSeat(position: number): IPlayer | undefined {
         return this.seating.getPlayerOnSeat(position);
     }
 
@@ -74,7 +74,7 @@ export class TownSquare {
      * @param force Whether the player will sit on given seat no matter existing seat assignment. Default to false.
      * @returns Whether the player manages to sit on the given seat.
      */
-    async sit(player: Player, seat: Seat, force = false): Promise<boolean> {
+    async sit(player: IPlayer, seat: Seat, force = false): Promise<boolean> {
         const playerSeatNumber = player.seatNumber;
         if (playerSeatNumber === seat.position) {
             // seat is occupied by requested player

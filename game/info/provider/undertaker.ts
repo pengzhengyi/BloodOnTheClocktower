@@ -6,7 +6,7 @@ import {
 } from '../information';
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import type { CharacterToken } from '~/game/character';
 
 /**
@@ -14,13 +14,13 @@ import type { CharacterToken } from '~/game/character';
  * "Each night*, you learn which character died by execution today."
  */
 export interface UndertakerInformation {
-    executedPlayer: Player;
+    executedPlayer: IPlayer;
     character: CharacterToken;
 }
 
 export interface UndertakerInformationProviderContext
     extends InfoProvideContext {
-    executedPlayer: Player;
+    executedPlayer: IPlayer;
 }
 
 export class UndertakerInformationProvider<

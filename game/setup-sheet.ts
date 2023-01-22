@@ -2,7 +2,7 @@ import { Generator } from './collections';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
-import type { Player } from './player';
+import type { IPlayer } from './player';
 import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating';
@@ -140,7 +140,7 @@ export abstract class SetupSheet {
     }
 
     static setupSeatingFromPlayers(
-        players: Array<Player> | Players
+        players: Array<IPlayer> | Players
     ): Promise<Seating> {
         return Seating.from(players);
     }

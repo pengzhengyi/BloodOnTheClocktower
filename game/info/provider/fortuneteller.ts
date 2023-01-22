@@ -6,20 +6,20 @@ import {
 } from '../information';
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 /**
  * {@link `fortuneteller["ability"]`}
  * "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you."
  */
 export interface FortuneTellerInformation {
-    chosenPlayers: [Player, Player];
+    chosenPlayers: [IPlayer, IPlayer];
     hasDemon: boolean;
 }
 
 export interface FortuneTellerInformationProviderContext
     extends InfoProvideContext {
-    chosenPlayers: [Player, Player];
+    chosenPlayers: [IPlayer, IPlayer];
 }
 
 export class FortuneTellerInformationProvider<

@@ -4,7 +4,7 @@ import { mockGame } from './game';
 import { mockAbilityLoader } from './ability-loader';
 import { mockInfoProvideContext as _mockInfoProvideContext } from './information';
 import { mockNightSheet } from './night-sheet';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import type { Players } from '~/game/players';
 import type { SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
@@ -23,17 +23,17 @@ import type { AbilityLoader } from '~/game/ability/loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
 
 export function mockAbilityUseContext(
-    player?: Player,
+    player?: IPlayer,
     players?: Players
 ): AbilityUseContext {
     return {
-        requestedPlayer: player ?? mock<Player>(),
+        requestedPlayer: player ?? mock<IPlayer>(),
         players: players ?? mock<Players>(),
     };
 }
 
 export function mockAbilitySetupContext(
-    player?: Player,
+    player?: IPlayer,
     players?: Players,
     context?: AbilityUseContext,
     nightSheet?: NightSheet,
@@ -70,7 +70,7 @@ export function mockGetInfoAbilityUseContext(
 }
 
 export function mockVirginAbilityUseContext(
-    player?: Player,
+    player?: IPlayer,
     execution?: Execution
 ): VirginAbilityUseContext {
     return Object.assign({}, mockAbilityUseContext(player), {
@@ -79,7 +79,7 @@ export function mockVirginAbilityUseContext(
 }
 
 export function mockMayorAbilitySetupContext(
-    player?: Player,
+    player?: IPlayer,
     players?: Players,
     game?: Game,
     nightSheet?: NightSheet,

@@ -11,7 +11,7 @@ import { Chef } from '~/content/characters/output/chef';
 import { Players } from '~/game/players';
 import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/dead-reason';
-import { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { Seating } from '~/game/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
@@ -61,7 +61,7 @@ import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman
 
 async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
-): Promise<[Seating, Array<Player>]> {
+): Promise<[Seating, Array<IPlayer>]> {
     const players = await Promise.all(
         playerDescriptions.map((description) =>
             playerFromDescription(description)
@@ -73,8 +73,8 @@ async function createSeatingAndPlayersFromDescriptions(
 }
 
 export function createInfoProvideContext(
-    player: Player,
-    otherPlayers: Player[]
+    player: IPlayer,
+    otherPlayers: IPlayer[]
 ) {
     const context = mockInfoProvideContext();
     context.requestedPlayer = player;
@@ -83,15 +83,15 @@ export function createInfoProvideContext(
 }
 
 export async function createInfoProvideContextFromPlayerDescriptions(
-    isRequestedPlayer: AsyncPredicate<Player>,
+    isRequestedPlayer: AsyncPredicate<IPlayer>,
     ...playerDescriptions: Array<string>
 ) {
     const [seating, players] = await createSeatingAndPlayersFromDescriptions(
         ...playerDescriptions
     );
 
-    let requestedPlayer: Player;
-    const otherPlayers: Array<Player> = [];
+    let requestedPlayer: IPlayer;
+    const otherPlayers: Array<IPlayer> = [];
 
     for (const player of players) {
         if (await isRequestedPlayer(player)) {
@@ -107,9 +107,9 @@ export async function createInfoProvideContextFromPlayerDescriptions(
 }
 
 function createFortuneTellerInfoProviderContext(
-    fortuneTellerPlayer: Player,
-    chosenPlayers: [Player, Player],
-    otherPlayers: Array<Player>
+    fortuneTellerPlayer: IPlayer,
+    chosenPlayers: [IPlayer, IPlayer],
+    otherPlayers: Array<IPlayer>
 ): FortuneTellerInformationProviderContext {
     const context = createInfoProvideContext(fortuneTellerPlayer, [
         ...chosenPlayers,
@@ -121,9 +121,9 @@ function createFortuneTellerInfoProviderContext(
 }
 
 export function createUndertakerInfoProviderContext(
-    undertakerPlayer: Player,
-    executedPlayer: Player,
-    otherPlayers: Array<Player>
+    undertakerPlayer: IPlayer,
+    executedPlayer: IPlayer,
+    otherPlayers: Array<IPlayer>
 ): UndertakerInformationProviderContext {
     const context = createInfoProvideContext(undertakerPlayer, [
         executedPlayer,
@@ -135,9 +135,9 @@ export function createUndertakerInfoProviderContext(
 }
 
 function createRavenkeeperInfoProviderContext(
-    ravenkeeperPlayer: Player,
-    chosenPlayer: Player,
-    otherPlayers: Array<Player>
+    ravenkeeperPlayer: IPlayer,
+    chosenPlayer: IPlayer,
+    otherPlayers: Array<IPlayer>
 ): RavenkeeperInformationProviderContext {
     const context = createInfoProvideContext(ravenkeeperPlayer, [
         chosenPlayer,
@@ -235,7 +235,7 @@ describe('test DemonInformationProvider and MinionInformationProvider', () => {
 
 describe('test WasherwomanInformationProvider', () => {
     const provider = new WasherwomanInformationProvider();
-    let washerwomanPlayer: Player;
+    let washerwomanPlayer: IPlayer;
 
     beforeAll(async () => {
         washerwomanPlayer = await createBasicPlayer(undefined, Washerwoman);
@@ -305,7 +305,7 @@ describe('test WasherwomanInformationProvider', () => {
 
 describe('test LibrarianInformationProvider', () => {
     const provider = new LibrarianInformationProvider();
-    let librarianPlayer: Player;
+    let librarianPlayer: IPlayer;
 
     beforeAll(async () => {
         librarianPlayer = await createBasicPlayer(undefined, Librarian);
@@ -394,7 +394,7 @@ describe('test LibrarianInformationProvider', () => {
 
 describe('test InvestigatorInformationProvider', () => {
     const provider = new InvestigatorInformationProvider();
-    let investigatorPlayer: Player;
+    let investigatorPlayer: IPlayer;
 
     beforeAll(async () => {
         investigatorPlayer = await createBasicPlayer(undefined, Investigator);
@@ -642,7 +642,7 @@ describe('test EmpathInformationProvider', () => {
 
 describe('test FortuneTellerInformationProvider', () => {
     const provider = new FortuneTellerInformationProvider();
-    let fortuneTellerPlayer: Player;
+    let fortuneTellerPlayer: IPlayer;
 
     beforeAll(async () => {
         fortuneTellerPlayer = await createBasicPlayer(undefined, FortuneTeller);
@@ -754,7 +754,7 @@ describe('test FortuneTellerInformationProvider', () => {
 
 describe('test UndertakerInformationProvider', () => {
     const provider = new UndertakerInformationProvider();
-    let undertakerPlayer: Player;
+    let undertakerPlayer: IPlayer;
 
     beforeAll(async () => {
         undertakerPlayer = await createBasicPlayer(undefined, Undertaker);
@@ -826,7 +826,7 @@ describe('test UndertakerInformationProvider', () => {
 
 describe('test RavenkeeperInformationProvider', () => {
     const provider = new RavenkeeperInformationProvider();
-    let ravenkeeperPlayer: Player;
+    let ravenkeeperPlayer: IPlayer;
 
     beforeAll(async () => {
         ravenkeeperPlayer = await createBasicPlayer(undefined, Ravenkeeper);
@@ -864,7 +864,7 @@ describe('test RavenkeeperInformationProvider', () => {
 
 describe('True TravellerInformationProvider info', () => {
     const provider = new TravellerInformationProvider();
-    let travellerPlayer: Player;
+    let travellerPlayer: IPlayer;
 
     beforeAll(async () => {
         travellerPlayer = await playerFromDescription(

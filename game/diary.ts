@@ -8,7 +8,7 @@ import { Execution } from './execution';
 import { Exile } from './exile';
 import { moment, Moment } from './moment';
 import { isPhase, Phase } from './phase';
-import type { Player } from './player';
+import type { IPlayer } from './player';
 import { IToll, Toll } from './toll';
 
 type MomentQuery =
@@ -26,16 +26,16 @@ export type Event = Execution | Exile | Phase | Death;
 export interface IDiary {
     execution: IToll<Execution> | undefined;
     exiles: Array<IToll<Exile>>;
-    deaths: Map<Player, IToll<Death>>;
+    deaths: Map<IPlayer, IToll<Death>>;
     phaseToMoment: Map<Phase, IToll<Phase>>;
     hasExecution: boolean;
     hasExile: boolean;
-    executed: Player | undefined;
+    executed: IPlayer | undefined;
 
     record(event: Event): IToll<Event>;
     getMoment(event: Event): Moment | undefined;
-    hasDead(player: Player): boolean;
-    hasDiedAtNight(player: Player): boolean;
+    hasDead(player: IPlayer): boolean;
+    hasDiedAtNight(player: IPlayer): boolean;
     hasRecorded(event: Event): boolean;
     isEventAtDay(event: Event): boolean;
     isEventAtNight(event: Event): boolean;
@@ -52,7 +52,7 @@ abstract class AbstractDiary implements IDiary {
 
     exiles: Array<IToll<Exile>> = [];
 
-    deaths: Map<Player, IToll<Death>> = new Map();
+    deaths: Map<IPlayer, IToll<Death>> = new Map();
 
     phaseToMoment: Map<Phase, IToll<Phase>> = new Map();
 
@@ -66,7 +66,7 @@ abstract class AbstractDiary implements IDiary {
         return this.exiles.length > 0;
     }
 
-    get executed(): Player | undefined {
+    get executed(): IPlayer | undefined {
         return this.execution?.forWhat.executed;
     }
 
@@ -94,11 +94,11 @@ abstract class AbstractDiary implements IDiary {
         return this.eventToMoment.get(event);
     }
 
-    hasDead(player: Player): boolean {
+    hasDead(player: IPlayer): boolean {
         return this.deaths.has(player);
     }
 
-    hasDiedAtNight(player: Player): boolean {
+    hasDiedAtNight(player: IPlayer): boolean {
         const death = this.deaths.get(player);
 
         if (death === undefined) {

@@ -1,12 +1,12 @@
 import { ExileNonTraveller, NoVoteInExile } from './exception';
 import { Nomination, NominationState } from './nomination';
-import { Player } from './player';
+import type { IPlayer } from './player';
 import { Vote } from './vote';
 
 export type ExileState = NominationState;
 
 export class Exile extends Nomination {
-    static async init(nominator: Player, nominated: Player) {
+    static async init(nominator: IPlayer, nominated: IPlayer) {
         const exile = new this(nominator, nominated);
         await exile.validate();
         return exile;
@@ -20,7 +20,7 @@ export class Exile extends Nomination {
 
     async getPlayerAboutToExile(
         numPlayer: number
-    ): Promise<Player | undefined> {
+    ): Promise<IPlayer | undefined> {
         let hasEnoughVoteToExile = await this.vote?.hasEnoughVoteToExile(
             numPlayer
         );

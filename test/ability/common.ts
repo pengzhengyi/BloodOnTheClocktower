@@ -27,7 +27,7 @@ import type {
     InformationRequestContext,
     IInformationRequester,
 } from '~/game/info/requester/requester';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { StoryTeller } from '~/game/storyteller';
 import type {
     AsyncFactory,
@@ -103,7 +103,7 @@ export async function expectCharacterGetInformation<
 export async function monkProtectPlayer(
     ability: MonkProtectAbility,
     context: GetInfoAbilityUseContext,
-    playerToProtect: Player
+    playerToProtect: IPlayer
 ): Promise<MonkAbilityUseResult> {
     chooseMock.mockImplementation(async (_monkPlayer, _players) => {
         expect(await _monkPlayer.character).toEqual(Monk);
@@ -120,8 +120,8 @@ export async function monkProtectPlayer(
 }
 
 export async function expectAfterDemonAttack(
-    playerToKill: Player,
-    demonPlayer: Player,
+    playerToKill: IPlayer,
+    demonPlayer: IPlayer,
     expectToBeDead = true
 ): Promise<Death> {
     expect(playerToKill.alive).toBeTrue();
@@ -186,9 +186,9 @@ export async function mockRecluseRegisterAs<T>(
 }
 
 export async function expectDieInsteadAfterDemonAttack(
-    mayorPlayer: Player,
-    demonPlayer: Player,
-    playerDieInstead: Player
+    mayorPlayer: IPlayer,
+    demonPlayer: IPlayer,
+    playerDieInstead: IPlayer
 ): Promise<Death> {
     expect(mayorPlayer.alive).toBeTrue();
     storytellerChooseOneMock.mockResolvedValue(playerDieInstead);
@@ -206,7 +206,7 @@ export async function expectDieInsteadAfterDemonAttack(
 
 export async function expectAfterSlayerKill(
     ability: SlayerAbility,
-    chosenPlayer: Player,
+    chosenPlayer: IPlayer,
     shouldBeDead: boolean,
     _context?: AbilityUseContext,
     slayerPlayer?: SlayerPlayer
@@ -240,7 +240,7 @@ export async function expectAfterSlayerKill(
 export async function expectAfterExecute(
     execution: Execution,
     numAlivePlayer: number,
-    expectPlayerToBeDead?: Player
+    expectPlayerToBeDead?: IPlayer
 ): Promise<Death | undefined> {
     const toExecute = await execution.setPlayerAboutToDie(numAlivePlayer);
     if (expectPlayerToBeDead === undefined) {
@@ -261,9 +261,9 @@ export async function expectAfterExecute(
 
 export async function mockButlerChooseMaster(
     ability: ButlerAbility,
-    master: Player,
+    master: IPlayer,
     context?: AbilityUseContext,
-    butlerPlayer?: Player
+    butlerPlayer?: IPlayer
 ) {
     chooseMock.mockResolvedValue(master);
     await ability.use(context ?? mockAbilityUseContext(butlerPlayer));

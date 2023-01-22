@@ -6,7 +6,7 @@ import {
 } from './common';
 import { mockGamePhaseForNight } from './game-phase';
 import type { CharacterSheet } from '~/game/character-sheet';
-import { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
 import type { Players } from '~/game/players';
 import type { Seating } from '~/game/seating';
@@ -54,7 +54,7 @@ export function mockInfoProvideContext(): InfoProvideContext {
         clocktower: mock<IClocktower>(),
         characterSheet: mock<CharacterSheet>(),
         travellerSheet: mock<TravellerSheet>(),
-        requestedPlayer: mock<Player>(),
+        requestedPlayer: mock<IPlayer>(),
         players: mock<Players>(),
         seating: mock<Seating>(),
         storyteller: mock<StoryTeller>(),
@@ -96,7 +96,7 @@ export function mockContextForDemonInformation(
         numPlayers
     );
     context.requestedPlayer = mockObject<
-        Player,
+        IPlayer,
         [boolean, boolean, typeof CharacterType]
     >(
         ['isDemon', 'alive', 'characterType'],
@@ -135,7 +135,7 @@ export function mockContextForMinionInformation(
         numPlayers
     );
     context.requestedPlayer = mockObject<
-        Player,
+        IPlayer,
         [boolean, boolean, typeof CharacterType]
     >(
         ['isMinion', 'alive', 'characterType'],
@@ -180,7 +180,7 @@ export function mockClocktowerWithIsNonfirstNight(
 
 export function mockClocktowerForDeathAtNight(
     context: { clocktower: IClocktower },
-    playerHasDied: Player
+    playerHasDied: IPlayer
 ) {
     const mockHasDiedAtNight = jest.fn();
     mockHasDiedAtNight.mockImplementation((player) =>
@@ -200,9 +200,12 @@ export function mockClocktowerForDeathAtNight(
 export function mockClocktowerForUndertaker(
     context: { clocktower: IClocktower },
     isNonfirstNight: boolean,
-    executedPlayer?: Player
+    executedPlayer?: IPlayer
 ) {
-    const today = mockWithPropertyValues<IDiary, [boolean, Player | undefined]>(
+    const today = mockWithPropertyValues<
+        IDiary,
+        [boolean, IPlayer | undefined]
+    >(
         ['hasExecution', 'executed'],
         [executedPlayer !== undefined, executedPlayer]
     );
@@ -225,14 +228,14 @@ export function mockContextForCharacterInformation<TCharacter, TInformation>(
     );
 
     const mockPlayer = mockObject<
-        Player,
+        IPlayer,
         [Promise<TCharacter>, boolean, boolean, boolean]
     >(
         ['character', 'alive', 'drunk', 'poisoned'],
         [Promise.resolve(character), requestedPlayerIsAlive, false, false],
         {
             from: (mockFunction) =>
-                mockFunction.mockImplementation(function (this: Player) {
+                mockFunction.mockImplementation(function (this: IPlayer) {
                     return this;
                 }),
         }
@@ -413,7 +416,7 @@ export function mockContextForTravellerInformation(
     );
 
     context.requestedPlayer = mockObject<
-        Player,
+        IPlayer,
         [boolean, boolean, boolean, typeof CharacterType]
     >(
         ['isTraveller', 'alive', 'isEvil', 'characterType'],

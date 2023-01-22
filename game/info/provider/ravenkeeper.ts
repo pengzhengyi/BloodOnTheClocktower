@@ -6,7 +6,7 @@ import {
 } from '../information';
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import type { CharacterToken } from '~/game/character';
 
 /**
@@ -14,13 +14,13 @@ import type { CharacterToken } from '~/game/character';
  * "If you die at night, you are woken to choose a player: you learn their character."
  */
 export interface RavenkeeperInformation {
-    chosenPlayer: Player;
+    chosenPlayer: IPlayer;
     character: CharacterToken;
 }
 
 export interface RavenkeeperInformationProviderContext
     extends InfoProvideContext {
-    chosenPlayer: Player;
+    chosenPlayer: IPlayer;
 }
 
 export class RavenkeeperInformationProvider<

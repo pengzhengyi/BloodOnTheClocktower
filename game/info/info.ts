@@ -1,4 +1,4 @@
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type {
     TrueInformationOptions,
     FalseInformationOptions,
@@ -34,7 +34,7 @@ export abstract class Info<T> {
         this.info = info;
     }
 
-    send(player: Player, reason?: string): Promise<void> {
+    send(player: IPlayer, reason?: string): Promise<void> {
         return Environment.current.gameUI.send(player, this, reason);
     }
 }

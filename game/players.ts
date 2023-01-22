@@ -11,16 +11,16 @@ import {
 import { Generator } from './collections';
 import type { InteractionInitiator } from './effect';
 import { IncorrectNumberOfCharactersToAssign } from './exception';
-import type { CharacterAssignmentResult, Player } from './player';
+import type { CharacterAssignmentResult, IPlayer } from './player';
 
-export type PlayersModification = (players: Array<Player>) => void;
+export type PlayersModification = (players: Array<IPlayer>) => void;
 
-export class Players extends Generator<Player> {
-    static of(...players: Array<Player>) {
+export class Players extends Generator<IPlayer> {
+    static of(...players: Array<IPlayer>) {
         return new this(players);
     }
 
-    static async allGood(players: Iterable<Player>): Promise<boolean> {
+    static async allGood(players: Iterable<IPlayer>): Promise<boolean> {
         const areAlignmentsGood = await Promise.all(
             Generator.map((player) => player.isGood, players)
         );
@@ -28,14 +28,14 @@ export class Players extends Generator<Player> {
         return areAlignmentsGood.every((isGood) => isGood);
     }
 
-    static async allEvil(players: Iterable<Player>): Promise<boolean> {
+    static async allEvil(players: Iterable<IPlayer>): Promise<boolean> {
         const isPlayerEvil = Generator.promiseRaceAll(
             Generator.toPromise((player) => player.isEvil, players)
         );
         return await Generator.everyAsync((isEvil) => isEvil, isPlayerEvil);
     }
 
-    protected readonly players: Array<Player>;
+    protected readonly players: Array<IPlayer>;
 
     get length(): number {
         return this.players.length;
@@ -81,7 +81,7 @@ export class Players extends Generator<Player> {
         return this.filter((player) => player.alive);
     }
 
-    constructor(players: Array<Player>) {
+    constructor(players: Array<IPlayer>) {
         super(players, [], false);
         this.players = players;
     }
@@ -95,7 +95,7 @@ export class Players extends Generator<Player> {
         return this;
     }
 
-    findByCharacter(character: CharacterToken): Promise<Player | undefined> {
+    findByCharacter(character: CharacterToken): Promise<IPlayer | undefined> {
         return this.findAsync(
             async (player) => (await player.character) === character
         );
@@ -117,7 +117,7 @@ export class Players extends Generator<Player> {
         return this.filter((player) => playerIds.has(player.id));
     }
 
-    intersect(players?: Iterable<Player>) {
+    intersect(players?: Iterable<IPlayer>) {
         if (players === undefined) {
             return Players.empty() as Players;
         }

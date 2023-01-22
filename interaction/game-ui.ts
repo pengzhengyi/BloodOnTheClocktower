@@ -8,7 +8,7 @@ import { IStorytellerChooseOne } from './storyteller-choose-one';
 import { IStorytellerConfirm } from './storyteller-confirm';
 import { IStorytellerDecide } from './storyteller-decide';
 import type { IHasRaisedHandForVote } from './has-raised-hand-for-vote';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import type { StaticThis } from '~/game/types';
 
 export type IGameUIInteractions = [
@@ -94,7 +94,7 @@ abstract class AbstractGameUI implements IGameUI {
 
     choose<T>(
         ...args: [
-            Player,
+            IPlayer,
             Iterable<T>,
             number | undefined,
             string | undefined,
@@ -159,7 +159,7 @@ abstract class AbstractGameUI implements IGameUI {
     }
 
     send<T>(
-        ...args: [Player, T, string | undefined, number | undefined]
+        ...args: [IPlayer, T, string | undefined, number | undefined]
     ): Promise<void> {
         return this.tryUseProvider<ISend>('send', args);
     }

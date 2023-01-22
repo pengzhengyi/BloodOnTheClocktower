@@ -1,18 +1,18 @@
 import { InvalidPlayerToSit } from './exception';
-import { Player } from './player';
+import type { IPlayer } from './player';
 import { Environment } from '~/interaction/environment';
 
 export interface SitResult {
-    player: Player;
+    player: IPlayer;
     // eslint-disable-next-line no-use-before-define
     seat: Seat;
     hasSat: boolean;
 }
 
 export class Seat {
-    player?: Player;
+    player?: IPlayer;
 
-    static async init(position: number, player: Player) {
+    static async init(position: number, player: IPlayer) {
         const seat = new this(position);
         await seat.sit(player);
         return seat;
@@ -30,7 +30,7 @@ export class Seat {
         return this.player === undefined;
     }
 
-    async trySit(player: Player): Promise<SitResult> {
+    async trySit(player: IPlayer): Promise<SitResult> {
         if (this.isOccupied) {
             return {
                 player,
@@ -42,7 +42,7 @@ export class Seat {
         }
     }
 
-    async sit(player: Player): Promise<SitResult> {
+    async sit(player: IPlayer): Promise<SitResult> {
         if (player === undefined) {
             const error = new InvalidPlayerToSit(player);
             await error.resolve();
@@ -77,7 +77,7 @@ export class Seat {
         };
     }
 
-    async remove(): Promise<Player | undefined> {
+    async remove(): Promise<IPlayer | undefined> {
         const satPlayer = this.player;
         if (
             satPlayer !== undefined &&
@@ -95,11 +95,11 @@ export class Seat {
         return `Seat ${this.position}`;
     }
 
-    protected formatPromptForSitPlayer(player: Player): string {
+    protected formatPromptForSitPlayer(player: IPlayer): string {
         return `Allow ${player.toString()} to sit at ${this.toString()}`;
     }
 
-    protected formatPromptForRemovePlayer(player: Player): string {
+    protected formatPromptForRemovePlayer(player: IPlayer): string {
         return `Remove ${player.toString()} from ${this.toString()}`;
     }
 }

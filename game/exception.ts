@@ -18,7 +18,7 @@ import type {
     UndertakerPlayer,
     AsyncPredicate,
 } from './types';
-import type { Player } from './player';
+import type { IPlayer } from './player';
 import type { Players } from './players';
 import type { Seat } from './seat';
 import type { CharacterToken } from './character';
@@ -190,8 +190,8 @@ export class AttemptMoreThanOneExecution extends RecoverableGameError {
 
     constructor(
         readonly execution: Execution,
-        readonly executed: Player,
-        readonly attemptedToExecute: Player
+        readonly executed: IPlayer,
+        readonly attemptedToExecute: IPlayer
     ) {
         super(AttemptMoreThanOneExecution.description);
     }
@@ -246,7 +246,7 @@ export class NominatorNominatedBefore extends RecoverableGameError {
     constructor(
         readonly failedNomination: Nomination,
         readonly pastNomination: Nomination,
-        readonly nominator: Player
+        readonly nominator: IPlayer
     ) {
         super(NominatorNominatedBefore.description);
     }
@@ -261,7 +261,7 @@ export class NominatedNominatedBefore extends RecoverableGameError {
     constructor(
         readonly failedNomination: Nomination,
         readonly pastNomination: Nomination,
-        readonly nominated: Player
+        readonly nominated: IPlayer
     ) {
         super(NominatedNominatedBefore.description);
     }
@@ -269,12 +269,12 @@ export class NominatedNominatedBefore extends RecoverableGameError {
 
 export class PlayerHasUnclearAlignment extends RecoverableGameError {
     static description =
-        'Player does not have a clear alignment as alignment is neither specified nor inferrable';
+        'IPlayer does not have a clear alignment as alignment is neither specified nor inferrable';
 
     declare correctedAlignment: Alignment;
 
     constructor(
-        readonly player: Player,
+        readonly player: IPlayer,
         readonly specifiedAlignment?: Alignment
     ) {
         super(PlayerHasUnclearAlignment.description);
@@ -286,7 +286,7 @@ export class DeadPlayerCannotNominate extends RecoverableGameError {
 
     forceAllowNomination = false;
 
-    constructor(readonly player: Player) {
+    constructor(readonly player: IPlayer) {
         super(DeadPlayerCannotNominate.description);
     }
 }
@@ -305,7 +305,7 @@ export class NumberOfSeatNotPositive extends RecoverableGameError {
 export class UnexpectedEmptySeat extends RecoverableGameError {
     static description = 'Encountered an empty seat unexpected';
 
-    get satPlayer(): Player | undefined {
+    get satPlayer(): IPlayer | undefined {
         return this.emptySeat.player;
     }
 
@@ -317,7 +317,7 @@ export class UnexpectedEmptySeat extends RecoverableGameError {
 export class PlayerNotSat extends RecoverableGameError {
     static description = 'Encountered a player without a seat unexpected';
 
-    constructor(readonly player: Player) {
+    constructor(readonly player: IPlayer) {
         super(PlayerNotSat.description);
     }
 }
@@ -325,9 +325,9 @@ export class PlayerNotSat extends RecoverableGameError {
 export class InvalidPlayerToSit extends RecoverableGameError {
     static description = 'Try to sit an invalid player';
 
-    declare correctedPlayer: Player;
+    declare correctedPlayer: IPlayer;
 
-    constructor(readonly player: Player) {
+    constructor(readonly player: IPlayer) {
         super(PlayerNotSat.description);
     }
 }
@@ -345,8 +345,8 @@ export class PlayerNoNeighbors extends RecoverableGameError {
         'Cannot get two players that sitting nearest to the player';
 
     constructor(
-        readonly player: Player,
-        readonly neighbors: [Player | undefined, Player | undefined],
+        readonly player: IPlayer,
+        readonly neighbors: [IPlayer | undefined, IPlayer | undefined],
         readonly seating: Seating
     ) {
         super(PlayerNoNeighbors.description);
@@ -358,8 +358,8 @@ export class PlayerNoAliveNeighbors extends PlayerNoNeighbors {
         'Cannot get two alive players that sitting nearest to the player';
 
     constructor(
-        readonly player: Player,
-        readonly neighbors: [Player | undefined, Player | undefined],
+        readonly player: IPlayer,
+        readonly neighbors: [IPlayer | undefined, IPlayer | undefined],
         readonly seating: Seating
     ) {
         super(player, neighbors, seating);
@@ -379,7 +379,7 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
     static description = 'Cannot determine character type of a character';
 
     constructor(
-        readonly player?: Player,
+        readonly player?: IPlayer,
         readonly character?: CharacterToken,
         readonly type?: string
     ) {
@@ -414,7 +414,7 @@ export class ReassignCharacterToPlayer extends RecoverableGameError {
     shouldReassign = false;
 
     constructor(
-        readonly player: Player,
+        readonly player: IPlayer,
         readonly existingCharacter: CharacterToken,
         readonly newCharacter: CharacterToken
     ) {
@@ -649,11 +649,11 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
     static description =
         'The fortune teller has not chosen two players to detect';
 
-    declare corrected: [Player, Player];
+    declare corrected: [IPlayer, IPlayer];
 
     constructor(
         readonly fortuneTellerPlayer: FortuneTellerPlayer,
-        readonly chosen: Array<Player> | undefined,
+        readonly chosen: Array<IPlayer> | undefined,
         readonly context: GetInfoAbilityUseContext
     ) {
         super(FortuneTellerChooseInvalidPlayers.description);
@@ -663,7 +663,7 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
 export class MonkNotChoosePlayerToProtect extends RecoverableGameError {
     static description = 'The monk has not chosen player to protect';
 
-    declare correctedPlayerToProtect: Player;
+    declare correctedPlayerToProtect: IPlayer;
 
     constructor(
         readonly monkPlayer: MonkPlayer,
@@ -676,7 +676,7 @@ export class MonkNotChoosePlayerToProtect extends RecoverableGameError {
 export class SlayerNotChoosePlayerToKill extends RecoverableGameError {
     static description = 'The slayer has not chosen player to kill';
 
-    declare correctedPlayerToKill: Player;
+    declare correctedPlayerToKill: IPlayer;
 
     constructor(
         readonly slayerPlayer: SlayerPlayer,
@@ -689,7 +689,7 @@ export class SlayerNotChoosePlayerToKill extends RecoverableGameError {
 export class ButlerNotChooseMasterToFollow extends RecoverableGameError {
     static description = 'The butler has not chosen master to follow on vote';
 
-    declare correctedMaster: Player;
+    declare correctedMaster: IPlayer;
 
     constructor(
         readonly butlerPlayer: ButlerPlayer,
@@ -703,7 +703,7 @@ export class RavenkeeperNotChoosePlayerToProtect extends RecoverableGameError {
     static description =
         'The ravenkeeper has not chosen player to learn the character';
 
-    declare correctedPlayer: Player;
+    declare correctedPlayer: IPlayer;
 
     constructor(
         readonly RavenkeeperPlayer: RavenkeeperPlayer,
@@ -717,7 +717,7 @@ export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
     static description =
         'The undertaker cannot get information when there was no execution today';
 
-    declare corrected: [Player, Player];
+    declare corrected: [IPlayer, IPlayer];
 
     constructor(
         readonly undertakerPlayer: UndertakerPlayer,

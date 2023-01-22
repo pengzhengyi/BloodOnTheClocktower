@@ -9,7 +9,7 @@ import {
     setPlayerDead,
 } from '~/__mocks__/player';
 
-import { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { Vote } from '~/game/vote';
 
 afterAll(() => {
@@ -19,11 +19,11 @@ afterAll(() => {
 
 async function collectVotesForExecution(
     vote: Vote,
-    playerToWillRaiseHand: Map<Player, boolean>
-): Promise<Array<Player>> {
-    const votedPlayers: Array<Player> = [];
+    playerToWillRaiseHand: Map<IPlayer, boolean>
+): Promise<Array<IPlayer>> {
+    const votedPlayers: Array<IPlayer> = [];
 
-    hasRaisedHandForVoteMock.mockImplementation((player: Player) => {
+    hasRaisedHandForVoteMock.mockImplementation((player: IPlayer) => {
         return Promise.resolve(playerToWillRaiseHand.get(player));
     });
 
@@ -37,14 +37,14 @@ async function collectVotesForExecution(
 }
 
 async function createVoteAndCollectVotes(
-    nominated: Player,
+    nominated: IPlayer,
     forExile: boolean,
-    playersToVote: Array<Player>,
+    playersToVote: Array<IPlayer>,
     willPlayerRaiseHand: Array<boolean>
-): Promise<Array<Player>> {
+): Promise<Array<IPlayer>> {
     const vote = new Vote(nominated, forExile);
 
-    const playerToWillRaiseHand = new Map<Player, boolean>();
+    const playerToWillRaiseHand = new Map<IPlayer, boolean>();
 
     for (let i = 0; i < playersToVote.length; i++) {
         playerToWillRaiseHand.set(playersToVote[i], willPlayerRaiseHand[i]);

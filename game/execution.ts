@@ -4,7 +4,7 @@ import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from './dead-reason';
 import { EffectTarget } from './effect-target';
 import { Nomination } from './nomination';
-import { Player } from './player';
+import { IPlayer, Player } from './player';
 import { Predicate } from './types';
 import type { Death } from './death';
 import {
@@ -45,23 +45,23 @@ export class Execution extends EffectTarget<Execution> {
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
-    get toExecute(): Player | undefined {
+    get toExecute(): IPlayer | undefined {
         return this._toExecute;
     }
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
-    get executed(): Player | undefined {
+    get executed(): IPlayer | undefined {
         return this._executed;
     }
 
-    protected readonly pastNominators: Set<Player> = new Set();
+    protected readonly pastNominators: Set<IPlayer> = new Set();
 
-    protected readonly pastNominateds: Set<Player> = new Set();
+    protected readonly pastNominateds: Set<IPlayer> = new Set();
 
-    protected _executed?: Player;
+    protected _executed?: IPlayer;
 
-    protected _toExecute?: Player;
+    protected _toExecute?: IPlayer;
 
     // eslint-disable-next-line no-useless-constructor
     protected constructor(
@@ -77,7 +77,7 @@ export class Execution extends EffectTarget<Execution> {
      */
     async setPlayerAboutToDie(
         numAlivePlayer: number
-    ): Promise<Player | undefined> {
+    ): Promise<IPlayer | undefined> {
         const playerAboutToDie = await this.getPlayerAboutToDie(numAlivePlayer);
         this._toExecute = playerAboutToDie;
         return playerAboutToDie;
@@ -90,7 +90,7 @@ export class Execution extends EffectTarget<Execution> {
      * @returns Whether a player has been executed.
      */
     async execute(
-        player?: Player,
+        player?: IPlayer,
         deadReason: DeadReason = DeadReason.Executed
     ): Promise<Death | undefined> {
         if (!this.willExecute(player)) {
@@ -113,9 +113,9 @@ export class Execution extends EffectTarget<Execution> {
      */
     async getPlayerAboutToDie(
         numAlivePlayer: number
-    ): Promise<Player | undefined> {
+    ): Promise<IPlayer | undefined> {
         let highestNumVotes = 0;
-        let playerAboutToDie: Player | undefined;
+        let playerAboutToDie: IPlayer | undefined;
 
         for (const nomination of this.nominations) {
             try {
@@ -180,12 +180,13 @@ export class Execution extends EffectTarget<Execution> {
         return false;
     }
 
-    protected willExecute(player?: Player): boolean {
+    protected willExecute(player?: IPlayer): boolean {
         if (this.executed !== undefined) {
             if (player === undefined && this.toExecute === undefined) {
                 return false;
             } else {
-                const attemptedToExecute = (player || this.toExecute) as Player;
+                const attemptedToExecute = (player ||
+                    this.toExecute) as IPlayer;
                 throw new AttemptMoreThanOneExecution(
                     this,
                     this.executed,
@@ -198,7 +199,7 @@ export class Execution extends EffectTarget<Execution> {
     }
 
     protected async tryExecute(
-        player: Player,
+        player: IPlayer,
         deadReason: DeadReason
     ): Promise<Death | undefined> {
         if (
@@ -216,7 +217,7 @@ export class Execution extends EffectTarget<Execution> {
         }
     }
 
-    protected formatPromptForExecutePlayer(player: Player): string {
+    protected formatPromptForExecutePlayer(player: IPlayer): string {
         return `Confirm player ${player} will be executed immediately?`;
     }
 

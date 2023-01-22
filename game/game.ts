@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
-import { Player } from './player';
+import { IPlayer } from './player';
 import { Players } from './players';
 import { Edition } from './edition';
 import { EffectTarget } from './effect-target';
@@ -69,7 +69,7 @@ export class Game extends EffectTarget<Game> {
     }
 
     async getWinningTeam(
-        players: Iterable<Player>
+        players: Iterable<IPlayer>
     ): Promise<Alignment | undefined> {
         let evilWinConditionReached = true;
         let goodWinConditionReached = true;

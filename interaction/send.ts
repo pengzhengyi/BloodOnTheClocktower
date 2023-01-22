@@ -1,11 +1,11 @@
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 export interface ISend {
     /**
      * Send a player some data.
      */
     send<T>(
-        player: Player,
+        player: IPlayer,
         data: T,
         reason?: string,
         timeout?: number

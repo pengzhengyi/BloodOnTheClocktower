@@ -6,7 +6,7 @@ import type { CharacterToken } from './character';
 import type { NightSheet } from './night-sheet';
 import type { DeadReason } from './dead-reason';
 import type { Middleware, NextFunction } from './middleware';
-import type { Player } from './player';
+import type { IPlayer } from './player';
 import { Environment } from '~/interaction/environment';
 
 interface ProxyHandlerRequest<TTarget extends object> {
@@ -154,7 +154,7 @@ export abstract class Effect<TTarget extends object> {
         return predicate(context.interaction.target);
     }
 
-    protected isTargetHasAbility(context: InteractionContext<Player>) {
+    protected isTargetHasAbility(context: InteractionContext<IPlayer>) {
         return context.interaction.target.hasAbility;
     }
 
@@ -172,18 +172,18 @@ export abstract class Effect<TTarget extends object> {
     protected matchNotNullInitiatorSameAsTarget(
         context: InteractionContext<TTarget>
     ) {
-        return this.matchNotNullInitiator<Player>(context, (initiator) =>
-            initiator.equals(context.interaction.target as Player)
+        return this.matchNotNullInitiator<IPlayer>(context, (initiator) =>
+            initiator.equals(context.interaction.target as IPlayer)
         );
     }
 
     protected matchNotNullInitiatorDifferentThanTarget(
         context: InteractionContext<TTarget>
     ) {
-        return this.matchNotNullInitiator<Player>(
+        return this.matchNotNullInitiator<IPlayer>(
             context,
             (initiator) =>
-                !initiator.equals(context.interaction.target as Player)
+                !initiator.equals(context.interaction.target as IPlayer)
         );
     }
 
@@ -204,7 +204,7 @@ export abstract class Effect<TTarget extends object> {
     protected matchDemonKill(context: InteractionContext<TTarget>) {
         return (
             this.isGetProperty(context, 'setDead' as keyof TTarget) &&
-            this.matchNotNullInitiator<Player>(context, (initiator) =>
+            this.matchNotNullInitiator<IPlayer>(context, (initiator) =>
                 initiator.storytellerGet('_isDemon')
             )
         );
@@ -374,7 +374,7 @@ export function CharacterNightEffect<
 }
 
 export abstract class RegisterAsEffect<
-    TPlayer extends Player,
+    TPlayer extends IPlayer,
     V
 > extends Effect<TPlayer> {
     abstract readonly propertyName: keyof TPlayer;
@@ -424,7 +424,7 @@ export abstract class RegisterAsEffect<
 }
 
 export abstract class RegisterAsAlignmentEffect<
-    TPlayer extends Player
+    TPlayer extends IPlayer
 > extends RegisterAsEffect<TPlayer, Alignment> {
     static readonly options = [Alignment.Good, Alignment.Evil];
 
@@ -442,25 +442,25 @@ export abstract class RegisterAsAlignmentEffect<
 }
 
 export abstract class RegisterAsGoodAlignmentEffect<
-    TPlayer extends Player
+    TPlayer extends IPlayer
 > extends RegisterAsAlignmentEffect<TPlayer> {
     readonly alignment = Alignment.Good;
 }
 
 export abstract class RegisterAsEvilAlignmentEffect<
-    TPlayer extends Player
+    TPlayer extends IPlayer
 > extends RegisterAsAlignmentEffect<TPlayer> {
     readonly alignment = Alignment.Evil;
 }
 
 export abstract class RegisterAsCharacterEffect<
-    TPlayer extends Player
+    TPlayer extends IPlayer
 > extends RegisterAsEffect<TPlayer, CharacterToken> {
     readonly propertyName = 'character';
 }
 
 export abstract class ThinkAsEffect<
-    TPlayer extends Player,
+    TPlayer extends IPlayer,
     V
 > extends Effect<TPlayer> {
     abstract readonly propertyName: keyof TPlayer;
@@ -486,7 +486,7 @@ export abstract class ThinkAsEffect<
 }
 
 export class ThinkAsCharacterEffect<
-    TPlayer extends Player
+    TPlayer extends IPlayer
 > extends ThinkAsEffect<TPlayer, CharacterToken> {
     readonly propertyName = 'character';
 

@@ -6,7 +6,7 @@ import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
 import { DeadReason } from './dead-reason';
 import { Death } from './death';
-import { EffectTarget } from './effect-target';
+import { EffectTarget, IEffectTarget } from './effect-target';
 import { Nomination } from './nomination';
 import { PlayerState } from './player-state';
 
@@ -29,11 +29,100 @@ import { DrunkReason } from './drunk-reason';
 import { Environment } from '~/interaction/environment';
 
 export interface CharacterAssignmentResult {
-    player: Player;
+    player: IPlayer;
 
     character: CharacterToken;
 
     result: boolean;
+}
+
+export interface IPlayer extends IEffectTarget<IPlayer> {
+    /* basic info */
+    readonly id: string;
+    readonly username: string;
+
+    seatNumber: number | undefined;
+    readonly alignment: Promise<Alignment>;
+    readonly character: Promise<CharacterToken>;
+
+    /* player state */
+    /**
+     * {@link `glossary["Healthy"]`}
+     * Not poisoned.
+     */
+    readonly healthy: boolean;
+    readonly poisoned: boolean;
+    /**
+     * {@link `glossary["Alive"]`}
+     * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
+     */
+    readonly alive: boolean;
+    /**
+     * {@link `glossary["Dead"]`}
+     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
+     */
+    readonly dead: boolean;
+    /**
+     * {@link `glossary["Sober"]`}
+     * Not drunk.
+     */
+    readonly sober: boolean;
+    /**
+     * {@link `glossary["Drunk"]`}
+     *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
+     */
+    readonly drunk: boolean;
+    readonly sane: boolean;
+    readonly mad: boolean;
+
+    readonly canNominate: Promise<boolean>;
+    readonly canVote: Promise<boolean>;
+    readonly canExile: Promise<boolean>;
+    readonly hasAbility: boolean;
+
+    /* character type */
+    readonly isMinion: Promise<boolean>;
+    readonly isDemon: Promise<boolean>;
+    readonly isTownsfolk: Promise<boolean>;
+    readonly isOutsider: Promise<boolean>;
+    readonly isFabled: Promise<boolean>;
+    readonly isTraveller: Promise<boolean>;
+    /**
+     * {@link `glossary["Demon, The"]`}
+     * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
+     */
+    readonly isTheDemon: Promise<boolean>;
+    readonly isAliveNontraveller: Promise<boolean>;
+    readonly characterType: Promise<typeof CharacterType>;
+
+    readonly isGood: Promise<boolean>;
+    readonly isEvil: Promise<boolean>;
+
+    assignCharacter(
+        character: CharacterToken,
+        alignment?: Alignment
+    ): Promise<CharacterAssignmentResult>;
+    setDead(reason?: DeadReason): Promise<Death>;
+    setDrunk(reason?: DrunkReason): Promise<boolean>;
+    attack(victim: IPlayer): Promise<Death>;
+    nominate(
+        nominated: IPlayer,
+        execution: Execution
+    ): Promise<Nomination | undefined>;
+    collectVote(forExile: boolean): Promise<boolean>;
+    revokeVoteToken(reason?: string): Promise<boolean>;
+
+    storytellerGet<
+        V,
+        K extends keyof IPlayer | string = keyof IPlayer | string
+    >(
+        key: K
+    ): V;
+
+    toJSON(): Record<string, any>;
+    valueOf(): string;
+    equals(player: IPlayer): boolean;
+    toString(): string;
 }
 
 /**
@@ -41,14 +130,15 @@ export interface CharacterAssignmentResult {
  * Any person who has an in-play character, not including the Storyteller.
  */
 @Exclude()
-export class Player extends EffectTarget<Player> {
-    static reasonForReclaimDeadPlayerVote =
+export class Player extends EffectTarget<IPlayer> implements IPlayer {
+    protected static reasonForReclaimDeadPlayerVote =
         'Dead players may only vote once more during the game.';
 
-    static revokeVoteTokenDefaultPrompt = 'Revoke vote token for player: ';
+    protected static revokeVoteTokenDefaultPrompt =
+        'Revoke vote token for player: ';
 
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
-        keyof ProxyHandler<Player>
+        keyof ProxyHandler<IPlayer>
     > = ['get'];
 
     static async init(
@@ -56,7 +146,7 @@ export class Player extends EffectTarget<Player> {
         character?: CharacterToken,
         alignment?: Alignment,
         _id?: string,
-        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<IPlayer>>
     ) {
         const id = _id ?? uuid();
 
@@ -94,8 +184,8 @@ export class Player extends EffectTarget<Player> {
         return player.getProxy();
     }
 
-    static async isCharacterType(
-        player: Player,
+    protected static async isCharacterType(
+        player: IPlayer,
         characterType: typeof CharacterType
     ): Promise<boolean> {
         return (await player.characterType).is(characterType);
@@ -108,134 +198,107 @@ export class Player extends EffectTarget<Player> {
         return player._characterType.is(characterType);
     }
 
-    get alignment(): Promise<Alignment> {
+    @Expose({ toPlainOnly: true })
+    readonly id;
+
+    @Expose({ toPlainOnly: true })
+    readonly username;
+
+    seatNumber: number | undefined;
+
+    get alignment() {
         return Promise.resolve(this._alignment);
     }
 
     @Expose({ name: 'alignment', toPlainOnly: true })
     protected declare _alignment: Alignment;
 
-    @Expose({ toPlainOnly: true })
-    readonly id: string;
-
-    @Expose({ toPlainOnly: true })
-    username: string;
-
-    get character(): Promise<CharacterToken> {
+    get character() {
         return Promise.resolve(this._character);
     }
 
+    @Expose({ name: 'character', toPlainOnly: true })
+    protected _characterId(): string {
+        return this._character.id;
+    }
+
     protected declare _character: CharacterToken;
-
-    infoRequester?: unknown;
-
-    isWake = false;
 
     /**
      * {@link `glossary["Vote token"]`}
      * The round white circular token that is put on a player’s life token when they die. When this dead player votes, they remove their vote token and cannot vote for the rest of the game.
      */
-    hasVoteToken = true;
+    protected hasVoteToken = true;
 
-    seatNumber?: number;
-
-    readonly canSupportExile: boolean = true;
-
-    deadReason?: DeadReason;
-
-    /**
-     * {@link `glossary["Healthy"]`}
-     * Not poisoned.
-     */
-    get healthy(): boolean {
+    get healthy() {
         return this.state.healthy;
     }
 
-    get poisoned(): boolean {
+    get poisoned() {
         return this.state.poisoned;
     }
 
-    /**
-     * {@link `glossary["Alive"]`}
-     * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
-     */
-    get alive(): boolean {
+    get alive() {
         return this.state.alive;
     }
 
-    /**
-     * {@link `glossary["Dead"]`}
-     * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
-     */
-    get dead(): boolean {
+    get dead() {
         return this.state.dead;
     }
 
-    /**
-     * {@link `glossary["Shroud"]`}
-     * The black and grey banner-shaped token used in the Grimoire to indicate that a player is dead.
-     */
-    get hasShroud(): boolean {
-        return this.dead;
-    }
-
-    /**
-     * {@link `glossary["Sober"]`}
-     * Not drunk.
-     */
-    get sober(): boolean {
+    get sober() {
         return this.state.sober;
     }
 
-    /**
-     * {@link `glossary["Drunk"]`}
-     *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
-     */
-    get drunk(): boolean {
+    get drunk() {
         return this.state.drunk;
     }
 
-    get sane(): boolean {
+    get sane() {
         return this.state.sane;
     }
 
-    get mad(): boolean {
+    get mad() {
         return this.state.mad;
     }
 
-    get canNominate(): boolean {
-        return this.alive;
+    get canNominate() {
+        return Promise.resolve(this.alive);
     }
 
     get canVote(): Promise<boolean> {
         return Promise.resolve(this.alive || this.hasVoteToken);
     }
 
+    get canExile(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
+
     get hasAbility(): boolean {
         return !this.dead && !this.drunk && !this.poisoned;
     }
 
-    get isMinion() {
+    get isMinion(): Promise<boolean> {
         return Player.isCharacterType(this, Minion);
     }
 
-    get isDemon() {
+    get isDemon(): Promise<boolean> {
         return Player.isCharacterType(this, Demon);
     }
 
-    get isTownsfolk() {
+    get isTownsfolk(): Promise<boolean> {
         return Player.isCharacterType(this, Townsfolk);
     }
 
-    get isOutsider() {
+    get isOutsider(): Promise<boolean> {
         return Player.isCharacterType(this, Outsider);
     }
 
-    get isFabled() {
+    get isFabled(): Promise<boolean> {
         return Player.isCharacterType(this, Fabled);
     }
 
-    get isTraveller() {
+    get isTraveller(): Promise<boolean> {
         return Player.isCharacterType(this, Traveller);
     }
 
@@ -263,10 +326,6 @@ export class Player extends EffectTarget<Player> {
         return Player._isCharacterType(this, Traveller);
     }
 
-    /**
-     * {@link `glossary["Demon, The"]`}
-     * The player that has the Demon character. In a game with multiple Demons, each alive Demon player counts as “The Demon”.
-     */
     get isTheDemon(): Promise<boolean> {
         return this.isDemon.then((isDemon) => this.alive && isDemon);
     }
@@ -301,17 +360,12 @@ export class Player extends EffectTarget<Player> {
      */
     protected readonly state: PlayerState = PlayerState.init();
 
-    @Expose({ name: 'character', toPlainOnly: true })
-    protected _characterId(): string {
-        return this._character.id;
-    }
-
     protected constructor(
         id: string,
         username: string,
         character?: CharacterToken,
         alignment?: Alignment,
-        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Player>>
+        enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<IPlayer>>
     ) {
         super(enabledProxyHandlerPropertyNames);
         this.id = id;
@@ -360,12 +414,10 @@ export class Player extends EffectTarget<Player> {
         };
     }
 
-    async setDead(reason: DeadReason = DeadReason.Other): Promise<Death> {
-        this.deadReason = reason;
+    setDead(reason: DeadReason = DeadReason.Other): Promise<Death> {
         this.state.dead = true;
         // TODO lose ability and influences
-        await undefined;
-        return new Death(this, reason);
+        return Promise.resolve(new Death(this, reason));
     }
 
     setDrunk(_reason: DrunkReason = DrunkReason.Other): Promise<boolean> {
@@ -373,16 +425,16 @@ export class Player extends EffectTarget<Player> {
         return Promise.resolve(this.drunk);
     }
 
-    async attack(victim: Player): Promise<Death> {
+    async attack(victim: IPlayer): Promise<Death> {
         // TODO
         return await victim.setDead(DeadReason.DemonAttack);
     }
 
     async nominate(
-        nominated: Player,
+        nominated: IPlayer,
         execution: Execution
     ): Promise<Nomination | undefined> {
-        if (!this.canNominate) {
+        if (!(await this.canNominate)) {
             const error = new DeadPlayerCannotNominate(this);
             await error.resolve();
             if (!error.forceAllowNomination) {
@@ -398,7 +450,7 @@ export class Player extends EffectTarget<Player> {
 
     async collectVote(forExile: boolean): Promise<boolean> {
         const shouldCheckHandRaised =
-            (forExile && this.canSupportExile) || (await this.canVote);
+            (forExile && (await this.canExile)) || (await this.canVote);
         if (
             shouldCheckHandRaised &&
             (await Environment.current.gameUI.hasRaisedHandForVote(this))
@@ -428,9 +480,10 @@ export class Player extends EffectTarget<Player> {
         }
     }
 
-    storytellerGet<V, K extends keyof Player | string = keyof Player | string>(
-        key: K
-    ): V {
+    storytellerGet<
+        V,
+        K extends keyof IPlayer | string = keyof IPlayer | string
+    >(key: K): V {
         return (this as Record<K, any>)[key] as V;
     }
 
@@ -442,7 +495,7 @@ export class Player extends EffectTarget<Player> {
         return this.id;
     }
 
-    equals(player: Player): boolean {
+    equals(player: IPlayer): boolean {
         return this.id === player.id;
     }
 

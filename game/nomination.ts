@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { Vote } from './vote';
-import { Player } from './player';
+import { IPlayer, Player } from './player';
 
 export enum NominationState {
     NotStarted,
@@ -11,7 +11,7 @@ export enum NominationState {
 
 @Exclude()
 export class Nomination {
-    static async init(nominator: Player, nominated: Player) {
+    static async init(nominator: IPlayer, nominated: IPlayer) {
         const nomination = new this(nominator, nominated);
         return await nomination;
     }
@@ -22,11 +22,11 @@ export class Nomination {
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
-    nominator: Player;
+    nominator: IPlayer;
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
-    nominated: Player;
+    nominated: IPlayer;
 
     get state(): NominationState {
         if (this.vote === undefined) {
@@ -40,7 +40,7 @@ export class Nomination {
         }
     }
 
-    protected constructor(nominator: Player, nominated: Player) {
+    protected constructor(nominator: IPlayer, nominated: IPlayer) {
         this.nominator = nominator;
         this.nominated = nominated;
     }
@@ -53,7 +53,7 @@ export class Nomination {
         return this.state !== NominationState.NotStarted;
     }
 
-    startVote(players: Iterable<Player>) {
+    startVote(players: Iterable<IPlayer>) {
         const vote: Vote = this.isVoteStarted()
             ? this.vote
             : (this.vote = this.createVote());

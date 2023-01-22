@@ -4,7 +4,7 @@ import {
     RavenkeeperInformationRequester,
     RavenkeeperInformationRequestContext,
 } from '../info/requester/ravenkeeper';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { RavenkeeperPlayer } from '../types';
 import {
     GetCharacterInformationAbility,
@@ -50,15 +50,15 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
 
     protected async choosePlayer(
         ravenkeeperPlayer: RavenkeeperPlayer,
-        players: Iterable<Player>,
+        players: Iterable<IPlayer>,
         context: GetInfoAbilityUseContext
-    ): Promise<Player> {
+    ): Promise<IPlayer> {
         let chosen = (await Environment.current.gameUI.choose(
             ravenkeeperPlayer,
             players,
             1,
             GetRavenkeeperInformationAbility.description
-        )) as Player;
+        )) as IPlayer;
 
         if (chosen === undefined) {
             const error = new RavenkeeperNotChoosePlayerToProtect(

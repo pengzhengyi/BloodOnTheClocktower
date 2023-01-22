@@ -6,7 +6,7 @@ import {
 } from '../information';
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 /**
  * {@link `empath["ability"]`}
@@ -132,8 +132,8 @@ export class EmpathInformationProvider<
     }
 
     protected async isEvilAliveNeighbor(
-        aliveNeighbor: Player,
-        empathPlayer: Player,
+        aliveNeighbor: IPlayer,
+        empathPlayer: IPlayer,
         shouldFromRequestedPlayerPerspective: boolean
     ): Promise<boolean> {
         const player = shouldFromRequestedPlayerPerspective

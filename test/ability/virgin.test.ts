@@ -10,10 +10,10 @@ import type { Action, VirginPlayer } from '~/game/types';
 import { mockVirginAbilityUseContext } from '~/__mocks__/ability';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { handleMock, storytellerConfirmMock } from '~/__mocks__/game-ui';
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 async function expectAfterNominateVirgin(
-    nominator: Player,
+    nominator: IPlayer,
     virginPlayer: VirginPlayer,
     execution?: Execution,
     ability?: VirginAbility,

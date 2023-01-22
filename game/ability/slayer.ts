@@ -1,7 +1,7 @@
 import { DeadReason } from '../dead-reason';
 import type { Death } from '../death';
 import { SlayerNotChoosePlayerToKill } from '../exception';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { SlayerPlayer } from '../types';
 import { Ability, AbilityUseContext, AbilityUseResult } from './ability';
 import {
@@ -12,7 +12,7 @@ import {
 import { Environment } from '~/interaction/environment';
 
 export interface SlayerAbilityUseResult extends AbilityUseResult {
-    chosenPlayer: Player;
+    chosenPlayer: IPlayer;
     death?: Death;
 }
 
@@ -78,8 +78,8 @@ export class SlayerAbility extends Ability<
     }
 
     protected async attemptToKillDemon(
-        player: Player,
-        slayerPlayer: Player
+        player: IPlayer,
+        slayerPlayer: IPlayer
     ): Promise<Death | undefined> {
         this.hasUsedAbility = true;
         if (await player.from(slayerPlayer).isTheDemon) {
@@ -89,15 +89,15 @@ export class SlayerAbility extends Ability<
 
     protected async chooseSuspectedDemon(
         slayerPlayer: SlayerPlayer,
-        players: Iterable<Player>,
+        players: Iterable<IPlayer>,
         context: AbilityUseContext
-    ): Promise<Player> {
+    ): Promise<IPlayer> {
         let chosen = (await Environment.current.gameUI.choose(
             slayerPlayer,
             players,
             1,
             SlayerAbility.description
-        )) as Player;
+        )) as IPlayer;
 
         if (chosen === undefined) {
             const error = new SlayerNotChoosePlayerToKill(

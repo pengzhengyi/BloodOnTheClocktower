@@ -2,7 +2,7 @@ import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
 import type { Constructor, StaticThis } from '../types';
 import type { CharacterSheet } from '../character-sheet';
 import type { NightSheet } from '../night-sheet';
-import type { Player } from '../player';
+import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { Info } from '../info/info';
 import type { InfoProvideContext } from '../info/provider/provider';
@@ -21,7 +21,7 @@ import {
 import { Environment } from '~/interaction/environment';
 
 export interface AbilityUseContext {
-    requestedPlayer: Player;
+    requestedPlayer: IPlayer;
     players: Players;
 }
 

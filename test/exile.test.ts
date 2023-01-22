@@ -2,20 +2,20 @@ import { collectVotesForNomination as collectVotesForExile } from './execution.t
 import { handleMock } from '~/__mocks__/game-ui';
 import { Exile } from '~/game/exile';
 import { ExileNonTraveller } from '~/game/exception';
-import { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { Scapegoat } from '~/content/characters/output/scapegoat';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer, setPlayerDead } from '~/__mocks__/player';
 
 async function createExileAndCollectVotes(
-    nominated: Player,
-    nominator: Player,
-    playersToVote: Array<Player>,
+    nominated: IPlayer,
+    nominator: IPlayer,
+    playersToVote: Array<IPlayer>,
     willPlayerRaiseHand: Array<boolean>
-): Promise<Array<Player>> {
+): Promise<Array<IPlayer>> {
     const exile = await Exile.init(nominator, nominated);
 
-    const playerToWillRaiseHand = new Map<Player, boolean>();
+    const playerToWillRaiseHand = new Map<IPlayer, boolean>();
 
     for (let i = 0; i < playersToVote.length; i++) {
         playerToWillRaiseHand.set(playersToVote[i], willPlayerRaiseHand[i]);

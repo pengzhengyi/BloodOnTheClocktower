@@ -1,7 +1,7 @@
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { clockwise } from './common';
 import { NoVotesWhenCountingVote } from './exception';
-import { Player } from './player';
+import { Player, IPlayer } from './player';
 import { PlayerOrdering } from './types';
 import { Environment } from '~/interaction/environment';
 
@@ -16,25 +16,25 @@ export class Vote {
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
-    public readonly nominated: Player;
+    public readonly nominated: IPlayer;
 
     @Expose({ toPlainOnly: true })
     public readonly forExile: boolean;
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
-    votes?: Array<Player>;
+    votes?: Array<IPlayer>;
 
     get voted() {
         return this.hasVoted();
     }
 
-    constructor(nominated: Player, forExile = false) {
+    constructor(nominated: IPlayer, forExile = false) {
         this.nominated = nominated;
         this.forExile = forExile;
     }
 
-    hasVoted(): this is { votes: Array<Player> } {
+    hasVoted(): this is { votes: Array<IPlayer> } {
         return this.votes !== undefined;
     }
 
@@ -49,7 +49,7 @@ export class Vote {
             );
         }
 
-        return (this as { votes: Array<Player> }).votes.length >= threshold;
+        return (this as { votes: Array<IPlayer> }).votes.length >= threshold;
     }
 
     hasEnoughVoteToExecute(numAlivePlayer: number): Promise<boolean> {
@@ -60,7 +60,7 @@ export class Vote {
         return this.hasEnoughVote(numPlayer / 2);
     }
 
-    getVoteOrder(players: PlayerOrdering): IterableIterator<Player> {
+    getVoteOrder(players: PlayerOrdering): IterableIterator<IPlayer> {
         const nominated = this.nominated;
         const nominatedIndex = players.indexOf(nominated);
         // array out of bound handled by clockwise
@@ -71,7 +71,7 @@ export class Vote {
         return instanceToPlain(this);
     }
 
-    async *collectVotes(players: Iterable<Player>) {
+    async *collectVotes(players: Iterable<IPlayer>) {
         if (this.hasVoted()) {
             const shouldVoteAgain =
                 await Environment.current.gameUI.storytellerConfirm(

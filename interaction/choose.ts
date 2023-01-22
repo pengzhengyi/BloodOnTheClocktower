@@ -1,4 +1,4 @@
-import type { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 
 export interface IChoose {
     /**
@@ -7,7 +7,7 @@ export interface IChoose {
      * It can be specified either as single select (default) or multi-select.
      */
     choose<T>(
-        player: Player,
+        player: IPlayer,
         options: Iterable<T>,
         n?: number,
         reason?: string,

@@ -1,10 +1,10 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { clockwise, randomChoice } from '~/game/common';
-import { Player } from '~/game/player';
+import type { IPlayer } from '~/game/player';
 import { Seating } from '~/game/seating';
 import { createBasicPlayers } from '~/__mocks__/player';
 
-async function createSeating(players: Array<Player>): Promise<Seating> {
+async function createSeating(players: Array<IPlayer>): Promise<Seating> {
     const seating = await Seating.from(players);
     expect(seating.allSat).toBeTrue();
     return seating;
@@ -12,7 +12,7 @@ async function createSeating(players: Array<Player>): Promise<Seating> {
 
 async function createPlayersAndSeating(
     numPlayers: number
-): Promise<[Array<Player>, Seating]> {
+): Promise<[Array<IPlayer>, Seating]> {
     const players = await createBasicPlayers(numPlayers);
 
     const seating = await createSeating(players);

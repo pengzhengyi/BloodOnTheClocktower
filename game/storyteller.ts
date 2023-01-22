@@ -6,7 +6,7 @@ import type {
     InformationRequestContext,
 } from './info/requester/requester';
 import { InfoProviderLoader } from './info/provider/loader';
-import { Player } from './player';
+import type { IPlayer } from './player';
 import type { Players } from './players';
 import { AsyncTask } from './types';
 import { Environment } from '~/interaction/environment';
@@ -23,7 +23,7 @@ export class StoryTeller {
 
     protected infoProviderLoader: InfoProviderLoader = new InfoProviderLoader();
 
-    async getGrimoire(_requestedPlayer: Player): Promise<Grimoire> {
+    async getGrimoire(_requestedPlayer: IPlayer): Promise<Grimoire> {
         await new BlankGrimoire(this).throwWhen(
             (error) => error.storyteller.grimoire === undefined
         );
@@ -32,7 +32,11 @@ export class StoryTeller {
         return this.grimoire!;
     }
 
-    async interact(player: Player, action: AsyncTask<Player>, reason?: string) {
+    async interact(
+        player: IPlayer,
+        action: AsyncTask<IPlayer>,
+        reason?: string
+    ) {
         if (reason === undefined) {
             reason = action.toString();
         }
@@ -49,15 +53,11 @@ export class StoryTeller {
      * A player opening their eyes at night. The Storyteller wakes a player by tapping twice on the knee or shoulder, and wakes all players by saying “eyes open, everybody” at dawn.
      */
     async wake(
-        player: Player,
-        action: AsyncTask<Player>,
+        player: IPlayer,
+        action: AsyncTask<IPlayer>,
         reason: string = StoryTeller.DEFAULT_WAKE_REASON
     ) {
-        player.isWake = true;
-
         await this.interact(player, action, reason);
-
-        player.isWake = false;
     }
 
     async giveInfo<TInformation, InfoType extends Info<TInformation>>(
