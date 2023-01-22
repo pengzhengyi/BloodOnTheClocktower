@@ -24,15 +24,17 @@ export type ISubscriber<TEvent extends IEvent = IEvent> =
     | IBlockingSubscriber<TEvent>
     | INonBlockingSubscriber<TEvent>;
 
-export interface INotification {
+export interface INotification<
+    TEventCategory extends IEventCategory = IEventCategory
+> {
     subscribe<TEvent extends IEvent = IEvent>(
-        eventCategory: IEventCategory,
+        eventCategory: TEventCategory,
         subscriber: ISubscriber<TEvent>,
         priority?: number
     ): void;
 
     unsubscribe<TEvent extends IEvent = IEvent>(
-        eventCategory: IEventCategory,
+        eventCategory: TEventCategory,
         subscriber: ISubscriber<TEvent>
     ): void;
 

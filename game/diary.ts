@@ -7,7 +7,7 @@ import {
 import { Execution } from './execution';
 import { Exile } from './exile';
 import { moment, Moment } from './moment';
-import { Phase } from './phase';
+import { isPhase, Phase } from './phase';
 import type { Player } from './player';
 import { IToll, Toll } from './toll';
 
@@ -82,7 +82,7 @@ abstract class AbstractDiary implements IDiary {
         } else if (event instanceof Death) {
             this.deaths.set(event.player, toll as IToll<Death>);
             return toll;
-        } else if (event in Phase) {
+        } else if (isPhase(event)) {
             this.phaseToMoment.set(event, toll as IToll<Phase>);
             return toll;
         }

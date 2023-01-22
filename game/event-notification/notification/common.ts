@@ -10,11 +10,14 @@ import type {
 import { LazyMap, Generator } from '~/game/collections';
 import type { ResolveCallback } from '~/game/types';
 
-export abstract class AbstractNotification implements INotification {
+export abstract class AbstractNotification<
+    TEventCategory extends IEventCategory = IEventCategory
+> implements INotification<TEventCategory>
+{
     abstract readonly defaultPriorityWhenNotProvided: number;
 
     protected subscribers: LazyMap<
-        IEventCategory,
+        TEventCategory,
         OrderedMap<number, Set<ISubscriber<IEvent>>>
     > = new LazyMap(
         (_key) =>
@@ -25,16 +28,16 @@ export abstract class AbstractNotification implements INotification {
     );
 
     protected subscriberToPriority: LazyMap<
-        IEventCategory,
+        TEventCategory,
         Map<ISubscriber<IEvent>, number>
     > = new LazyMap((_key) => new Map());
 
-    protected get eventCategories(): Iterable<IEventCategory> {
+    protected get eventCategories(): Iterable<TEventCategory> {
         return this.subscriberToPriority.keys();
     }
 
     subscribe<TEvent extends IEvent = IEvent>(
-        eventCategory: IEventCategory,
+        eventCategory: TEventCategory,
         subscriber: ISubscriber<TEvent>,
         priority?: number | undefined
     ): void {
@@ -55,7 +58,7 @@ export abstract class AbstractNotification implements INotification {
     }
 
     unsubscribe<TEvent extends IEvent = IEvent>(
-        eventCategory: IEventCategory,
+        eventCategory: TEventCategory,
         subscriber: ISubscriber<TEvent>
     ): boolean {
         const priority = this.subscriberToPriority
@@ -111,7 +114,7 @@ export abstract class AbstractNotification implements INotification {
 
     protected getEventCategories<TEvent extends IEvent = IEvent>(
         event: TEvent
-    ): Iterable<IEventCategory> {
+    ): Iterable<TEventCategory> {
         return Generator.filter(
             (eventCategory) => eventCategory.has(event),
             this.eventCategories
@@ -133,7 +136,7 @@ export abstract class AbstractNotification implements INotification {
     }
 
     protected *getSubscribersForEventCategory(
-        eventCategory: IEventCategory
+        eventCategory: TEventCategory
     ): Iterable<ISubscriber<IEvent>> {
         const priorityToSubscribers = this.subscribers.get(eventCategory);
 

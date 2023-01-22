@@ -58,3 +58,7 @@ export function includePhase(phases: number, phase: Phase) {
 export function toString(phase: Phase): string {
     return Phase[phase];
 }
+
+export function isPhase(phase: unknown): phase is Phase {
+    return Number.isInteger(phase) && (phase as number) in Phase;
+}

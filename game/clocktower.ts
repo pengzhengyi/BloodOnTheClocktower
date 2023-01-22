@@ -5,10 +5,16 @@ import { Diary, Event, IDiary } from './diary';
 import { Chronology, IChronology } from './chronology';
 import type { IToll } from './toll';
 import type { Moment } from './moment';
+import {
+    GamePhaseNotification,
+    IGamePhaseNotification,
+} from './event-notification/notification/game-phase';
+import { GamePhaseEvent } from './event-notification/event/game-phase';
 
 export interface IClocktower {
     readonly gamePhase: IGamePhase;
     readonly today: IDiary;
+    readonly notification: IGamePhaseNotification;
 
     record(event: Event): IToll<Event>;
     recall(dateIndex: number): IDiary;
@@ -32,6 +38,8 @@ export interface IClocktower {
 export class Clocktower implements IClocktower {
     readonly gamePhase: IGamePhase;
 
+    readonly notification: IGamePhaseNotification;
+
     get today(): IDiary {
         return this.diaries[this.dateIndex];
     }
@@ -46,6 +54,7 @@ export class Clocktower implements IClocktower {
 
     constructor() {
         this.gamePhase = GamePhase.setup();
+        this.notification = new GamePhaseNotification();
         this.prepareForFirstDate();
     }
 
@@ -90,6 +99,8 @@ export class Clocktower implements IClocktower {
             return false;
         }
 
+        await this.notifyPhaseUpdate();
+
         if (this.dateIndex > currentDate) {
             this.prepareForNewDate();
         }
@@ -106,5 +117,10 @@ export class Clocktower implements IClocktower {
 
     protected prepareForNewDate() {
         this.diaries[this.dateIndex] = new Diary();
+    }
+
+    protected async notifyPhaseUpdate() {
+        const event = new GamePhaseEvent(this.gamePhase);
+        return await this.notification.notify(event);
     }
 }

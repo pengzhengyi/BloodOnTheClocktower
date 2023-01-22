@@ -8,9 +8,9 @@ import {
     SetupPhaseCategory,
 } from '../event-category/game-phase';
 import type { IGamePhaseEvent } from '../event/game-phase';
-import type { IEvent } from '../types';
+import type { IEvent, INotification, ISubscriber } from '../types';
 import { AbstractNotification } from './common';
-import type { Phase } from '~/game/phase';
+import { isPhase, Phase } from '~/game/phase';
 import { NightSheet } from '~/game/night-sheet';
 import { Generator } from '~/game/collections';
 
@@ -26,12 +26,24 @@ const CATEGORY_CLASSES = [
 type TCategoryClass = typeof CATEGORY_CLASSES[number];
 type TCategoryPhase = TCategoryClass['phase'];
 
+export interface IGamePhaseNotification
+    extends INotification<IGamePhaseCategory> {
+    subscribe<TEvent extends IEvent = IEvent>(
+        eventCategory: IGamePhaseCategory | TCategoryPhase,
+        subscriber: ISubscriber<TEvent>,
+        priority?: number
+    ): void;
+}
+
 /**
  * A notification system based on game phase. Game phase is categorized based on phase.
  *
  * For example, second day and fourth day have the same event category while second day and first night does not have.
  */
-export class GamePhaseNotification extends AbstractNotification {
+export class GamePhaseNotification
+    extends AbstractNotification
+    implements IGamePhaseNotification
+{
     defaultPriorityWhenNotProvided: number =
         NightSheet.DEFAULT_NOT_ACTING_PRIORITY + 1;
 
@@ -54,6 +66,22 @@ export class GamePhaseNotification extends AbstractNotification {
     // eslint-disable-next-line no-dupe-class-members
     static getEventCategory(phase: Phase): IGamePhaseCategory | undefined {
         return this.phaseToCategory.get(phase);
+    }
+
+    subscribe<TEvent extends IEvent = IEvent>(
+        gamePhaseCategory: IGamePhaseCategory | TCategoryPhase,
+        subscriber: ISubscriber<TEvent>,
+        priority?: number | undefined
+    ): void {
+        let eventCategory: IGamePhaseCategory;
+        if (isPhase(gamePhaseCategory)) {
+            eventCategory =
+                GamePhaseNotification.getEventCategory(gamePhaseCategory);
+        } else {
+            eventCategory = gamePhaseCategory as IGamePhaseCategory;
+        }
+
+        return super.subscribe(eventCategory, subscriber, priority);
     }
 
     protected getEventCategories(event: IEvent): Iterable<IGamePhaseCategory> {
