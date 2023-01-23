@@ -9,7 +9,7 @@ import {
     CompositeGamePhaseKind,
     GamePhaseKind,
 } from './game-phase-kind';
-import { Pipeline } from './middleware';
+import { IPipeline, Pipeline } from './proxy/pipeline';
 import type { Transform } from './types';
 
 abstract class AbstractGamePhaseBased<
@@ -72,10 +72,10 @@ class GamePhaseBased<V> extends AbstractGamePhaseBased<BasicGamePhaseKind, V> {
     }
 }
 
-export class Effects<TTarget extends object> extends Pipeline<
-    InteractionContext<TTarget>,
-    Effect<TTarget>
-> {
+export class Effects<TTarget extends object>
+    extends Pipeline<InteractionContext<TTarget>, Effect<TTarget>>
+    implements IPipeline<InteractionContext<TTarget>>
+{
     static gamePhase: GamePhase;
 
     static init<TTarget extends object>(enableForwarding = true) {

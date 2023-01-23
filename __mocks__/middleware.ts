@@ -1,6 +1,6 @@
-import { Middleware, NextFunction } from '~/game/middleware';
+import { IMiddleware, NextFunction } from '~/game/proxy/middleware';
 
-export class Operation<TContext> implements Middleware<TContext> {
+export class Operation<TContext> implements IMiddleware<TContext> {
     constructor(
         protected readonly operation: (context: TContext) => TContext,
         protected readonly isBefore: boolean

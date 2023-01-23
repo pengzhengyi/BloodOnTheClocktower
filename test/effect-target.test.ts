@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { Effect, InteractionContext } from '~/game/effect';
 import { EffectTarget } from '~/game/effect-target';
 import { CompositeGamePhaseKind } from '~/game/game-phase-kind';
-import type { NextFunction } from '~/game/middleware';
+import type { NextFunction } from '~/game/proxy/middleware';
 
 enum Role {
     User,

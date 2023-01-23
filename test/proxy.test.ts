@@ -1,4 +1,4 @@
-import { SelfProxy } from '~/game/proxy';
+import { SelfProxy } from '~/game/proxy/proxy';
 
 class TestProxy extends SelfProxy {
     readonly foo = 10;

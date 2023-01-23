@@ -5,7 +5,7 @@ import { Constructor, Predicate } from './types';
 import type { CharacterToken } from './character';
 import type { NightSheet } from './night-sheet';
 import type { DeadReason } from './dead-reason';
-import type { Middleware, NextFunction } from './middleware';
+import type { IMiddleware, NextFunction } from './proxy/middleware';
 import type { IPlayer } from './player';
 import { Environment } from '~/interaction/environment';
 
@@ -28,7 +28,7 @@ export interface InteractionContext<TTarget extends object> {
 }
 
 export interface Effect<TTarget extends object>
-    extends Middleware<InteractionContext<TTarget>> {
+    extends IMiddleware<InteractionContext<TTarget>> {
     /**
      * Determine whether the effect will trigger under a given context
      * @param context The context under which the interaction request might trigger the effect.

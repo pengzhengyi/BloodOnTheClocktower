@@ -1,4 +1,4 @@
-import { Pipeline } from '~/game/middleware';
+import { Pipeline } from '~/game/proxy/pipeline';
 import { Operation } from '~/__mocks__/middleware';
 
 describe('Test basic functionalities', () => {

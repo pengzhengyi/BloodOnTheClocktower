@@ -8,7 +8,7 @@ import {
     FortuneTellerInformationRequestContext,
     FortuneTellerInformationRequester,
 } from '../info/requester/fortuneteller';
-import type { NextFunction } from '../middleware';
+import type { NextFunction } from '../proxy/middleware';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
 import type { FortuneTellerPlayer } from '../types';

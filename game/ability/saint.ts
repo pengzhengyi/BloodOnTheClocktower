@@ -2,7 +2,7 @@ import { Effect, InteractionContext } from '../effect';
 import type { Execution } from '../execution';
 import type { Game } from '../game';
 import { BasicGamePhaseKind } from '../game-phase-kind';
-import type { NextFunction } from '../middleware';
+import type { NextFunction } from '../proxy/middleware';
 import type { SaintPlayer, RequireGame, RequireExecution } from '../types';
 import {
     AbilitySetupContext,
