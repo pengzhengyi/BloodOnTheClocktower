@@ -6,7 +6,7 @@ import { Alignment } from './alignment';
 import type { CharacterToken } from './character';
 import { DeadReason } from './dead-reason';
 import { Death } from './death';
-import { EffectTarget, IEffectTarget } from './effect-target';
+import { EffectTarget, IEffectTarget } from './effect/effect-target';
 import { Nomination } from './nomination';
 import { PlayerState } from './player-state';
 

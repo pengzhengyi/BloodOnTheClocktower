@@ -1,4 +1,4 @@
-import { CharacterNightEffect, SafeFromDemonEffect } from '../effect';
+import { CharacterNightEffect, SafeFromDemonEffect } from '../effect/effect';
 import { MonkNotChoosePlayerToProtect } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { CharacterToken } from '../character';

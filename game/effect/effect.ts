@@ -1,12 +1,12 @@
-import { Alignment } from './alignment';
-import { CharacterEffectOriginNotSetup } from './exception';
-import { BasicGamePhaseKind, GamePhaseKind } from './game-phase-kind';
-import { Constructor, Predicate } from './types';
-import type { CharacterToken } from './character';
-import type { NightSheet } from './night-sheet';
-import type { DeadReason } from './dead-reason';
-import type { IMiddleware, NextFunction } from './proxy/middleware';
-import type { IPlayer } from './player';
+import { Alignment } from '../alignment';
+import { CharacterEffectOriginNotSetup } from '../exception';
+import { BasicGamePhaseKind, GamePhaseKind } from '../game-phase-kind';
+import { Constructor, Predicate } from '../types';
+import type { CharacterToken } from '../character';
+import type { NightSheet } from '../night-sheet';
+import type { DeadReason } from '../dead-reason';
+import type { IMiddleware, NextFunction } from '../proxy/middleware';
+import type { IPlayer } from '../player';
 import { Environment } from '~/interaction/environment';
 
 interface ProxyHandlerRequest<TTarget extends object> {

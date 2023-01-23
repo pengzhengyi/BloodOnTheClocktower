@@ -1,5 +1,5 @@
+import { GamePhaseKind } from '../game-phase-kind';
 import { Effect } from './effect';
-import { GamePhaseKind } from './game-phase-kind';
 
 export abstract class EffectPrecedence {
     /**

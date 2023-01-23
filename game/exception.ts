@@ -36,9 +36,9 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
-import type { Effect, TCharacterEffect } from './effect';
+import type { Effect, TCharacterEffect } from './effect/effect';
 import type { Alignment } from './alignment';
-import type { Effects } from './effects';
+import type { Effects } from './effect/effects';
 import type { Seating } from './seating';
 import { GamePhaseKind } from './game-phase-kind';
 import type {

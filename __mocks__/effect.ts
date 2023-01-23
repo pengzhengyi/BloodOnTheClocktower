@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue } from './common';
-import { Effect } from '~/game/effect';
+import { Effect } from '~/game/effect/effect';
 
 export function mockApplicableEffect<TTarget extends object>() {
     const effect = mock<Effect<TTarget>>();

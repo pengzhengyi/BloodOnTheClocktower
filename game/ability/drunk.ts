@@ -2,7 +2,7 @@ import type { CharacterToken, TownsfolkCharacterToken } from '../character';
 import type { CharacterSheet } from '../character-sheet';
 import { Generator } from '../collections';
 import { DrunkReason } from '../drunk-reason';
-import { ThinkAsCharacterEffect } from '../effect';
+import { ThinkAsCharacterEffect } from '../effect/effect';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { IPlayer } from '../player';
 import type { Players } from '../players';

@@ -1,5 +1,5 @@
 import { DeadReason } from '../dead-reason';
-import { Effect, InteractionContext } from '../effect';
+import { Effect, InteractionContext } from '../effect/effect';
 import type { Execution } from '../execution';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';

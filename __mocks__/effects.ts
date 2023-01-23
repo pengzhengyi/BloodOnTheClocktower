@@ -1,5 +1,5 @@
 import { createGamePhase, mockGamePhase } from './game-phase';
-import { Effects } from '~/game/effects';
+import { Effects } from '~/game/effect/effects';
 import type { GamePhase } from '~/game/game-phase';
 import { Action } from '~/game/types';
 

@@ -3,7 +3,7 @@ import { Alignment } from './alignment';
 import { IPlayer } from './player';
 import { Players } from './players';
 import { Edition } from './edition';
-import { EffectTarget } from './effect-target';
+import { EffectTarget } from './effect/effect-target';
 import { StoryTeller } from './storyteller';
 import { TownSquare } from './town-square';
 import type { IDiary } from './diary';

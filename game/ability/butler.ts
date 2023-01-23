@@ -1,4 +1,4 @@
-import { Effect, InteractionContext } from '../effect';
+import { Effect, InteractionContext } from '../effect/effect';
 import { ButlerNotChooseMasterToFollow } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';

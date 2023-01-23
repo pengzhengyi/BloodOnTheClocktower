@@ -1,4 +1,4 @@
-import { SafeFromDemonEffect, InteractionContext } from '../effect';
+import { SafeFromDemonEffect, InteractionContext } from '../effect/effect';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { SoldierPlayer } from '../types';
 import {

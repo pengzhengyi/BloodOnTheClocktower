@@ -1,5 +1,9 @@
 import type { CharacterToken } from '../character';
-import { CharacterNightEffect, Effect, InteractionContext } from '../effect';
+import {
+    CharacterNightEffect,
+    Effect,
+    InteractionContext,
+} from '../effect/effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 

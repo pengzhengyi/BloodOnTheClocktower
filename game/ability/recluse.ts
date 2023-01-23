@@ -5,7 +5,7 @@ import {
     RegisterAsGoodAlignmentEffect,
     InteractionContext,
     RegisterAsCharacterEffect,
-} from '../effect';
+} from '../effect/effect';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { ReclusePlayer } from '../types';
 import {

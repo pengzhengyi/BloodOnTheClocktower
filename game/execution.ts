@@ -2,7 +2,7 @@
 import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from './dead-reason';
-import { EffectTarget } from './effect-target';
+import { EffectTarget } from './effect/effect-target';
 import { Nomination } from './nomination';
 import { IPlayer, Player } from './player';
 import { Predicate } from './types';

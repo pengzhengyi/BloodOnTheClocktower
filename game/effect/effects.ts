@@ -1,16 +1,16 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
-import { Generator, LazyMap } from './collections';
-import { Effect, Forwarding, InteractionContext } from './effect';
-import { EffectsNotSetup } from './exception';
-import { GamePhase } from './game-phase';
+import { Generator, LazyMap } from '../collections';
+import { EffectsNotSetup } from '../exception';
+import { GamePhase } from '../game-phase';
 import {
     ALL_GAME_PHASE_KINDS,
     BasicGamePhaseKind,
     CompositeGamePhaseKind,
     GamePhaseKind,
-} from './game-phase-kind';
-import { IPipeline, Pipeline } from './proxy/pipeline';
-import type { Transform } from './types';
+} from '../game-phase-kind';
+import { IPipeline, Pipeline } from '../proxy/pipeline';
+import type { Transform } from '../types';
+import { Effect, Forwarding, InteractionContext } from './effect';
 
 abstract class AbstractGamePhaseBased<
     TGamePhaseKind,

@@ -1,6 +1,6 @@
 import { Alignment } from '../alignment';
 import { DeadReason } from '../dead-reason';
-import { Effect, InteractionContext } from '../effect';
+import { Effect, InteractionContext } from '../effect/effect';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { Game } from '../game';
 import type { NextFunction } from '../proxy/middleware';

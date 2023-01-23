@@ -1,4 +1,4 @@
-import { Effect, InteractionContext } from '../effect';
+import { Effect, InteractionContext } from '../effect/effect';
 import type { Execution } from '../execution';
 import type { Game } from '../game';
 import { BasicGamePhaseKind } from '../game-phase-kind';

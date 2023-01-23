@@ -9,7 +9,7 @@ import {
     Townsfolk,
 } from './character-type';
 import { Generator } from './collections';
-import type { InteractionInitiator } from './effect';
+import type { InteractionInitiator } from './effect/effect';
 import { IncorrectNumberOfCharactersToAssign } from './exception';
 import type { CharacterAssignmentResult, IPlayer } from './player';
 
