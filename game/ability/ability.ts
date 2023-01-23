@@ -112,7 +112,7 @@ export abstract class Ability<
     abstract createContext(...args: any[]): Promise<TAbilityUseContext>;
 
     isEligible(context: TAbilityUseContext): Promise<boolean> {
-        return Promise.resolve(context.requestedPlayer.alive);
+        return context.requestedPlayer.alive;
     }
 
     setup(_context: TAbilitySetupContext): Promise<void> {
@@ -160,8 +160,8 @@ export abstract class Ability<
         }
     }
 
-    willMalfunction(context: TAbilityUseContext): Promise<boolean> {
-        return Promise.resolve(!context.requestedPlayer.hasAbility);
+    async willMalfunction(context: TAbilityUseContext): Promise<boolean> {
+        return !(await context.requestedPlayer.hasAbility);
     }
 
     toString(): string {

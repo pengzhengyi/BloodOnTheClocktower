@@ -80,7 +80,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     ): Promise<TownsfolkCharacterToken> {
         const townsfolkOptions = characterSheet.townsfolk;
         const inPlayCharacters = players.map((player) =>
-            player.storytellerGet<CharacterToken>('_character')
+            player.storytellerGet('_character')
         );
         const options = Generator.exclude(townsfolkOptions, inPlayCharacters);
 

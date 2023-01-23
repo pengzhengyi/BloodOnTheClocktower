@@ -106,12 +106,16 @@ export class EmpathInformationProvider<
     ): Promise<number> {
         const aliveNeighbors = await context.seating.getAliveNeighbors(
             context.requestedPlayer,
-            (seat) => {
+            async (seat) => {
                 const player = shouldFromRequestedPlayerPerspective
                     ? seat.player?.from(context.requestedPlayer)
                     : seat.player;
 
-                return player?.alive ?? false;
+                if (player === undefined) {
+                    return false;
+                } else {
+                    return await player.alive;
+                }
             }
         );
 

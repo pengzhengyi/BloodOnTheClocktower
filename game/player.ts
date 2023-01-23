@@ -26,6 +26,7 @@ import {
 } from './exception';
 import type { Execution } from './execution';
 import { DrunkReason } from './drunk-reason';
+import { Generator } from './collections';
 import { Environment } from '~/interaction/environment';
 
 export interface CharacterAssignmentResult {
@@ -50,35 +51,41 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
      * {@link `glossary["Healthy"]`}
      * Not poisoned.
      */
-    readonly healthy: boolean;
-    readonly poisoned: boolean;
+    readonly healthy: Promise<boolean>;
+    /**
+     * {@link `glossary["Poisoned"]`}
+     *  A poisoned player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Poisoned players do not know they are poisoned. See Drunk.
+     */
+    readonly poisoned: Promise<boolean>;
     /**
      * {@link `glossary["Alive"]`}
      * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
      */
-    readonly alive: boolean;
+    readonly alive: Promise<boolean>;
     /**
      * {@link `glossary["Dead"]`}
      * A player that is not alive. Dead players may only vote once more during the game. When a player dies, their life token flips over, they gain a shroud in the Grimoire, they immediately lose their ability, and any persistent effects of their ability immediately end.
      */
-    readonly dead: boolean;
+    readonly dead: Promise<boolean>;
     /**
      * {@link `glossary["Sober"]`}
      * Not drunk.
      */
-    readonly sober: boolean;
+    readonly sober: Promise<boolean>;
     /**
      * {@link `glossary["Drunk"]`}
      *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
      */
-    readonly drunk: boolean;
-    readonly sane: boolean;
-    readonly mad: boolean;
+    readonly drunk: Promise<boolean>;
+    readonly sane: Promise<boolean>;
+    readonly mad: Promise<boolean>;
 
     readonly canNominate: Promise<boolean>;
     readonly canVote: Promise<boolean>;
     readonly canExile: Promise<boolean>;
-    readonly hasAbility: boolean;
+    readonly hasAbility: Promise<boolean>;
+    readonly willGetTrueInformation: Promise<boolean>;
+    readonly willGetFalseInformation: Promise<boolean>;
 
     /* character type */
     readonly isMinion: Promise<boolean>;
@@ -111,6 +118,18 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     ): Promise<Nomination | undefined>;
     collectVote(forExile: boolean): Promise<boolean>;
     revokeVoteToken(reason?: string): Promise<boolean>;
+
+    storytellerGet(key: '_isDemon'): boolean;
+    storytellerGet(key: '_character'): CharacterToken;
+    storytellerGet(key: '_alive'): boolean;
+    storytellerGet(key: '_dead'): boolean;
+    storytellerGet(key: '_healthy'): boolean;
+    storytellerGet(key: '_poisoned'): boolean;
+    storytellerGet(key: '_sober'): boolean;
+    storytellerGet(key: '_drunk'): boolean;
+    storytellerGet(key: '_hasAbility'): boolean;
+    storytellerGet(key: '_willGetTrueInformation'): boolean;
+    storytellerGet(key: '_willGetFalseInformation'): boolean;
 
     storytellerGet<
         V,
@@ -231,51 +250,104 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     protected hasVoteToken = true;
 
     get healthy() {
+        return Promise.resolve(this._healthy);
+    }
+
+    protected get _healthy() {
         return this.state.healthy;
     }
 
     get poisoned() {
+        return Promise.resolve(this._poisoned);
+    }
+
+    protected get _poisoned() {
         return this.state.poisoned;
     }
 
     get alive() {
+        return Promise.resolve(this._alive);
+    }
+
+    protected get _alive() {
         return this.state.alive;
     }
 
     get dead() {
-        return this.state.dead;
+        return Promise.resolve(this._dead);
+    }
+
+    protected get _dead() {
+        return Promise.resolve(this.state.dead);
     }
 
     get sober() {
+        return Promise.resolve(this._sober);
+    }
+
+    protected get _sober() {
         return this.state.sober;
     }
 
     get drunk() {
+        return Promise.resolve(this._drunk);
+    }
+
+    protected get _drunk() {
         return this.state.drunk;
     }
 
     get sane() {
-        return this.state.sane;
+        return Promise.resolve(this.state.sane);
     }
 
     get mad() {
-        return this.state.mad;
+        return Promise.resolve(this.state.mad);
     }
 
     get canNominate() {
-        return Promise.resolve(this.alive);
+        return this.alive;
     }
 
     get canVote(): Promise<boolean> {
-        return Promise.resolve(this.alive || this.hasVoteToken);
+        return this.alive.then((isAlive) => isAlive || this.hasVoteToken);
     }
 
     get canExile(): Promise<boolean> {
         return Promise.resolve(true);
     }
 
-    get hasAbility(): boolean {
-        return !this.dead && !this.drunk && !this.poisoned;
+    get hasAbility(): Promise<boolean> {
+        return Generator.everyAsync(
+            (state) => state,
+            Generator.promiseRaceAll([this.alive, this.sober, this.healthy])
+        );
+    }
+
+    protected get _hasAbility(): boolean {
+        return this._alive && this._sober && this._healthy;
+    }
+
+    get willGetTrueInformation(): Promise<boolean> {
+        return Generator.everyAsync(
+            (state) => state,
+            Generator.promiseRaceAll([this.sober, this.healthy])
+        );
+    }
+
+    protected get _willGetTrueInformation(): boolean {
+        return Generator.every((state) => state, [this._sober, this._healthy]);
+    }
+
+    get willGetFalseInformation(): Promise<boolean> {
+        return Generator.anyAsync(
+            (state) => state,
+            Generator.promiseRaceAll([this.drunk, this.poisoned])
+        );
+    }
+
+    protected get _willGetFalseInformation(): boolean {
+        return Generator.any((state) => state, [this._drunk, this._poisoned]);
     }
 
     get isMinion(): Promise<boolean> {
@@ -327,15 +399,20 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     get isTheDemon(): Promise<boolean> {
-        return this.isDemon.then((isDemon) => this.alive && isDemon);
+        return Generator.everyAsync(
+            (condition) => condition,
+            Generator.promiseRaceAll([this.alive, this.isDemon])
+        );
     }
 
     get isAliveNontraveller() {
-        if (!this.alive) {
-            return Promise.resolve(false);
-        }
-
-        return this.isTraveller.then((isTraveller) => !isTraveller);
+        const isNontraveller = this.isTraveller.then(
+            (isTraveller) => !isTraveller
+        );
+        return Generator.everyAsync(
+            (condition) => condition,
+            Generator.promiseRaceAll([this.alive, isNontraveller])
+        );
     }
 
     get characterType(): Promise<typeof CharacterType> {
@@ -422,7 +499,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     setDrunk(_reason: DrunkReason = DrunkReason.Other): Promise<boolean> {
         this.state.drunk = true;
-        return Promise.resolve(this.drunk);
+        return this.drunk;
     }
 
     async attack(victim: IPlayer): Promise<Death> {
@@ -455,7 +532,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
             shouldCheckHandRaised &&
             (await Environment.current.gameUI.hasRaisedHandForVote(this))
         ) {
-            if (this.dead) {
+            if (await this.dead) {
                 await this.revokeVoteToken(
                     Player.reasonForReclaimDeadPlayerVote
                 );

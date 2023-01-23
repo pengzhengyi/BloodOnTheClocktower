@@ -7,6 +7,7 @@ import type { NextFunction } from '../middleware';
 import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { MayorPlayer, RequireGame } from '../types';
+import { Generator } from '../collections';
 import {
     Ability,
     AbilitySetupContext,
@@ -31,7 +32,7 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
     isApplicable(context: InteractionContext<Game>): boolean {
         return (
             super.isApplicable(context) &&
-            this.mayorPlayer.hasAbility &&
+            this.mayorPlayer.storytellerGet('_hasAbility') &&
             this.isGetProperty(context, 'getWinningTeam')
         );
     }
@@ -48,7 +49,7 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         updatedContext.result = async (players: Iterable<IPlayer>) => {
             const winningTeam = await getWinningTeamMethod(players);
 
-            if (winningTeam === undefined && this.isPeacefulWin(game)) {
+            if (winningTeam === undefined && (await this.isPeacefulWin(game))) {
                 return Alignment.Good;
             }
 
@@ -57,8 +58,13 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         return updatedContext;
     }
 
-    protected isPeacefulWin(game: Game) {
-        return !game.hasExecution && game.alivePlayers.count() === 3;
+    protected async isPeacefulWin(game: Game) {
+        if (game.hasExecution) {
+            return false;
+        } else {
+            const numAlivePlayers = Generator.count(await game.alivePlayers);
+            return numAlivePlayers === 3;
+        }
     }
 }
 

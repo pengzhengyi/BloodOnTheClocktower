@@ -37,7 +37,7 @@ export class Game extends EffectTarget<Game> {
 
     declare edition: Edition;
 
-    get alivePlayers(): Players {
+    get alivePlayers() {
         return this.players.clone().alive;
     }
 

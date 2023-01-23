@@ -32,8 +32,6 @@ import {
     UndertakerInformationRequestContext,
 } from '~/game/info/requester/undertaker';
 import { WasherwomanInformationRequester } from '~/game/info/requester/washerwoman';
-import type { IPlayer } from '~/game/player';
-import { mockWithPropertyValues } from '~/__mocks__/common';
 import {
     mockContextForChefInformation,
     mockContextForDemonInformation,
@@ -48,6 +46,7 @@ import {
     mockContextForUndertakerInformation,
     mockContextForWasherwomanInformation,
 } from '~/__mocks__/information';
+import { mockPlayerWithState } from '~/__mocks__/player';
 
 describe('test DemonInformationRequester', () => {
     const requester = new DemonInformationRequester<
@@ -111,10 +110,11 @@ describe('test DemonInformationRequester', () => {
                 true,
                 true
             );
-            context.requestedPlayer = mockWithPropertyValues<
-                IPlayer,
-                [boolean, boolean]
-            >(['drunk', 'poisoned'], [true, false]);
+            context.requestedPlayer = mockPlayerWithState(
+                undefined,
+                undefined,
+                false
+            );
             expect(await requester.willGetTrueInformation(context)).toBeFalse();
         }
     );
@@ -129,10 +129,7 @@ describe('test DemonInformationRequester', () => {
                 true,
                 true
             );
-            context.requestedPlayer = mockWithPropertyValues<
-                IPlayer,
-                [boolean, boolean]
-            >(['drunk', 'poisoned'], [false, false]);
+            context.requestedPlayer = mockPlayerWithState();
             expect(await requester.willGetTrueInformation(context)).toBeTrue();
         }
     );
@@ -200,10 +197,11 @@ describe('test MinionInformationRequester', () => {
                 true,
                 true
             );
-            context.requestedPlayer = mockWithPropertyValues<
-                IPlayer,
-                [boolean, boolean]
-            >(['drunk', 'poisoned'], [true, false]);
+            context.requestedPlayer = mockPlayerWithState(
+                undefined,
+                undefined,
+                false
+            );
             expect(await requester.willGetTrueInformation(context)).toBeFalse();
         }
     );
@@ -218,10 +216,7 @@ describe('test MinionInformationRequester', () => {
                 true,
                 true
             );
-            context.requestedPlayer = mockWithPropertyValues<
-                IPlayer,
-                [boolean, boolean]
-            >(['drunk', 'poisoned'], [false, false]);
+            context.requestedPlayer = mockPlayerWithState();
             expect(await requester.willGetTrueInformation(context)).toBeTrue();
         }
     );
@@ -289,10 +284,11 @@ describe('test TravellerInformationRequester', () => {
                 true,
                 true
             );
-            context.requestedPlayer = mockWithPropertyValues<
-                IPlayer,
-                [boolean, boolean]
-            >(['drunk', 'poisoned'], [true, false]);
+            context.requestedPlayer = mockPlayerWithState(
+                undefined,
+                undefined,
+                false
+            );
             expect(await requester.willGetTrueInformation(context)).toBeFalse();
         }
     );
@@ -307,10 +303,7 @@ describe('test TravellerInformationRequester', () => {
                 true,
                 true
             );
-            context.requestedPlayer = mockWithPropertyValues<
-                IPlayer,
-                [boolean, boolean]
-            >(['drunk', 'poisoned'], [false, false]);
+            context.requestedPlayer = mockPlayerWithState();
             expect(await requester.willGetTrueInformation(context)).toBeTrue();
         }
     );

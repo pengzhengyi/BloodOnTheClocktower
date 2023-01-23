@@ -78,7 +78,7 @@ export class Players extends Generator<IPlayer> {
     }
 
     get alive() {
-        return this.filter((player) => player.alive);
+        return this.filterAllAsync((player) => player.alive);
     }
 
     constructor(players: Array<IPlayer>) {

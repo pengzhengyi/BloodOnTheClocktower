@@ -117,7 +117,7 @@ export function IsAlive<
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsAlive extends InfoRequesterClass {
         async isEligible(context: InfoProvideContext): Promise<boolean> {
-            if (context.requestedPlayer.alive) {
+            if (await context.requestedPlayer.alive) {
                 return await super.isEligible(context);
             }
             return false;

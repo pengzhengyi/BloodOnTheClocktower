@@ -4,7 +4,6 @@ import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
-import type { CharacterToken } from '~/game/character';
 import { Minion, Outsider, Townsfolk } from '~/game/character-type';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Chef } from '~/content/characters/output/chef';
@@ -197,7 +196,7 @@ describe('test DemonInformationProvider and MinionInformationProvider', () => {
             expect(option.isTrueInfo).toBeTrue();
             expect(
                 option.info.minions.map((player) =>
-                    player.storytellerGet<CharacterToken>('_character')
+                    player.storytellerGet('_character')
                 )
             ).toIncludeSameMembers([Poisoner]);
             expect(option.info.notInPlayGoodCharacters).toHaveLength(3);

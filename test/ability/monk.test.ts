@@ -92,8 +92,8 @@ describe('test MonkProtectAbility', () => {
         const _result = await monkProtectPlayer(ability, context, mayorPlayer);
 
         await expectAfterDemonAttack(mayorPlayer, impPlayer, false);
-        expect(monkPlayer.alive).toBeTrue();
-        expect(impPlayer.alive).toBeTrue();
+        expect(await monkPlayer.alive).toBeTrue();
+        expect(await impPlayer.alive).toBeTrue();
     });
 
     /**

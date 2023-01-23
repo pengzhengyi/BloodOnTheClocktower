@@ -154,8 +154,10 @@ export abstract class Effect<TTarget extends object> {
         return predicate(context.interaction.target);
     }
 
-    protected isTargetHasAbility(context: InteractionContext<IPlayer>) {
-        return context.interaction.target.hasAbility;
+    protected isTargetHasAbility(
+        context: InteractionContext<IPlayer>
+    ): boolean {
+        return context.interaction.target.storytellerGet('_hasAbility');
     }
 
     protected matchNotNullInitiator<T = InteractionInitiator>(

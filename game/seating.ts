@@ -3,7 +3,7 @@ import { clockwise, counterclockwise, shuffle } from './common';
 import type { IPlayer } from './player';
 import { Players } from './players';
 import { Seat, SitResult } from './seat';
-import { Direction, Predicate, TAUTOLOGY } from './types';
+import { AnyPredicate, Direction, Predicate, TAUTOLOGY } from './types';
 import {
     AccessInvalidSeatPosition,
     NumberOfSeatNotPositive,
@@ -105,6 +105,15 @@ export class Seating {
         return new this(seats);
     }
 
+    protected static async isSeatPlayerAlive(seat: Seat): Promise<boolean> {
+        const player = seat.player;
+        if (player === undefined) {
+            return false;
+        } else {
+            return await player.alive;
+        }
+    }
+
     protected static async createSeats(numSeats: number): Promise<Array<Seat>> {
         numSeats = await this.validateNumSeats(numSeats);
 
@@ -185,15 +194,12 @@ export class Seating {
             Direction.Clockwise
         );
 
-        for (const seat of Generator.push(
-            clockwiseSeats,
-            this.seats[nominatedPosition]
-        )) {
-            await new UnexpectedEmptySeat(this, seat).throwWhen(
-                (error) => error.emptySeat.player === undefined
-            );
+        for await (const seat of clockwiseSeats) {
             yield seat.player!;
         }
+
+        const nominated = this.seats[nominatedPosition].player as IPlayer;
+        yield nominated;
     }
 
     /**
@@ -202,10 +208,10 @@ export class Seating {
      * @param condition A condition that needs to be satisfied for a seat to be considered qualified.
      * @returns A seat satisfying the condition and its distance from start seat position. Neighboring seats have a distance of 1.
      */
-    getNearestSeat(
+    async getNearestSeat(
         seatPosition: number,
         condition: Predicate<Seat>
-    ): [Seat, number] | undefined {
+    ): Promise<[Seat, number] | undefined> {
         const clockwiseIterator = this.iterateSeatsExcludingStart(
             seatPosition,
             Direction.Clockwise,
@@ -226,7 +232,7 @@ export class Seating {
 
         while (true) {
             ({ done: isClockwiseIterated, value: clockwiseSeat } =
-                clockwiseIterator.next());
+                await clockwiseIterator.next());
             if (isClockwiseIterated) {
                 return undefined;
             }
@@ -240,7 +246,7 @@ export class Seating {
             }
 
             ({ done: isCounterclockwiseIterated, value: counterclockwiseSeat } =
-                counterclockwiseIterator.next());
+                await counterclockwiseIterator.next());
             if (isCounterclockwiseIterated) {
                 return undefined;
             }
@@ -284,7 +290,7 @@ export class Seating {
      */
     async getNeighbors(
         player: IPlayer,
-        predicate?: Predicate<Seat>
+        predicate?: AnyPredicate<Seat>
     ): Promise<[IPlayer, IPlayer]> {
         const seat = this.getSeatByPlayer(player);
 
@@ -306,7 +312,7 @@ export class Seating {
      */
     async getAliveNeighbors(
         player: IPlayer,
-        isAlive: Predicate<Seat> = (seat) => seat.player?.alive ?? false
+        isAlive: AnyPredicate<Seat> = Seating.isSeatPlayerAlive
     ): Promise<[IPlayer, IPlayer]> {
         return await this.getNeighbors(player, isAlive);
     }
@@ -487,11 +493,11 @@ export class Seating {
         return false;
     }
 
-    protected *iterateSeatsExcludingStart(
+    protected async *iterateSeatsExcludingStart(
         startSeatPosition: number,
         direction: Direction,
-        filterSeat: Predicate<Seat> = TAUTOLOGY
-    ): IterableIterator<Seat> {
+        filterSeat: AnyPredicate<Seat> = TAUTOLOGY
+    ): AsyncGenerator<Seat> {
         if (startSeatPosition < 0 || startSeatPosition >= this.numSeats) {
             return;
         }
@@ -503,7 +509,7 @@ export class Seating {
         for (const neighborSeat of iterate(this.seats, startSeatPosition)) {
             if (isFirst) {
                 isFirst = false;
-            } else if (filterSeat(neighborSeat)) {
+            } else if (await filterSeat(neighborSeat)) {
                 yield neighborSeat;
             }
         }
@@ -516,23 +522,23 @@ export class Seating {
         );
     }
 
-    protected tryGetNextSeat(
+    protected async tryGetNextSeat(
         seatPosition: number,
-        filterSeat?: Predicate<Seat>
-    ): Seat | undefined {
+        filterSeat?: AnyPredicate<Seat>
+    ): Promise<Seat | undefined> {
         const neighbors = this.iterateSeatsExcludingStart(
             seatPosition,
             Direction.Clockwise,
             filterSeat
         );
-        return neighbors.next().value;
+        return (await neighbors.next()).value;
     }
 
     protected async getClockwisePlayer(
         seatPosition: number,
-        filterSeat?: Predicate<Seat>
+        filterSeat?: AnyPredicate<Seat>
     ): Promise<IPlayer | undefined> {
-        const nextSeat = this.tryGetNextSeat(seatPosition, filterSeat);
+        const nextSeat = await this.tryGetNextSeat(seatPosition, filterSeat);
 
         if (nextSeat !== undefined) {
             await new UnexpectedEmptySeat(this, nextSeat).throwWhen(
@@ -543,23 +549,23 @@ export class Seating {
         return nextSeat?.player;
     }
 
-    protected tryGetPrevSeat(
+    protected async tryGetPrevSeat(
         seatPosition: number,
-        filterSeat?: Predicate<Seat>
-    ): Seat | undefined {
+        filterSeat?: AnyPredicate<Seat>
+    ): Promise<Seat | undefined> {
         const neighbors = this.iterateSeatsExcludingStart(
             seatPosition,
             Direction.Counterclockwise,
             filterSeat
         );
-        return neighbors.next().value;
+        return (await neighbors.next()).value;
     }
 
     protected async getCounterclockwisePlayer(
         seatPosition: number,
-        filterSeat?: Predicate<Seat>
+        filterSeat?: AnyPredicate<Seat>
     ): Promise<IPlayer | undefined> {
-        const prevSeat = this.tryGetPrevSeat(seatPosition, filterSeat);
+        const prevSeat = await this.tryGetPrevSeat(seatPosition, filterSeat);
 
         if (prevSeat !== undefined) {
             await new UnexpectedEmptySeat(this, prevSeat).throwWhen(

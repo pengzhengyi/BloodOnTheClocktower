@@ -124,16 +124,16 @@ export async function expectAfterDemonAttack(
     demonPlayer: IPlayer,
     expectToBeDead = true
 ): Promise<Death> {
-    expect(playerToKill.alive).toBeTrue();
+    expect(await playerToKill.alive).toBeTrue();
     const death = await playerToKill
         .from(demonPlayer)
         .setDead(DeadReason.DemonAttack);
 
     if (expectToBeDead) {
-        expect(playerToKill.dead).toBeTrue();
+        expect(await playerToKill.dead).toBeTrue();
         expect(death).toBeDefined();
     } else {
-        expect(playerToKill.alive).toBeTrue();
+        expect(await playerToKill.alive).toBeTrue();
         expect(death).toBeUndefined();
     }
 
@@ -190,16 +190,16 @@ export async function expectDieInsteadAfterDemonAttack(
     demonPlayer: IPlayer,
     playerDieInstead: IPlayer
 ): Promise<Death> {
-    expect(mayorPlayer.alive).toBeTrue();
+    expect(await mayorPlayer.alive).toBeTrue();
     storytellerChooseOneMock.mockResolvedValue(playerDieInstead);
     const death = await mayorPlayer
         .from(demonPlayer)
         .setDead(DeadReason.DemonAttack);
-    expect(mayorPlayer.alive).toBeTrue();
+    expect(await mayorPlayer.alive).toBeTrue();
     storytellerChooseOneMock.mockReset();
     expect(death).toBeDefined();
     expect(death.isFor(playerDieInstead)).toBeTrue();
-    expect(playerDieInstead.dead).toBeTrue();
+    expect(await playerDieInstead.dead).toBeTrue();
 
     return death;
 }
@@ -227,10 +227,10 @@ export async function expectAfterSlayerKill(
         expect(result.status).toEqual(
             AbilityUseStatus.Success | AbilityUseStatus.HasEffect
         );
-        expect(chosenPlayer.dead).toBeTrue();
+        expect(await chosenPlayer.dead).toBeTrue();
     } else {
         expect(result.death).toBeUndefined();
-        expect(chosenPlayer.dead).toBeFalse();
+        expect(await chosenPlayer.dead).toBeFalse();
     }
 
     expect(result.chosenPlayer).toBe(chosenPlayer);

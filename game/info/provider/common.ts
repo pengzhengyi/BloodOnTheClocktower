@@ -80,9 +80,11 @@ export abstract class OneOfTwoPlayersHasCharacterTypeInformationProvider<
         if (
             await Generator.anyAsync(
                 (characterType) => characterType.is(this.expectedCharacterType),
-                Generator.toPromise(
-                    (player) => player.characterType,
-                    information.players
+                Generator.promiseRaceAll(
+                    Generator.toPromise(
+                        (player) => player.characterType,
+                        information.players
+                    )
                 )
             )
         ) {

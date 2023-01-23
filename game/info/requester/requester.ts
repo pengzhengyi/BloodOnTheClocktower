@@ -67,9 +67,7 @@ export class InformationRequester<
     implements IInformationRequester<TInformation, TInformationRequestContext>
 {
     willGetTrueInformation(context: InfoProvideContext): Promise<boolean> {
-        return Promise.resolve(
-            !context.requestedPlayer.drunk && !context.requestedPlayer.poisoned
-        );
+        return context.requestedPlayer.willGetTrueInformation;
     }
 
     createContext(..._args: any[]): Promise<TInformationRequestContext> {

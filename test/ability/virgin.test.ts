@@ -45,10 +45,10 @@ async function expectAfterNominateVirgin(
     }
 
     if (expectDead) {
-        expect(nominator.dead).toBeTrue();
+        expect(await nominator.dead).toBeTrue();
         storytellerConfirmMock.mockReset();
     } else {
-        expect(nominator.dead).toBeFalse();
+        expect(await nominator.dead).toBeFalse();
     }
 
     if (expectHasAbility) {
@@ -83,7 +83,7 @@ describe('test VirginAbility', () => {
         const washerwomanPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Washerwoman`
         );
-        expect(washerwomanPlayer.alive).toBeTrue();
+        expect(await washerwomanPlayer.alive).toBeTrue();
 
         await expectAfterNominateVirgin(washerwomanPlayer, virginPlayer);
     });
@@ -96,7 +96,7 @@ describe('test VirginAbility', () => {
             `${faker.name.firstName()} is the Drunk`
         );
 
-        expect(drunkPlayer.alive).toBeTrue();
+        expect(await drunkPlayer.alive).toBeTrue();
 
         await expectAfterNominateVirgin(
             drunkPlayer,
@@ -116,7 +116,7 @@ describe('test VirginAbility', () => {
             `${faker.name.firstName()} is the Librarian`
         );
         await librarianPlayer.setDead(DeadReason.DemonAttack);
-        expect(librarianPlayer.dead).toBeTrue();
+        expect(await librarianPlayer.dead).toBeTrue();
 
         handleMock.mockImplementation((error) => {
             expect(error).toBeInstanceOf(DeadPlayerCannotNominate);

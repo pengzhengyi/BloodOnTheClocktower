@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { mock } from 'jest-mock-extended';
 import { randomCharacter } from './character';
-import { mockWithPropertyValue } from './common';
+import { mockWithPropertyValue, mockWithPropertyValues } from './common';
 import { storytellerConfirmMock } from './game-ui';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
@@ -57,6 +57,61 @@ export function mockAlivePlayer(): IPlayer {
 
 export function mockDeadPlayer(): IPlayer {
     return mockWithPropertyValue('alive', false);
+}
+
+export function mockPlayerWithState(
+    isHealthy = true,
+    isAlive = true,
+    isSober = true,
+    isSane = true
+): IPlayer {
+    const willGetTrueInformation = isSober && isHealthy;
+    const willGetFalseInformation = !willGetTrueInformation;
+    const hasAbility = isSober && isAlive && isHealthy;
+
+    return mockWithPropertyValues<
+        IPlayer,
+        [
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>,
+            Promise<boolean>
+        ]
+    >(
+        [
+            'healthy',
+            'poisoned',
+            'alive',
+            'dead',
+            'sober',
+            'drunk',
+            'sane',
+            'mad',
+            'willGetTrueInformation',
+            'willGetFalseInformation',
+            'hasAbility',
+        ],
+        [
+            Promise.resolve(isHealthy),
+            Promise.resolve(!isHealthy),
+            Promise.resolve(isAlive),
+            Promise.resolve(!isAlive),
+            Promise.resolve(isSober),
+            Promise.resolve(!isSober),
+            Promise.resolve(isSane),
+            Promise.resolve(!isSane),
+            Promise.resolve(willGetTrueInformation),
+            Promise.resolve(willGetFalseInformation),
+            Promise.resolve(hasAbility),
+        ]
+    );
 }
 
 export async function setPlayerDead(player: IPlayer): Promise<void> {

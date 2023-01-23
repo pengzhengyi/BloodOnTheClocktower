@@ -148,7 +148,7 @@ describe('Test basic functionalities', () => {
         await execution.setPlayerAboutToDie(10 - 3);
         expect(execution.toExecute).toEqual(players[7]);
         expect(await execution.execute()).toBeDefined();
-        expect(players[7].dead).toBeDefined();
+        expect(await players[7].dead).toBeDefined();
     });
 });
 
