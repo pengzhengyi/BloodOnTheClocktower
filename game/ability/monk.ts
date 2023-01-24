@@ -1,10 +1,11 @@
-import { CharacterNightEffect, SafeFromDemonEffect } from '../effect/effect';
 import { MonkNotChoosePlayerToProtect } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { CharacterToken } from '../character';
 import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { MonkPlayer } from '../types';
+import { SafeFromDemonEffect } from '../effect/safe-from-demon';
+import { CharacterNightEffect } from '../effect/character';
 import {
     Ability,
     AbilitySetupContext,

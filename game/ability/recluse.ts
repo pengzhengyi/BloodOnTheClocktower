@@ -1,11 +1,11 @@
 import type { CharacterToken } from '../character';
 import type { CharacterSheet } from '../character-sheet';
 import { CachingGenerator, Generator } from '../collections';
+import type { InteractionContext } from '../effect/effect';
 import {
-    RegisterAsGoodAlignmentEffect,
-    InteractionContext,
     RegisterAsCharacterEffect,
-} from '../effect/effect';
+    RegisterAsEvilAlignmentEffect,
+} from '../effect/register-as';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { ReclusePlayer } from '../types';
 import {
@@ -17,7 +17,7 @@ import {
 } from './ability';
 import { AbilityUseStatus } from './status';
 
-class RecluseRegisterAsEvilAlignmentEffect extends RegisterAsGoodAlignmentEffect<ReclusePlayer> {
+class RecluseRegisterAsEvilAlignmentEffect extends RegisterAsEvilAlignmentEffect<ReclusePlayer> {
     protected formatPromptForChoose(
         context: InteractionContext<ReclusePlayer>
     ): string {

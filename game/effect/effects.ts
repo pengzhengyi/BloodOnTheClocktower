@@ -10,7 +10,8 @@ import {
 } from '../game-phase-kind';
 import { IPipeline, Pipeline } from '../proxy/pipeline';
 import type { Transform } from '../types';
-import { IEffect, Forwarding, InteractionContext } from './effect';
+import type { IEffect, InteractionContext } from './effect';
+import { Forwarding } from './forwarding';
 
 abstract class AbstractGamePhaseBased<
     TGamePhaseKind,

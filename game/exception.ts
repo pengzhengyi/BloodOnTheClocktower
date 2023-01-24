@@ -36,7 +36,7 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
-import type { IEffect, TCharacterEffect } from './effect/effect';
+import type { IEffect } from './effect/effect';
 import type { Alignment } from './alignment';
 import type { Effects } from './effect/effects';
 import type { Seating } from './seating';
@@ -51,6 +51,7 @@ import type {
 import type { InfoRequestContext } from './info/requester/requester';
 import type { InfoProviderLoader } from './info/provider/loader';
 import type { IDiary, Event as ClocktowerEvent } from './diary';
+import type { TCharacterEffect } from './effect/character';
 import { Environment } from '~/interaction/environment';
 
 export class BaseError extends Error {

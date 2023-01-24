@@ -1,9 +1,5 @@
 import type { CharacterToken } from '../character';
-import {
-    CharacterNightEffect,
-    Effect,
-    InteractionContext,
-} from '../effect/effect';
+import { Effect, InteractionContext } from '../effect/effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 
@@ -16,6 +12,7 @@ import type { NextFunction } from '../proxy/middleware';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
 import type { FortuneTellerPlayer } from '../types';
+import { CharacterNightEffect } from '../effect/character';
 import {
     AbilitySetupContext,
     GetCharacterInformationAbility,
