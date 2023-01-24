@@ -73,27 +73,29 @@ class GamePhaseBased<V> extends AbstractGamePhaseBased<BasicGamePhaseKind, V> {
     }
 }
 
+export interface IEffects<TTarget extends object, TGetPriorityContext = any>
+    extends IPipeline<InteractionContext<TTarget>>,
+        Iterable<IEffect<TTarget, TGetPriorityContext>> {
+    readonly size: number;
+
+    add(
+        effect: IEffect<TTarget, TGetPriorityContext>,
+        priorityContext: TGetPriorityContext
+    ): void;
+
+    has(effect: IEffect<TTarget, TGetPriorityContext>): boolean;
+
+    delete(effect: IEffect<TTarget, TGetPriorityContext>): boolean;
+}
+
 export class Effects<TTarget extends object>
     extends Pipeline<
         InteractionContext<TTarget>,
         IEffect<TTarget, BasicGamePhaseKind>
     >
-    implements IPipeline<InteractionContext<TTarget>>
+    implements IEffects<TTarget, BasicGamePhaseKind>
 {
     static gamePhase: GamePhase;
-
-    static init<TTarget extends object>(enableForwarding = true) {
-        const effects = new this<TTarget>();
-
-        if (enableForwarding) {
-            effects.add(
-                Forwarding.instance<TTarget>(),
-                CompositeGamePhaseKind.ALL
-            );
-        }
-
-        return effects;
-    }
 
     get size(): number {
         return this.effectToPriority.size;
@@ -118,7 +120,7 @@ export class Effects<TTarget extends object>
         return gamePhase;
     }
 
-    protected constructor() {
+    constructor(enableForwarding = true) {
         super([]);
         this.effectToPriority = new Map();
         this.hierarchy = new GamePhaseBased(
@@ -128,6 +130,10 @@ export class Effects<TTarget extends object>
                     (priority, otherPriority) => otherPriority - priority
                 )
         );
+
+        if (enableForwarding) {
+            this.addForwardingFallback();
+        }
     }
 
     *[Symbol.iterator]() {
@@ -248,5 +254,9 @@ export class Effects<TTarget extends object>
         gamePhaseKind: BasicGamePhaseKind
     ) {
         return effect.getPriority(gamePhaseKind);
+    }
+
+    protected addForwardingFallback() {
+        this.add(Forwarding.instance<TTarget>(), CompositeGamePhaseKind.ALL);
     }
 }

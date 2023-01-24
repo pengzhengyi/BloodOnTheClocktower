@@ -1,6 +1,6 @@
 import { SelfProxy } from '../proxy/proxy';
 import type { InteractionContext, InteractionInitiator } from './effect';
-import { Effects } from './effects';
+import { Effects, IEffects } from './effects';
 
 /**
  * IEffectTarget represents a proxy that intercept operations declared by `enabledProxyHandlerPropertyNames`. For example, if `get` is one of enabled proxy handler, then attempts to access properties in the target will be intercepted.
@@ -8,7 +8,7 @@ import { Effects } from './effects';
  * Then IEffectTarget will use effects which is a series of middlewares to optionally redefine the operation behavior. For example, `EffectTarget` will redefine behavior using applicable effects.
  */
 export interface IEffectTarget<TTarget extends object> extends SelfProxy {
-    readonly effects: Effects<TTarget>;
+    readonly effects: IEffects<TTarget>;
 
     /**
      * Handler names for which operations will be intercepted.
@@ -38,13 +38,13 @@ export abstract class EffectTarget<TTarget extends object>
         return this._enabledProxyHandlerPropertyNames;
     }
 
-    declare effects: Effects<TTarget>;
+    declare effects: IEffects<TTarget>;
 
     protected _enabledProxyHandlerPropertyNames?: Array<
         keyof ProxyHandler<TTarget>
     >;
 
-    protected get _pipeline(): Effects<TTarget> {
+    protected get _pipeline(): IEffects<TTarget> {
         return this.effects;
     }
 
@@ -101,7 +101,7 @@ export abstract class EffectTarget<TTarget extends object>
     }
 
     protected initializeEffects() {
-        this.effects = Effects.init();
+        this.effects = new Effects();
     }
 
     protected defineDefaultProxyHandlers() {

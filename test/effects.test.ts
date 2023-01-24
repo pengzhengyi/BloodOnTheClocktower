@@ -10,7 +10,7 @@ import { createBasicPlayer, mockPlayer } from '~/__mocks__/player';
 function createBasicEffects<TTarget extends object>(
     enableForwarding?: boolean
 ) {
-    return Effects.init<TTarget>(enableForwarding);
+    return new Effects<TTarget>(enableForwarding);
 }
 
 function createEffects<TTarget extends object>(

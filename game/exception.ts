@@ -38,7 +38,7 @@ import {
 } from './character-type';
 import type { IEffect } from './effect/effect';
 import type { Alignment } from './alignment';
-import type { Effects } from './effect/effects';
+import type { IEffects } from './effect/effects';
 import type { Seating } from './seating';
 import { GamePhaseKind } from './game-phase-kind';
 import type {
@@ -752,12 +752,13 @@ export class CannotGetEffectPriority<
 }
 
 export class EffectsNotSetup<
-    TTarget extends object
+    TTarget extends object,
+    TGetPriorityContext = any
 > extends RecoverableGameError {
     static description =
         'Effects has not setup game phase based priority ordering';
 
-    constructor(readonly effects: Effects<TTarget>) {
+    constructor(readonly effects: IEffects<TTarget, TGetPriorityContext>) {
         super(EffectsNotSetup.description);
     }
 }
