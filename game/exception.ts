@@ -36,7 +36,7 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
-import type { Effect, TCharacterEffect } from './effect/effect';
+import type { IEffect, TCharacterEffect } from './effect/effect';
 import type { Alignment } from './alignment';
 import type { Effects } from './effect/effects';
 import type { Seating } from './seating';
@@ -743,7 +743,7 @@ export class CannotGetEffectPriority<
         'Cannot get priority of an effect for specified game phase';
 
     constructor(
-        readonly effect: Effect<T>,
+        readonly effect: IEffect<T>,
         readonly gamePhaseKind: GamePhaseKind
     ) {
         super(CannotGetEffectPriority.description);

@@ -27,8 +27,14 @@ export interface InteractionContext<TTarget extends object> {
     initiator?: InteractionInitiator;
 }
 
-export interface Effect<TTarget extends object>
+export interface IEffect<TTarget extends object, TGetPriorityContext = any>
     extends IMiddleware<InteractionContext<TTarget>> {
+    readonly active: boolean;
+
+    deactivate(reason?: string): Promise<boolean>;
+
+    reactivate(reason?: string): Promise<boolean>;
+
     /**
      * Determine whether the effect will trigger under a given context
      * @param context The context under which the interaction request might trigger the effect.
@@ -36,19 +42,23 @@ export interface Effect<TTarget extends object>
     isApplicable(context: InteractionContext<TTarget>): boolean;
 
     /**
-     * Get the priority of an effect for a given game phase.
+     * Get the priority of an effect for a given context.
      *
      * For example, priority might differ for first night, during the day, and other nights.
-     * @param gamePhaseKind A category of game phase.
-     * @returns The priority of this effect in current game phase.
+     * @param forWhat The context for which to get priority of.
+     * @returns The priority of this effect for given context.
      */
-    getPriority(gamePhaseKind: GamePhaseKind): number;
+    getPriority(forWhat: TGetPriorityContext): number;
+
+    toString(): string;
 }
 
 /**
  * Effect is the influence resulting from player's character ability. Effect can impact either the state of the game or players.
  */
-export abstract class Effect<TTarget extends object> {
+export abstract class Effect<TTarget extends object>
+    implements IEffect<TTarget, BasicGamePhaseKind>
+{
     protected _active = true;
 
     get active(): boolean {
@@ -81,6 +91,13 @@ export abstract class Effect<TTarget extends object> {
         return false;
     }
 
+    /**
+     * Get the priority of an effect for a given game phase.
+     *
+     * For example, priority might differ for first night, during the day, and other nights.
+     * @param gamePhaseKind A category of game phase.
+     * @returns The priority of this effect in current game phase.
+     */
     getPriority(gamePhaseKind: BasicGamePhaseKind): number {
         switch (gamePhaseKind) {
             case BasicGamePhaseKind.FirstNight:

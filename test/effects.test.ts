@@ -1,4 +1,4 @@
-import type { Effect, InteractionContext } from '~/game/effect/effect';
+import type { IEffect, InteractionContext } from '~/game/effect/effect';
 import { Effects } from '~/game/effect/effects';
 import { CompositeGamePhaseKind } from '~/game/game-phase-kind';
 import {
@@ -14,7 +14,7 @@ function createBasicEffects<TTarget extends object>(
 }
 
 function createEffects<TTarget extends object>(
-    effectToPriority: Map<Effect<TTarget>, number>
+    effectToPriority: Map<IEffect<TTarget>, number>
 ): Effects<TTarget> {
     const effects: Effects<TTarget> = createBasicEffects(false);
 
@@ -50,7 +50,7 @@ describe('Test Effects basic functionalities', () => {
         const effect5 = mockApplicableEffect();
         const effect6 = mockApplicableEffect();
 
-        const effectToPriority = new Map<Effect<object>, number>([
+        const effectToPriority = new Map<IEffect<object>, number>([
             [effect1, 1],
             [effect2, 1],
             [effect3, 3],
@@ -83,7 +83,7 @@ describe('Test Effects basic functionalities', () => {
         const effect5 = mockInapplicableEffect();
         const effect6 = mockInapplicableEffect();
 
-        const effectToPriority = new Map<Effect<object>, number>([
+        const effectToPriority = new Map<IEffect<object>, number>([
             [effect1, 1],
             [effect2, 1],
             [effect3, 3],
@@ -113,7 +113,9 @@ describe('Test Effects edge cases', () => {
 
     test('apply when there is an effect with empty apply', async () => {
         const effect = mockApplicableEffect();
-        const effectToPriority = new Map<Effect<object>, number>([[effect, 1]]);
+        const effectToPriority = new Map<IEffect<object>, number>([
+            [effect, 1],
+        ]);
 
         const effects = createEffects(effectToPriority);
         const player = await createBasicPlayer();

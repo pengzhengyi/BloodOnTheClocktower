@@ -10,7 +10,7 @@ import {
 } from '../game-phase-kind';
 import { IPipeline, Pipeline } from '../proxy/pipeline';
 import type { Transform } from '../types';
-import { Effect, Forwarding, InteractionContext } from './effect';
+import { IEffect, Forwarding, InteractionContext } from './effect';
 
 abstract class AbstractGamePhaseBased<
     TGamePhaseKind,
@@ -73,7 +73,10 @@ class GamePhaseBased<V> extends AbstractGamePhaseBased<BasicGamePhaseKind, V> {
 }
 
 export class Effects<TTarget extends object>
-    extends Pipeline<InteractionContext<TTarget>, Effect<TTarget>>
+    extends Pipeline<
+        InteractionContext<TTarget>,
+        IEffect<TTarget, BasicGamePhaseKind>
+    >
     implements IPipeline<InteractionContext<TTarget>>
 {
     static gamePhase: GamePhase;
@@ -95,10 +98,13 @@ export class Effects<TTarget extends object>
         return this.effectToPriority.size;
     }
 
-    protected effectToPriority: Map<Effect<TTarget>, GamePhaseBased<number>>;
+    protected effectToPriority: Map<
+        IEffect<TTarget, BasicGamePhaseKind>,
+        GamePhaseBased<number>
+    >;
 
     protected hierarchy: GamePhaseBased<
-        OrderedMap<number, LinkList<Effect<TTarget>>>
+        OrderedMap<number, LinkList<IEffect<TTarget, BasicGamePhaseKind>>>
     >;
 
     protected get gamePhase(): GamePhase {
@@ -141,7 +147,10 @@ export class Effects<TTarget extends object>
         }
     }
 
-    add(effect: Effect<TTarget>, gamePhaseKind: GamePhaseKind) {
+    add(
+        effect: IEffect<TTarget, BasicGamePhaseKind>,
+        gamePhaseKind: GamePhaseKind
+    ) {
         this.effectToPriority.set(
             effect,
             new GamePhaseBased((gamePhaseKind) =>
@@ -170,18 +179,18 @@ export class Effects<TTarget extends object>
                 const priorityToEffects = this.hierarchy.get(_gamePhaseKind);
                 this.addEffectToPriorityStack(
                     effect,
-                    gamePhaseKind,
+                    _gamePhaseKind,
                     priorityToEffects
                 );
             }
         }
     }
 
-    has(effect: Effect<TTarget>): boolean {
+    has(effect: IEffect<TTarget, BasicGamePhaseKind>): boolean {
         return this.effectToPriority.has(effect);
     }
 
-    delete(effect: Effect<TTarget>): boolean {
+    delete(effect: IEffect<TTarget, BasicGamePhaseKind>): boolean {
         const priority = this.effectToPriority.get(effect);
 
         if (priority === undefined) {
@@ -205,15 +214,20 @@ export class Effects<TTarget extends object>
     }
 
     protected addEffectToPriorityStack(
-        effect: Effect<TTarget>,
-        gamePhaseKind: GamePhaseKind,
-        priorityToEffects: OrderedMap<number, LinkList<Effect<TTarget>>>
+        effect: IEffect<TTarget, BasicGamePhaseKind>,
+        gamePhaseKind: BasicGamePhaseKind,
+        priorityToEffects: OrderedMap<
+            number,
+            LinkList<IEffect<TTarget, BasicGamePhaseKind>>
+        >
     ) {
         const priority = this.getPriority(effect, gamePhaseKind);
         let samePriorityEffects = priorityToEffects.getElementByKey(priority);
 
         if (samePriorityEffects === undefined) {
-            samePriorityEffects = new LinkList<Effect<TTarget>>();
+            samePriorityEffects = new LinkList<
+                IEffect<TTarget, BasicGamePhaseKind>
+            >();
             priorityToEffects.setElement(priority, samePriorityEffects);
         }
 
@@ -222,15 +236,15 @@ export class Effects<TTarget extends object>
 
     protected getApplicableMiddlewares(
         context: InteractionContext<TTarget>
-    ): Array<Effect<TTarget>> {
+    ): Array<IEffect<TTarget, BasicGamePhaseKind>> {
         return Array.from(
             Generator.filter((effect) => effect.isApplicable(context), this)
         );
     }
 
     protected getPriority(
-        effect: Effect<TTarget>,
-        gamePhaseKind: GamePhaseKind
+        effect: IEffect<TTarget, BasicGamePhaseKind>,
+        gamePhaseKind: BasicGamePhaseKind
     ) {
         return effect.getPriority(gamePhaseKind);
     }
