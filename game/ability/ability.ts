@@ -12,7 +12,7 @@ import type {
     InformationRequestContext,
     IInformationRequester,
 } from '../info/requester/requester';
-import type { AbilityLoader } from './loader';
+import type { IAbilityLoader } from './loader';
 import {
     AbilitySuccessCommunicatedInfo,
     AbilitySuccessUseWhenMalfunction,
@@ -28,7 +28,7 @@ export interface AbilityUseContext {
 export interface AbilitySetupContext extends AbilityUseContext {
     nightSheet: NightSheet;
     characterSheet: CharacterSheet;
-    abilityLoader: AbilityLoader;
+    abilityLoader: IAbilityLoader;
 }
 
 export interface AbilityUseResult {

@@ -1,6 +1,7 @@
 /* eslint-disable no-dupe-class-members */
 import type { CharacterToken } from '../character';
 import { Generator } from '../collections';
+import type { Constructor } from '../types';
 import { ButlerAbility } from './butler';
 import { GetChefInformationAbility } from './chef';
 import { GetEmpathInformationAbility } from './empath';
@@ -17,6 +18,12 @@ import { SoldierAbility } from './soldier';
 import { GetUndertakerInformationAbility } from './undertaker';
 import { VirginAbility } from './virgin';
 import { GetWasherwomanInformationAbility } from './washerwoman';
+import type {
+    AbilitySetupContext,
+    AbilityUseContext,
+    AbilityUseResult,
+    IAbility,
+} from './ability';
 import { Butler } from '~/content/characters/output/butler';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
@@ -75,7 +82,31 @@ const ABILITIES = [
 
 type TCharacterAbility = typeof ABILITIES[number];
 
-export class AbilityLoader {
+export interface IAbilityLoader {
+    load<
+        TAbilityUseContext extends AbilityUseContext,
+        TAbilityUseResult extends AbilityUseResult,
+        TAbilitySetupContext extends AbilitySetupContext,
+        TAbility extends Constructor<
+            IAbility<
+                TAbilityUseContext,
+                TAbilityUseResult,
+                TAbilitySetupContext
+            >
+        >
+    >(
+        character: CharacterToken
+    ): Array<TAbility>;
+
+    /**
+     *
+     */
+    loadCharacterAbility(
+        character: CharacterToken
+    ): TCharacterAbility | undefined;
+}
+
+export class AbilityLoader implements IAbilityLoader {
     static characterToAbility: Map<TCharacterToken, TCharacterAbility> =
         new Map(Generator.pair(CHARACTERS, ABILITIES));
 

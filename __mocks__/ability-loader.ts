@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
-import type { AbilityLoader } from '~/game/ability/loader';
+import type { IAbilityLoader } from '~/game/ability/loader';
 
 export function mockAbilityLoader() {
-    return mock<AbilityLoader>();
+    return mock<IAbilityLoader>();
 }

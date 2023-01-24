@@ -19,7 +19,7 @@ import type {
 import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
 import type { SaintAbilitySetupContext } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
-import type { AbilityLoader } from '~/game/ability/loader';
+import type { IAbilityLoader } from '~/game/ability/loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
 
 export function mockAbilityUseContext(
@@ -38,7 +38,7 @@ export function mockAbilitySetupContext(
     context?: AbilityUseContext,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet,
-    abilityLoader?: AbilityLoader
+    abilityLoader?: IAbilityLoader
 ): AbilitySetupContext {
     if (context === undefined) {
         context = mockAbilityUseContext(player, players);
