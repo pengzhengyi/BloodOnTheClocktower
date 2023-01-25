@@ -23,7 +23,9 @@ import type {
     AbilityUseContext,
     AbilityUseResult,
     IAbility,
+    ICharacterAbilityClass,
 } from './ability';
+import { DrunkAbility } from './drunk';
 import { Butler } from '~/content/characters/output/butler';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
@@ -40,75 +42,108 @@ import { Soldier } from '~/content/characters/output/soldier';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
-
-const CHARACTERS = [
-    Washerwoman,
-    Librarian,
-    Investigator,
-    Chef,
-    Empath,
-    FortuneTeller,
-    Undertaker,
-    Monk,
-    Ravenkeeper,
-    Virgin,
-    Slayer,
-    Soldier,
-    Mayor,
-    Butler,
-    Recluse,
-    Saint,
-] as const;
-type TCharacterToken = typeof CHARACTERS[number];
-
-const ABILITIES = [
-    GetWasherwomanInformationAbility,
-    GetLibrarianInformationAbility,
-    GetInvestigatorInformationAbility,
-    GetChefInformationAbility,
-    GetEmpathInformationAbility,
-    GetFortuneTellerInformationAbility,
-    GetUndertakerInformationAbility,
-    MonkProtectAbility,
-    GetRavenkeeperInformationAbility,
-    VirginAbility,
-    SlayerAbility,
-    SoldierAbility,
-    MayorAbility,
-    ButlerAbility,
-    RecluseAbility,
-    SaintAbility,
-] as const;
-
-type TCharacterAbility = typeof ABILITIES[number];
+import { Drunk } from '~/content/characters/output/drunk';
 
 export interface IAbilityLoader {
-    load<
-        TAbilityUseContext extends AbilityUseContext,
-        TAbilityUseResult extends AbilityUseResult,
-        TAbilitySetupContext extends AbilitySetupContext,
-        TAbility extends Constructor<
-            IAbility<
-                TAbilityUseContext,
-                TAbilityUseResult,
-                TAbilitySetupContext
-            >
-        >
-    >(
+    load(
         character: CharacterToken
-    ): Array<TAbility>;
+    ): Array<
+        Constructor<
+            IAbility<AbilityUseContext, AbilityUseResult, AbilitySetupContext>
+        >
+    >;
 
     /**
      *
      */
     loadCharacterAbility(
         character: CharacterToken
-    ): TCharacterAbility | undefined;
+    ):
+        | ICharacterAbilityClass<
+              AbilityUseContext,
+              AbilityUseResult,
+              AbilitySetupContext
+          >
+        | undefined;
 }
 
+const CharacterAbilityClasses: Array<
+    ICharacterAbilityClass<
+        AbilityUseContext,
+        AbilityUseResult,
+        AbilitySetupContext
+    >
+> = [
+    class extends GetWasherwomanInformationAbility {
+        static origin: CharacterToken = Washerwoman;
+    },
+    class extends GetLibrarianInformationAbility {
+        static origin: CharacterToken = Librarian;
+    },
+    class extends GetInvestigatorInformationAbility {
+        static origin: CharacterToken = Investigator;
+    },
+    class extends GetChefInformationAbility {
+        static origin: CharacterToken = Chef;
+    },
+    class extends GetEmpathInformationAbility {
+        static origin: CharacterToken = Empath;
+    },
+    class extends GetFortuneTellerInformationAbility {
+        static origin: CharacterToken = FortuneTeller;
+    },
+    class extends GetUndertakerInformationAbility {
+        static origin: CharacterToken = Undertaker;
+    },
+    class extends MonkProtectAbility {
+        static origin: CharacterToken = Monk;
+    },
+    class extends GetRavenkeeperInformationAbility {
+        static origin: CharacterToken = Ravenkeeper;
+    },
+    class extends VirginAbility {
+        static origin: CharacterToken = Virgin;
+    },
+    class extends SlayerAbility {
+        static origin: CharacterToken = Slayer;
+    },
+    class extends SoldierAbility {
+        static origin: CharacterToken = Soldier;
+    },
+    class extends MayorAbility {
+        static origin: CharacterToken = Mayor;
+    },
+    class extends ButlerAbility {
+        static origin: CharacterToken = Butler;
+    },
+    class extends DrunkAbility {
+        static origin: CharacterToken = Drunk;
+    },
+    class extends RecluseAbility {
+        static origin: CharacterToken = Recluse;
+    },
+    class extends SaintAbility {
+        static origin: CharacterToken = Saint;
+    },
+];
+
 export class AbilityLoader implements IAbilityLoader {
-    static characterToAbility: Map<TCharacterToken, TCharacterAbility> =
-        new Map(Generator.pair(CHARACTERS, ABILITIES));
+    static characterToAbility: Map<
+        CharacterToken,
+        ICharacterAbilityClass<
+            AbilityUseContext,
+            AbilityUseResult,
+            AbilitySetupContext
+        >
+    > = new Map(
+        Generator.map(
+            (CharacterAbilityClass) => [
+                CharacterAbilityClass.origin,
+                CharacterAbilityClass,
+            ],
+            CharacterAbilityClasses
+        )
+    );
 
     load(
         character: typeof Washerwoman
@@ -139,10 +174,17 @@ export class AbilityLoader implements IAbilityLoader {
     load(character: typeof Soldier): [typeof SoldierAbility];
     load(character: typeof Mayor): [typeof MayorAbility];
     load(character: typeof Butler): [typeof ButlerAbility];
+    load(character: typeof Drunk): [typeof DrunkAbility];
     load(character: typeof Recluse): [typeof RecluseAbility];
     load(character: typeof Saint): [typeof SaintAbility];
 
-    load(character: CharacterToken): Array<TCharacterAbility> {
+    load(
+        character: CharacterToken
+    ): Array<
+        Constructor<
+            IAbility<AbilityUseContext, AbilityUseResult, AbilitySetupContext>
+        >
+    > {
         const abilities = [];
 
         const characterAbility = this.loadCharacterAbility(character);
@@ -153,9 +195,7 @@ export class AbilityLoader implements IAbilityLoader {
         return abilities;
     }
 
-    loadCharacterAbility(
-        character: CharacterToken
-    ): TCharacterAbility | undefined {
+    loadCharacterAbility(character: CharacterToken) {
         return AbilityLoader.characterToAbility.get(character);
     }
 }

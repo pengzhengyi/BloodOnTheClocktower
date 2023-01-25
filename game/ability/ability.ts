@@ -1,5 +1,5 @@
 import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
-import type { Constructor, StaticThis } from '../types';
+import type { Constructor, IBindToCharacter, StaticThis } from '../types';
 import type { CharacterSheet } from '../character-sheet';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
@@ -60,6 +60,15 @@ export interface IAbility<
 
     createContext(...args: any[]): Promise<TAbilityUseContext>;
 }
+
+export type ICharacterAbilityClass<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
+> = Constructor<
+    IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
+> &
+    IBindToCharacter;
 
 /**
  * {@link `glossary["Ability"]`}

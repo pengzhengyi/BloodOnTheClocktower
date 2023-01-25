@@ -2,19 +2,15 @@ import type { CharacterToken } from '../character';
 import { CharacterEffectOriginNotSetup } from '../exception';
 import type { NightSheet } from '../night-sheet';
 import type { NextFunction } from '../proxy/middleware';
-import type { Constructor } from '../types';
+import type { Constructor, IBindToCharacter } from '../types';
 import type { Effect, InteractionContext } from './effect';
 
-interface WithOrigin {
-    origin: CharacterToken;
-}
-
 export type TCharacterEffect<TTarget extends object> = Effect<TTarget> &
-    WithOrigin;
+    IBindToCharacter;
 
 interface TCharacterEffectConstructor<TTarget extends object>
     extends Constructor<Effect<TTarget>>,
-        WithOrigin {}
+        IBindToCharacter {}
 
 export function CharacterEffect<
     TTarget extends object,

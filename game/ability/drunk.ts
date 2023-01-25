@@ -105,7 +105,11 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         const CharacterAbility =
             context.abilityLoader.loadCharacterAbility(character);
         if (CharacterAbility !== undefined) {
-            this.thinkAsAbility = new CharacterAbility();
+            this.thinkAsAbility = new CharacterAbility() as Ability<
+                AbilityUseContext,
+                AbilityUseResult,
+                AbilitySetupContext
+            >;
             await this.thinkAsAbility.setup(context);
         }
     }
