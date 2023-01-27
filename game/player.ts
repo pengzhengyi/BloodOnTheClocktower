@@ -8,7 +8,7 @@ import { DeadReason } from './dead-reason';
 import { Death } from './death';
 import { EffectTarget, IEffectTarget } from './effect/effect-target';
 import { Nomination } from './nomination';
-import { PlayerState } from './player-state';
+import { PlayerState, State } from './player-state';
 
 import {
     CharacterType,
@@ -27,6 +27,7 @@ import {
 import type { Execution } from './execution';
 import { DrunkReason } from './drunk-reason';
 import { Generator } from './collections';
+import type { IPoisonedReason } from './poisoned-reason';
 import { Environment } from '~/interaction/environment';
 
 export interface CharacterAssignmentResult {
@@ -111,6 +112,8 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     ): Promise<CharacterAssignmentResult>;
     setDead(reason?: DeadReason): Promise<Death>;
     setDrunk(reason?: DrunkReason): Promise<boolean>;
+    setPoison(reason: IPoisonedReason): Promise<boolean>;
+    removePoison(reason: IPoisonedReason): Promise<boolean>;
     attack(victim: IPlayer): Promise<Death>;
     nominate(
         nominated: IPlayer,
@@ -435,7 +438,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
      * {@link `glossary["State"]`}
      * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
      */
-    protected readonly state: PlayerState = PlayerState.init();
+    protected readonly state: PlayerState = new PlayerState();
 
     protected constructor(
         id: string,
@@ -492,14 +495,24 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     setDead(reason: DeadReason = DeadReason.Other): Promise<Death> {
-        this.state.dead = true;
+        this.state.setNegativeState(State.Dead, true, reason);
         // TODO lose ability and influences
         return Promise.resolve(new Death(this, reason));
     }
 
-    setDrunk(_reason: DrunkReason = DrunkReason.Other): Promise<boolean> {
-        this.state.drunk = true;
+    setDrunk(reason: DrunkReason = DrunkReason.Other): Promise<boolean> {
+        this.state.setNegativeState(State.Drunk, true, reason);
         return this.drunk;
+    }
+
+    setPoison(reason: IPoisonedReason): Promise<boolean> {
+        this.state.setNegativeState(State.Poisoned, true, reason);
+        return this.poisoned;
+    }
+
+    removePoison(reason: IPoisonedReason): Promise<boolean> {
+        this.state.setNegativeState(State.Poisoned, false, reason);
+        return this.healthy;
     }
 
     async attack(victim: IPlayer): Promise<Death> {

@@ -16,6 +16,7 @@ import type { Soldier } from '~/content/characters/output/soldier';
 import type { Undertaker } from '~/content/characters/output/undertaker';
 import type { Virgin } from '~/content/characters/output/virgin';
 import type { Imp } from '~/content/characters/output/imp';
+import type { Poisoner } from '~/content/characters/output/poisoner';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -190,12 +191,20 @@ export type DrunkPlayer = IPlayer & {
     character: Drunk;
 };
 
+export type PoisonerPlayer = IPlayer & {
+    character: Poisoner;
+};
+
 export type ImpPlayer = IPlayer & {
     character: Imp;
 };
 
 export interface RequireGame {
     game: Game;
+}
+
+export interface RequireReason {
+    readonly reason: string;
 }
 
 export interface RequireExecution {

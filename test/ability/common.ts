@@ -6,14 +6,13 @@ import type {
     GetInfoAbilityUseContext,
     GetInformationAbilityUseResult,
 } from '~/game/ability/ability';
-import type {
-    MonkProtectAbility,
-    MonkAbilityUseResult,
-} from '~/game/ability/monk';
+import { MonkProtectAbility, MonkAbilityUseResult } from '~/game/ability/monk';
 import { RecluseAbility } from '~/game/ability/recluse';
 import {
     AbilitySuccessCommunicatedFalseInfo,
     AbilitySuccessCommunicatedInfo,
+    AbilitySuccessUseWhenHasEffect,
+    AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from '~/game/ability/status';
 import { Generator } from '~/game/collections';
@@ -32,6 +31,8 @@ import { StoryTeller } from '~/game/storyteller';
 import type {
     AsyncFactory,
     DrunkPlayer,
+    MonkPlayer,
+    PoisonerPlayer,
     ReclusePlayer,
     SlayerPlayer,
     Task,
@@ -52,6 +53,12 @@ import type { Execution } from '~/game/execution';
 import type { ButlerAbility } from '~/game/ability/butler';
 import { DrunkAbility } from '~/game/ability/drunk';
 import { AbilityLoader } from '~/game/ability/loader';
+import {
+    PoisonerAbility,
+    PoisonerAbilityUseResult,
+} from '~/game/ability/poisoner';
+import { Poisoner } from '~/content/characters/output/poisoner';
+import type { NightSheet } from '~/game/night-sheet';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -112,9 +119,7 @@ export async function monkProtectPlayer(
     const result = (await ability.use(context)) as MonkAbilityUseResult;
     chooseMock.mockReset();
 
-    expect(result.status).toEqual(
-        AbilityUseStatus.Success | AbilityUseStatus.HasEffect
-    );
+    expect(result.status).toEqual(AbilitySuccessUseWhenHasEffect);
     expect(result.protectedPlayer).toEqual(playerToProtect);
     return result;
 }
@@ -237,6 +242,37 @@ export async function expectAfterSlayerKill(
     expect(await ability.isEligible(context)).toBeFalse();
 }
 
+export async function expectAfterPoisonerPoison(
+    ability: PoisonerAbility,
+    chosenPlayer: IPlayer,
+    shouldGetPoisoned: boolean,
+    _context?: AbilityUseContext,
+    poisonerPlayer?: PoisonerPlayer
+) {
+    const context = _context ?? mockAbilityUseContext(poisonerPlayer);
+
+    expect(await ability.isEligible(context)).toBeTrue();
+
+    chooseMock.mockImplementation(async (_poisonerPlayer, _players) => {
+        expect(await _poisonerPlayer.character).toEqual(Poisoner);
+        return chosenPlayer;
+    });
+
+    const result = (await ability.use(context)) as PoisonerAbilityUseResult;
+    chooseMock.mockReset();
+
+    expect(result.poisonedPlayer);
+
+    if (shouldGetPoisoned) {
+        expect(result.status).toEqual(AbilitySuccessUseWhenHasEffect);
+        expect(result.poisonedPlayer).toBe(chosenPlayer);
+        expect(await chosenPlayer.poisoned).toBeTrue();
+    } else {
+        expect(result.status).toEqual(AbilitySuccessUseWhenMalfunction);
+        expect(await chosenPlayer.poisoned).toBeFalse();
+    }
+}
+
 export async function expectAfterExecute(
     execution: Execution,
     numAlivePlayer: number,
@@ -270,7 +306,7 @@ export async function mockButlerChooseMaster(
     chooseMock.mockReset();
 }
 
-export async function setupDrunk(
+export async function setupDrunkAbility(
     drunkPlayer: DrunkPlayer,
     thinkAsCharacter: CharacterToken,
     context?: AbilitySetupContext
@@ -288,4 +324,21 @@ export async function setupDrunk(
     await drunkAbility.setup(context);
     storytellerChooseOneMock.mockReset();
     return drunkAbility;
+}
+
+export async function setupMonkProtectAbility(
+    monkPlayer: MonkPlayer,
+    context?: AbilitySetupContext,
+    nightSheet?: NightSheet
+): Promise<MonkProtectAbility> {
+    const ability = new MonkProtectAbility();
+
+    context ??= mockAbilitySetupContext(
+        monkPlayer,
+        undefined,
+        undefined,
+        nightSheet
+    );
+    await ability.setup(context);
+    return ability;
 }

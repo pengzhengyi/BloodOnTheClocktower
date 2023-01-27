@@ -1,5 +1,14 @@
-import { AbilityRequiresSetup, RecoverableGameError } from '../exception';
-import type { Constructor, IBindToCharacter, StaticThis } from '../types';
+import {
+    AbilityCanOnlyUseOnce,
+    AbilityRequiresSetup,
+    RecoverableGameError,
+} from '../exception';
+import type {
+    AsyncFactory,
+    Constructor,
+    IBindToCharacter,
+    StaticThis,
+} from '../types';
 import type { CharacterSheet } from '../character-sheet';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
@@ -12,6 +21,7 @@ import type {
     InformationRequestContext,
     IInformationRequester,
 } from '../info/requester/requester';
+import type { IClocktower } from '../clocktower';
 import type { IAbilityLoader } from './loader';
 import {
     AbilitySuccessCommunicatedInfo,
@@ -29,6 +39,7 @@ export interface AbilitySetupContext extends AbilityUseContext {
     nightSheet: NightSheet;
     characterSheet: CharacterSheet;
     abilityLoader: IAbilityLoader;
+    clocktower: IClocktower;
 }
 
 export interface AbilityUseResult {
@@ -133,40 +144,12 @@ export abstract class Ability<
         return Promise.resolve(undefined);
     }
 
-    async use(
+    use(
         context: TAbilityUseContext
     ): Promise<TAbilityUseResult | AbilityUseResult> {
-        try {
-            return await RecoverableGameError.catch<
-                RecoverableGameError,
-                TAbilityUseResult | AbilityUseResult
-            >(
-                async () => {
-                    if (await this.willMalfunction(context)) {
-                        return await this.useWhenMalfunction(context);
-                    } else {
-                        return await this.useWhenNormal(context);
-                    }
-                },
-                (error) =>
-                    Promise.resolve({
-                        status: error.handled
-                            ? AbilityUseStatus.Failure |
-                              AbilityUseStatus.ErrorHandled
-                            : AbilityUseStatus.Failure,
-                        reason: error.handled
-                            ? Ability.REASON_FOR_HANDLED_ERROR
-                            : Ability.REASON_FOR_UNEXPECTED_ERROR,
-                        error,
-                    })
-            );
-        } catch (error) {
-            return {
-                status: AbilityUseStatus.Failure,
-                description: Ability.REASON_FOR_UNEXPECTED_ERROR,
-                error: error as Error,
-            };
-        }
+        return this.handleUnexpectedErrorDuringUse(() =>
+            this.handleRecoverableErrorDuringUse(() => this.tryUse(context))
+        );
     }
 
     async willMalfunction(context: TAbilityUseContext): Promise<boolean> {
@@ -176,6 +159,49 @@ export abstract class Ability<
     toString(): string {
         return this.constructor.name;
     }
+
+    protected async tryUse(
+        context: TAbilityUseContext
+    ): Promise<TAbilityUseResult | AbilityUseResult> {
+        if (await this.willMalfunction(context)) {
+            return await this.useWhenMalfunction(context);
+        } else {
+            return await this.useWhenNormal(context);
+        }
+    }
+
+    protected async handleUnexpectedErrorDuringUse(
+        action: AsyncFactory<TAbilityUseResult | AbilityUseResult>
+    ): Promise<TAbilityUseResult | AbilityUseResult> {
+        try {
+            return await action();
+        } catch (error) {
+            return {
+                status: AbilityUseStatus.Failure,
+                description: Ability.REASON_FOR_UNEXPECTED_ERROR,
+                error: error as Error,
+            };
+        }
+    }
+
+    protected async handleRecoverableErrorDuringUse(
+        action: AsyncFactory<TAbilityUseResult | AbilityUseResult>
+    ): Promise<TAbilityUseResult | AbilityUseResult> {
+        return await RecoverableGameError.catch<
+            RecoverableGameError,
+            TAbilityUseResult | AbilityUseResult
+        >(action, (error) =>
+            Promise.resolve({
+                status: error.handled
+                    ? AbilityUseStatus.Failure | AbilityUseStatus.ErrorHandled
+                    : AbilityUseStatus.Failure,
+                reason: error.handled
+                    ? Ability.REASON_FOR_HANDLED_ERROR
+                    : Ability.REASON_FOR_UNEXPECTED_ERROR,
+                error,
+            })
+        );
+    }
 }
 
 export function RequireSetup<
@@ -183,19 +209,58 @@ export function RequireSetup<
     TAbilityUseResult extends AbilityUseResult,
     TAbilitySetupContext extends AbilitySetupContext,
     TAbility extends Constructor<
-        IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
+        Ability<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
     >
 >(AbilityClass: TAbility) {
-    return class requireSetup extends AbilityClass {
-        async use(
+    return class RequireSetup extends AbilityClass {
+        declare createContext;
+
+        declare useWhenNormal;
+
+        declare useWhenMalfunction;
+
+        protected async tryUse(
             context: TAbilityUseContext
         ): Promise<TAbilityUseResult | AbilityUseResult> {
             if (!this.hasSetup) {
-                const error = new AbilityRequiresSetup(this, context);
-                await error.resolve();
+                throw new AbilityRequiresSetup(this, context);
             }
 
-            return await super.use(context);
+            return await super.tryUse(context);
+        }
+    };
+}
+
+export function Once<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext,
+    TAbility extends Constructor<
+        Ability<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
+    >
+>(AbilityClass: TAbility) {
+    return class Once extends AbilityClass {
+        protected hasUsedAbility = false;
+
+        declare createContext;
+
+        declare useWhenNormal;
+
+        declare useWhenMalfunction;
+
+        async isEligible(context: TAbilityUseContext): Promise<boolean> {
+            return (await super.isEligible(context)) && !this.hasUsedAbility;
+        }
+
+        async tryUse(
+            context: TAbilityUseContext
+        ): Promise<TAbilityUseResult | AbilityUseResult> {
+            if (this.hasUsedAbility) {
+                throw new AbilityCanOnlyUseOnce(this, context);
+            } else {
+                this.hasUsedAbility = true;
+                return await super.tryUse(context);
+            }
         }
     };
 }

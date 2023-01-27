@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { createInfoProvideContext } from '../info-provider.test';
 import { playerFromDescription } from '../utils';
-import { monkProtectPlayer, expectAfterDemonAttack } from './common';
+import {
+    monkProtectPlayer,
+    expectAfterDemonAttack,
+    setupMonkProtectAbility,
+} from './common';
 import { Monk } from '~/content/characters/output/monk';
 import { MayorAbility } from '~/game/ability/mayor';
 import { MonkProtectAbility } from '~/game/ability/monk';
@@ -31,7 +35,11 @@ describe('test MonkProtectAbility', () => {
     afterAll(() => recoverGamePhase());
 
     beforeEach(async () => {
-        ability = new MonkProtectAbility();
+        ability = await setupMonkProtectAbility(
+            monkPlayer,
+            undefined,
+            await getTroubleBrewingNightSheet()
+        );
         impPlayer = await playerFromDescription(
             `${faker.name.firstName()} is the Imp`
         );

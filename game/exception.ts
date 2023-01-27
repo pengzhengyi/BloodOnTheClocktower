@@ -17,6 +17,7 @@ import type {
     StaticThis,
     UndertakerPlayer,
     AsyncPredicate,
+    PoisonerPlayer,
 } from './types';
 import type { IPlayer } from './player';
 import type { Players } from './players';
@@ -646,6 +647,25 @@ export class AbilityRequiresSetup<
     }
 }
 
+export class AbilityCanOnlyUseOnce<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext
+> extends RecoverableGameError {
+    static description = 'Ability can be used once per game';
+
+    constructor(
+        readonly ability: IAbility<
+            TAbilityUseContext,
+            TAbilityUseResult,
+            TAbilitySetupContext
+        >,
+        readonly context: TAbilityUseContext
+    ) {
+        super(AbilityCanOnlyUseOnce.description);
+    }
+}
+
 export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
     static description =
         'The fortune teller has not chosen two players to detect';
@@ -671,6 +691,19 @@ export class MonkNotChoosePlayerToProtect extends RecoverableGameError {
         readonly context: AbilityUseContext
     ) {
         super(MonkNotChoosePlayerToProtect.description);
+    }
+}
+
+export class PoisonerNotChoosePlayerToPoison extends RecoverableGameError {
+    static description = 'The poisoner has not chosen player to poison';
+
+    declare correctedPlayerToPoison: IPlayer;
+
+    constructor(
+        readonly poisonerPlayer: PoisonerPlayer,
+        readonly context: AbilityUseContext
+    ) {
+        super(PoisonerNotChoosePlayerToPoison.description);
     }
 }
 

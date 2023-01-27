@@ -26,6 +26,7 @@ import type {
     ICharacterAbilityClass,
 } from './ability';
 import { DrunkAbility } from './drunk';
+import { PoisonerAbility } from './poisoner';
 import { Butler } from '~/content/characters/output/butler';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
@@ -43,6 +44,7 @@ import { Undertaker } from '~/content/characters/output/undertaker';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Drunk } from '~/content/characters/output/drunk';
+import { Poisoner } from '~/content/characters/output/poisoner';
 
 export interface IAbilityLoader {
     load(
@@ -125,6 +127,9 @@ const CharacterAbilityClasses: Array<
     class extends SaintAbility {
         static origin: CharacterToken = Saint;
     },
+    class extends PoisonerAbility {
+        static origin: CharacterToken = Poisoner;
+    },
 ];
 
 export class AbilityLoader implements IAbilityLoader {
@@ -177,6 +182,7 @@ export class AbilityLoader implements IAbilityLoader {
     load(character: typeof Drunk): [typeof DrunkAbility];
     load(character: typeof Recluse): [typeof RecluseAbility];
     load(character: typeof Saint): [typeof SaintAbility];
+    load(character: typeof Poisoner): [typeof PoisonerAbility];
 
     load(
         character: CharacterToken

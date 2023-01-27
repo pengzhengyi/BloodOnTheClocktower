@@ -51,7 +51,7 @@ class BaseMonkProtectAbility extends Ability<
 
     async setup(context: AbilitySetupContext): Promise<void> {
         await super.setup(context);
-        this.protection.setup(context.nightSheet);
+        this.protection.setupPriority(context.nightSheet);
     }
 
     async useWhenMalfunction(

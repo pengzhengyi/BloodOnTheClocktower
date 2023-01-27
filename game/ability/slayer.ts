@@ -3,7 +3,7 @@ import type { Death } from '../death';
 import { SlayerNotChoosePlayerToKill } from '../exception';
 import type { IPlayer } from '../player';
 import type { SlayerPlayer } from '../types';
-import { Ability, AbilityUseContext, AbilityUseResult } from './ability';
+import { Ability, AbilityUseContext, AbilityUseResult, Once } from './ability';
 import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
@@ -16,7 +16,7 @@ export interface SlayerAbilityUseResult extends AbilityUseResult {
     death?: Death;
 }
 
-export class SlayerAbility extends Ability<
+class BaseSlayerAbility extends Ability<
     AbilityUseContext,
     SlayerAbilityUseResult
 > {
@@ -26,7 +26,7 @@ export class SlayerAbility extends Ability<
     static readonly description =
         'Once per game, during the day, publicly choose a player: if they are the Demon, they die.';
 
-    protected hasUsedAbility = false;
+    declare hasUsedAbility: boolean;
 
     async useWhenMalfunction(
         context: AbilityUseContext
@@ -68,10 +68,6 @@ export class SlayerAbility extends Ability<
         });
     }
 
-    async isEligible(context: AbilityUseContext): Promise<boolean> {
-        return (await super.isEligible(context)) && !this.hasUsedAbility;
-    }
-
     createContext(..._args: any[]): Promise<AbilityUseContext> {
         // TODO choose player will be moved here
         throw new Error('Method not implemented.');
@@ -81,7 +77,6 @@ export class SlayerAbility extends Ability<
         player: IPlayer,
         slayerPlayer: IPlayer
     ): Promise<Death | undefined> {
-        this.hasUsedAbility = true;
         if (await player.from(slayerPlayer).isTheDemon) {
             return await player.setDead(DeadReason.SlayerKill);
         }
@@ -96,7 +91,7 @@ export class SlayerAbility extends Ability<
             slayerPlayer,
             players,
             1,
-            SlayerAbility.description
+            BaseSlayerAbility.description
         )) as IPlayer;
 
         if (chosen === undefined) {
@@ -121,3 +116,9 @@ export class SlayerAbility extends Ability<
         return `Slayer player ${context.requestedPlayer} may inadvertently execute their accuser`;
     }
 }
+
+export interface SlayerAbility
+    extends Ability<AbilityUseContext, SlayerAbilityUseResult> {}
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SlayerAbility = Once(BaseSlayerAbility);

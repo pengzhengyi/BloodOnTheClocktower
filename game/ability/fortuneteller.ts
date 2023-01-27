@@ -157,7 +157,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     ) {
         this.redHerringPlayer = redHerringPlayer;
         const effect = new RedHerringEffect(fortuneTellerPlayer);
-        effect.setup(nightSheet);
+        effect.setupPriority(nightSheet);
         redHerringPlayer.effects.add(effect, CompositeGamePhaseKind.EveryNight);
     }
 }

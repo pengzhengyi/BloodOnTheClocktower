@@ -1,6 +1,6 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
-import { Generator } from './collections';
+import { Generator, LazyMap } from './collections';
 
 export enum State {
     None = 0,
@@ -59,24 +59,12 @@ export class PlayerState {
         }
     }
 
-    static of(state: number) {
-        return new this(state);
-    }
-
-    static init() {
-        return new this(State.None);
-    }
-
     /**
      * {@link `glossary["Drunk"]`}
      *  A drunk player has no ability but thinks they do, and the Storyteller acts like they do. If their ability would give them information, the Storyteller may give them false information. Drunk players do not know they are drunk.
      */
     get drunk(): boolean {
         return this.hasNegativeState(State.Drunk);
-    }
-
-    set drunk(active: boolean) {
-        this.setNegativeState(State.Drunk, active);
     }
 
     /**
@@ -87,16 +75,8 @@ export class PlayerState {
         return !this.drunk;
     }
 
-    set sober(active: boolean) {
-        this.setNegativeState(State.Drunk, !active);
-    }
-
     get poisoned(): boolean {
         return this.hasNegativeState(State.Poisoned);
-    }
-
-    set poisoned(active: boolean) {
-        this.setNegativeState(State.Poisoned, active);
     }
 
     /**
@@ -107,20 +87,12 @@ export class PlayerState {
         return !this.poisoned;
     }
 
-    set healthy(active: boolean) {
-        this.setNegativeState(State.Poisoned, !active);
-    }
-
     /**
      * {@link `glossary["Alive"]`}
      * A player that has not died. Alive players have their ability, may vote as many times as they wish, and may nominate players. As long as 3 or more players are alive, the game continues.
      */
     get alive(): boolean {
         return !this.dead;
-    }
-
-    set alive(active: boolean) {
-        this.setNegativeState(State.Dead, !active);
     }
 
     /**
@@ -131,24 +103,12 @@ export class PlayerState {
         return this.hasNegativeState(State.Dead);
     }
 
-    set dead(active: boolean) {
-        this.setNegativeState(State.Dead, active);
-    }
-
     get mad(): boolean {
         return this.hasNegativeState(State.Mad);
     }
 
-    set mad(active: boolean) {
-        this.setNegativeState(State.Mad, active);
-    }
-
     get sane(): boolean {
         return !this.mad;
-    }
-
-    set sane(active: boolean) {
-        this.setNegativeState(State.Mad, !active);
     }
 
     /**
@@ -156,30 +116,32 @@ export class PlayerState {
      * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
      */
     @Expose({ toPlainOnly: true })
-    protected state: number = State.None;
-
-    protected constructor(state: number) {
-        this.state = state;
+    protected get state(): number {
+        return (
+            (this.dead ? State.Dead : 0) +
+            (this.drunk ? State.Drunk : 0) +
+            +(this.poisoned ? State.Poisoned : 0) +
+            +(this.mad ? State.Mad : 0)
+        );
     }
 
-    addNegativeState(negativeState: NegativeState) {
-        this.state |= negativeState;
-    }
+    protected negativeStateCauses: LazyMap<NegativeState, Set<unknown>> =
+        new LazyMap((_state) => new Set());
 
-    removeNegativeState(negativeState: NegativeState) {
-        this.state &= ~negativeState;
-    }
-
-    setNegativeState(negativeState: NegativeState, active: boolean) {
+    setNegativeState(
+        negativeState: NegativeState,
+        active: boolean,
+        cause: unknown
+    ) {
         if (active) {
-            this.addNegativeState(negativeState);
+            this.addNegativeState(negativeState, cause);
         } else {
-            this.removeNegativeState(negativeState);
+            this.removeNegativeState(negativeState, cause);
         }
     }
 
     hasNegativeState(negativeState: NegativeState): boolean {
-        return (this.state & negativeState) === negativeState;
+        return this.negativeStateCauses.get(negativeState).size > 0;
     }
 
     valueOf() {
@@ -206,5 +168,16 @@ export class PlayerState {
         );
 
         return stateNames.join(', ');
+    }
+
+    protected addNegativeState(negativeState: NegativeState, cause: unknown) {
+        this.negativeStateCauses.get(negativeState).add(cause);
+    }
+
+    protected removeNegativeState(
+        negativeState: NegativeState,
+        cause: unknown
+    ) {
+        this.negativeStateCauses.get(negativeState).delete(cause);
     }
 }

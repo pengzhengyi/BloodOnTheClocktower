@@ -1,9 +1,8 @@
 import type { CharacterToken } from '../character';
 import { CharacterEffectOriginNotSetup } from '../exception';
 import type { NightSheet } from '../night-sheet';
-import type { NextFunction } from '../proxy/middleware';
 import type { Constructor, IBindToCharacter } from '../types';
-import type { Effect, InteractionContext } from './effect';
+import type { Effect } from './effect';
 
 export type TCharacterEffect<TTarget extends object> = Effect<TTarget> &
     IBindToCharacter;
@@ -21,13 +20,6 @@ export function CharacterEffect<
         implements TCharacterEffect<TTarget>
     {
         declare static readonly origin: CharacterToken;
-
-        apply(
-            context: InteractionContext<TTarget>,
-            next: NextFunction<InteractionContext<TTarget>>
-        ): InteractionContext<TTarget> {
-            return super.apply(context, next);
-        }
 
         get origin(): CharacterToken {
             const origin = (this.constructor as any).origin;
@@ -51,14 +43,7 @@ export function CharacterNightEffect<
 
         protected otherNightPriority?: number;
 
-        apply(
-            context: InteractionContext<TTarget>,
-            next: NextFunction<InteractionContext<TTarget>>
-        ): InteractionContext<TTarget> {
-            return super.apply(context, next);
-        }
-
-        setup(nightSheet: NightSheet): [number, number] {
+        setupPriority(nightSheet: NightSheet): [number, number] {
             return this.setupNightPriority(nightSheet);
         }
 

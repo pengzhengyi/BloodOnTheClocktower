@@ -4,9 +4,10 @@ import { mockGame } from './game';
 import { mockAbilityLoader } from './ability-loader';
 import { mockInfoProvideContext as _mockInfoProvideContext } from './information';
 import { mockNightSheet } from './night-sheet';
+import { mockClocktower } from './clocktower';
 import type { IPlayer } from '~/game/player';
 import type { Players } from '~/game/players';
-import type { SaintPlayer, Task } from '~/game/types';
+import type { PoisonerPlayer, SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
 import type { NightSheet } from '~/game/night-sheet';
@@ -21,6 +22,7 @@ import type { SaintAbilitySetupContext } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
 import type { IAbilityLoader } from '~/game/ability/loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
+import type { IClocktower } from '~/game/clocktower';
 
 export function mockAbilityUseContext(
     player?: IPlayer,
@@ -38,7 +40,8 @@ export function mockAbilitySetupContext(
     context?: AbilityUseContext,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet,
-    abilityLoader?: IAbilityLoader
+    abilityLoader?: IAbilityLoader,
+    clocktower?: IClocktower
 ): AbilitySetupContext {
     if (context === undefined) {
         context = mockAbilityUseContext(player, players);
@@ -52,6 +55,9 @@ export function mockAbilitySetupContext(
 
     (context as AbilitySetupContext).abilityLoader =
         abilityLoader ?? mockAbilityLoader();
+
+    (context as AbilitySetupContext).clocktower =
+        clocktower ?? mockClocktower();
 
     return context as AbilitySetupContext;
 }
@@ -129,4 +135,20 @@ export function mockSaintAbilityUseContext(
     return Object.assign({}, mockAbilityUseContext(player), {
         execution: execution ?? mock<Execution>(),
     });
+}
+
+export function mockPoisonerAbilitySetupContext(
+    poisonerPlayer: PoisonerPlayer,
+    nightSheet?: NightSheet,
+    clocktower?: IClocktower
+) {
+    return mockAbilitySetupContext(
+        poisonerPlayer,
+        undefined,
+        undefined,
+        nightSheet,
+        undefined,
+        undefined,
+        clocktower
+    );
 }

@@ -4,7 +4,7 @@ import {
     createInfoProvideContextFromPlayerDescriptions,
 } from '../info-provider.test';
 import {
-    setupDrunk,
+    setupDrunkAbility,
     expectAfterDemonAttack,
     expectCharacterGetInformation,
 } from './common';
@@ -45,7 +45,7 @@ describe('test DrunkAbility', () => {
         const impPlayer = await createBasicPlayer(undefined, Imp);
         const drunkPlayer = await createBasicPlayer(undefined, Drunk);
 
-        await setupDrunk(drunkPlayer, Soldier);
+        await setupDrunkAbility(drunkPlayer, Soldier);
 
         await expectAfterDemonAttack(drunkPlayer, impPlayer, true);
     });
@@ -66,7 +66,7 @@ describe('test DrunkAbility', () => {
             Drunk
         ))!;
 
-        const drunkAbility = await setupDrunk(drunkPlayer, Empath);
+        const drunkAbility = await setupDrunkAbility(drunkPlayer, Empath);
         mockClocktowerWithIsNonfirstNight(infoProvideContext, true);
 
         mockStorytellerChooseMatchingOne(
@@ -112,7 +112,7 @@ describe('test DrunkAbility', () => {
             saintPlayer,
         ]);
 
-        const drunkAbility = await setupDrunk(drunkPlayer, Ravenkeeper);
+        const drunkAbility = await setupDrunkAbility(drunkPlayer, Ravenkeeper);
 
         await expectAfterDemonAttack(drunkPlayer, impPlayer, true);
 
@@ -151,7 +151,7 @@ describe('test DrunkAbility', () => {
         );
         const drunkPlayer = await createBasicPlayer(undefined, Drunk);
 
-        const drunkAbility = await setupDrunk(drunkPlayer, Undertaker);
+        const drunkAbility = await setupDrunkAbility(drunkPlayer, Undertaker);
 
         mockStorytellerChooseMatchingOne(
             (information: Information<UndertakerInformation>) =>
