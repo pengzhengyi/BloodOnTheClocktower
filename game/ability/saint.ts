@@ -44,10 +44,7 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
             updatedContext.result as Execution['execute']
         ).bind(execution);
 
-        const newAddNomination: Execution['execute'] = async (
-            player,
-            deadReason
-        ) => {
+        const newExecute: Execution['execute'] = async (player, deadReason) => {
             const death = await originalExecute(player, deadReason);
 
             if (death !== undefined && death.isFor(this.saintPlayer)) {
@@ -57,7 +54,7 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
             return death;
         };
 
-        updatedContext.result = newAddNomination;
+        updatedContext.result = newExecute;
         return updatedContext;
     }
 

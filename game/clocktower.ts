@@ -1,10 +1,10 @@
 import { RecallFutureDate, RecallFutureEvent } from './exception';
 import { GamePhase, IGamePhase } from './game-phase';
-import { Phase } from './phase';
+import { Phase, toString } from './phase';
 import { Diary, Event, IDiary } from './diary';
 import { Chronology, IChronology } from './chronology';
 import type { IToll } from './toll';
-import type { Moment } from './moment';
+import { moment, Moment } from './moment';
 import {
     GamePhaseNotification,
     IGamePhaseNotification,
@@ -29,6 +29,8 @@ export interface IClocktower {
      */
     rewind(start?: Moment, end?: Moment): Iterable<IToll<Event>>;
     advance(reason?: string): Promise<boolean>;
+
+    toString(): string;
 }
 
 /**
@@ -107,6 +109,12 @@ export class Clocktower implements IClocktower {
 
         this.record(this.gamePhase.phase);
         return true;
+    }
+
+    toString() {
+        return `Date ${this.dateIndex} ${toString(
+            this.gamePhase.phase
+        )} ${moment().format()}`;
     }
 
     protected prepareForFirstDate() {

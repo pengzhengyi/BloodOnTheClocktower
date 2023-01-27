@@ -1,5 +1,5 @@
 import { createExecutionAndAddVotedNominations } from '../execution.test';
-import { expectAfterExecute } from './common';
+import { expectAfterExecuteSaint } from './common';
 import { Baron } from '~/content/characters/output/baron';
 import { Imp } from '~/content/characters/output/imp';
 import { Investigator } from '~/content/characters/output/investigator';
@@ -7,17 +7,10 @@ import { Librarian } from '~/content/characters/output/librarian';
 import { Monk } from '~/content/characters/output/monk';
 import { Recluse } from '~/content/characters/output/recluse';
 import { Saint } from '~/content/characters/output/saint';
-import { SaintAbility } from '~/game/ability/saint';
-import { AbilitySuccessUseWhenHasEffect } from '~/game/ability/status';
-import { Alignment } from '~/game/alignment';
 import type { GamePhase } from '~/game/game-phase';
 import type { Action } from '~/game/types';
-import {
-    mockSaintAbilitySetupContext,
-    mockSaintAbilityUseContext,
-} from '~/__mocks__/ability';
+
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
-import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { mockPlayers } from '~/__mocks__/players';
 
 describe('test SaintAbility', () => {
@@ -65,29 +58,12 @@ describe('test SaintAbility', () => {
             ]
         );
 
-        const setupContext = mockSaintAbilitySetupContext(
-            saintPlayer,
-            players,
-            undefined,
-            await getTroubleBrewingNightSheet()
-        );
-        const saintAbility = await SaintAbility.init(setupContext);
-
-        const useContext = mockSaintAbilityUseContext(saintPlayer, execution);
-        expect(await saintAbility.isEligible(useContext)).toBeTrue();
-        const result = await saintAbility.use(useContext);
-        expect(result.status).toBe(AbilitySuccessUseWhenHasEffect);
-
-        const _death = await expectAfterExecute(
+        await expectAfterExecuteSaint(
             execution,
-            _players.length,
-            saintPlayer
-        );
-
-        expect(setupContext.game.setWinningTeam).toHaveBeenCalledOnce();
-        expect(setupContext.game.setWinningTeam).toBeCalledWith(
-            Alignment.Good,
-            expect.any(String)
+            saintPlayer,
+            true,
+            undefined,
+            players
         );
     });
 

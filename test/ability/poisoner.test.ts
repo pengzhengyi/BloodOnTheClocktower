@@ -1,4 +1,15 @@
-import { expectAfterPoisonerPoison, expectAfterSlayerKill } from './common';
+import { faker } from '@faker-js/faker';
+import {
+    createInfoProvideContext,
+    createInfoProvideContextFromPlayerDescriptions,
+} from '../info-provider.test';
+import {
+    expectCharacterGetInformation,
+    expectAfterPoisonerPoison,
+    expectAfterSlayerKill,
+    expectUndertakerToLearn,
+    expectAfterExecuteSaint,
+} from './common';
 import { Imp } from '~/content/characters/output/imp';
 import { Poisoner } from '~/content/characters/output/poisoner';
 import { Slayer } from '~/content/characters/output/slayer';
@@ -7,6 +18,31 @@ import { SlayerAbility } from '~/game/ability/slayer';
 import { mockPoisonerAbilitySetupContext } from '~/__mocks__/ability';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { Empath } from '~/content/characters/output/empath';
+import { GetEmpathInformationAbility } from '~/game/ability/empath';
+import { Clocktower } from '~/game/clocktower';
+import { Phase } from '~/game/phase';
+import { clocktowerAdvanceToDateAndPhase } from '~/__mocks__/clocktower';
+import {
+    mockStorytellerChooseFirstOne,
+    mockStorytellerChooseMatchingOne,
+    storytellerChooseOneMock,
+} from '~/__mocks__/game-ui';
+import type { Information } from '~/game/info/information';
+import type { EmpathInformation } from '~/game/info/provider/empath';
+import { Investigator } from '~/content/characters/output/investigator';
+import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
+import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
+import { Baron } from '~/content/characters/output/baron';
+import { Minion } from '~/game/character-type';
+import type { InvestigatorInformation } from '~/game/info/provider/investigator';
+import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
+import { Undertaker } from '~/content/characters/output/undertaker';
+import { Saint } from '~/content/characters/output/saint';
+import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
+import { Virgin } from '~/content/characters/output/virgin';
+import type { UndertakerInformation } from '~/game/info/provider/undertaker';
+import { Execution } from '~/game/execution';
 
 describe('test PoisonerAbility', () => {
     /**
@@ -42,5 +78,212 @@ describe('test PoisonerAbility', () => {
             undefined,
             slayerPlayer
         );
+    });
+
+    /**
+     * {@link `poisoner["gameplay"][1]`}
+     */
+    test('The poisoned Empath, who neighbours two evil players, learns a "0.” The next night, the Empath, no longer poisoned, learns the correct information: a "2.”', async () => {
+        const infoProvideContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                async (player) => (await player.character) === Empath,
+                `${faker.name.firstName()} is the Poisoner`,
+                `${faker.name.firstName()} is the Empath`,
+                `${faker.name.firstName()} is the Imp`
+            );
+
+        const poisonerPlayer =
+            (await infoProvideContext.players.findByCharacter(Poisoner))!;
+        const empathPlayer = (await infoProvideContext.players.findByCharacter(
+            Empath
+        ))!;
+        const poisonerAbility = new PoisonerAbility();
+
+        const clocktower = new Clocktower();
+        const setupContext = mockPoisonerAbilitySetupContext(
+            poisonerPlayer,
+            await getTroubleBrewingNightSheet(),
+            clocktower
+        );
+
+        await clocktowerAdvanceToDateAndPhase(clocktower, 0, Phase.Night);
+
+        await poisonerAbility.setup(setupContext);
+
+        await expectAfterPoisonerPoison(
+            poisonerAbility,
+            empathPlayer,
+            true,
+            undefined,
+            poisonerPlayer
+        );
+        const empathAbility = new GetEmpathInformationAbility();
+
+        mockStorytellerChooseMatchingOne(
+            (information: Information<EmpathInformation>) =>
+                information.info.numEvilAliveNeighbors === 0,
+            3
+        );
+
+        const falseInformation = await expectCharacterGetInformation(
+            empathAbility,
+            () => infoProvideContext,
+            [
+                (context) => {
+                    context.clocktower = clocktower;
+                },
+            ],
+            undefined
+        );
+        expect(falseInformation.numEvilAliveNeighbors).toBe(0);
+
+        await clocktowerAdvanceToDateAndPhase(clocktower, 1, Phase.Night);
+        mockStorytellerChooseFirstOne();
+
+        const trueInformation = await expectCharacterGetInformation(
+            empathAbility,
+            () => infoProvideContext,
+            [
+                (context) => {
+                    context.clocktower = clocktower;
+                },
+            ],
+            undefined
+        );
+        expect(trueInformation.numEvilAliveNeighbors).toBe(2);
+
+        storytellerChooseOneMock.mockReset();
+    });
+
+    /**
+     * {@link `poisoner["gameplay"][2]`}
+     */
+    test('The Investigator is poisoned. They learn that one of two players is the Baron, even though neither is a Minion. (Or even the right players, but the wrong Minion type.)', async () => {
+        const investigatorPlayer = await createBasicPlayer(
+            undefined,
+            Investigator
+        );
+        const poisonerPlayer = await createBasicPlayer(undefined, Poisoner);
+        const slayerPlayer = await createBasicPlayer(undefined, Slayer);
+        const empathPlayer = await createBasicPlayer(undefined, Empath);
+
+        const infoProvideContext = createInfoProvideContext(
+            investigatorPlayer,
+            [poisonerPlayer, empathPlayer, slayerPlayer]
+        );
+        infoProvideContext.characterSheet = getTroubleBrewingCharacterSheet();
+
+        const poisonerAbility = new PoisonerAbility();
+
+        const setupContext = mockPoisonerAbilitySetupContext(
+            poisonerPlayer,
+            await getTroubleBrewingNightSheet()
+        );
+        await poisonerAbility.setup(setupContext);
+
+        await expectAfterPoisonerPoison(
+            poisonerAbility,
+            investigatorPlayer,
+            true,
+            undefined,
+            poisonerPlayer
+        );
+
+        mockStorytellerChooseMatchingOne(
+            (information: Information<InvestigatorInformation>) =>
+                information.info.character === Baron &&
+                information.info.players.includes(empathPlayer) &&
+                information.info.players.includes(slayerPlayer)
+        );
+        const falseInformation = await expectCharacterGetInformation(
+            new GetInvestigatorInformationAbility(),
+            () => infoProvideContext,
+            [(context) => mockClocktowerWithIsFirstNight(context, true)],
+            undefined
+        );
+
+        expect(falseInformation.character).toBe(Baron);
+        expect(falseInformation.characterType).toBe(Minion);
+        expect(falseInformation.players).toIncludeSameMembers([
+            empathPlayer,
+            slayerPlayer,
+        ]);
+    });
+
+    /**
+     * {@link `poisoner["gameplay"][3]`}
+     */
+    test('The Undertaker is poisoned. Even though the Imp died today, they learn that the Virgin died. A few days later, a poisoned Saint dies, and the game continues.', async () => {
+        const poisonerPlayer = await createBasicPlayer(undefined, Poisoner);
+        const undertakerPlayer = await createBasicPlayer(undefined, Undertaker);
+        const saintPlayer = await createBasicPlayer(undefined, Saint);
+        const impPlayer = await createBasicPlayer(undefined, Imp);
+
+        const undertakerAbility = new GetUndertakerInformationAbility();
+
+        const poisonerAbility = new PoisonerAbility();
+
+        const clocktower = new Clocktower();
+        const setupContext = mockPoisonerAbilitySetupContext(
+            poisonerPlayer,
+            await getTroubleBrewingNightSheet(),
+            clocktower
+        );
+        await poisonerAbility.setup(setupContext);
+
+        await clocktowerAdvanceToDateAndPhase(clocktower, 0, Phase.Night);
+
+        await expectAfterPoisonerPoison(
+            poisonerAbility,
+            undertakerPlayer,
+            true,
+            undefined,
+            poisonerPlayer
+        );
+
+        mockStorytellerChooseMatchingOne(
+            (information: Information<UndertakerInformation>) =>
+                information.info.character === Virgin
+        );
+        await expectUndertakerToLearn(
+            undertakerAbility,
+            impPlayer,
+            Virgin,
+            undefined,
+            undertakerPlayer,
+            getTroubleBrewingCharacterSheet()
+        );
+        storytellerChooseOneMock.mockReset();
+
+        await clocktowerAdvanceToDateAndPhase(clocktower, 3, Phase.Night);
+
+        // poisoned saint
+        await expectAfterPoisonerPoison(
+            poisonerAbility,
+            saintPlayer,
+            true,
+            undefined,
+            poisonerPlayer
+        );
+
+        const execution = Execution.init();
+        await expectAfterExecuteSaint(
+            execution,
+            saintPlayer,
+            false,
+            undefined,
+            undefined,
+            12,
+            undefined,
+            undefined,
+            true
+        );
+    });
+
+    /**
+     * {@link `poisoner["gameplay"][4]`}
+     */
+    test('The Poisoner poisons the Mayor, then becomes the Imp. The Mayor is no longer poisoned because there is no Poisoner in play.', async () => {
+        // TODO need to implement imp ability
     });
 });

@@ -18,7 +18,10 @@ import type {
     GetInfoAbilityUseContext,
 } from '~/game/ability/ability';
 import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
-import type { SaintAbilitySetupContext } from '~/game/ability/saint';
+import type {
+    SaintAbilitySetupContext,
+    SaintAbilityUseContext,
+} from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
 import type { IAbilityLoader } from '~/game/ability/loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
@@ -131,7 +134,7 @@ export function mockSaintAbilitySetupContext(
 export function mockSaintAbilityUseContext(
     player?: SaintPlayer,
     execution?: Execution
-): VirginAbilityUseContext {
+): SaintAbilityUseContext {
     return Object.assign({}, mockAbilityUseContext(player), {
         execution: execution ?? mock<Execution>(),
     });

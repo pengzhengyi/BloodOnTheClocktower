@@ -62,7 +62,7 @@ export class GamePhase implements IGamePhase {
     }
 
     get cycleIndex(): number {
-        return Math.floor((this.phaseCounter - 1) / 4);
+        return Math.max(Math.floor((this.phaseCounter - 1) / 4), 0);
     }
 
     get isFirstNight(): boolean {

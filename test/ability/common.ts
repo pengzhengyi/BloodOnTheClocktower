@@ -1,3 +1,4 @@
+import { createInfoProvideContext } from '../info-provider.test';
 import { Monk } from '~/content/characters/output/monk';
 import type {
     AbilitySetupContext,
@@ -34,15 +35,22 @@ import type {
     MonkPlayer,
     PoisonerPlayer,
     ReclusePlayer,
+    SaintPlayer,
     SlayerPlayer,
     Task,
+    UndertakerPlayer,
 } from '~/game/types';
 import {
     mockAbilitySetupContext,
     mockAbilityUseContext,
     mockGetInfoAbilityUseContext,
+    mockSaintAbilitySetupContext,
+    mockSaintAbilityUseContext,
 } from '~/__mocks__/ability';
-import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
+import {
+    getTroubleBrewingCharacterSheet,
+    mockCharacterSheet,
+} from '~/__mocks__/character-sheet';
 import { chooseMock, storytellerChooseOneMock } from '~/__mocks__/game-ui';
 import { Slayer } from '~/content/characters/output/slayer';
 import type {
@@ -59,6 +67,14 @@ import {
 } from '~/game/ability/poisoner';
 import { Poisoner } from '~/content/characters/output/poisoner';
 import type { NightSheet } from '~/game/night-sheet';
+import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
+import { mockClocktowerForUndertaker } from '~/__mocks__/information';
+import {
+    SaintAbility,
+    SaintAbilitySetupContext,
+    SaintAbilityUseContext,
+} from '~/game/ability/saint';
+import type { Players } from '~/game/players';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -209,6 +225,39 @@ export async function expectDieInsteadAfterDemonAttack(
     return death;
 }
 
+export async function expectUndertakerToLearn(
+    ability: GetUndertakerInformationAbility,
+    executedPlayer: IPlayer,
+    shouldBeCharacter: CharacterToken,
+    _context?: GetInfoAbilityUseContext,
+    undertakerPlayer?: UndertakerPlayer,
+    characterSheet?: CharacterSheet
+) {
+    characterSheet ??= mockCharacterSheet();
+    const infoProviderContext =
+        _context ??
+        mockGetInfoAbilityUseContext(
+            () => createInfoProvideContext(undertakerPlayer!, []),
+            [
+                (context) =>
+                    mockClocktowerForUndertaker(context, true, executedPlayer),
+                (context) => {
+                    context.characterSheet = characterSheet!;
+                },
+            ]
+        );
+    expect(await ability.isEligible(infoProviderContext)).toBeTrue();
+
+    const info = await expectCharacterGetInformation(
+        ability,
+        () => infoProviderContext,
+        []
+    );
+
+    expect(info.character).toBe(shouldBeCharacter);
+    expect(info.executedPlayer).toBe(executedPlayer);
+}
+
 export async function expectAfterSlayerKill(
     ability: SlayerAbility,
     chosenPlayer: IPlayer,
@@ -293,6 +342,53 @@ export async function expectAfterExecute(
     }
 
     return death;
+}
+
+export async function expectAfterExecuteSaint(
+    execution: Execution,
+    saintPlayer: SaintPlayer,
+    expectGameEnd = true,
+    ability?: SaintAbility,
+    players?: Players,
+    numAlivePlayer?: number,
+    setupContext?: SaintAbilitySetupContext,
+    useContext?: SaintAbilityUseContext,
+    forceExecution = false
+) {
+    setupContext ??= mockSaintAbilitySetupContext(saintPlayer, players);
+    ability ??= await SaintAbility.init(setupContext);
+    useContext ??= mockSaintAbilityUseContext(saintPlayer, execution);
+    expect(await ability.isEligible(useContext)).toBeTrue();
+
+    const result = await ability.use(useContext);
+    const willMalfunction = await ability.willMalfunction(useContext);
+    if (willMalfunction) {
+        expect(result.status).toBe(AbilitySuccessUseWhenMalfunction);
+    } else {
+        expect(result.status).toEqual(AbilitySuccessUseWhenHasEffect);
+    }
+
+    numAlivePlayer ??= players?.length;
+
+    if (forceExecution) {
+        const _death = await execution.execute(saintPlayer);
+    } else {
+        const _death = await expectAfterExecute(
+            execution,
+            numAlivePlayer!,
+            saintPlayer
+        );
+    }
+
+    if (expectGameEnd) {
+        expect(setupContext.game.setWinningTeam).toHaveBeenCalledOnce();
+        expect(setupContext.game.setWinningTeam).toBeCalledWith(
+            Alignment.Good,
+            expect.any(String)
+        );
+    } else {
+        expect(setupContext.game.setWinningTeam).not.toHaveBeenCalled();
+    }
 }
 
 export async function mockButlerChooseMaster(
