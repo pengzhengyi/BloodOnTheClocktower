@@ -2,7 +2,7 @@
 import type { CharacterToken } from '../character';
 import { Generator } from '../collections';
 import type { Constructor } from '../types';
-import { CharacterType, Minion } from '../character-type';
+import { CharacterType, Demon, Minion } from '../character-type';
 import { ButlerAbility } from './butler';
 import { GetChefInformationAbility } from './chef';
 import { GetEmpathInformationAbility } from './empath';
@@ -30,6 +30,7 @@ import type {
 import { DrunkAbility } from './drunk';
 import { PoisonerAbility } from './poisoner';
 import { GetMinionInformationAbility } from './minion';
+import { GetDemonInformationAbility } from './demon';
 import { Butler } from '~/content/characters/output/butler';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
@@ -144,6 +145,9 @@ const CharacterTypeAbilityClasses: Array<
 > = [
     class extends GetMinionInformationAbility {
         static origin: typeof CharacterType = Minion;
+    },
+    class extends GetDemonInformationAbility {
+        static origin: typeof CharacterType = Demon;
     },
 ];
 

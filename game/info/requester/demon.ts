@@ -17,6 +17,14 @@ class BaseDemonInformationRequester<
     readonly expectedCharacterType = Demon;
 }
 
+export interface DemonInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<DemonInformation>
+> extends CharacterTypeInformationRequester<
+        DemonInformation,
+        TInformationRequestContext
+    > {}
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DemonInformationRequester = IsAlive(
     hasEnoughPlayerForDemonMinionInformation(
         AtFirstNight(BaseDemonInformationRequester)
