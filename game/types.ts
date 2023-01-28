@@ -17,6 +17,9 @@ import type { Undertaker } from '~/content/characters/output/undertaker';
 import type { Virgin } from '~/content/characters/output/virgin';
 import type { Imp } from '~/content/characters/output/imp';
 import type { Poisoner } from '~/content/characters/output/poisoner';
+import type { Spy } from '~/content/characters/output/spy';
+import type { Chef } from '~/content/characters/output/chef';
+import { Empath } from '~/content/characters/output/empath';
 
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
@@ -147,6 +150,14 @@ export type FortuneTellerPlayer = IPlayer & {
     character: FortuneTeller;
 };
 
+export type EmpathPlayer = IPlayer & {
+    character: Empath;
+};
+
+export type ChefPlayer = IPlayer & {
+    character: Chef;
+};
+
 export type MonkPlayer = IPlayer & {
     character: Monk;
 };
@@ -193,6 +204,10 @@ export type DrunkPlayer = IPlayer & {
 
 export type PoisonerPlayer = IPlayer & {
     character: Poisoner;
+};
+
+export type SpyPlayer = IPlayer & {
+    character: Spy;
 };
 
 export type ImpPlayer = IPlayer & {

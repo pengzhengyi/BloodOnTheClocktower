@@ -4,7 +4,7 @@ import {
     mockWithPropertyValue,
     mockWithPropertyValues,
 } from './common';
-import { mockGamePhaseForNight } from './game-phase';
+import { mockGamePhaseForDay, mockGamePhaseForNight } from './game-phase';
 import type { CharacterSheet } from '~/game/character-sheet';
 import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
@@ -165,6 +165,13 @@ export function mockClocktowerWithIsFirstNight(
     context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
         'gamePhase',
         mockGamePhaseForNight(!isFirstNight)
+    );
+}
+
+export function mockClocktowerWithDay(context: { clocktower: IClocktower }) {
+    context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
+        'gamePhase',
+        mockGamePhaseForDay()
     );
 }
 

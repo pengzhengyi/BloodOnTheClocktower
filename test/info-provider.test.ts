@@ -58,7 +58,7 @@ import {
 } from '~/game/info/provider/undertaker';
 import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman';
 
-async function createSeatingAndPlayersFromDescriptions(
+export async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
 ): Promise<[Seating, Array<IPlayer>]> {
     const players = await Promise.all(

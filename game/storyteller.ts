@@ -23,7 +23,7 @@ export class StoryTeller {
 
     protected infoProviderLoader: InfoProviderLoader = new InfoProviderLoader();
 
-    async getGrimoire(_requestedPlayer: IPlayer): Promise<Grimoire> {
+    async getGrimoire(_requestedPlayer?: IPlayer): Promise<Grimoire> {
         await new BlankGrimoire(this).throwWhen(
             (error) => error.storyteller.grimoire === undefined
         );

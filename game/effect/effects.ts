@@ -49,6 +49,17 @@ abstract class AbstractGamePhaseBased<
 
         return this;
     }
+
+    toString(): string {
+        const gamePhaseKindToValueString = this.getGamePhaseKinds()
+            .map(
+                (gamePhaseKind) =>
+                    `${gamePhaseKind}: ${this.get(gamePhaseKind)}`
+            )
+            .join(', ');
+
+        return `{${gamePhaseKindToValueString}}`;
+    }
 }
 
 class GamePhaseBased<V> extends AbstractGamePhaseBased<BasicGamePhaseKind, V> {
@@ -70,6 +81,19 @@ class GamePhaseBased<V> extends AbstractGamePhaseBased<BasicGamePhaseKind, V> {
         }
 
         return BasicGamePhaseKind.Other;
+    }
+
+    toString(): string {
+        const gamePhaseKindToValueString = this.getGamePhaseKinds()
+            .map(
+                (gamePhaseKind) =>
+                    `${BasicGamePhaseKind[gamePhaseKind]}: ${this.get(
+                        gamePhaseKind
+                    )}`
+            )
+            .join(', ');
+
+        return `{${gamePhaseKindToValueString}}`;
     }
 }
 

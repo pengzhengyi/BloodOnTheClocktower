@@ -31,3 +31,10 @@ export function mockGamePhaseForNight(
         );
     }
 }
+
+export function mockGamePhaseForDay(): IGamePhase {
+    return mockWithPropertyValues<IGamePhase, [boolean, boolean, boolean]>(
+        ['isNonfirstNight', 'isFirstNight', 'isNight'],
+        [false, false, false]
+    );
+}

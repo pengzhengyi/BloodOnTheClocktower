@@ -37,8 +37,10 @@ import type {
     ReclusePlayer,
     SaintPlayer,
     SlayerPlayer,
+    SpyPlayer,
     Task,
     UndertakerPlayer,
+    VirginPlayer,
 } from '~/game/types';
 import {
     mockAbilitySetupContext,
@@ -46,18 +48,23 @@ import {
     mockGetInfoAbilityUseContext,
     mockSaintAbilitySetupContext,
     mockSaintAbilityUseContext,
+    mockVirginAbilityUseContext,
 } from '~/__mocks__/ability';
 import {
     getTroubleBrewingCharacterSheet,
     mockCharacterSheet,
 } from '~/__mocks__/character-sheet';
-import { chooseMock, storytellerChooseOneMock } from '~/__mocks__/game-ui';
+import {
+    chooseMock,
+    storytellerChooseOneMock,
+    storytellerConfirmMock,
+} from '~/__mocks__/game-ui';
 import { Slayer } from '~/content/characters/output/slayer';
 import type {
     SlayerAbility,
     SlayerAbilityUseResult,
 } from '~/game/ability/slayer';
-import type { Execution } from '~/game/execution';
+import { Execution } from '~/game/execution';
 import type { ButlerAbility } from '~/game/ability/butler';
 import { DrunkAbility } from '~/game/ability/drunk';
 import { AbilityLoader } from '~/game/ability/loader';
@@ -75,6 +82,9 @@ import {
     SaintAbilityUseContext,
 } from '~/game/ability/saint';
 import type { Players } from '~/game/players';
+import { SpyAbility } from '~/game/ability/spy';
+import { VirginAbility, VirginAbilityUseContext } from '~/game/ability/virgin';
+import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -204,6 +214,100 @@ export async function mockRecluseRegisterAs<T>(
     storytellerChooseOneMock.mockReset();
 
     return result;
+}
+
+export async function mockSpyRegisterAs<T>(
+    spyPlayer: SpyPlayer,
+    action: AsyncFactory<T>,
+    registerAsCharacter: CharacterToken,
+    registerAsAlignment?: Alignment,
+    spyAbility?: SpyAbility,
+    setupContext?: AbilitySetupContext,
+    characterSheet?: CharacterSheet,
+    requireAbilitySetup = true
+): Promise<T> {
+    if (requireAbilitySetup) {
+        spyAbility ??= new SpyAbility();
+        characterSheet ??= getTroubleBrewingCharacterSheet();
+
+        await spyAbility.setup(
+            setupContext ??
+                mockAbilitySetupContext(
+                    spyPlayer,
+                    undefined,
+                    undefined,
+                    undefined,
+                    characterSheet
+                )
+        );
+    }
+
+    registerAsAlignment ??= registerAsCharacter.characterType.defaultAlignment;
+
+    storytellerChooseOneMock.mockImplementation(
+        (options: Generator<any>, reason?: string) => {
+            if (reason?.includes('character')) {
+                return Promise.resolve(registerAsCharacter);
+            } else if (reason?.includes('alignment')) {
+                return Promise.resolve(registerAsAlignment);
+            } else {
+                return Promise.resolve(options.take(1));
+            }
+        }
+    );
+    const result = await action();
+    storytellerChooseOneMock.mockReset();
+
+    return result;
+}
+
+export async function expectAfterNominateVirgin(
+    nominator: IPlayer,
+    virginPlayer: VirginPlayer,
+    execution?: Execution,
+    ability?: VirginAbility,
+    context?: VirginAbilityUseContext,
+    expectDead = true,
+    expectHasAbility = false
+) {
+    execution ??= Execution.init();
+    ability ??= new VirginAbility();
+    context ??= mockVirginAbilityUseContext(virginPlayer, execution);
+
+    expect(await ability.isEligible(context)).toBeTrue();
+    const result = await ability.use(context);
+
+    expect(result.status).toEqual(
+        AbilityUseStatus.Success | AbilityUseStatus.HasEffect
+    );
+
+    if (expectDead) {
+        storytellerConfirmMock.mockResolvedValue(true);
+    }
+
+    const [_gamePhase, recover] = mockGamePhaseTemporarily(3);
+    const nomination = await nominator.nominate(virginPlayer, execution);
+
+    recover();
+
+    if (expectHasAbility) {
+        expect(nomination).toBeUndefined();
+    } else {
+        expect(nomination).toBeDefined();
+    }
+
+    if (expectDead) {
+        expect(await nominator.dead).toBeTrue();
+        storytellerConfirmMock.mockReset();
+    } else {
+        expect(await nominator.dead).toBeFalse();
+    }
+
+    if (expectHasAbility) {
+        expect(await ability.isEligible(context)).toBeTrue();
+    } else {
+        expect(await ability.isEligible(context)).toBeFalse();
+    }
 }
 
 export async function expectDieInsteadAfterDemonAttack(

@@ -12,6 +12,14 @@ class BaseSpyInformationRequester<
     readonly expectedCharacter = Spy;
 }
 
+export interface SpyInformationRequester<
+    TInformationRequestContext extends InformationRequestContext<SpyInformation>
+> extends CharacterInformationRequester<
+        SpyInformation,
+        TInformationRequestContext
+    > {}
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SpyInformationRequester = EachNight(
     IsAlive(BaseSpyInformationRequester)
 );

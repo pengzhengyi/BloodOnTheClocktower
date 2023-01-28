@@ -54,7 +54,10 @@ export class NominateVirginPenalty extends Effect<Execution> {
             ) {
                 this._hasNominatedVirgin = true;
 
-                if (await nomination.nominator.isTownsfolk) {
+                if (
+                    await nomination.nominator.from(this.virginPlayer)
+                        .isTownsfolk
+                ) {
                     await execution.execute(
                         nomination.nominator,
                         DeadReason.NominateVirgin
