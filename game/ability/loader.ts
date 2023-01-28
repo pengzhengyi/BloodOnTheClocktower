@@ -2,6 +2,7 @@
 import type { CharacterToken } from '../character';
 import { Generator } from '../collections';
 import type { Constructor } from '../types';
+import { CharacterType, Minion } from '../character-type';
 import { ButlerAbility } from './butler';
 import { GetChefInformationAbility } from './chef';
 import { GetEmpathInformationAbility } from './empath';
@@ -24,9 +25,11 @@ import type {
     AbilityUseResult,
     IAbility,
     ICharacterAbilityClass,
+    ICharacterTypeAbilityClass,
 } from './ability';
 import { DrunkAbility } from './drunk';
 import { PoisonerAbility } from './poisoner';
+import { GetMinionInformationAbility } from './minion';
 import { Butler } from '~/content/characters/output/butler';
 import { Chef } from '~/content/characters/output/chef';
 import { Empath } from '~/content/characters/output/empath';
@@ -132,6 +135,18 @@ const CharacterAbilityClasses: Array<
     },
 ];
 
+const CharacterTypeAbilityClasses: Array<
+    ICharacterTypeAbilityClass<
+        AbilityUseContext,
+        AbilityUseResult,
+        AbilitySetupContext
+    >
+> = [
+    class extends GetMinionInformationAbility {
+        static origin: typeof CharacterType = Minion;
+    },
+];
+
 export class AbilityLoader implements IAbilityLoader {
     static characterToAbility: Map<
         CharacterToken,
@@ -147,6 +162,23 @@ export class AbilityLoader implements IAbilityLoader {
                 CharacterAbilityClass,
             ],
             CharacterAbilityClasses
+        )
+    );
+
+    static characterTypeToAbility: Map<
+        typeof CharacterType,
+        ICharacterTypeAbilityClass<
+            AbilityUseContext,
+            AbilityUseResult,
+            AbilitySetupContext
+        >
+    > = new Map(
+        Generator.map(
+            (CharacterTypeAbilityClass) => [
+                CharacterTypeAbilityClass.origin,
+                CharacterTypeAbilityClass,
+            ],
+            CharacterTypeAbilityClasses
         )
     );
 
@@ -197,11 +229,21 @@ export class AbilityLoader implements IAbilityLoader {
         if (characterAbility !== undefined) {
             abilities.push(characterAbility);
         }
+        const characterTypeAbility = this.loadCharacterTypeAbility(character);
+        if (characterTypeAbility !== undefined) {
+            abilities.push(characterTypeAbility);
+        }
 
         return abilities;
     }
 
     loadCharacterAbility(character: CharacterToken) {
         return AbilityLoader.characterToAbility.get(character);
+    }
+
+    loadCharacterTypeAbility(character: CharacterToken) {
+        return AbilityLoader.characterTypeToAbility.get(
+            character.characterType
+        );
     }
 }

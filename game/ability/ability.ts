@@ -7,6 +7,7 @@ import type {
     AsyncFactory,
     Constructor,
     IBindToCharacter,
+    IBindToCharacterType,
     StaticThis,
 } from '../types';
 import type { CharacterSheet } from '../character-sheet';
@@ -22,6 +23,7 @@ import type {
     IInformationRequester,
 } from '../info/requester/requester';
 import type { IClocktower } from '../clocktower';
+import type { ICharacterTypeInformationRequester } from '../info/requester/common';
 import type { IAbilityLoader } from './loader';
 import {
     AbilitySuccessCommunicatedInfo,
@@ -57,8 +59,20 @@ export interface IAbility<
 > {
     hasSetup: boolean;
 
+    /**
+     * Whether this ability is eligible to use.
+     *
+     * For example, an ability might be ineligible when its player is dead or the ability can only be used once.
+     * @param context An context for using the ability.
+     * @returns A promise that resolves to whether the ability is eligible to use.
+     */
     isEligible(context: TAbilityUseContext): Promise<boolean>;
 
+    /**
+     * Whether this ability will malfunction, such as when the player is drunk or poisoned. When an ability malfunctions, its player might receive false info or has no ability.
+     * @param context An context for using the ability.
+     * @returns A promise that resolves to whether the ability will malfunction.
+     */
     willMalfunction(context: TAbilityUseContext): Promise<boolean>;
 
     setup(context: TAbilitySetupContext): Promise<void>;
@@ -69,6 +83,11 @@ export interface IAbility<
 
     loseAbility(reason?: string): Promise<void>;
 
+    /**
+     * Create an context for using the ability.
+     * @param args Arguments for creating the context.
+     * @returns A promise that resolves to the constructed context.
+     */
     createContext(...args: any[]): Promise<TAbilityUseContext>;
 }
 
@@ -80,6 +99,15 @@ export type ICharacterAbilityClass<
     IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
 > &
     IBindToCharacter;
+
+export type ICharacterTypeAbilityClass<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult,
+    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
+> = Constructor<
+    IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
+> &
+    IBindToCharacterType;
 
 /**
  * {@link `glossary["Ability"]`}
@@ -121,10 +149,20 @@ export abstract class Ability<
 
     protected _hasSetup = false;
 
+    /**
+     * Use an ability when it will malfunction.
+     * @param context An context for using the ability.
+     * @returns The result of using the ability.
+     */
     abstract useWhenMalfunction(
         context: TAbilityUseContext
     ): Promise<TAbilityUseResult | AbilityUseResult>;
 
+    /**
+     * Use an ability when it will not malfunction.
+     * @param context An context for using the ability.
+     * @returns The result of using the ability.
+     */
     abstract useWhenNormal(
         context: TAbilityUseContext
     ): Promise<TAbilityUseResult | AbilityUseResult>;
@@ -517,3 +555,11 @@ export abstract class GetCharacterInformationAbility<
         );
     }
 }
+
+export abstract class GetCharacterTypeInformationAbility<
+    TInformation,
+    TInformationRequester extends ICharacterTypeInformationRequester<
+        TInformation,
+        InformationRequestContext<TInformation>
+    >
+> extends GetCharacterInformationAbility<TInformation, TInformationRequester> {}

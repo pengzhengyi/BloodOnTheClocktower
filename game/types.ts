@@ -1,7 +1,7 @@
 import type { Execution } from './execution';
 import type { Game } from './game';
 import type { IPlayer } from './player';
-import type { Minion, Demon, Townsfolk } from './character-type';
+import type { Minion, Demon, Townsfolk, CharacterType } from './character-type';
 import type { CharacterToken } from './character';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';
@@ -223,4 +223,8 @@ export type TownsfolkPlayer = IPlayer & {
 
 export interface IBindToCharacter {
     origin: CharacterToken;
+}
+
+export interface IBindToCharacterType {
+    origin: typeof CharacterType;
 }

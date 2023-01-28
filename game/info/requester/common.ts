@@ -1,6 +1,7 @@
 import type { Info } from '../info';
 import type { InfoProvideContext } from '../provider/provider';
 import {
+    IInformationRequester,
     InfoRequestContext,
     InfoRequester,
     InformationRequestContext,
@@ -159,10 +160,24 @@ export function hasEnoughPlayerForDemonMinionInformation<
     };
 }
 
-export abstract class CharacterTypeInformationRequester<
+export interface ICharacterTypeInformationRequester<
     TInformation,
     TInformationRequestContext extends InformationRequestContext<TInformation>
-> extends InformationRequester<TInformation, TInformationRequestContext> {
+> extends IInformationRequester<TInformation, TInformationRequestContext> {
+    readonly expectedCharacterType: typeof CharacterType;
+}
+
+export abstract class CharacterTypeInformationRequester<
+        TInformation,
+        TInformationRequestContext extends InformationRequestContext<TInformation>
+    >
+    extends InformationRequester<TInformation, TInformationRequestContext>
+    implements
+        ICharacterTypeInformationRequester<
+            TInformation,
+            TInformationRequestContext
+        >
+{
     abstract readonly expectedCharacterType: typeof CharacterType;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {
