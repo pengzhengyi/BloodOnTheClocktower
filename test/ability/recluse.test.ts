@@ -28,6 +28,7 @@ import {
     mockClocktowerForUndertaker,
 } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { Poisoner } from '~/content/characters/output/poisoner';
 
 describe('test RecluseAbility', () => {
     /**
@@ -204,5 +205,37 @@ describe('test RecluseAbility', () => {
         );
 
         expect(info.numPairEvilPlayers).toEqual(0);
+    });
+
+    /**
+     * {@link `investigator["gameplay"][2]`}
+     */
+    test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
+        const infoProvideContext =
+            await createInfoProvideContextFromPlayerDescriptions(
+                async (player) => (await player.character) === Investigator,
+                `Brianna is the Recluse`,
+                `Marianna is the Imp`,
+                `${faker.name.firstName()} is the Investigator`
+            );
+
+        const reclusePlayer = (await infoProvideContext.players.findByCharacter(
+            Recluse
+        ))!;
+
+        const ability = new GetInvestigatorInformationAbility();
+        const info = await mockRecluseRegisterAs(
+            reclusePlayer,
+            async () =>
+                await expectCharacterGetInformation(
+                    ability,
+                    () => infoProvideContext,
+                    [(context) => mockClocktowerWithIsFirstNight(context, true)]
+                ),
+            Poisoner
+        );
+
+        expect(info.character).toEqual(Poisoner);
+        expect(info.characterType).toEqual(Minion);
     });
 });

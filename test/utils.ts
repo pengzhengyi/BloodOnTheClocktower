@@ -2,7 +2,7 @@ import { Alignment } from '~/game/alignment';
 import { CharacterLoader } from '~/game/character-loader';
 import { Player } from '~/game/player';
 
-const regex = /(.*) is (?:the|a|an)\s(evil|good|)\s?(.*)/i;
+const regex = /(.*) is\s?(?:the|a|an)?\s(evil|good|)\s?(.*)/i;
 
 export async function playerFromDescription(description: string) {
     const matchResult = description.match(regex);

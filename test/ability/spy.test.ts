@@ -13,7 +13,7 @@ import { Monk } from '~/content/characters/output/monk';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
-import { Townsfolk } from '~/game/character-type';
+import { Minion, Townsfolk } from '~/game/character-type';
 import {
     mockClocktowerForUndertaker,
     mockClocktowerWithIsFirstNight,
@@ -34,9 +34,89 @@ import {
     storytellerChooseOneMock,
 } from '~/__mocks__/game-ui';
 import type { ChefInformation } from '~/game/info/provider/chef';
+import type { InvestigatorInformation } from '~/game/info/provider/investigator';
 import type { Information } from '~/game/info/information';
+import { Investigator } from '~/content/characters/output/investigator';
+import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
 
 describe('test SpyAbility', () => {
+    /**
+     * {@link `washerwoman["gameplay"][2]`}
+     */
+    test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', async () => {
+        const washerwomanPlayer = await createBasicPlayer(
+            undefined,
+            Washerwoman
+        );
+
+        const Sarah = await playerFromDescription('Sarah is the Scarlet Woman');
+
+        const Marianna = await playerFromDescription('Marianna is the Spy');
+
+        const washerwomanAbility = new GetWasherwomanInformationAbility();
+
+        const info = await mockSpyRegisterAs(
+            Marianna,
+            () =>
+                expectCharacterGetInformation(
+                    washerwomanAbility,
+                    () =>
+                        createInfoProvideContext(washerwomanPlayer, [
+                            Marianna,
+                            Sarah,
+                        ]),
+                    [(context) => mockClocktowerWithIsFirstNight(context, true)]
+                ),
+            Ravenkeeper
+        );
+
+        expect(info.characterType).toBe(Townsfolk);
+        expect(info.players).toIncludeSameMembers([Marianna, Sarah]);
+        expect(info.character).toBe(Ravenkeeper);
+    });
+
+    /**
+     * {@link `investigator["gameplay"][1]`}
+     */
+    test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', async () => {
+        const investigatorPlayer = await createBasicPlayer(
+            undefined,
+            Investigator
+        );
+
+        const Lewis = await playerFromDescription('Sarah is the Poisoner');
+
+        const Angelus = await playerFromDescription('Angelus is the Spy');
+
+        const investigatorAbility = new GetInvestigatorInformationAbility();
+
+        mockStorytellerChooseMatchingOne<InvestigatorInformation>(
+            (info) => info.character === Spy,
+            2
+        );
+
+        const info = await mockSpyRegisterAs(
+            Angelus,
+            () =>
+                expectCharacterGetInformation(
+                    investigatorAbility,
+                    () =>
+                        createInfoProvideContext(investigatorPlayer, [
+                            Angelus,
+                            Lewis,
+                        ]),
+                    [(context) => mockClocktowerWithIsFirstNight(context, true)]
+                ),
+            Spy
+        );
+
+        storytellerChooseOneMock.mockReset();
+
+        expect(info.characterType).toBe(Minion);
+        expect(info.players).toIncludeSameMembers([Angelus, Lewis]);
+        expect(info.character).toBe(Spy);
+    });
+
     /**
      * {@link `spy["gameplay"][0]`}
      */

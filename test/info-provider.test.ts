@@ -293,13 +293,6 @@ describe('test WasherwomanInformationProvider', () => {
             ).toEqual(1);
         }
     });
-
-    /**
-     * {@link `washerwoman["gameplay"][2]`}
-     */
-    test('Marianna is the Spy, and Sarah is the Scarlet Woman. The Washerwoman learns that one of them is the Ravenkeeper. (This happens because the Spy is registering as a Townsfolk—in this case, the Ravenkeeper)', async () => {
-        // TODO
-    });
 });
 
 describe('test LibrarianInformationProvider', () => {
@@ -425,20 +418,6 @@ describe('test InvestigatorInformationProvider', () => {
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);
         }
-    });
-
-    /**
-     * {@link `investigator["gameplay"][1]`}
-     */
-    test('Angelus is the Spy, and Lewis is the Poisoner. The Investigator learns that either Angelus or Lewis is the Spy.', async () => {
-        // TODO
-    });
-
-    /**
-     * {@link `investigator["gameplay"][2]`}
-     */
-    test('Brianna is the Recluse, and Marianna is the Imp. The Investigator learns that either Brianna or Marianna is the Poisoner. (This happens because the Recluse is registering as a Minion—in this case, the Poisoner.)', async () => {
-        // TODO
     });
 });
 
@@ -813,13 +792,6 @@ describe('test UndertakerInformationProvider', () => {
                 await provider.evaluateGoodness(option.info, context)
             ).toEqual(1);
         }
-    });
-
-    /**
-     * {@link `undertaker["gameplay"][2]`}
-     */
-    test('The Spy is executed. Two Travellers are exiled. That night, the Undertaker is shown the Butler token, because the Spy is registering as the Butler, and because the exiles are not executions.', async () => {
-        // TODO
     });
 });
 
