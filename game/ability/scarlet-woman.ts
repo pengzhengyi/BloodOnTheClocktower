@@ -76,10 +76,11 @@ class BaseScarletWomanBecomeDemonEffect
         ) as IPlayer['setDead'];
 
         updatedContext.result = async (reason: DeadReason) => {
+            const canBecomeDemon = await this.canBecomeDemon();
             const death = await originalSetDead(reason);
 
-            if (await context.interaction.target.dead) {
-                await this.tryBecomeDemon();
+            if ((await context.interaction.target.dead) && canBecomeDemon) {
+                await this.becomeDemon();
             }
 
             return death;
@@ -116,18 +117,13 @@ class BaseScarletWomanBecomeDemonEffect
         player.effects.delete(this);
     }
 
-    protected async tryBecomeDemon() {
-        const players = await this.getPlayers();
-        if (await this.canBecomeDemon(players)) {
-            await this.becomeDemon();
-        }
-    }
-
     protected async becomeDemon() {
         await this.scarletWomanPlayer.overrideCharacterType(Demon);
     }
 
-    protected async canBecomeDemon(players: Players): Promise<boolean> {
+    protected async canBecomeDemon(): Promise<boolean> {
+        const players = await this.getPlayers();
+
         let playerCount = 0;
         for await (const _aliveNontravellerPlayer of players
             .clone()
