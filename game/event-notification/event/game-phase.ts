@@ -2,7 +2,7 @@ import type { IEvent } from '../types';
 import type { IGamePhase } from '~/game/game-phase';
 
 export interface IGamePhaseEvent extends IEvent {
-    gamePhase: IGamePhase;
+    readonly gamePhase: IGamePhase;
 }
 
 export class GamePhaseEvent implements IGamePhaseEvent {

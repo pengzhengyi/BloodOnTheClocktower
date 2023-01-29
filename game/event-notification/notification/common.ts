@@ -16,6 +16,8 @@ export abstract class AbstractNotification<
 {
     abstract readonly defaultPriorityWhenNotProvided: number;
 
+    abstract readonly eventCategories: Iterable<TEventCategory>;
+
     protected subscribers: LazyMap<
         TEventCategory,
         OrderedMap<number, Set<ISubscriber<IEvent>>>
@@ -31,10 +33,6 @@ export abstract class AbstractNotification<
         TEventCategory,
         Map<ISubscriber<IEvent>, number>
     > = new LazyMap((_key) => new Map());
-
-    protected get eventCategories(): Iterable<TEventCategory> {
-        return this.subscriberToPriority.keys();
-    }
 
     subscribe<TEvent extends IEvent = IEvent>(
         eventCategory: TEventCategory,

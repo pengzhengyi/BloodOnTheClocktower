@@ -1,4 +1,4 @@
-import type { Predicate } from './types';
+import type { ISingleton, Predicate, NoParamConstructor } from './types';
 
 /**
  * Iterate from the element at specified index to last element and then from first element to the last element before specified index.
@@ -136,4 +136,27 @@ export function binarySearch<T>(
     }
 
     return end;
+}
+
+export function Singleton<
+    T extends object,
+    TClass extends NoParamConstructor<T> = NoParamConstructor<T>
+>(ClassConstructor: TClass): ISingleton<T> & Omit<TClass, 'new'> {
+    // @ts-ignore: force type conversion with singleton pattern
+    return class Singleton extends ClassConstructor {
+        static getInstance() {
+            if (this._instance === undefined) {
+                this._instance = new this() as T;
+            }
+
+            return this._instance;
+        }
+
+        protected static _instance?: T;
+
+        // eslint-disable-next-line no-useless-constructor
+        protected constructor() {
+            super();
+        }
+    };
 }

@@ -55,7 +55,7 @@ repos:
 
   # Groups and sorts python imports, see .isort.cfg for configuration
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.4
+    rev: 5.12.0
     hooks:
       - id: isort
         stages: [commit]
@@ -80,7 +80,7 @@ repos:
   # Push hooks (runs on push because developers may commit incomplete changes)
   # Python files linter, see .pylintrc for configuration
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.16.0b0
+    rev: v2.16.0b1
     hooks:
       - id: pylint
         stages: [push]

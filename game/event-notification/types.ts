@@ -5,6 +5,11 @@ export interface IEvent {
 }
 
 export interface IEventCategory {
+    /**
+     * Determine whether an event belongs to this event category.
+     * @param event An event.
+     * @returns True if provided event belongs to this event category, false otherwise.
+     */
     has(event: IEvent): boolean;
 }
 

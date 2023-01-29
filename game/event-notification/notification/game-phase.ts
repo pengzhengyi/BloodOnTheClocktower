@@ -51,8 +51,8 @@ export class GamePhaseNotification
         Generator.map(
             ([category, phase]) => [phase, category],
             Generator.map(
-                (Category: TCategoryClass) =>
-                    [new Category(), Category.phase] as [
+                (CategoryClass: TCategoryClass) =>
+                    [CategoryClass.getInstance(), CategoryClass.phase] as [
                         IGamePhaseCategory,
                         TCategoryPhase
                     ],
@@ -66,6 +66,10 @@ export class GamePhaseNotification
     // eslint-disable-next-line no-dupe-class-members
     static getEventCategory(phase: Phase): IGamePhaseCategory | undefined {
         return this.phaseToCategory.get(phase);
+    }
+
+    get eventCategories() {
+        return GamePhaseNotification.phaseToCategory.values();
     }
 
     subscribe<TEvent extends IEvent = IEvent>(

@@ -113,6 +113,9 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     setDead(reason?: DeadReason): Promise<Death>;
     setDrunk(reason?: DrunkReason): Promise<boolean>;
     setPoison(reason: IPoisonedReason): Promise<boolean>;
+    overrideCharacterType(
+        characterType: typeof CharacterType
+    ): Promise<typeof CharacterType>;
     removePoison(reason: IPoisonedReason): Promise<boolean>;
     attack(victim: IPlayer): Promise<Death>;
     nominate(
@@ -130,6 +133,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     storytellerGet(key: '_poisoned'): boolean;
     storytellerGet(key: '_sober'): boolean;
     storytellerGet(key: '_drunk'): boolean;
+    storytellerGet(key: '_isTheDemon'): boolean;
     storytellerGet(key: '_hasAbility'): boolean;
     storytellerGet(key: '_willGetTrueInformation'): boolean;
     storytellerGet(key: '_willGetFalseInformation'): boolean;
@@ -158,6 +162,9 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     protected static revokeVoteTokenDefaultPrompt =
         'Revoke vote token for player: ';
+
+    protected static overrideCharacterTypeDefaultPrompt =
+        'Override character type for player: ';
 
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
         keyof ProxyHandler<IPlayer>
@@ -408,6 +415,10 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         );
     }
 
+    protected get _isTheDemon(): boolean {
+        return this._alive && this._isDemon;
+    }
+
     get isAliveNontraveller() {
         const isNontraveller = this.isTraveller.then(
             (isTraveller) => !isTraveller
@@ -419,8 +430,14 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     get characterType(): Promise<typeof CharacterType> {
+        if (this.overriddenCharacterType !== undefined) {
+            return Promise.resolve(this.overriddenCharacterType);
+        }
+
         return this.character.then((character) => character.characterType);
     }
+
+    protected overriddenCharacterType?: typeof CharacterType;
 
     get isGood(): Promise<boolean> {
         return this.alignment.then((alignment) => alignment === Alignment.Good);
@@ -508,6 +525,21 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     setPoison(reason: IPoisonedReason): Promise<boolean> {
         this.state.setNegativeState(State.Poisoned, true, reason);
         return this.poisoned;
+    }
+
+    async overrideCharacterType(
+        characterType: typeof CharacterType,
+        reason?: string
+    ): Promise<typeof CharacterType> {
+        if (
+            await Environment.current.gameUI.storytellerConfirm(
+                this.formatPromptForOverrideCharacterType(reason)
+            )
+        ) {
+            this.overriddenCharacterType = characterType;
+        }
+
+        return this.characterType;
     }
 
     removePoison(reason: IPoisonedReason): Promise<boolean> {
@@ -599,6 +631,16 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         return (
             (hasReason ? reason + ' ' : '') +
             Player.revokeVoteTokenDefaultPrompt +
+            playerString
+        );
+    }
+
+    protected formatPromptForOverrideCharacterType(reason?: string): string {
+        const hasReason = reason === undefined;
+        const playerString = this.toString();
+        return (
+            (hasReason ? reason + ' ' : '') +
+            Player.overrideCharacterTypeDefaultPrompt +
             playerString
         );
     }

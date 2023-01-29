@@ -3,6 +3,7 @@ import type { Game } from './game';
 import type { IPlayer } from './player';
 import type { Minion, Demon, Townsfolk, CharacterType } from './character-type';
 import type { CharacterToken } from './character';
+import type { Phase } from './phase';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';
 import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
@@ -19,8 +20,10 @@ import type { Imp } from '~/content/characters/output/imp';
 import type { Poisoner } from '~/content/characters/output/poisoner';
 import type { Spy } from '~/content/characters/output/spy';
 import type { Chef } from '~/content/characters/output/chef';
-import { Empath } from '~/content/characters/output/empath';
+import type { Empath } from '~/content/characters/output/empath';
+import type { ScarletWoman } from '~/content/characters/output/scarletwoman';
 
+export type NoParamConstructor<T> = { new (): T };
 export type Constructor<T> = { new (...args: any[]): T };
 export type StaticThis<T> = Constructor<T>;
 
@@ -48,6 +51,7 @@ export type AsyncReducer<T1, T2> = (
 export type Loader<K, V> = (key: K) => V | undefined;
 export type Factory<V> = () => V;
 export type AsyncFactory<V> = () => Promise<V>;
+export type AnyFactory<V> = Factory<V> | AsyncFactory<V>;
 
 export type ResolveCallback<T> = (value: T | PromiseLike<T>) => void;
 export type RejectCallback = (reason?: any) => void;
@@ -147,72 +151,80 @@ export type Neighbor = [IPlayer, IPlayer];
 export type AnyObject = Record<string, any>;
 
 export type FortuneTellerPlayer = IPlayer & {
-    character: FortuneTeller;
+    character: Promise<FortuneTeller>;
 };
 
 export type EmpathPlayer = IPlayer & {
-    character: Empath;
+    character: Promise<Empath>;
 };
 
 export type ChefPlayer = IPlayer & {
-    character: Chef;
+    character: Promise<Chef>;
 };
 
 export type MonkPlayer = IPlayer & {
-    character: Monk;
+    character: Promise<Monk>;
 };
 
 export type RavenkeeperPlayer = IPlayer & {
-    character: Ravenkeeper;
+    character: Promise<Ravenkeeper>;
 };
 
 export type VirginPlayer = IPlayer & {
-    character: Virgin;
+    character: Promise<Virgin>;
 };
 
 export type SlayerPlayer = IPlayer & {
-    character: Slayer;
+    character: Promise<Slayer>;
 };
 
 export type SoldierPlayer = IPlayer & {
-    character: Soldier;
+    character: Promise<Soldier>;
 };
 
 export type MayorPlayer = IPlayer & {
-    character: Mayor;
+    character: Promise<Mayor>;
 };
 
 export type ButlerPlayer = IPlayer & {
-    character: Butler;
+    character: Promise<Butler>;
 };
 
 export type UndertakerPlayer = IPlayer & {
-    character: Undertaker;
+    character: Promise<Undertaker>;
 };
 
 export type ReclusePlayer = IPlayer & {
-    character: Recluse;
+    character: Promise<Recluse>;
 };
 
 export type SaintPlayer = IPlayer & {
-    character: Saint;
+    character: Promise<Saint>;
 };
 
 export type DrunkPlayer = IPlayer & {
-    character: Drunk;
+    character: Promise<Drunk>;
 };
 
 export type PoisonerPlayer = IPlayer & {
-    character: Poisoner;
+    character: Promise<Poisoner>;
 };
 
 export type SpyPlayer = IPlayer & {
-    character: Spy;
+    character: Promise<Spy>;
+};
+
+export type ScarletWomanPlayer = IPlayer & {
+    character: Promise<ScarletWoman>;
 };
 
 export type ImpPlayer = IPlayer & {
-    character: Imp;
+    character: Promise<Imp>;
 };
+
+export interface RequirePhase {
+    phase: Phase;
+}
 
 export interface RequireGame {
     game: Game;
@@ -227,13 +239,13 @@ export interface RequireExecution {
 }
 
 export type MinionPlayer = IPlayer & {
-    characterType: Minion;
+    characterType: Promise<Minion>;
 };
 export type DemonPlayer = IPlayer & {
-    characterType: Demon;
+    characterType: Promise<Demon>;
 };
 export type TownsfolkPlayer = IPlayer & {
-    characterType: Townsfolk;
+    characterType: Promise<Townsfolk>;
 };
 
 export interface IBindToCharacter {
@@ -242,4 +254,8 @@ export interface IBindToCharacter {
 
 export interface IBindToCharacterType {
     origin: typeof CharacterType;
+}
+
+export interface ISingleton<T> {
+    getInstance(): T;
 }

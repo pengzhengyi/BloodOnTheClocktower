@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
 import type { CharacterToken } from '../character';
-import type { IClocktower } from '../clocktower';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, InteractionContext } from '../effect/effect';
 import type {
@@ -14,6 +13,7 @@ import type { IPlayer } from '../player';
 import type { Players } from '../players';
 import type { IPoisonedReason } from '../poisoned-reason';
 import type { PoisonerPlayer } from '../types';
+import type { IGamePhaseNotification } from '../event-notification/notification/game-phase';
 import {
     Ability,
     AbilitySetupContext,
@@ -71,8 +71,11 @@ class BasePoisonEffect
         this.removePoison();
     }
 
-    setupPoisonFadeAway(clocktower: IClocktower, priority?: number) {
-        clocktower.notification.subscribe(Phase.Dusk, this, priority);
+    setupPoisonFadeAway(
+        notification: IGamePhaseNotification,
+        priority?: number
+    ) {
+        notification.subscribe(Phase.Dusk, this, priority);
     }
 
     addPoison() {
@@ -107,7 +110,7 @@ class BasePoisonerAbility extends Ability<
     async setup(context: AbilitySetupContext): Promise<void> {
         await super.setup(context);
         this.poison.setupPriority(context.nightSheet);
-        this.poison.setupPoisonFadeAway(context.clocktower);
+        this.poison.setupPoisonFadeAway(context.clocktower.notification);
     }
 
     async useWhenMalfunction(
