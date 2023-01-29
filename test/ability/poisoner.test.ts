@@ -9,6 +9,7 @@ import {
     expectAfterSlayerKill,
     expectUndertakerToLearn,
     expectAfterExecuteSaint,
+    setupPoisonerAbility,
 } from './common';
 import { Imp } from '~/content/characters/output/imp';
 import { Poisoner } from '~/content/characters/output/poisoner';
@@ -53,13 +54,11 @@ describe('test PoisonerAbility', () => {
         const slayerPlayer = await createBasicPlayer(undefined, Slayer);
         const impPlayer = await createBasicPlayer(undefined, Imp);
 
-        const poisonerAbility = new PoisonerAbility();
-
-        const setupContext = mockPoisonerAbilitySetupContext(
+        const poisonerAbility = await setupPoisonerAbility(
             poisonerPlayer,
+            undefined,
             await getTroubleBrewingNightSheet()
         );
-        await poisonerAbility.setup(setupContext);
 
         await expectAfterPoisonerPoison(
             poisonerAbility,
@@ -97,18 +96,16 @@ describe('test PoisonerAbility', () => {
         const empathPlayer = (await infoProvideContext.players.findByCharacter(
             Empath
         ))!;
-        const poisonerAbility = new PoisonerAbility();
 
         const clocktower = new Clocktower();
-        const setupContext = mockPoisonerAbilitySetupContext(
+        await clocktowerAdvanceToDateAndPhase(clocktower, 0, Phase.Night);
+
+        const poisonerAbility = await setupPoisonerAbility(
             poisonerPlayer,
+            undefined,
             await getTroubleBrewingNightSheet(),
             clocktower
         );
-
-        await clocktowerAdvanceToDateAndPhase(clocktower, 0, Phase.Night);
-
-        await poisonerAbility.setup(setupContext);
 
         await expectAfterPoisonerPoison(
             poisonerAbility,
@@ -173,13 +170,11 @@ describe('test PoisonerAbility', () => {
         );
         infoProvideContext.characterSheet = getTroubleBrewingCharacterSheet();
 
-        const poisonerAbility = new PoisonerAbility();
-
-        const setupContext = mockPoisonerAbilitySetupContext(
+        const poisonerAbility = await setupPoisonerAbility(
             poisonerPlayer,
+            undefined,
             await getTroubleBrewingNightSheet()
         );
-        await poisonerAbility.setup(setupContext);
 
         await expectAfterPoisonerPoison(
             poisonerAbility,

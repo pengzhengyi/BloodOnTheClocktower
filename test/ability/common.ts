@@ -46,6 +46,7 @@ import {
     mockAbilitySetupContext,
     mockAbilityUseContext,
     mockGetInfoAbilityUseContext,
+    mockPoisonerAbilitySetupContext,
     mockSaintAbilitySetupContext,
     mockSaintAbilityUseContext,
     mockVirginAbilityUseContext,
@@ -85,6 +86,7 @@ import type { Players } from '~/game/players';
 import { SpyAbility } from '~/game/ability/spy';
 import { VirginAbility, VirginAbilityUseContext } from '~/game/ability/virgin';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
+import type { IClocktower } from '~/game/clocktower';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -504,6 +506,24 @@ export async function mockButlerChooseMaster(
     chooseMock.mockResolvedValue(master);
     await ability.use(context ?? mockAbilityUseContext(butlerPlayer));
     chooseMock.mockReset();
+}
+
+export async function setupPoisonerAbility(
+    poisonerPlayer: PoisonerPlayer,
+    poisonerAbility?: PoisonerAbility,
+    nightsheet?: NightSheet,
+    clocktower?: IClocktower
+): Promise<PoisonerAbility> {
+    poisonerAbility ??= new PoisonerAbility();
+
+    const setupContext = mockPoisonerAbilitySetupContext(
+        poisonerPlayer,
+        nightsheet,
+        clocktower
+    );
+    await poisonerAbility.setup(setupContext);
+
+    return poisonerAbility;
 }
 
 export async function setupDrunkAbility(
