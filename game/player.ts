@@ -115,9 +115,6 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     setDead(reason?: DeadReason): Promise<Death>;
     setDrunk(reason?: DrunkReason): Promise<boolean>;
     setPoison(reason: IPoisonedReason): Promise<boolean>;
-    overrideCharacterType(
-        characterType: typeof CharacterType
-    ): Promise<typeof CharacterType>;
     removePoison(reason: IPoisonedReason): Promise<boolean>;
     nominate(
         nominated: IPlayer,
@@ -164,9 +161,6 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     protected static revokeVoteTokenDefaultPrompt =
         'Revoke vote token for player: ';
-
-    protected static overrideCharacterTypeDefaultPrompt =
-        'Override character type for player: ';
 
     protected static assignCharacterDefaultPrompt =
         'Assign character and alignment for player: ';
@@ -435,18 +429,12 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     get characterType(): Promise<typeof CharacterType> {
-        if (this.overriddenCharacterType !== undefined) {
-            return Promise.resolve(this.overriddenCharacterType);
-        }
-
         return this.character.then((character) => character.characterType);
     }
 
     protected get _characterType(): typeof CharacterType {
         return this._character.characterType;
     }
-
-    protected overriddenCharacterType?: typeof CharacterType;
 
     get isGood(): Promise<boolean> {
         return this.alignment.then((alignment) => alignment === Alignment.Good);
@@ -490,25 +478,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         force = false,
         reason?: string
     ): Promise<CharacterAssignmentResult> {
-        let shouldReassign = true;
-        if (force) {
-            shouldReassign =
-                await InteractionEnvironment.current.gameUI.storytellerConfirm(
-                    this.formatPromptForAssignCharacter(reason)
-                );
-        } else {
-            await ReassignCharacterToPlayer.catch(
-                () =>
-                    Promise.resolve(
-                        this.validateCharacterNotAssigned(character)
-                    ),
-                async (error) => {
-                    shouldReassign = await error.shouldReassign;
-                }
-            );
-        }
-
-        if (!shouldReassign) {
+        if (!(await this.canAssignCharacter(character, force, reason))) {
             return {
                 player: this,
                 character,
@@ -540,23 +510,6 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     setPoison(reason: IPoisonedReason): Promise<boolean> {
         this.state.setNegativeState(State.Poisoned, true, reason);
         return this.poisoned;
-    }
-
-    async overrideCharacterType(
-        characterType: typeof CharacterType,
-        reason?: string
-    ): Promise<typeof CharacterType> {
-        if (
-            await InteractionEnvironment.current.gameUI.storytellerConfirm(
-                this.formatPromptForOverrideCharacterType(reason)
-            )
-        ) {
-            this.overriddenCharacterType = characterType;
-        }
-
-        // TODO notify character type change
-
-        return this.characterType;
     }
 
     removePoison(reason: IPoisonedReason): Promise<boolean> {
@@ -649,16 +602,6 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         );
     }
 
-    protected formatPromptForOverrideCharacterType(reason?: string): string {
-        const hasReason = reason === undefined;
-        const playerString = this.toString();
-        return (
-            (hasReason ? reason + ' ' : '') +
-            Player.overrideCharacterTypeDefaultPrompt +
-            playerString
-        );
-    }
-
     protected formatPromptForAssignCharacter(reason?: string): string {
         const hasReason = reason === undefined;
         const playerString = this.toString();
@@ -705,5 +648,35 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
                 newCharacter
             );
         }
+    }
+
+    protected async canAssignCharacter(
+        character: CharacterToken,
+        force: boolean,
+        reason?: string
+    ): Promise<boolean> {
+        if (this._character === undefined) {
+            return true;
+        }
+
+        let shouldReassign = true;
+        if (force) {
+            shouldReassign =
+                await InteractionEnvironment.current.gameUI.storytellerConfirm(
+                    this.formatPromptForAssignCharacter(reason)
+                );
+        } else {
+            await ReassignCharacterToPlayer.catch(
+                () =>
+                    Promise.resolve(
+                        this.validateCharacterNotAssigned(character)
+                    ),
+                async (error) => {
+                    shouldReassign = await error.shouldReassign;
+                }
+            );
+        }
+
+        return shouldReassign;
     }
 }

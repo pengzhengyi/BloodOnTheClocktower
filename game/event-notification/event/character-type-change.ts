@@ -1,6 +1,7 @@
 import type { IEvent } from '../types';
 import { IPlayer } from '~/game/player';
 import { CharacterType, Demon } from '~/game/character-type';
+import { PlayerCharacterTypeBecomeUndefined } from '~/game/exception';
 
 export enum ChangeType {
     Become,
@@ -85,9 +86,93 @@ const LoseDemon: ICharacterTypeChange = {
 export class LoseDemonEvent extends CharacterTypeChangeEvent {
     constructor(
         affectedPlayer: IPlayer,
-        previousCharacterType: typeof CharacterType,
+        newCharacterType: typeof CharacterType,
         reason?: string
     ) {
-        super(affectedPlayer, previousCharacterType, Demon, LoseDemon, reason);
+        super(affectedPlayer, Demon, newCharacterType, LoseDemon, reason);
+    }
+}
+
+export abstract class CharacterTypeChangeEventFactory {
+    static getCharacterTypeChangeEvent(
+        affectedPlayer: IPlayer,
+        previousCharacterType?: typeof CharacterType,
+        newCharacterType?: typeof CharacterType,
+        reason?: string
+    ): Array<ICharacterTypeChangeEvent> {
+        if (previousCharacterType === undefined) {
+            return [];
+        }
+
+        if (newCharacterType === undefined) {
+            throw new PlayerCharacterTypeBecomeUndefined(
+                affectedPlayer,
+                previousCharacterType,
+                newCharacterType,
+                reason
+            );
+        }
+
+        if (previousCharacterType === newCharacterType) {
+            return [];
+        }
+
+        const events = [];
+
+        const becomeCharacterTypeChangeEvent =
+            this.getBecomeCharacterTypeChangeEvent(
+                affectedPlayer,
+                previousCharacterType,
+                newCharacterType,
+                reason
+            );
+        if (becomeCharacterTypeChangeEvent !== undefined) {
+            events.push(becomeCharacterTypeChangeEvent);
+        }
+
+        const loseCharacterTypeChangeEvent =
+            this.getLoseCharacterTypeChangeEvent(
+                affectedPlayer,
+                previousCharacterType,
+                newCharacterType,
+                reason
+            );
+        if (loseCharacterTypeChangeEvent !== undefined) {
+            events.push(loseCharacterTypeChangeEvent);
+        }
+
+        return events;
+    }
+
+    protected static getBecomeCharacterTypeChangeEvent(
+        affectedPlayer: IPlayer,
+        previousCharacterType: typeof CharacterType,
+        newCharacterType: typeof CharacterType,
+        reason?: string
+    ): ICharacterTypeChangeEvent | undefined {
+        switch (newCharacterType) {
+            case Demon:
+                return new BecomeDemonEvent(
+                    affectedPlayer,
+                    previousCharacterType,
+                    reason
+                );
+        }
+    }
+
+    protected static getLoseCharacterTypeChangeEvent(
+        affectedPlayer: IPlayer,
+        previousCharacterType: typeof CharacterType,
+        newCharacterType: typeof CharacterType,
+        reason?: string
+    ): ICharacterTypeChangeEvent | undefined {
+        switch (previousCharacterType) {
+            case Demon:
+                return new LoseDemonEvent(
+                    affectedPlayer,
+                    newCharacterType,
+                    reason
+                );
+        }
     }
 }

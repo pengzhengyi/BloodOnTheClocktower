@@ -425,6 +425,20 @@ export class ReassignCharacterToPlayer extends RecoverableGameError {
     }
 }
 
+export class PlayerCharacterTypeBecomeUndefined extends RecoverableGameError {
+    static description =
+        'player character type unexpectedly change to undefined';
+
+    constructor(
+        readonly player: IPlayer,
+        readonly previousCharacterType: typeof CharacterType,
+        readonly newCharacterType: undefined,
+        readonly reason?: string
+    ) {
+        super(PlayerCharacterTypeBecomeUndefined.description);
+    }
+}
+
 export class IncorrectNumberOfCharactersToAssign extends RecoverableGameError {
     static description =
         'the number of characters to assign does not match the number of players';
