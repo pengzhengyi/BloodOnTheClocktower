@@ -123,7 +123,7 @@ export abstract class Character {
     }
 
     static toString() {
-        return `${this.readableName})`;
+        return `${this.readableName}`;
     }
 
     static toScriptCharacter(): ScriptCharacter {

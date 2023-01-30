@@ -33,6 +33,8 @@ import type {
     AsyncFactory,
     DemonPlayer,
     DrunkPlayer,
+    ImpPlayer,
+    MinionPlayer,
     MonkPlayer,
     PoisonerPlayer,
     ReclusePlayer,
@@ -59,6 +61,7 @@ import {
 } from '~/__mocks__/character-sheet';
 import {
     chooseMock,
+    mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
     storytellerConfirmMock,
 } from '~/__mocks__/game-ui';
@@ -92,6 +95,8 @@ import type { IClocktower } from '~/game/clocktower';
 import { Demon } from '~/game/character-type';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';
+import { ImpAbility, ImpAbilityUseResult } from '~/game/ability/imp';
+import { Imp } from '~/content/characters/output/imp';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -159,7 +164,7 @@ export async function monkProtectPlayer(
 
 export async function expectAfterDemonAttack(
     playerToKill: IPlayer,
-    demonPlayer: IPlayer,
+    demonPlayer: DemonPlayer,
     expectToBeDead = true
 ): Promise<Death> {
     expect(await playerToKill.alive).toBeTrue();
@@ -174,6 +179,70 @@ export async function expectAfterDemonAttack(
         expect(await playerToKill.alive).toBeTrue();
         expect(death).toBeUndefined();
     }
+
+    return death;
+}
+
+export async function expectAfterImpKill(
+    playerToKill: IPlayer,
+    impPlayer: ImpPlayer,
+    impAbility?: ImpAbility,
+    setupContext?: AbilitySetupContext,
+    useContext?: AbilityUseContext,
+    players?: Players,
+    expectToBeDead = true
+): Promise<Death | undefined> {
+    expect(await playerToKill.alive).toBeTrue();
+
+    if (impAbility === undefined) {
+        impAbility = new ImpAbility();
+        setupContext ??= mockAbilitySetupContext(impPlayer, players);
+        await impAbility.setup(setupContext);
+    }
+
+    useContext ??= mockAbilityUseContext(impPlayer, players);
+    chooseMock.mockResolvedValue(playerToKill);
+    const result = (await impAbility.use(useContext)) as ImpAbilityUseResult;
+    chooseMock.mockReset();
+
+    expect(result.playerToKill?.equals(playerToKill)).toBeTrue();
+    if (expectToBeDead) {
+        expect(await playerToKill.dead).toBeTrue();
+        expect(result.death).toBeDefined();
+    } else {
+        expect(await playerToKill.alive).toBeTrue();
+        expect(result.death).toBeUndefined();
+    }
+
+    return result.death;
+}
+
+export async function expectAfterImpSelfKill(
+    impPlayer: ImpPlayer,
+    minionPlayerToBecomeDemon: MinionPlayer,
+    impAbility?: ImpAbility,
+    setupContext?: AbilitySetupContext,
+    useContext?: AbilityUseContext,
+    players?: Players
+): Promise<Death | undefined> {
+    mockStorytellerChooseMatchingOne<MinionPlayer>((player) =>
+        player.equals(minionPlayerToBecomeDemon)
+    );
+    storytellerConfirmMock.mockResolvedValue(true);
+    const death = await expectAfterImpKill(
+        impPlayer,
+        impPlayer,
+        impAbility,
+        setupContext,
+        useContext,
+        players,
+        true
+    );
+    storytellerConfirmMock.mockReset();
+    storytellerChooseOneMock.mockReset();
+    expect(death?.isFor(impPlayer)).toBeTrue();
+    expect(await minionPlayerToBecomeDemon.characterType).toBe(Demon);
+    expect(await minionPlayerToBecomeDemon.character).toBe(Imp);
 
     return death;
 }

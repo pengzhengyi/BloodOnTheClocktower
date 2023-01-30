@@ -119,7 +119,6 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
         characterType: typeof CharacterType
     ): Promise<typeof CharacterType>;
     removePoison(reason: IPoisonedReason): Promise<boolean>;
-    attack(victim: IPlayer): Promise<Death>;
     nominate(
         nominated: IPlayer,
         execution: Execution
@@ -563,11 +562,6 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     removePoison(reason: IPoisonedReason): Promise<boolean> {
         this.state.setNegativeState(State.Poisoned, false, reason);
         return this.healthy;
-    }
-
-    async attack(victim: IPlayer): Promise<Death> {
-        // TODO
-        return await victim.setDead(DeadReason.DemonAttack);
     }
 
     async nominate(

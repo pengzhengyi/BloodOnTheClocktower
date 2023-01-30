@@ -116,7 +116,7 @@ class BasePoisonerAbility extends Ability<
     async useWhenMalfunction(
         context: AbilityUseContext
     ): Promise<PoisonerAbilityUseResult> {
-        const _playerToProtect = await this.choosePlayerToPoison(
+        const _playerToPoison = await this.choosePlayerToPoison(
             context.requestedPlayer,
             context.players,
             context

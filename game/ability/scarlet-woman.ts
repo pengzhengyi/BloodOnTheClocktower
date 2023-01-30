@@ -118,12 +118,13 @@ class BaseScarletWomanBecomeDemonEffect
 
     protected async becomeDemon(deadDemonPlayer: DemonPlayer) {
         const deadDemon = await deadDemonPlayer.character;
-        const _assignmentResult = await this.scarletWomanPlayer.assignCharacter(
+        const assignmentResult = await this.scarletWomanPlayer.assignCharacter(
             deadDemon,
             undefined,
             true,
             BaseScarletWomanBecomeDemonEffect.description
         );
+        return assignmentResult;
     }
 
     protected async canBecomeDemon(): Promise<boolean> {
