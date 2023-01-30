@@ -37,6 +37,17 @@ export interface IEffect<TTarget extends object, TGetPriorityContext = any>
     isApplicable(context: InteractionContext<TTarget>): boolean;
 
     /**
+     * Apply current effect's influence on a context. Calling `next` will pass processing to next effect in the processing pipeline. The result of modification is stored inside `context.result`.
+     * @param context A context that stores both the information about the triggering interaction and the processed result.
+     * @param next A function that represent the remaining effects (lower priority effects) to handle the context.
+     * @returns A processed context.
+     */
+    apply(
+        context: InteractionContext<TTarget>,
+        next: NextFunction<InteractionContext<TTarget>>
+    ): InteractionContext<TTarget>;
+
+    /**
      * Get the priority of an effect for a given context.
      *
      * For example, priority might differ for first night, during the day, and other nights.
@@ -109,14 +120,32 @@ export abstract class Effect<TTarget extends object>
     }
 
     apply(
-        _context: InteractionContext<TTarget>,
-        _next: NextFunction<InteractionContext<TTarget>>
+        context: InteractionContext<TTarget>,
+        next: NextFunction<InteractionContext<TTarget>>
     ): InteractionContext<TTarget> {
-        throw new Error('Method not implemented.');
+        return this.applyCooperatively(context, next);
     }
 
     toString(): string {
         return this.constructor.name;
+    }
+
+    protected applyCooperatively(
+        context: InteractionContext<TTarget>,
+        next: NextFunction<InteractionContext<TTarget>>
+    ): InteractionContext<TTarget> {
+        if (context.result === undefined) {
+            return this.applyCooperativelyImpl(context, next);
+        } else {
+            return next(context);
+        }
+    }
+
+    protected applyCooperativelyImpl(
+        _context: InteractionContext<TTarget>,
+        _next: NextFunction<InteractionContext<TTarget>>
+    ): InteractionContext<TTarget> {
+        throw new Error('Method not implemented.');
     }
 
     protected getPriorityForFirstNightGamePhaseKind() {

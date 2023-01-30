@@ -34,15 +34,12 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<Execution>,
         next: NextFunction<InteractionContext<Execution>>
     ): InteractionContext<Execution> {
-        const updatedContext = next(context);
         const execution = context.interaction.target as Execution;
-        const originalExecute = (
-            updatedContext.result as Execution['execute']
-        ).bind(execution);
+        const originalExecute = execution.execute.bind(execution);
 
         const newExecute: Execution['execute'] = async (player, deadReason) => {
             const death = await originalExecute(player, deadReason);
@@ -54,7 +51,8 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
             return death;
         };
 
-        updatedContext.result = newExecute;
+        context.result = newExecute;
+        const updatedContext = next(context);
         return updatedContext;
     }
 

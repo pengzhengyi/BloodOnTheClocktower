@@ -66,7 +66,9 @@ export async function createSeatingAndPlayersFromDescriptions(
             playerFromDescription(description)
         )
     );
+    storytellerConfirmMock.mockResolvedValue(true);
     const seating = await Seating.from(players);
+    storytellerConfirmMock.mockReset();
     expect(seating.allSat).toBeTrue();
     return [seating, players];
 }
@@ -146,14 +148,6 @@ function createRavenkeeperInfoProviderContext(
         chosenPlayer;
     return context as RavenkeeperInformationProviderContext;
 }
-
-beforeAll(() => {
-    storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));
-});
-
-afterAll(() => {
-    storytellerConfirmMock.mockReset();
-});
 
 describe('test DemonInformationProvider and MinionInformationProvider', () => {
     const demonInformationProvider = new DemonInformationProvider();

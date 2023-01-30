@@ -42,12 +42,12 @@ class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<FortuneTellerPlayer>,
         next: NextFunction<InteractionContext<FortuneTellerPlayer>>
     ): InteractionContext<FortuneTellerPlayer> {
+        context.result = Promise.resolve(true);
         const updatedContext = next(context);
-        updatedContext.result = Promise.resolve(true);
         return updatedContext;
     }
 }

@@ -33,15 +33,12 @@ export class NominateVirginPenalty extends Effect<Execution> {
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<Execution>,
         next: NextFunction<InteractionContext<Execution>>
     ): InteractionContext<Execution> {
-        const updatedContext = next(context);
         const execution = context.interaction.target as Execution;
-        const originalAddNomination = (
-            updatedContext.result as Execution['addNomination']
-        ).bind(execution);
+        const originalAddNomination = execution.addNomination.bind(execution);
 
         const newAddNomination = async (
             nomination: Nomination
@@ -68,7 +65,8 @@ export class NominateVirginPenalty extends Effect<Execution> {
             return result;
         };
 
-        updatedContext.result = newAddNomination;
+        context.result = newAddNomination;
+        const updatedContext = next(context);
         return updatedContext;
     }
 }

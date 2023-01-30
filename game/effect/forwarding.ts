@@ -15,17 +15,15 @@ export class Forwarding<TTarget extends object> extends Effect<TTarget> {
         return Number.NEGATIVE_INFINITY;
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<TTarget>,
         next: NextFunction<InteractionContext<TTarget>>
     ): InteractionContext<TTarget> {
-        if (context.result === undefined) {
-            // @ts-ignore: allow dynamically invocation of Reflect methods
-            context.result = Reflect[context.interaction.trap].apply(null, [
-                context.interaction.target,
-                ...context.interaction.args,
-            ]);
-        }
+        // @ts-ignore: allow dynamically invocation of Reflect methods
+        context.result = Reflect[context.interaction.trap].apply(null, [
+            context.interaction.target,
+            ...context.interaction.args,
+        ]);
 
         return next(context);
     }

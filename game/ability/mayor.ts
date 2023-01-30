@@ -37,16 +37,14 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<Game>,
         next: NextFunction<InteractionContext<Game>>
     ): InteractionContext<Game> {
-        const updatedContext = next(context);
-
         const game = context.interaction.target;
-        const getWinningTeamMethod = updatedContext.result.bind();
+        const getWinningTeamMethod = game.getWinningTeam.bind(game);
 
-        updatedContext.result = async (players: Iterable<IPlayer>) => {
+        context.result = async (players: Iterable<IPlayer>) => {
             const winningTeam = await getWinningTeamMethod(players);
 
             if (winningTeam === undefined && (await this.isPeacefulWin(game))) {
@@ -55,6 +53,8 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
 
             return winningTeam;
         };
+
+        const updatedContext = next(context);
         return updatedContext;
     }
 
@@ -84,19 +84,15 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<MayorPlayer>,
         next: NextFunction<InteractionContext<MayorPlayer>>
     ): InteractionContext<MayorPlayer> {
-        const updatedContext = next(context);
-
         const killer = context.initiator;
         const mayorPlayer = context.interaction.target;
-        const setDeadMethod = updatedContext.result.bind(mayorPlayer);
+        const setDeadMethod = mayorPlayer.setDead.bind(mayorPlayer);
 
-        updatedContext.result = async (
-            reason: DeadReason = DeadReason.Other
-        ) => {
+        context.result = async (reason: DeadReason = DeadReason.Other) => {
             const chosenPlayerToDie = await this.choosePlayerToDieInstead(
                 this.players
             );
@@ -108,6 +104,7 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
                 return await chosenPlayerToDie.from(killer).setDead(reason);
             }
         };
+        const updatedContext = next(context);
         return updatedContext;
     }
 

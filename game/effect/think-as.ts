@@ -19,12 +19,12 @@ export abstract class ThinkAsEffect<
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<TPlayer>,
         next: NextFunction<InteractionContext<TPlayer>>
     ): InteractionContext<TPlayer> {
+        context.result = Promise.resolve(this.thinkAs);
         const updatedContext = next(context);
-        updatedContext.result = Promise.resolve(this.thinkAs);
         return updatedContext;
     }
 }

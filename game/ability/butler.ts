@@ -31,12 +31,12 @@ export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<ButlerPlayer>,
         next: NextFunction<InteractionContext<ButlerPlayer>>
     ): InteractionContext<ButlerPlayer> {
+        context.result = this.canVote();
         const updatedContext = next(context);
-        updatedContext.result = this.canVote();
         return updatedContext;
     }
 

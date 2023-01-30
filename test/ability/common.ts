@@ -31,11 +31,13 @@ import type { IPlayer } from '~/game/player';
 import { StoryTeller } from '~/game/storyteller';
 import type {
     AsyncFactory,
+    DemonPlayer,
     DrunkPlayer,
     MonkPlayer,
     PoisonerPlayer,
     ReclusePlayer,
     SaintPlayer,
+    ScarletWomanPlayer,
     SlayerPlayer,
     SpyPlayer,
     Task,
@@ -82,11 +84,14 @@ import {
     SaintAbilitySetupContext,
     SaintAbilityUseContext,
 } from '~/game/ability/saint';
-import type { Players } from '~/game/players';
+import { Players } from '~/game/players';
 import { SpyAbility } from '~/game/ability/spy';
 import { VirginAbility, VirginAbilityUseContext } from '~/game/ability/virgin';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import type { IClocktower } from '~/game/clocktower';
+import { Demon } from '~/game/character-type';
+import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
+import { createBasicGame } from '~/__mocks__/game';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -440,11 +445,56 @@ export async function expectAfterExecute(
         expect(toExecute).toBe(expectPlayerToBeDead);
     }
 
+    if (expectPlayerToBeDead) {
+        storytellerConfirmMock.mockResolvedValue(true);
+    }
+
     const death = await execution.execute();
+
+    if (expectPlayerToBeDead) {
+        storytellerConfirmMock.mockReset();
+    }
+
     if (expectPlayerToBeDead === undefined) {
         expect(death).toBeUndefined();
     } else {
         expect(death?.isFor(expectPlayerToBeDead));
+    }
+
+    return death;
+}
+
+export async function expectScarletWomanBecomeDemonAfterDemonDeath(
+    scarletWomanPlayer: ScarletWomanPlayer,
+    demonPlayer: DemonPlayer,
+    scarletWomanAbility?: ScarletWomanAbility,
+    setupContext?: AbilitySetupContext,
+    players?: Players,
+    deadReason: DeadReason = DeadReason.Other,
+    validateGameNotEnd = false
+) {
+    if (scarletWomanAbility === undefined) {
+        scarletWomanAbility = new ScarletWomanAbility();
+        players ??= new Players([scarletWomanPlayer, demonPlayer]);
+        setupContext ??= mockAbilitySetupContext(scarletWomanPlayer, players);
+        await scarletWomanAbility.setup(setupContext);
+    }
+
+    storytellerConfirmMock.mockResolvedValue(true);
+    const death = await demonPlayer.setDead(deadReason);
+    storytellerConfirmMock.mockReset();
+    expect(await demonPlayer.dead).toBeTrue();
+    expect(await scarletWomanPlayer.characterType).toBe(Demon);
+    expect(await scarletWomanPlayer.character).toBe(
+        await demonPlayer.character
+    );
+
+    if (validateGameNotEnd) {
+        const game = createBasicGame();
+        const winningAlignment = await game.getWinningTeam(
+            setupContext!.players
+        );
+        expect(winningAlignment).toBeUndefined();
     }
 
     return death;
@@ -477,7 +527,9 @@ export async function expectAfterExecuteSaint(
     numAlivePlayer ??= players?.length;
 
     if (forceExecution) {
+        storytellerConfirmMock.mockResolvedValue(true);
         const _death = await execution.execute(saintPlayer);
+        storytellerConfirmMock.mockReset();
     } else {
         const _death = await expectAfterExecute(
             execution,

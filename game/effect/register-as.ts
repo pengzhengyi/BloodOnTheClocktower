@@ -23,13 +23,13 @@ abstract class RegisterAsEffect<
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<TPlayer>,
         next: NextFunction<InteractionContext<TPlayer>>
     ): InteractionContext<TPlayer> {
-        const updatedContext = next(context);
         const registerAs = this.choose(context);
-        updatedContext.result = registerAs;
+        context.result = registerAs;
+        const updatedContext = next(context);
         return updatedContext;
     }
 

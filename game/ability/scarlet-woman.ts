@@ -11,7 +11,6 @@ import { CharacterNightEffect } from '../effect/character';
 import type { DeadReason } from '../dead-reason';
 import type { IPlayer } from '../player';
 import { Players } from '../players';
-import { Demon } from '../character-type';
 import type { INonBlockingSubscriber } from '../event-notification/types';
 import {
     ChangeType,
@@ -66,26 +65,26 @@ class BaseScarletWomanBecomeDemonEffect
         );
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<DemonPlayer>,
         next: NextFunction<InteractionContext<DemonPlayer>>
     ): InteractionContext<DemonPlayer> {
-        const updatedContext = next(context);
-        const originalSetDead = updatedContext.result.bind(
+        const originalSetDead = context.interaction.target.setDead.bind(
             context.interaction.target
-        ) as IPlayer['setDead'];
+        );
 
-        updatedContext.result = async (reason: DeadReason) => {
+        context.result = async (reason: DeadReason) => {
             const canBecomeDemon = await this.canBecomeDemon();
             const death = await originalSetDead(reason);
 
             if ((await context.interaction.target.dead) && canBecomeDemon) {
-                await this.becomeDemon();
+                await this.becomeDemon(context.interaction.target);
             }
 
             return death;
         };
 
+        const updatedContext = next(context);
         return updatedContext;
     }
 
@@ -117,8 +116,14 @@ class BaseScarletWomanBecomeDemonEffect
         player.effects.delete(this);
     }
 
-    protected async becomeDemon() {
-        await this.scarletWomanPlayer.overrideCharacterType(Demon);
+    protected async becomeDemon(deadDemonPlayer: DemonPlayer) {
+        const deadDemon = await deadDemonPlayer.character;
+        const _assignmentResult = await this.scarletWomanPlayer.assignCharacter(
+            deadDemon,
+            undefined,
+            true,
+            BaseScarletWomanBecomeDemonEffect.description
+        );
     }
 
     protected async canBecomeDemon(): Promise<boolean> {

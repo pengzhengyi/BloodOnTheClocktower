@@ -108,7 +108,9 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
 
     assignCharacter(
         character: CharacterToken,
-        alignment?: Alignment
+        alignment?: Alignment,
+        force?: boolean,
+        reason?: string
     ): Promise<CharacterAssignmentResult>;
     setDead(reason?: DeadReason): Promise<Death>;
     setDrunk(reason?: DrunkReason): Promise<boolean>;
@@ -127,6 +129,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
 
     storytellerGet(key: '_isDemon'): boolean;
     storytellerGet(key: '_character'): CharacterToken;
+    storytellerGet(key: '_characterType'): typeof CharacterType;
     storytellerGet(key: '_alive'): boolean;
     storytellerGet(key: '_dead'): boolean;
     storytellerGet(key: '_healthy'): boolean;
@@ -165,6 +168,9 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     protected static overrideCharacterTypeDefaultPrompt =
         'Override character type for player: ';
+
+    protected static assignCharacterDefaultPrompt =
+        'Assign character and alignment for player: ';
 
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
         keyof ProxyHandler<IPlayer>
@@ -246,12 +252,12 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         return Promise.resolve(this._character);
     }
 
+    protected declare _character: CharacterToken;
+
     @Expose({ name: 'character', toPlainOnly: true })
     protected _characterId(): string {
         return this._character.id;
     }
-
-    protected declare _character: CharacterToken;
 
     /**
      * {@link `glossary["Vote token"]`}
@@ -288,7 +294,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _dead() {
-        return Promise.resolve(this.state.dead);
+        return this.state.dead;
     }
 
     get sober() {
@@ -437,6 +443,10 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         return this.character.then((character) => character.characterType);
     }
 
+    protected get _characterType(): typeof CharacterType {
+        return this._character.characterType;
+    }
+
     protected overriddenCharacterType?: typeof CharacterType;
 
     get isGood(): Promise<boolean> {
@@ -445,10 +455,6 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     get isEvil(): Promise<boolean> {
         return this.alignment.then((alignment) => alignment === Alignment.Evil);
-    }
-
-    protected get _characterType(): typeof CharacterType {
-        return this._character.characterType;
     }
 
     /**
@@ -468,41 +474,51 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         this.id = id;
         this.username = username;
 
+        // alignment and character can be lazy initialized
+        alignment = this.tryInferAlignment(alignment, character);
         if (alignment !== undefined) {
             this._alignment = alignment;
         }
 
         if (character !== undefined) {
-            this.initializeCharacter(character);
+            this._character = character;
         }
     }
 
     async assignCharacter(
         character: CharacterToken,
-        alignment?: Alignment
+        alignment?: Alignment,
+        force = false,
+        reason?: string
     ): Promise<CharacterAssignmentResult> {
-        if (this._character !== undefined) {
-            const error = new ReassignCharacterToPlayer(
-                this,
-                this._character,
-                character
+        let shouldReassign = true;
+        if (force) {
+            shouldReassign =
+                await Environment.current.gameUI.storytellerConfirm(
+                    this.formatPromptForAssignCharacter(reason)
+                );
+        } else {
+            await ReassignCharacterToPlayer.catch(
+                () =>
+                    Promise.resolve(
+                        this.validateCharacterNotAssigned(character)
+                    ),
+                async (error) => {
+                    shouldReassign = await error.shouldReassign;
+                }
             );
-            await error.resolve();
-
-            if (!error.shouldReassign) {
-                return {
-                    player: this,
-                    character,
-                    result: false,
-                };
-            }
         }
 
-        if (alignment !== undefined) {
-            this._alignment = alignment;
+        if (!shouldReassign) {
+            return {
+                player: this,
+                character,
+                result: false,
+            };
         }
 
-        this.initializeCharacter(character);
+        this._alignment = this.inferAlignment(alignment, character);
+        this._character = character;
 
         return {
             player: this,
@@ -538,6 +554,8 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         ) {
             this.overriddenCharacterType = characterType;
         }
+
+        // TODO notify character type change
 
         return this.characterType;
     }
@@ -645,21 +663,51 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         );
     }
 
-    protected initializeCharacter(character: CharacterToken) {
-        this._character = character;
+    protected formatPromptForAssignCharacter(reason?: string): string {
+        const hasReason = reason === undefined;
+        const playerString = this.toString();
+        return (
+            (hasReason ? reason + ' ' : '') +
+            Player.assignCharacterDefaultPrompt +
+            playerString
+        );
+    }
 
-        if (this._alignment === undefined) {
-            const alignment = this._characterType.defaultAlignment;
-            if (alignment === undefined) {
-                throw new PlayerHasUnclearAlignment(this, alignment);
-            } else {
-                this._alignment = alignment;
-            }
+    protected inferAlignment(
+        alignment?: Alignment,
+        character?: CharacterToken
+    ): Alignment {
+        const inferredAlignment = this.tryInferAlignment(alignment, character);
+        if (inferredAlignment === undefined) {
+            throw new PlayerHasUnclearAlignment(this, inferredAlignment);
+        } else {
+            return inferredAlignment;
         }
+    }
+
+    protected tryInferAlignment(
+        alignment?: Alignment,
+        character?: CharacterToken
+    ): Alignment | undefined {
+        if (alignment !== undefined) {
+            return alignment;
+        }
+
+        return character?.characterType.defaultAlignment;
     }
 
     protected initializeEffects() {
         super.initializeEffects();
         // TODO initialize player specific effects
+    }
+
+    protected validateCharacterNotAssigned(newCharacter: CharacterToken) {
+        if (this._character !== undefined) {
+            throw new ReassignCharacterToPlayer(
+                this,
+                this._character,
+                newCharacter
+            );
+        }
     }
 }

@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { createInfoProvideContextFromPlayerDescriptions } from '../info-provider.test';
-import { expectCharacterGetInformation } from './common';
+import {
+    expectCharacterGetInformation,
+    expectScarletWomanBecomeDemonAfterDemonDeath,
+} from './common';
 import { Imp } from '~/content/characters/output/imp';
 import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
@@ -18,7 +21,6 @@ import {
 } from '~/__mocks__/information';
 import { createBasicGame } from '~/__mocks__/game';
 import { Alignment } from '~/game/alignment';
-import { Demon } from '~/game/character-type';
 import { GetFortuneTellerInformationAbility } from '~/game/ability/fortuneteller';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import {
@@ -89,33 +91,23 @@ describe('test ScarletWomanAbility', () => {
                 `${faker.name.firstName()} is the Baron`
             );
 
-        const scarletWomanAbility = new ScarletWomanAbility();
         const scarletWomanPlayer =
             (await infoProvideContext.players.findByCharacter(
                 ScarletWoman
             )) as ScarletWomanPlayer;
-        const setupContext = mockAbilitySetupContext(
-            scarletWomanPlayer,
-            undefined,
-            infoProvideContext
-        );
-
-        await scarletWomanAbility.setup(setupContext);
 
         const impPlayer = (await infoProvideContext.players.findByCharacter(
             Imp
         )) as ImpPlayer;
-        const _death = await impPlayer.setDead(DeadReason.Executed);
-
-        expect(await impPlayer.dead).toBeTrue();
-
-        expect(await scarletWomanPlayer.characterType).toBe(Demon);
-
-        const game = createBasicGame();
-        const winningAlignment = await game.getWinningTeam(
-            infoProvideContext.players
+        await expectScarletWomanBecomeDemonAfterDemonDeath(
+            scarletWomanPlayer,
+            impPlayer,
+            undefined,
+            undefined,
+            infoProvideContext.players,
+            DeadReason.Executed,
+            true
         );
-        expect(winningAlignment).toBeUndefined();
     });
 
     /**
@@ -132,18 +124,10 @@ describe('test ScarletWomanAbility', () => {
                 `${faker.name.firstName()} is the Fortune Teller`
             );
 
-        const scarletWomanAbility = new ScarletWomanAbility();
         const scarletWomanPlayer =
             (await infoProvideContext.players.findByCharacter(
                 ScarletWoman
             )) as ScarletWomanPlayer;
-        const setupContext = mockAbilitySetupContext(
-            scarletWomanPlayer,
-            undefined,
-            infoProvideContext
-        );
-
-        await scarletWomanAbility.setup(setupContext);
 
         const fortuneTellerPlayer =
             (await infoProvideContext.players.findByCharacter(
@@ -181,11 +165,16 @@ describe('test ScarletWomanAbility', () => {
         const impPlayer = (await infoProvideContext.players.findByCharacter(
             Imp
         )) as ImpPlayer;
-        const _death = await impPlayer.setDead(DeadReason.Other);
 
-        expect(await impPlayer.dead).toBeTrue();
-
-        expect(await scarletWomanPlayer.characterType).toBe(Demon);
+        await expectScarletWomanBecomeDemonAfterDemonDeath(
+            scarletWomanPlayer,
+            impPlayer,
+            undefined,
+            undefined,
+            infoProvideContext.players,
+            undefined,
+            true
+        );
 
         const fortuneTellerLaterNightInfo = await expectCharacterGetInformation(
             fortuneTellerAbility,

@@ -9,13 +9,12 @@ export abstract class SafeFromDemonEffect<
         return super.isApplicable(context) && this.matchDemonKill(context);
     }
 
-    apply(
+    protected applyCooperativelyImpl(
         context: InteractionContext<TPlayer>,
         next: NextFunction<InteractionContext<TPlayer>>
     ): InteractionContext<TPlayer> {
+        context.result = (_reason: DeadReason) => Promise.resolve(undefined);
         const updatedContext = next(context);
-        updatedContext.result = (_reason: DeadReason) =>
-            Promise.resolve(undefined);
         return updatedContext;
     }
 }
