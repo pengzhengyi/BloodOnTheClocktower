@@ -1,19 +1,19 @@
-import { Generator } from './collections';
-import { clockwise, counterclockwise, shuffle } from './common';
-import type { IPlayer } from './player';
-import { Players } from './players';
-import { Seat, SitResult } from './seat';
-import { AnyPredicate, Direction, Predicate, TAUTOLOGY } from './types';
+import { Generator } from '../collections';
+import { clockwise, counterclockwise, shuffle } from '../common';
+import type { IPlayer } from '../player';
+import { Players } from '../players';
+import { AnyPredicate, Direction, Predicate, TAUTOLOGY } from '../types';
 import {
     AccessInvalidSeatPosition,
     NumberOfSeatNotPositive,
     PlayerNoNeighbors,
     PlayerNotSat,
     UnexpectedEmptySeat,
-} from './exception';
+} from '../exception';
+import { Seat, SitResult } from './seat';
 import { InteractionEnvironment } from '~/interaction/environment';
 
-export interface SyncResult {
+interface SyncResult {
     occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;
     assignedPlayerMismatchUnoccupiedSeats: Set<IPlayer>;
 }
@@ -75,7 +75,8 @@ export class Seating {
             );
             const seatNumber = player.seatNumber!;
 
-            seats[seatNumber] = await Seat.init(seatNumber, player);
+            seats[seatNumber] = new Seat(seatNumber);
+            await seats[seatNumber].sit(player);
         }
 
         for (

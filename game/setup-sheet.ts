@@ -5,7 +5,7 @@ import { Grimoire } from './grimoire';
 import type { IPlayer } from './player';
 import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
-import { Seating } from './seating';
+import { Seating } from './seating/seating';
 import { TownSquare } from './town-square';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';

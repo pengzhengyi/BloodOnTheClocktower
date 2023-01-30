@@ -1,7 +1,7 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { clockwise, randomChoice } from '~/game/common';
 import type { IPlayer } from '~/game/player';
-import { Seating } from '~/game/seating';
+import { Seating } from '~/game/seating/seating';
 import { createBasicPlayers } from '~/__mocks__/player';
 
 async function createSeating(players: Array<IPlayer>): Promise<Seating> {

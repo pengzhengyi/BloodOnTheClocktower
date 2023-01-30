@@ -1,8 +1,8 @@
 import { IClocktower, Clocktower } from './clocktower';
 import type { IPlayer } from './player';
 import { Players, PlayersModification } from './players';
-import { Seat } from './seat';
-import { SeatAssignment, SeatAssignmentMode, Seating } from './seating';
+import type { ISeat } from './seating/seat';
+import { SeatAssignment, SeatAssignmentMode, Seating } from './seating/seating';
 
 export interface ResitResult {
     oldSeating: Seating;
@@ -74,7 +74,7 @@ export class TownSquare {
      * @param force Whether the player will sit on given seat no matter existing seat assignment. Default to false.
      * @returns Whether the player manages to sit on the given seat.
      */
-    async sit(player: IPlayer, seat: Seat, force = false): Promise<boolean> {
+    async sit(player: IPlayer, seat: ISeat, force = false): Promise<boolean> {
         const playerSeatNumber = player.seatNumber;
         if (playerSeatNumber === seat.position) {
             // seat is occupied by requested player
@@ -101,7 +101,7 @@ export class TownSquare {
         }
         // seat is unoccupied now
 
-        const sitResult = await seat.trySit(player);
+        const sitResult = seat.trySit(player);
         return sitResult.hasSat;
     }
 }

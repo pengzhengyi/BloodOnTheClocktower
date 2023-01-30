@@ -11,7 +11,7 @@ import { Players } from '~/game/players';
 import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/dead-reason';
 import type { IPlayer } from '~/game/player';
-import { Seating } from '~/game/seating';
+import { Seating } from '~/game/seating/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Saint } from '~/content/characters/output/saint';

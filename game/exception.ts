@@ -22,7 +22,7 @@ import type {
 } from './types';
 import type { IPlayer } from './player';
 import type { Players } from './players';
-import type { Seat } from './seat';
+import type { ISeat } from './seating/seat';
 import type { CharacterToken } from './character';
 import type { StoryTeller } from './storyteller';
 import type {
@@ -41,7 +41,7 @@ import {
 import type { IEffect } from './effect/effect';
 import type { Alignment } from './alignment';
 import type { IEffects } from './effect/effects';
-import type { Seating } from './seating';
+import type { Seating } from './seating/seating';
 import { GamePhaseKind } from './game-phase-kind';
 import type {
     AbilityUseContext,
@@ -312,7 +312,7 @@ export class UnexpectedEmptySeat extends RecoverableGameError {
         return this.emptySeat.player;
     }
 
-    constructor(readonly seating: Seating, readonly emptySeat: Seat) {
+    constructor(readonly seating: Seating, readonly emptySeat: ISeat) {
         super(UnexpectedEmptySeat.description);
     }
 }

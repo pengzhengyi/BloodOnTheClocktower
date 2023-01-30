@@ -9,7 +9,7 @@ import type { CharacterSheet } from '~/game/character-sheet';
 import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
 import type { Players } from '~/game/players';
-import type { Seating } from '~/game/seating';
+import type { Seating } from '~/game/seating/seating';
 import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
