@@ -21,7 +21,7 @@ import {
     RequireSetup,
 } from './ability';
 import { Imp } from '~/content/characters/output/imp';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
     static readonly description =
@@ -80,7 +80,7 @@ class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
         );
 
         const chosenMinion =
-            await Environment.current.gameUI.storytellerChooseOne(
+            await InteractionEnvironment.current.gameUI.storytellerChooseOne(
                 aliveMinions,
                 BaseImpMakeCopyEffect.description
             );
@@ -172,7 +172,7 @@ class BaseImpAbility extends Ability<AbilityUseContext, ImpAbilityUseResult> {
         players: Players,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await Environment.current.gameUI.choose(
+        let chosen = (await InteractionEnvironment.current.gameUI.choose(
             impPlayer,
             players,
             1,

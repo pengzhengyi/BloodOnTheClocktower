@@ -19,7 +19,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export class MayorPeacefulWinEffect extends Effect<Game> {
     static readonly description =
@@ -111,7 +111,7 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
     protected async choosePlayerToDieInstead(
         players: Iterable<IPlayer>
     ): Promise<IPlayer> {
-        return (await Environment.current.gameUI.storytellerChooseOne(
+        return (await InteractionEnvironment.current.gameUI.storytellerChooseOne(
             players,
             MayorDieInsteadEffect.description
         )) as IPlayer;

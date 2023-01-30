@@ -1,6 +1,6 @@
 import type { NumberOfCharacters as Assignment } from './script-tool';
 import type { TravellerCharacterToken } from './character';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 /**
  * {@link `glossary["Traveller Sheet"]`}
@@ -11,7 +11,7 @@ export class TravellerSheet {
         travellerCharacters: Iterable<TravellerCharacterToken>,
         numTraveller: number
     ): Promise<Array<TravellerCharacterToken>> {
-        return Environment.current.gameUI.storytellerChoose(
+        return InteractionEnvironment.current.gameUI.storytellerChoose(
             travellerCharacters,
             numTraveller
         ) as Promise<Array<TravellerCharacterToken>>;

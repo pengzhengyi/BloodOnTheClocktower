@@ -14,7 +14,7 @@ import {
     RequireSetup,
 } from './ability';
 import { AbilityUseStatus } from './status';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     /**
@@ -84,7 +84,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         );
         const options = Generator.exclude(townsfolkOptions, inPlayCharacters);
 
-        return await Environment.current.gameUI.storytellerChooseOne(
+        return await InteractionEnvironment.current.gameUI.storytellerChooseOne(
             options,
             BaseDrunkAbility.description
         );

@@ -7,7 +7,7 @@ import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating';
 import { TownSquare } from './town-square';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
 export abstract class SetupSheet {
@@ -150,7 +150,7 @@ export abstract class SetupSheet {
     }
 
     static setupEdition(): Promise<typeof Edition> {
-        return Environment.current.gameUI.storytellerChooseOne(
+        return InteractionEnvironment.current.gameUI.storytellerChooseOne(
             this.SUPPORTED_EDITIONS
         );
     }

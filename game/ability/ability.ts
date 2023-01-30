@@ -30,7 +30,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface AbilityUseContext {
     requestedPlayer: IPlayer;
@@ -371,7 +371,7 @@ abstract class GetInfoAbility<
             context,
             infoRequestContext
         );
-        await Environment.current.gameUI.send(
+        await InteractionEnvironment.current.gameUI.send(
             context.requestedPlayer,
             info,
             sendInfoReason

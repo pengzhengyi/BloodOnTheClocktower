@@ -10,7 +10,7 @@ import {
     GetCharacterInformationAbility,
     GetInfoAbilityUseContext,
 } from './ability';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
     RavenkeeperInformation,
@@ -53,7 +53,7 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
         players: Iterable<IPlayer>,
         context: GetInfoAbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await Environment.current.gameUI.choose(
+        let chosen = (await InteractionEnvironment.current.gameUI.choose(
             ravenkeeperPlayer,
             players,
             1,

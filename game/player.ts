@@ -28,7 +28,7 @@ import type { Execution } from './execution';
 import { DrunkReason } from './drunk-reason';
 import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface CharacterAssignmentResult {
     player: IPlayer;
@@ -493,7 +493,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         let shouldReassign = true;
         if (force) {
             shouldReassign =
-                await Environment.current.gameUI.storytellerConfirm(
+                await InteractionEnvironment.current.gameUI.storytellerConfirm(
                     this.formatPromptForAssignCharacter(reason)
                 );
         } else {
@@ -547,7 +547,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         reason?: string
     ): Promise<typeof CharacterType> {
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatPromptForOverrideCharacterType(reason)
             )
         ) {
@@ -587,7 +587,9 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
             (forExile && (await this.canExile)) || (await this.canVote);
         if (
             shouldCheckHandRaised &&
-            (await Environment.current.gameUI.hasRaisedHandForVote(this))
+            (await InteractionEnvironment.current.gameUI.hasRaisedHandForVote(
+                this
+            ))
         ) {
             if (await this.dead) {
                 await this.revokeVoteToken(
@@ -603,7 +605,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     async revokeVoteToken(reason?: string): Promise<boolean> {
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatPromptForRevokeVoteToken(reason)
             )
         ) {

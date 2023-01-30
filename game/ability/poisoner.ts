@@ -25,7 +25,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 import { Poisoner } from '~/content/characters/output/poisoner';
 
 class BasePoisonEffect
@@ -181,7 +181,7 @@ class BasePoisonerAbility extends Ability<
         players: Players,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await Environment.current.gameUI.choose(
+        let chosen = (await InteractionEnvironment.current.gameUI.choose(
             poisonerPlayer,
             players,
             1,

@@ -1,6 +1,6 @@
 import { InvalidPlayerToSit } from './exception';
 import type { IPlayer } from './player';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface SitResult {
     player: IPlayer;
@@ -57,7 +57,7 @@ export class Seat {
         }
 
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatPromptForSitPlayer(player)
             )
         ) {
@@ -81,7 +81,7 @@ export class Seat {
         const satPlayer = this.player;
         if (
             satPlayer !== undefined &&
-            (await Environment.current.gameUI.storytellerConfirm(
+            (await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatPromptForRemovePlayer(satPlayer)
             ))
         ) {

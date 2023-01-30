@@ -2,7 +2,7 @@ import { BasicGamePhaseKind } from '../game-phase-kind';
 import { Predicate } from '../types';
 import type { IMiddleware, NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 interface ProxyHandlerRequest<TTarget extends object> {
     trap: keyof ProxyHandler<TTarget>;
@@ -73,7 +73,7 @@ export abstract class Effect<TTarget extends object>
 
     async deactivate(reason?: string): Promise<boolean> {
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatDeactivatePrompt(reason)
             )
         ) {
@@ -86,7 +86,7 @@ export abstract class Effect<TTarget extends object>
 
     async reactivate(reason?: string): Promise<boolean> {
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatReactivatePrompt(reason)
             )
         ) {

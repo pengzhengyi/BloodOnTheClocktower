@@ -19,7 +19,7 @@ import {
     GetInfoAbilityUseContext,
     RequireSetup,
 } from './ability';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =
@@ -112,7 +112,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
         players: Iterable<IPlayer>,
         context: GetInfoAbilityUseContext
     ): Promise<[IPlayer, IPlayer]> {
-        let chosen = (await Environment.current.gameUI.choose(
+        let chosen = (await InteractionEnvironment.current.gameUI.choose(
             fortuneTellerPlayer,
             players,
             2,
@@ -144,7 +144,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     protected async chooseRedHerring(
         players: Iterable<IPlayer>
     ): Promise<IPlayer> {
-        return await Environment.current.gameUI.storytellerChooseOne(
+        return await InteractionEnvironment.current.gameUI.storytellerChooseOne(
             players,
             RedHerringEffect.description
         );

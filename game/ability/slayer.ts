@@ -9,7 +9,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface SlayerAbilityUseResult extends AbilityUseResult {
     chosenPlayer: IPlayer;
@@ -87,7 +87,7 @@ class BaseSlayerAbility extends Ability<
         players: Iterable<IPlayer>,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await Environment.current.gameUI.choose(
+        let chosen = (await InteractionEnvironment.current.gameUI.choose(
             slayerPlayer,
             players,
             1,

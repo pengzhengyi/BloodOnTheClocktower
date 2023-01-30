@@ -4,7 +4,7 @@ import type {
     FalseInformationOptions,
 } from './information';
 import type { StoryTellerInformationOptions } from './storyteller-information';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 /**
  * There are two classifications for info:
@@ -35,7 +35,7 @@ export abstract class Info<T> {
     }
 
     send(player: IPlayer, reason?: string): Promise<void> {
-        return Environment.current.gameUI.send(player, this, reason);
+        return InteractionEnvironment.current.gameUI.send(player, this, reason);
     }
 }
 

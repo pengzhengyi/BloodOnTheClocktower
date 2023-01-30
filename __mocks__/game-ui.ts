@@ -1,24 +1,27 @@
 import { mock } from 'jest-mock-extended';
 import { Generator } from '~/game/collections';
 import type { Predicate } from '~/game/types';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 import type { IGameUI } from '~/interaction/game-ui';
 
-export const hasRaisedHandForVoteMock = Environment.current.gameUI
+export const hasRaisedHandForVoteMock = InteractionEnvironment.current.gameUI
     .hasRaisedHandForVote as jest.Mock;
-export const handleMock = Environment.current.gameUI.handle as jest.Mock;
-export const chooseMock = Environment.current.gameUI.choose as jest.Mock;
-export const storytellerChooseMock = Environment.current.gameUI
+export const handleMock = InteractionEnvironment.current.gameUI
+    .handle as jest.Mock;
+export const chooseMock = InteractionEnvironment.current.gameUI
+    .choose as jest.Mock;
+export const storytellerChooseMock = InteractionEnvironment.current.gameUI
     .storytellerChoose as jest.Mock;
-export const storytellerChooseOneMock = Environment.current.gameUI
+export const storytellerChooseOneMock = InteractionEnvironment.current.gameUI
     .storytellerChooseOne as jest.Mock;
-export const storytellerDecideMock = Environment.current.gameUI
+export const storytellerDecideMock = InteractionEnvironment.current.gameUI
     .storytellerDecide as jest.Mock;
-export const confirmMock = Environment.current.gameUI.confirm as jest.Mock;
-export const storytellerConfirmMock = Environment.current.gameUI
+export const confirmMock = InteractionEnvironment.current.gameUI
+    .confirm as jest.Mock;
+export const storytellerConfirmMock = InteractionEnvironment.current.gameUI
     .storytellerConfirm as jest.Mock;
-export const sendMock = Environment.current.gameUI.send as jest.Mock;
-export const callForNominationMock = Environment.current.gameUI
+export const sendMock = InteractionEnvironment.current.gameUI.send as jest.Mock;
+export const callForNominationMock = InteractionEnvironment.current.gameUI
     .callForNomination as jest.Mock;
 
 export function mockGameUI() {

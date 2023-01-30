@@ -1,14 +1,16 @@
 import type { IGameUI, IGameUIProvider } from './game-ui';
-import { mockEnvironment } from '~/__mocks__/environment';
+import { mockInteractionEnvironment } from '~/__mocks__/interaction-environment';
 
-export interface IEnvironment extends IGameUIProvider {}
+export interface IInteractionEnvironment extends IGameUIProvider {}
 
-export interface IEnvironmentProvider {
-    current: IEnvironment;
+export interface IInteractionEnvironmentProvider {
+    current: IInteractionEnvironment;
 }
 
-abstract class AbstractEnvironment implements IEnvironment {
-    protected static _current = mockEnvironment();
+abstract class AbstractInteractionEnvironment
+    implements IInteractionEnvironment
+{
+    protected static _current = mockInteractionEnvironment();
 
     static get current() {
         return this._current;
@@ -17,4 +19,5 @@ abstract class AbstractEnvironment implements IEnvironment {
     abstract gameUI: IGameUI;
 }
 
-export const Environment: IEnvironmentProvider = AbstractEnvironment;
+export const InteractionEnvironment: IInteractionEnvironmentProvider =
+    AbstractInteractionEnvironment;

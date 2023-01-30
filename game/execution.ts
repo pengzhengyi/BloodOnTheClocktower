@@ -14,7 +14,7 @@ import {
     NoVoteInNomination,
     NoVotesWhenCountingVote,
 } from './exception';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 /**
  * {@link `glossary["Execution"]`}
@@ -203,7 +203,7 @@ export class Execution extends EffectTarget<Execution> {
         deadReason: DeadReason
     ): Promise<Death | undefined> {
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 this.formatPromptForExecutePlayer(player)
             )
         ) {

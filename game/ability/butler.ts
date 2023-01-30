@@ -10,7 +10,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
     static readonly description =
@@ -41,7 +41,9 @@ export class ButlerFollowMasterVoteEffect extends Effect<ButlerPlayer> {
     }
 
     protected canVote(): Promise<boolean> {
-        return Environment.current.gameUI.hasRaisedHandForVote(this.master!);
+        return InteractionEnvironment.current.gameUI.hasRaisedHandForVote(
+            this.master!
+        );
     }
 }
 
@@ -125,7 +127,7 @@ export class ButlerAbility extends Ability<
         players: Players,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await Environment.current.gameUI.choose(
+        let chosen = (await InteractionEnvironment.current.gameUI.choose(
             butlerPlayer,
             players.isNot(butlerPlayer),
             1,

@@ -3,7 +3,7 @@ import type { CharacterToken } from '../character';
 import type { IPlayer } from '../player';
 import type { NextFunction } from '../proxy/middleware';
 import { Effect, InteractionContext } from './effect';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 abstract class RegisterAsEffect<
     TPlayer extends IPlayer,
@@ -34,7 +34,7 @@ abstract class RegisterAsEffect<
     }
 
     protected async choose(context: InteractionContext<TPlayer>): Promise<V> {
-        return await Environment.current.gameUI.storytellerChooseOne(
+        return await InteractionEnvironment.current.gameUI.storytellerChooseOne(
             this.options,
             this.formatPromptForChoose(context),
             this.recommended

@@ -2,7 +2,7 @@ import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { BasicGamePhaseKind } from './game-phase-kind';
 import { Phase, getPhase, getPhaseIndex, toString } from './phase';
-import { Environment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface IGamePhase {
     /**
@@ -131,7 +131,7 @@ export class GamePhase implements IGamePhase {
         reason = reason ? ` because ${reason}` : '';
 
         if (
-            await Environment.current.gameUI.storytellerConfirm(
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
                 `Should transition from ${this} to next phase${reason}`
             )
         ) {
