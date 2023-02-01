@@ -11,52 +11,12 @@ import {
     UnexpectedEmptySeat,
 } from '../exception';
 import { Seat, SitResult } from './seat';
+import { SeatAssignmentMode } from './seat-assignment-mode';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 interface SyncResult {
     occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;
     assignedPlayerMismatchUnoccupiedSeats: Set<IPlayer>;
-}
-
-export class SeatAssignment {
-    unoccupied: Set<Seat> = new Set();
-
-    unassigned: Set<IPlayer> = new Set();
-
-    occupied: Set<Seat> = new Set();
-
-    assigned: Set<IPlayer> = new Set();
-
-    constructor(seats: Iterable<Seat>, players: Iterable<IPlayer>) {
-        this.getSeatAssignment(seats, players);
-    }
-
-    protected getSeatAssignment(
-        seats: Iterable<Seat>,
-        players: Iterable<IPlayer>
-    ) {
-        for (const seat of seats) {
-            if (seat.isEmpty) {
-                this.unoccupied.add(seat);
-            } else {
-                this.occupied.add(seat);
-                this.assigned.add(seat.player!);
-            }
-        }
-
-        for (const player of players) {
-            if (!this.assigned.has(player)) {
-                this.unassigned.add(player);
-            }
-        }
-    }
-}
-
-export enum SeatAssignmentMode {
-    NaturalInsert = 0,
-    RandomInsert = 1,
-    NaturalOverwrite = 2,
-    RandomOverwrite = 3,
 }
 
 export class Seating {

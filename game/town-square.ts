@@ -2,7 +2,9 @@ import { IClocktower, Clocktower } from './clocktower';
 import type { IPlayer } from './player';
 import { Players, PlayersModification } from './players';
 import type { ISeat } from './seating/seat';
-import { SeatAssignment, SeatAssignmentMode, Seating } from './seating/seating';
+import { ISeatAssignment, SeatAssignment } from './seating/seat-assignment';
+import { SeatAssignmentMode } from './seating/seat-assignment-mode';
+import { Seating } from './seating/seating';
 
 export interface ResitResult {
     oldSeating: Seating;
@@ -35,7 +37,7 @@ export class TownSquare {
 
     protected players: Players;
 
-    get seatAssignment(): SeatAssignment {
+    get seatAssignment(): ISeatAssignment {
         return new SeatAssignment(this.seating, this.players);
     }
 

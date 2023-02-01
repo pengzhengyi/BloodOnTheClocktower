@@ -1,7 +1,7 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
-import { SeatAssignmentMode } from '~/game/seating/seating';
 import { TownSquare } from '~/game/town-square';
 import { createBasicPlayers } from '~/__mocks__/player';
+import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';
 
 beforeAll(() => {
     storytellerConfirmMock.mockResolvedValue(true);
