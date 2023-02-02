@@ -8,7 +8,7 @@ import type { IClocktower } from '~/game/clocktower';
 import { LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
 import type { Players } from '~/game/players';
-import type { Seating } from '~/game/seating/seating';
+import type { ISeating } from '~/game/seating/seating';
 import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
 
@@ -19,7 +19,7 @@ export interface InfoProvideContext {
     requestedPlayer: IPlayer;
     players: Players;
     storyteller: StoryTeller;
-    seating: Seating;
+    seating: ISeating;
     reason?: string;
 }
 

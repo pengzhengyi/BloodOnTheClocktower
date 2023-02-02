@@ -188,4 +188,25 @@ describe('test Generator', () => {
         expect(characters.length).toBeGreaterThan(0);
         expect(characters).toContain(FangGu);
     });
+
+    test.concurrent('shuffles an empty iterable', () => {
+        const emptyArray: number[] = [];
+        const shuffledArray = Generator.shuffle(emptyArray);
+
+        expect(shuffledArray).toEqual(emptyArray);
+    });
+
+    test.concurrent('shuffles a single-element iterable', () => {
+        const singleElementArray = [1];
+        const shuffledArray = Generator.shuffle(singleElementArray);
+
+        expect(shuffledArray).toEqual(singleElementArray);
+    });
+
+    test.concurrent('shuffles the elements in an array', () => {
+        const array = [1, 2, 3, 4, 5];
+        const shuffledArray = Generator.shuffle(array);
+
+        expect(shuffledArray).toIncludeSameMembers(array);
+    });
 });

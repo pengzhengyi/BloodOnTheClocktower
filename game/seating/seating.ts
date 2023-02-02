@@ -1,166 +1,174 @@
 import { Generator } from '../collections';
-import { clockwise, counterclockwise, shuffle } from '../common';
+import { clockwise, counterclockwise } from '../common';
 import type { IPlayer } from '../player';
-import { Players } from '../players';
-import { AnyPredicate, Direction, Predicate, TAUTOLOGY } from '../types';
+import { AnyPredicate, Direction, TAUTOLOGY } from '../types';
 import {
     AccessInvalidSeatPosition,
     NumberOfSeatNotPositive,
+    PlayerNoAliveNeighbors,
     PlayerNoNeighbors,
     PlayerNotSat,
     UnexpectedEmptySeat,
 } from '../exception';
-import { Seat, SitResult } from './seat';
-import { SeatAssignmentMode } from './seat-assignment-mode';
+import { ISeat, Seat, SitResult } from './seat';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 interface SyncResult {
-    occupiedSeatsMismatchUnassignedPlayer: Set<Seat>;
+    occupiedSeatsMismatchUnassignedPlayer: Set<ISeat>;
     assignedPlayerMismatchUnoccupiedSeats: Set<IPlayer>;
 }
 
-export class Seating {
-    /**
-     * Create seating from players with assigned seat numbers.
-     *
-     * @param players Players with assigned seat numbers. If a player does not have assigned seat number, storyteller will decide on the spot.
-     * @returns A Seating where players with assigned seat will be sat and empty seats will be created when there are spaces between assigned seats.
-     */
-    static async of(players: Iterable<IPlayer>) {
-        const seats: Array<Seat> = [];
+export interface ISeating extends Iterable<ISeat> {
+    readonly numSeats: number;
+    readonly isAllOccupied: boolean;
 
-        for (const player of players) {
-            await new PlayerNotSat(player).throwWhen(
-                (error) => error.player.seatNumber === undefined
-            );
-            const seatNumber = player.seatNumber!;
+    isOccupied(seatNumber: number): boolean;
+    getSeat(seatNumber: number): ISeat;
+    addSeat(): ISeat;
+    setNumSeats(newNumSeats: number): Promise<void>;
+    iterate(
+        startSeatNumber: number,
+        direction: Direction
+    ): IterableIterator<ISeat>;
+}
 
-            seats[seatNumber] = new Seat(seatNumber);
-            await seats[seatNumber].sit(player);
-        }
+export class Seating implements ISeating {
+    static DEFAULT_INITIAL_NUM_SEATS = 5;
 
-        for (
-            let seatPosition = 0;
-            seatPosition < seats.length;
-            seatPosition++
-        ) {
-            if (seats[seatPosition] === undefined) {
-                seats[seatPosition] = new Seat(seatPosition);
-            }
-        }
-
-        return new this(seats);
+    static getSafeIndex(seating: ISeating, unsafeSeatNumber: number): number {
+        return (unsafeSeatNumber + seating.numSeats) % seating.numSeats;
     }
 
-    static async from(
-        players: Array<IPlayer> | Players,
-        seatAssignmentMode: SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
-    ) {
-        const seating = await Seating.init(players.length);
-        await seating.assign(players, seatAssignmentMode);
-        return seating;
-    }
-
-    static async init(numSeats: number) {
-        const seats = await this.createSeats(numSeats);
-        return new this(seats);
-    }
-
-    protected static async isSeatPlayerAlive(seat: Seat): Promise<boolean> {
-        const player = seat.player;
-        if (player === undefined) {
-            return false;
-        } else {
-            return await player.alive;
-        }
-    }
-
-    protected static async createSeats(numSeats: number): Promise<Array<Seat>> {
-        numSeats = await this.validateNumSeats(numSeats);
-
-        return this.createConsecutiveSeats(0, numSeats);
-    }
-
-    protected static createConsecutiveSeats(
-        start: number,
-        stop: number
-    ): Array<Seat> {
-        return Array.from(
-            Generator.map(
-                (seatNumber) => new Seat(seatNumber),
-                Generator.range(start, stop)
-            )
-        );
-    }
-
-    protected static async validateNumSeats(numSeats: number): Promise<number> {
-        if (numSeats <= 0) {
-            const error = new NumberOfSeatNotPositive(numSeats);
-            await error.throwWhen((error) => error.correctedNumSeats <= 0);
-            numSeats = error.correctedNumSeats;
-        }
-
-        return numSeats;
-    }
-
-    get allSat(): boolean {
-        return this.seats.every((seat) => seat.isOccupied);
-    }
-
-    get numSeats(): number {
-        return this.seats.length;
-    }
-
-    protected constructor(public readonly seats: Array<Seat>) {
-        this.seats = seats;
-    }
-
-    [Symbol.iterator]() {
-        return this.seats[Symbol.iterator]();
-    }
-
-    getSeat(position: number): Seat {
-        if (position < 0 || position > this.numSeats) {
-            throw new AccessInvalidSeatPosition(position, this);
-        }
-
-        return this.seats[position];
-    }
-
-    getPlayerOnSeat(position: number): IPlayer | undefined {
-        return this.getSeat(position).player;
-    }
-
-    async changeNumSeats(newNumSeats: number) {
-        newNumSeats = await Seating.validateNumSeats(newNumSeats);
-
-        const numSeats = this.numSeats;
-        if (newNumSeats < numSeats) {
-            for (let i = newNumSeats; i < numSeats; i++) {
-                await this.seats[i].remove();
-            }
-            this.seats.length = newNumSeats;
-        } else if (newNumSeats > numSeats) {
-            const newSeats = Seating.createConsecutiveSeats(
-                numSeats,
-                newNumSeats
-            );
-            return this.seats.push(...newSeats);
-        }
-    }
-
-    async *getVoteOrder(nominatedPosition: number): AsyncGenerator<IPlayer> {
-        const clockwiseSeats = this.iterateSeatsExcludingStart(
-            nominatedPosition,
+    static *getVoteOrder(
+        seating: ISeating,
+        nominatedPosition: number
+    ): IterableIterator<IPlayer> {
+        for (const seat of seating.iterate(
+            this.getSafeIndex(seating, nominatedPosition + 1),
             Direction.Clockwise
-        );
+        )) {
+            if (seat.isOccupied) {
+                yield seat.player as IPlayer;
+            } else {
+                throw new UnexpectedEmptySeat(seating, seat);
+            }
+        }
+    }
 
-        for await (const seat of clockwiseSeats) {
-            yield seat.player!;
+    static getNeighboringSeats(
+        seating: ISeating,
+        seatNumber: number
+    ): [ISeat, ISeat] {
+        const numSeats = seating.numSeats;
+        let nextSeatNumber = seatNumber + 1;
+        if (nextSeatNumber === numSeats) {
+            nextSeatNumber = 0;
         }
 
-        const nominated = this.seats[nominatedPosition].player as IPlayer;
-        yield nominated;
+        const prevSeatNumber = seatNumber === 0 ? numSeats - 1 : seatNumber - 1;
+
+        return [
+            seating.getSeat(prevSeatNumber),
+            seating.getSeat(nextSeatNumber),
+        ];
+    }
+
+    static getNeighboringSeatPairs(
+        seating: ISeating
+    ): Iterable<[ISeat, ISeat]> {
+        return Generator.pair(
+            seating.iterate(0, Direction.Clockwise),
+            seating.iterate(1, Direction.Clockwise)
+        );
+    }
+
+    /**
+     * {@link `glossary["Neighbors"]`}
+     * The two players, whether dead or alive, sitting one seat clockwise and counterclockwise from the player in question.
+     */
+    static getNeighbors(seating: Seating, player: IPlayer): [IPlayer, IPlayer] {
+        const seatNumber = player.seatNumber;
+
+        if (seatNumber === undefined) {
+            throw new PlayerNotSat(player);
+        }
+
+        const neighborSeats = this.getNeighboringSeats(seating, seatNumber);
+        const neighbors = neighborSeats.map((seat) => seat.player);
+        if (neighbors.includes(undefined)) {
+            throw new PlayerNoNeighbors(
+                player,
+                neighbors as [IPlayer | undefined, IPlayer | undefined],
+                seating
+            );
+        } else {
+            return neighbors as [IPlayer, IPlayer];
+        }
+    }
+
+    static *getNeighborPairs(seating: ISeating): Iterable<[IPlayer, IPlayer]> {
+        for (const seats of this.getNeighboringSeatPairs(seating)) {
+            const neighbors = seats.map((seat) => seat.player);
+
+            let i = 0;
+            if (neighbors[i] === undefined || neighbors[++i] === undefined) {
+                throw new UnexpectedEmptySeat(seating, seating.getSeat(i));
+            } else {
+                yield neighbors as [IPlayer, IPlayer];
+            }
+        }
+    }
+
+    /**
+     * {@link `glossary["Alive neighbours"]`}
+     * The two alive players that are sitting closest—one clockwise, one counterclockwise—to the player in question, not including any dead players sitting between them.
+     */
+    static async getAliveNeighbors(
+        seating: ISeating,
+        player: IPlayer,
+        isPlayerAlive?: AnyPredicate<IPlayer>
+    ): Promise<[IPlayer, IPlayer]> {
+        const seatNumber = player.seatNumber;
+
+        if (seatNumber === undefined) {
+            throw new PlayerNotSat(player);
+        }
+
+        const aliveNeighborSeatClockwise = await this.find(
+            seating,
+            this.getSafeIndex(seating, seatNumber + 1),
+            Direction.Clockwise,
+            (seat) => this.isSeatPlayerAlive(seating, seat, isPlayerAlive)
+        );
+        const aliveNeighborSeatCounterclockwise = await this.find(
+            seating,
+            this.getSafeIndex(seating, seatNumber - 1),
+            Direction.Counterclockwise,
+            (seat) => this.isSeatPlayerAlive(seating, seat, isPlayerAlive)
+        );
+
+        const neighbors = [
+            aliveNeighborSeatClockwise?.player,
+            aliveNeighborSeatCounterclockwise?.player,
+        ] as [IPlayer | undefined, IPlayer | undefined];
+        if (neighbors.includes(undefined)) {
+            throw new PlayerNoAliveNeighbors(player, neighbors, seating);
+        } else {
+            return neighbors as [IPlayer, IPlayer];
+        }
+    }
+
+    static async find(
+        seating: ISeating,
+        startSeatNumber: number,
+        direction: Direction,
+        condition: AnyPredicate<ISeat> = TAUTOLOGY
+    ): Promise<ISeat | undefined> {
+        for (const seat of seating.iterate(startSeatNumber, direction)) {
+            if (await condition(seat)) {
+                return seat;
+            }
+        }
     }
 
     /**
@@ -169,19 +177,18 @@ export class Seating {
      * @param condition A condition that needs to be satisfied for a seat to be considered qualified.
      * @returns A seat satisfying the condition and its distance from start seat position. Neighboring seats have a distance of 1.
      */
-    async getNearestSeat(
-        seatPosition: number,
-        condition: Predicate<Seat>
-    ): Promise<[Seat, number] | undefined> {
-        const clockwiseIterator = this.iterateSeatsExcludingStart(
-            seatPosition,
-            Direction.Clockwise,
-            condition
+    static async findNearest(
+        seating: Seating,
+        seatNumber: number,
+        condition: AnyPredicate<ISeat> = TAUTOLOGY
+    ): Promise<{ seat: ISeat; distance: number } | undefined> {
+        const clockwiseIterator = seating.iterate(
+            this.getSafeIndex(seating, seatNumber + 1),
+            Direction.Clockwise
         );
-        const counterclockwiseIterator = this.iterateSeatsExcludingStart(
-            seatPosition,
-            Direction.Counterclockwise,
-            condition
+        const counterclockwiseIterator = seating.iterate(
+            this.getSafeIndex(seating, seatNumber - 1),
+            Direction.Counterclockwise
         );
 
         let isClockwiseIterated;
@@ -193,21 +200,22 @@ export class Seating {
 
         while (true) {
             ({ done: isClockwiseIterated, value: clockwiseSeat } =
-                await clockwiseIterator.next());
+                clockwiseIterator.next());
             if (isClockwiseIterated) {
                 return undefined;
             }
             if (Object.is(clockwiseSeat, counterclockwiseSeat)) {
+                // stop because two iterators meet
                 return undefined;
             }
 
             clockwiseDistance++;
-            if (condition(clockwiseSeat)) {
-                return [clockwiseSeat, clockwiseDistance];
+            if (await condition(clockwiseSeat)) {
+                return { seat: clockwiseSeat, distance: clockwiseDistance };
             }
 
             ({ done: isCounterclockwiseIterated, value: counterclockwiseSeat } =
-                await counterclockwiseIterator.next());
+                counterclockwiseIterator.next());
             if (isCounterclockwiseIterated) {
                 return undefined;
             }
@@ -216,129 +224,29 @@ export class Seating {
             }
 
             counterclockwiseDistance++;
-            if (condition(counterclockwiseSeat)) {
-                return [counterclockwiseSeat, counterclockwiseDistance];
+            if (await condition(counterclockwiseSeat)) {
+                return {
+                    seat: counterclockwiseSeat,
+                    distance: counterclockwiseDistance,
+                };
             }
         }
     }
 
-    tryGetSeatByPlayer(player: IPlayer): Seat | undefined {
-        const seatNum = player.seatNumber;
-
-        if (seatNum === undefined) {
-            return undefined;
-        }
-
-        return this.seats[seatNum];
-    }
-
-    async *iterateNeighbors(): AsyncIterable<[IPlayer, IPlayer]> {
-        for (const seats of this.iterateNeighboringSeats()) {
-            for (const seat of seats) {
-                await new UnexpectedEmptySeat(this, seat).throwWhen(
-                    (error) =>
-                        error.emptySeat === undefined || error.emptySeat.isEmpty
-                );
-            }
-
-            yield seats.map((seat) => seat.player!) as [IPlayer, IPlayer];
-        }
-    }
-
     /**
-     * {@link `glossary["Neighbors"]`}
-     * The two players, whether dead or alive, sitting one seat clockwise and counterclockwise from the player in question.
-     */
-    async getNeighbors(
-        player: IPlayer,
-        predicate?: AnyPredicate<Seat>
-    ): Promise<[IPlayer, IPlayer]> {
-        const seat = this.getSeatByPlayer(player);
-
-        const neighbors = await Promise.all([
-            this.getCounterclockwisePlayer(seat.position, predicate),
-            this.getClockwisePlayer(seat.position, predicate),
-        ]);
-
-        if (neighbors[0] !== undefined && neighbors[1] !== undefined) {
-            return [neighbors[0], neighbors[1]];
-        } else {
-            throw new PlayerNoNeighbors(player, neighbors, this);
-        }
-    }
-
-    /**
-     * {@link `glossary["Alive neighbours"]`}
-     * The two alive players that are sitting closest—one clockwise, one counterclockwise—to the player in question, not including any dead players sitting between them.
-     */
-    async getAliveNeighbors(
-        player: IPlayer,
-        isAlive: AnyPredicate<Seat> = Seating.isSeatPlayerAlive
-    ): Promise<[IPlayer, IPlayer]> {
-        return await this.getNeighbors(player, isAlive);
-    }
-
-    async assign(
-        players: Players | Array<IPlayer>,
-        seatAssignmentMode: SeatAssignmentMode
-    ): Promise<Array<SitResult>> {
-        const sitResults: Array<SitResult> = [];
-
-        for await (const sitResult of this.assignEach(
-            players,
-            seatAssignmentMode
-        )) {
-            sitResults.push(sitResult);
-        }
-
-        return sitResults;
-    }
-
-    async *assignEach(
-        players: Players | Array<IPlayer>,
-        seatAssignmentMode: SeatAssignmentMode
-    ): AsyncGenerator<SitResult> {
-        await this.fit(players.length);
-
-        let unoccupied: Iterable<Seat>;
-        let unassigned: Iterable<IPlayer>;
-
-        if (seatAssignmentMode < SeatAssignmentMode.NaturalOverwrite) {
-            await this.sync(players);
-
-            unoccupied = Generator.filter((seat) => seat.isEmpty, this.seats);
-
-            unassigned = Generator.filter(
-                (player) => player.seatNumber === undefined,
-                players
-            );
-        } else {
-            unoccupied = this.seats;
-            unassigned = players;
-        }
-
-        for await (const sitResult of this.assignPlayersToSeats(
-            unassigned,
-            unoccupied,
-            seatAssignmentMode === SeatAssignmentMode.RandomInsert ||
-                seatAssignmentMode === SeatAssignmentMode.RandomOverwrite
-        )) {
-            yield sitResult;
-        }
-    }
-
-    /**
-     * Exchange the players sitting at specified seating positions.
+     * Exchange the players sitting at specified seating positions. Either/both seat can be empty.
+     * @param seating A seating.
      * @param seatPosition The position of one seat
      * @param otherSeatPosition The position of the other seat
      * @returns The sitting results when players exchange the seat. Can have length 0, 1, or 2.
      */
-    async exchange(
+    static async exchange(
+        seating: ISeating,
         seatPosition: number,
         otherSeatPosition: number
     ): Promise<Array<SitResult>> {
-        const seat = this.getSeat(seatPosition);
-        const otherSeat = this.getSeat(otherSeatPosition);
+        const seat = seating.getSeat(seatPosition);
+        const otherSeat = seating.getSeat(otherSeatPosition);
 
         const [player, otherPlayer] = await Promise.all([
             seat.remove(),
@@ -357,35 +265,122 @@ export class Seating {
         return await Promise.all(willSit);
     }
 
-    protected getSeatByPlayer(player: IPlayer): Seat {
-        const seat = this.tryGetSeatByPlayer(player);
-
-        if (seat === undefined) {
-            throw new PlayerNotSat(player);
+    /**
+     * Try to increase number of seats to accommodate all the players when necessary.
+     * @param seating A seating.
+     * @param numPlayers Number of players should fit.
+     * @returns Whether the number of seats can fit all players.
+     */
+    static async fit(seating: ISeating, numPlayers: number): Promise<boolean> {
+        if (numPlayers <= seating.numSeats) {
+            return true;
         }
 
-        return seat;
+        if (
+            await InteractionEnvironment.current.gameUI.storytellerConfirm(
+                this.formatPromptForSeatIncrease(numPlayers)
+            )
+        ) {
+            await seating.setNumSeats(numPlayers);
+            return true;
+        }
+
+        return false;
     }
 
-    protected async *assignPlayersToSeats(
-        unassigned: Iterable<IPlayer>,
-        unoccupied: Iterable<Seat>,
-        shouldRandomlyAssign: boolean
-    ): AsyncGenerator<SitResult> {
-        let unassignedPlayers: Iterable<IPlayer>;
+    protected static formatPromptForSeatIncrease(newNumSeats: number) {
+        return `Increase number of seats to ${newNumSeats} to fit all players`;
+    }
 
-        if (shouldRandomlyAssign) {
-            unassignedPlayers = shuffle(unassigned);
+    protected static async isSeatPlayerAlive(
+        seating: ISeating,
+        seat: ISeat,
+        isPlayerAlive: AnyPredicate<IPlayer> = (player) => player.alive
+    ): Promise<boolean> {
+        const player = seat.player;
+        if (player === undefined) {
+            throw new UnexpectedEmptySeat(seating, seat);
         } else {
-            unassignedPlayers = unassigned;
+            return await isPlayerAlive(player);
+        }
+    }
+
+    protected static validateNumSeats(seating: ISeating, numSeats: number) {
+        if (numSeats <= 0) {
+            throw new NumberOfSeatNotPositive(seating, numSeats);
+        }
+    }
+
+    get isAllOccupied(): boolean {
+        return this.seats.every((seat) => seat.isOccupied);
+    }
+
+    get numSeats(): number {
+        return this.seats.length;
+    }
+
+    protected readonly seats: Array<ISeat> = [];
+
+    constructor(initialNumSeats: number = Seating.DEFAULT_INITIAL_NUM_SEATS) {
+        this.addSeats(initialNumSeats);
+    }
+
+    [Symbol.iterator]() {
+        return this.seats[Symbol.iterator]();
+    }
+
+    isOccupied(seatNumber: number): boolean {
+        return this.seats[seatNumber].isOccupied;
+    }
+
+    getSeat(seatNumber: number): ISeat {
+        if (seatNumber < 0 || seatNumber > this.numSeats) {
+            throw new AccessInvalidSeatPosition(seatNumber, this);
         }
 
-        for (const [unassignedPlayer, unoccupiedSeat] of Generator.pair(
-            unassignedPlayers,
-            unoccupied
-        )) {
-            yield await unoccupiedSeat.sit(unassignedPlayer);
+        return this.seats[seatNumber];
+    }
+
+    addSeat(): ISeat {
+        const newSeat = new Seat(this.numSeats);
+        this.seats.push(newSeat);
+        return newSeat;
+    }
+
+    async setNumSeats(numSeatsToAdd: number) {
+        Seating.validateNumSeats(this, numSeatsToAdd);
+
+        const numSeats = this.numSeats;
+        if (numSeatsToAdd < numSeats) {
+            const _removedPlayers = await Generator.promiseAll(
+                Generator.toPromise(
+                    (seat) => seat.remove(),
+                    Generator.slice(this.seats, numSeatsToAdd, numSeats)
+                )
+            );
+            this.seats.length = numSeatsToAdd;
+        } else if (numSeatsToAdd > numSeats) {
+            this.addSeats(numSeatsToAdd);
         }
+    }
+
+    iterate(
+        startSeatNumber: number,
+        direction: Direction
+    ): IterableIterator<ISeat> {
+        const iterateMethod =
+            direction === Direction.Clockwise ? clockwise : counterclockwise;
+        return iterateMethod(this.seats, startSeatNumber);
+    }
+
+    protected addSeats(numSeatsToAdd: number): Array<ISeat> {
+        const newSeats = [];
+
+        for (let i = 0; i < numSeatsToAdd; i++) {
+            newSeats.push(this.addSeat());
+        }
+
+        return newSeats;
     }
 
     /**
@@ -403,7 +398,7 @@ export class Seating {
      * @returns The result of syncing which describes the mismatches.
      */
     protected async sync(players: Iterable<IPlayer>): Promise<SyncResult> {
-        const occupiedSeatsMismatchUnassignedPlayer = new Set<Seat>();
+        const occupiedSeatsMismatchUnassignedPlayer = new Set<ISeat>();
         const assignedPlayerMismatchUnoccupiedSeats = new Set<IPlayer>();
 
         const willSit: Array<Promise<SitResult>> = [];
@@ -430,114 +425,5 @@ export class Seating {
             occupiedSeatsMismatchUnassignedPlayer,
             assignedPlayerMismatchUnoccupiedSeats,
         };
-    }
-
-    /**
-     * Try to increase number of seats to accommodate all the players when necessary.
-     * @param numPlayers Number of players should fit.
-     * @returns Whether the number of seats can fit all players.
-     */
-    protected async fit(numPlayers: number): Promise<boolean> {
-        if (numPlayers <= this.numSeats) {
-            return true;
-        }
-
-        if (
-            await InteractionEnvironment.current.gameUI.storytellerConfirm(
-                this.formatPromptForSeatIncrease(numPlayers)
-            )
-        ) {
-            await this.changeNumSeats(numPlayers);
-            return true;
-        }
-
-        return false;
-    }
-
-    protected async *iterateSeatsExcludingStart(
-        startSeatPosition: number,
-        direction: Direction,
-        filterSeat: AnyPredicate<Seat> = TAUTOLOGY
-    ): AsyncGenerator<Seat> {
-        if (startSeatPosition < 0 || startSeatPosition >= this.numSeats) {
-            return;
-        }
-
-        const iterate =
-            direction === Direction.Clockwise ? clockwise : counterclockwise;
-
-        let isFirst = true;
-        for (const neighborSeat of iterate(this.seats, startSeatPosition)) {
-            if (isFirst) {
-                isFirst = false;
-            } else if (await filterSeat(neighborSeat)) {
-                yield neighborSeat;
-            }
-        }
-    }
-
-    protected iterateNeighboringSeats(): Iterable<[Seat, Seat]> {
-        return Generator.pair(
-            clockwise(this.seats, 0),
-            clockwise(this.seats, 1)
-        );
-    }
-
-    protected async tryGetNextSeat(
-        seatPosition: number,
-        filterSeat?: AnyPredicate<Seat>
-    ): Promise<Seat | undefined> {
-        const neighbors = this.iterateSeatsExcludingStart(
-            seatPosition,
-            Direction.Clockwise,
-            filterSeat
-        );
-        return (await neighbors.next()).value;
-    }
-
-    protected async getClockwisePlayer(
-        seatPosition: number,
-        filterSeat?: AnyPredicate<Seat>
-    ): Promise<IPlayer | undefined> {
-        const nextSeat = await this.tryGetNextSeat(seatPosition, filterSeat);
-
-        if (nextSeat !== undefined) {
-            await new UnexpectedEmptySeat(this, nextSeat).throwWhen(
-                (error) => error.emptySeat.player === undefined
-            );
-        }
-
-        return nextSeat?.player;
-    }
-
-    protected async tryGetPrevSeat(
-        seatPosition: number,
-        filterSeat?: AnyPredicate<Seat>
-    ): Promise<Seat | undefined> {
-        const neighbors = this.iterateSeatsExcludingStart(
-            seatPosition,
-            Direction.Counterclockwise,
-            filterSeat
-        );
-        return (await neighbors.next()).value;
-    }
-
-    protected async getCounterclockwisePlayer(
-        seatPosition: number,
-        filterSeat?: AnyPredicate<Seat>
-    ): Promise<IPlayer | undefined> {
-        const prevSeat = await this.tryGetPrevSeat(seatPosition, filterSeat);
-
-        if (prevSeat !== undefined) {
-            await new UnexpectedEmptySeat(this, prevSeat).throwWhen(
-                (error) => error.emptySeat.player === undefined
-            );
-        }
-
-        return prevSeat?.player;
-    }
-
-    protected formatPromptForSeatIncrease(newSize: number) {
-        return `Increase number of seats to ${newSize} to fit all players`;
     }
 }

@@ -11,7 +11,7 @@ import { Players } from '~/game/players';
 import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/dead-reason';
 import type { IPlayer } from '~/game/player';
-import { Seating } from '~/game/seating/seating';
+import { ISeating } from '~/game/seating/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Saint } from '~/content/characters/output/saint';
@@ -57,19 +57,20 @@ import {
     UndertakerInformationProvider,
 } from '~/game/info/provider/undertaker';
 import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman';
+import { createSeatingAndAssignPlayers } from '~/__mocks__/seating';
 
 export async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
-): Promise<[Seating, Array<IPlayer>]> {
+): Promise<[ISeating, Array<IPlayer>]> {
     const players = await Promise.all(
         playerDescriptions.map((description) =>
             playerFromDescription(description)
         )
     );
     storytellerConfirmMock.mockResolvedValue(true);
-    const seating = await Seating.from(players);
+    const seating = await createSeatingAndAssignPlayers(players);
     storytellerConfirmMock.mockReset();
-    expect(seating.allSat).toBeTrue();
+    expect(seating.isAllOccupied).toBeTrue();
     return [seating, players];
 }
 

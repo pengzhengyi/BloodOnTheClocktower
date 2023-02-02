@@ -14,8 +14,10 @@ import type {
     ResolveCallback,
     StaticThis,
     Task,
+    TRandomRange,
     Transform,
 } from './types';
+import { getRandomCryptoIntInclusive } from './common';
 import { isIterable } from '~/utils/common';
 
 export class LazyMap<K, V> extends Map<K, V> {
@@ -355,6 +357,37 @@ export class Generator<T> implements Iterable<T> {
             } else {
                 return;
             }
+        }
+    }
+
+    static *skip<T>(n: number, iterable: Iterable<T>): Iterable<T> {
+        for (const element of iterable) {
+            if (n-- > 0) {
+                continue;
+            } else {
+                yield element;
+            }
+        }
+    }
+
+    static *slice<T>(
+        iterable: Iterable<T>,
+        start = 0,
+        end = Number.POSITIVE_INFINITY
+    ): Iterable<T> {
+        let i = 0;
+        for (const element of iterable) {
+            if (i < start) {
+                continue;
+            }
+
+            if (i < end) {
+                yield element;
+            } else {
+                return;
+            }
+
+            i++;
         }
     }
 
@@ -887,6 +920,49 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static shuffle<T>(
+        iterable: Iterable<T>,
+        randRangeInclusive: TRandomRange = getRandomCryptoIntInclusive
+    ): Array<T> {
+        const elements: Array<T> = [];
+
+        for (const element of iterable) {
+            this.shuffleIter(elements, element, randRangeInclusive);
+        }
+
+        return elements;
+    }
+
+    static async shuffleAsync<T>(
+        iterable: AsyncIterable<T>,
+        randRangeInclusive: TRandomRange = getRandomCryptoIntInclusive
+    ): Promise<Array<T>> {
+        const elements: Array<T> = [];
+
+        for await (const element of iterable) {
+            this.shuffleIter(elements, element, randRangeInclusive);
+        }
+
+        return elements;
+    }
+
+    protected static shuffleIter<T>(
+        elements: Array<T>,
+        element: T,
+        randRangeInclusive: TRandomRange
+    ) {
+        const newPosition = elements.length;
+        const newElementPosition = randRangeInclusive(0, newPosition);
+
+        if (newElementPosition === newPosition) {
+            elements.push(element);
+        } else {
+            // exchange with randomly chosen position to ensure the elements stay shuffled
+            elements[newPosition] = elements[newElementPosition];
+            elements[newElementPosition] = element;
+        }
+    }
+
     static once<T>(iterable: Iterable<T>): Generator<T> {
         return new this(iterable, [], false);
     }
@@ -1183,6 +1259,16 @@ export class Generator<T> implements Iterable<T> {
         return this.transform((iterable) => Generator.limit(n, iterable));
     }
 
+    skip(n: number) {
+        return this.transform((iterable) => Generator.skip(n, iterable));
+    }
+
+    slice(start = 0, end = Number.POSITIVE_INFINITY) {
+        return this.transform((iterable) =>
+            Generator.slice(iterable, start, end)
+        );
+    }
+
     combinations(k: number) {
         return this.become((iterable) => Generator.combinations(k, iterable));
     }
@@ -1198,6 +1284,12 @@ export class Generator<T> implements Iterable<T> {
 
     take(n?: number): undefined | T | Array<T> {
         return Generator.take(n, this);
+    }
+
+    shuffle(
+        randRangeInclusive: TRandomRange = getRandomCryptoIntInclusive
+    ): Array<T> {
+        return Generator.shuffle(this, randRangeInclusive);
     }
 
     count(): number {

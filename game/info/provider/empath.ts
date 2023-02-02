@@ -7,6 +7,7 @@ import {
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
+import { Seating } from '~/game/seating/seating';
 
 /**
  * {@link `empath["ability"]`}
@@ -104,12 +105,13 @@ export class EmpathInformationProvider<
         context: TInfoProvideContext,
         shouldFromRequestedPlayerPerspective: boolean
     ): Promise<number> {
-        const aliveNeighbors = await context.seating.getAliveNeighbors(
+        const aliveNeighbors = await Seating.getAliveNeighbors(
+            context.seating,
             context.requestedPlayer,
-            async (seat) => {
+            async (seatPlayer) => {
                 const player = shouldFromRequestedPlayerPerspective
-                    ? seat.player?.from(context.requestedPlayer)
-                    : seat.player;
+                    ? seatPlayer?.from(context.requestedPlayer)
+                    : seatPlayer;
 
                 if (player === undefined) {
                     return false;

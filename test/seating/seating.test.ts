@@ -1,21 +1,16 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
-import { clockwise, randomChoice } from '~/game/common';
+import { clockwise, getRandomIntInclusive } from '~/game/common';
 import type { IPlayer } from '~/game/player';
-import { Seating } from '~/game/seating/seating';
+import { Seating, ISeating } from '~/game/seating/seating';
 import { createBasicPlayers } from '~/__mocks__/player';
-
-async function createSeating(players: Array<IPlayer>): Promise<Seating> {
-    const seating = await Seating.from(players);
-    expect(seating.allSat).toBeTrue();
-    return seating;
-}
+import { createSeatingAndAssignPlayers } from '~/__mocks__/seating';
 
 async function createPlayersAndSeating(
     numPlayers: number
-): Promise<[Array<IPlayer>, Seating]> {
+): Promise<[Array<IPlayer>, ISeating]> {
     const players = await createBasicPlayers(numPlayers);
 
-    const seating = await createSeating(players);
+    const seating = await createSeatingAndAssignPlayers(players);
 
     return [players, seating];
 }
@@ -32,14 +27,18 @@ describe('Test basic functionalities', () => {
     test('Get vote order', async () => {
         const [players, seating] = await createPlayersAndSeating(10);
 
-        const nominatedSeatPosition = randomChoice(seating.seats).position;
+        const nominatedSeatPosition = getRandomIntInclusive(
+            0,
+            seating.numSeats - 1
+        );
 
         const expectedPlayersToVote = clockwise(
             players,
             nominatedSeatPosition + 1
         );
 
-        for await (const actualPlayerToVote of seating.getVoteOrder(
+        for await (const actualPlayerToVote of Seating.getVoteOrder(
+            seating,
             nominatedSeatPosition
         )) {
             const { done, value: expectedPlayerToVote } =
@@ -52,10 +51,10 @@ describe('Test basic functionalities', () => {
     test('exchange player seats', async () => {
         const [_players, seating] = await createPlayersAndSeating(8);
 
-        const firstPlayer = seating.getPlayerOnSeat(4);
-        const otherPlayer = seating.getPlayerOnSeat(6);
+        const firstPlayer = seating.getSeat(4).player;
+        const otherPlayer = seating.getSeat(6).player;
 
-        const sitResults = await seating.exchange(4, 6);
+        const sitResults = await Seating.exchange(seating, 4, 6);
 
         expect(sitResults).toHaveLength(2);
         expect(

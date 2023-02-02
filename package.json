@@ -33,6 +33,7 @@
         "@nuxtjs/composition-api": "^0.32.0",
         "@nuxtjs/dayjs": "^1.4.1",
         "@nuxtjs/pwa": "^3.3.5",
+        "@peculiar/webcrypto": "^1.4.1",
         "@pinia/nuxt": "^0.1.9",
         "@typescript-eslint/eslint-plugin": "^5.30.5",
         "@typescript-eslint/parser": "^5.30.5",

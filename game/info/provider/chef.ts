@@ -6,6 +6,7 @@ import {
 import { InfoProvideContext, InformationProvider } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
 import { Players } from '~/game/players';
+import { Seating } from '~/game/seating/seating';
 
 export interface ChefInformation {
     numPairEvilPlayers: number;
@@ -103,7 +104,9 @@ export class ChefInformationProvider<
     ): Promise<number> {
         let numPairEvilPlayers = 0;
 
-        for await (const _players of context.seating.iterateNeighbors()) {
+        for await (const _players of Seating.getNeighborPairs(
+            context.seating
+        )) {
             const players = shouldFromRequestedPlayerPerspective
                 ? _players.map((player) => player.from(context.requestedPlayer))
                 : _players;

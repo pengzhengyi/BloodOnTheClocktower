@@ -56,6 +56,11 @@ export type AnyFactory<V> = Factory<V> | AsyncFactory<V>;
 export type ResolveCallback<T> = (value: T | PromiseLike<T>) => void;
 export type RejectCallback = (reason?: any) => void;
 
+/**
+ * Generate a random integer r with equal chance in  min <= r <= max.
+ */
+export type TRandomRange = (min: number, max: number) => number;
+
 export enum RoleDataKeyName {
     /**
      * {@link `glossary["Ability"]`}

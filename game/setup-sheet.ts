@@ -2,10 +2,9 @@ import { Generator } from './collections';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
-import type { IPlayer } from './player';
 import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
-import { Seating } from './seating/seating';
+import { ISeating } from './seating/seating';
 import { TownSquare } from './town-square';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
@@ -135,16 +134,6 @@ export abstract class SetupSheet {
         ],
     ]);
 
-    static setupSeating(numPlayers: number): Promise<Seating> {
-        return Seating.init(numPlayers);
-    }
-
-    static setupSeatingFromPlayers(
-        players: Array<IPlayer> | Players
-    ): Promise<Seating> {
-        return Seating.from(players);
-    }
-
     static setupGrimoire(players: Players): Grimoire {
         return new Grimoire(players);
     }
@@ -155,7 +144,7 @@ export abstract class SetupSheet {
         );
     }
 
-    static setupTownSquare(seating: Seating, players: Players): TownSquare {
+    static setupTownSquare(seating: ISeating, players: Players): TownSquare {
         return new TownSquare(seating, players);
     }
 

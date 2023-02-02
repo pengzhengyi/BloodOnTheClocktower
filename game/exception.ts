@@ -41,7 +41,7 @@ import {
 import type { IEffect } from './effect/effect';
 import type { Alignment } from './alignment';
 import type { IEffects } from './effect/effects';
-import type { Seating } from './seating/seating';
+import type { ISeating } from './seating/seating';
 import { GamePhaseKind } from './game-phase-kind';
 import type {
     AbilityUseContext,
@@ -299,7 +299,7 @@ export class NumberOfSeatNotPositive extends RecoverableGameError {
 
     declare correctedNumSeats: number;
 
-    constructor(readonly numSeats: number) {
+    constructor(readonly seating: ISeating, readonly numSeats: number) {
         super(NumberOfSeatNotPositive.description);
         this.correctedNumSeats = numSeats;
     }
@@ -312,7 +312,7 @@ export class UnexpectedEmptySeat extends RecoverableGameError {
         return this.emptySeat.player;
     }
 
-    constructor(readonly seating: Seating, readonly emptySeat: ISeat) {
+    constructor(readonly seating: ISeating, readonly emptySeat: ISeat) {
         super(UnexpectedEmptySeat.description);
     }
 }
@@ -338,7 +338,7 @@ export class InvalidPlayerToSit extends RecoverableGameError {
 export class AccessInvalidSeatPosition extends RecoverableGameError {
     static description = 'Cannot get seat for an invalid position';
 
-    constructor(readonly position: number, readonly seating: Seating) {
+    constructor(readonly position: number, readonly seating: ISeating) {
         super(AccessInvalidSeatPosition.description);
     }
 }
@@ -350,7 +350,7 @@ export class PlayerNoNeighbors extends RecoverableGameError {
     constructor(
         readonly player: IPlayer,
         readonly neighbors: [IPlayer | undefined, IPlayer | undefined],
-        readonly seating: Seating
+        readonly seating: ISeating
     ) {
         super(PlayerNoNeighbors.description);
     }
@@ -363,7 +363,7 @@ export class PlayerNoAliveNeighbors extends PlayerNoNeighbors {
     constructor(
         readonly player: IPlayer,
         readonly neighbors: [IPlayer | undefined, IPlayer | undefined],
-        readonly seating: Seating
+        readonly seating: ISeating
     ) {
         super(player, neighbors, seating);
         this.message = PlayerNoAliveNeighbors.description;
