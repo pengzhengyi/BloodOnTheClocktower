@@ -15,12 +15,32 @@ export interface ISeat {
     readonly isEmpty: boolean;
 
     /**
+     * These are four scenarios when trying to sit a player to a seat, depending on whether the player is already assigned a seat and whether the seat is already occupied.
+     *
+     * - Assigned Player and Occupied Seat
+     * - Assigned Player and Unoccupied Seat
+     * - Unassigned Player and Occupied Seat
+     * - Unassigned Player and Unoccupied Seat
+     *
+     * `trySit` will only succeed for the last case: when an unassigned player try to sit an unoccupied Seat.
+     *
      * Try to sit a player to current seat. Will fail immediately when the seat is occupied.
      * @param player A player attempt to sit.
      * @returns The result of sitting.
      */
     trySit(player: IPlayer): SitResult;
     /**
+     * These are four scenarios when trying to sit a player to a seat, depending on whether the player is already assigned a seat and whether the seat is already occupied.
+     *
+     * - Assigned Player and Occupied Seat
+     * - Assigned Player and Unoccupied Seat
+     * - Unassigned Player and Occupied Seat
+     * - Unassigned Player and Unoccupied Seat
+     *
+     * For the last case, when an unassigned player try to sit an unoccupied, `sit` will behave like `trySit`. For the second to last, `sit` might require confirmation for emptying an occupied seat, making this call asynchronous.
+     *
+     * ! For the first two scenario, `sit` does not guarantee removing a player from its existing assigned seat. `ISeating.sit` should be used instead as it does proper cleaning up. In fact, `ISeating.sit` should be preferred when possible as the safer alternative.
+     *
      * Sit a player at current seat. If the seat is occupied, will try to remove sat player before sit the new player.
      * @param player A player attempt to sit.
      * @returns The result of sitting.
@@ -56,15 +76,20 @@ export class Seat implements ISeat {
     }
 
     trySit(player: IPlayer): SitResult {
-        if (this.isOccupied) {
-            return this.getFailToSitResult(player);
-        } else {
+        if (this.isEmpty && player.seatNumber === undefined) {
             return this.sitWhenEmpty(player);
+        } else {
+            return this.getFailToSitResult(player);
         }
     }
 
     async sit(player: IPlayer): Promise<SitResult> {
         if (this.isOccupied) {
+            if (player.seatNumber === this.position) {
+                // short circuit when player is already at desired seat
+                return this.getSucceedToSitResult(player);
+            }
+
             const removedPlayer = await this.remove();
             if (removedPlayer === undefined) {
                 return this.getFailToSitResult(player);

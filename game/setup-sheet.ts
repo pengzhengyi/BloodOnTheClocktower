@@ -4,8 +4,9 @@ import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
 import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
-import { ISeating } from './seating/seating';
-import { TownSquare } from './town-square';
+import { Seating } from './seating/seating';
+import { TownSquare, ITownSquare } from './town-square';
+import { Clocktower } from './clocktower';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
@@ -144,8 +145,10 @@ export abstract class SetupSheet {
         );
     }
 
-    static setupTownSquare(seating: ISeating, players: Players): TownSquare {
-        return new TownSquare(seating, players);
+    static setupTownSquare(numPlayers?: number): ITownSquare {
+        const seating = new Seating(numPlayers);
+        const clocktower = new Clocktower();
+        return new TownSquare(seating, clocktower);
     }
 
     static recommend(numPlayers: number): NumberOfCharacters {

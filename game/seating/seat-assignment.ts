@@ -76,7 +76,10 @@ export class SeatAssignment<
                 nextSeatToAssign = seating.addSeat();
             }
 
-            const sitResult = await nextSeatToAssign!.sit(player);
+            const sitResult = await seating.sit(
+                player,
+                nextSeatToAssign!.position
+            );
             yield sitResult;
         }
     }

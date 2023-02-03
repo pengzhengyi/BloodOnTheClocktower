@@ -11,12 +11,8 @@ import {
     UnexpectedEmptySeat,
 } from '../exception';
 import { ISeat, Seat, SitResult } from './seat';
+import { ISeatOccupancy, SeatOccupancy } from './seat-occupancy';
 import { InteractionEnvironment } from '~/interaction/environment';
-
-interface SyncResult {
-    occupiedSeatsMismatchUnassignedPlayer: Set<ISeat>;
-    assignedPlayerMismatchUnoccupiedSeats: Set<IPlayer>;
-}
 
 export interface ISeating extends Iterable<ISeat> {
     readonly numSeats: number;
@@ -26,10 +22,54 @@ export interface ISeating extends Iterable<ISeat> {
     getSeat(seatNumber: number): ISeat;
     addSeat(): ISeat;
     setNumSeats(newNumSeats: number): Promise<void>;
+
+    // sit player to seat or remove player from seat, these methods should be used rather than operate on seats
+    /**
+     * These are four scenarios when trying to sit a player to a seat, depending on whether the player is already assigned a seat and whether the seat is already occupied.
+     *
+     * - Assigned Player and Occupied Seat
+     * - Assigned Player and Unoccupied Seat
+     * - Unassigned Player and Occupied Seat
+     * - Unassigned Player and Unoccupied Seat
+     *
+     * `trySit` will only succeed for the last case: when an unassigned player try to sit an unoccupied Seat.
+     *
+     * Try to sit a player to current seat. Will fail immediately when the seat is occupied.
+     * @param player A player attempt to sit.
+     * @param seatNumber A seat position for the player.
+     * @returns The result of sitting.
+     */
+    trySit(player: IPlayer, seatNumber: number): SitResult;
+    /**
+     * These are four scenarios when trying to sit a player to a seat, depending on whether the player is already assigned a seat and whether the seat is already occupied.
+     *
+     * - Assigned Player and Occupied Seat
+     * - Assigned Player and Unoccupied Seat
+     * - Unassigned Player and Occupied Seat
+     * - Unassigned Player and Unoccupied Seat
+     *
+     * For the last case, when an unassigned player try to sit an unoccupied, `sit` will behave like `trySit`. For other cases, `sit` might require confirmation for removing an already assigned player from its seat and emptying an occupied seat, making this call asynchronous.
+     *
+     * ! For the first two scenario, `sit` does not guarantee removing a player from its existing assigned seat. `ISeating.sit` should be used instead as it does proper cleaning up. In fact, `ISeating.sit` should be preferred when possible as the safer alternative.
+     *
+     * Sit a player at designated seat position. If the player is assigned to a seat, will remove the player from that assigned seat.  If the seat is occupied, will try to remove sat player before sit the new player.
+     * @param player A player attempt to sit.
+     * @param seatNumber A seat position for the player.
+     * @returns The result of sitting.
+     */
+    sit(player: IPlayer, seatNumber: number): Promise<SitResult>;
+    /**
+     * Remove player (if sat) from its assigned seat.
+     * @returns True if removed; false otherwise.
+     */
+    remove(player: IPlayer): Promise<boolean>;
+
     iterate(
         startSeatNumber: number,
         direction: Direction
     ): IterableIterator<ISeat>;
+
+    toString(): string;
 }
 
 export class Seating implements ISeating {
@@ -71,6 +111,20 @@ export class Seating implements ISeating {
             seating.getSeat(prevSeatNumber),
             seating.getSeat(nextSeatNumber),
         ];
+    }
+
+    static getPlayerOnSeat(
+        seating: ISeating,
+        position: number
+    ): IPlayer | undefined {
+        return seating.getSeat(position).player;
+    }
+
+    static getSeatOccupancy(
+        seating: ISeating,
+        players: Iterable<IPlayer>
+    ): ISeatOccupancy {
+        return new SeatOccupancy(seating, players);
     }
 
     static getNeighboringSeatPairs(
@@ -364,6 +418,35 @@ export class Seating implements ISeating {
         }
     }
 
+    trySit(player: IPlayer, seatNumber: number): SitResult {
+        const seat = this.getSeat(seatNumber);
+        return seat.trySit(player);
+    }
+
+    async sit(player: IPlayer, seatNumber: number): Promise<SitResult> {
+        const seat = this.getSeat(seatNumber);
+
+        if (player.seatNumber === seatNumber) {
+            // short circuit when player is already at desired seat
+            return { player, hasSat: true, seat };
+        }
+
+        // make the player unassigned
+        await this.remove(player);
+
+        return await seat.sit(player);
+    }
+
+    async remove(player: IPlayer): Promise<boolean> {
+        if (player.seatNumber === undefined) {
+            return false;
+        }
+
+        const seat = this.getSeat(player.seatNumber);
+        const removed = await seat.remove();
+        return removed !== undefined;
+    }
+
     iterate(
         startSeatNumber: number,
         direction: Direction
@@ -383,47 +466,8 @@ export class Seating implements ISeating {
         return newSeats;
     }
 
-    /**
-     * Sync players' seat assignment with seats' occupancy.
-     *
-     * It will fix the following mismatch:
-     *
-     * - a player is assigned a seat but the seat appears to be empty (when player is pre-assigned)
-     * - a seat is occupied by a player but the player does not have this seat number assigned (rare, indicates a bug)
-     *
-     * ! It will not handle when a player is assigned a seat which is occupied by a different player.
-     * ! It will throw an error when there are fewer seats than the number of players.
-     *
-     * @param players
-     * @returns The result of syncing which describes the mismatches.
-     */
-    protected async sync(players: Iterable<IPlayer>): Promise<SyncResult> {
-        const occupiedSeatsMismatchUnassignedPlayer = new Set<ISeat>();
-        const assignedPlayerMismatchUnoccupiedSeats = new Set<IPlayer>();
-
-        const willSit: Array<Promise<SitResult>> = [];
-        for (const player of players) {
-            if (player.seatNumber !== undefined) {
-                const matchingSeat = this.getSeat(player.seatNumber);
-
-                if (matchingSeat.isEmpty) {
-                    assignedPlayerMismatchUnoccupiedSeats.add(player);
-                    willSit.push(matchingSeat.sit(player));
-                }
-            }
-        }
-        await Promise.all(willSit);
-
-        for (const seat of this) {
-            if (seat.isOccupied && seat.player!.seatNumber === undefined) {
-                occupiedSeatsMismatchUnassignedPlayer.add(seat);
-                seat.player!.seatNumber = seat.position;
-            }
-        }
-
-        return {
-            occupiedSeatsMismatchUnassignedPlayer,
-            assignedPlayerMismatchUnoccupiedSeats,
-        };
+    toString(): string {
+        const seatsStr = this.seats.map((seat) => `  |  ${seat}`).join('\n');
+        return `Seating:\n${seatsStr}`;
     }
 }

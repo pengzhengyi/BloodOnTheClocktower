@@ -1,7 +1,10 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
-import { TownSquare } from '~/game/town-square';
 import { createBasicPlayers } from '~/__mocks__/player';
 import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';
+import { Seating } from '~/game/seating/seating';
+import { createTownSquare } from '~/__mocks__/town-square';
+import { SeatAssignmentFromMode } from '~/game/seating/seat-assignment-factory';
+import { SeatAssignment } from '~/game/seating/seat-assignment';
 
 beforeAll(() => {
     storytellerConfirmMock.mockResolvedValue(true);
@@ -15,38 +18,55 @@ describe('Test basic functionalities', () => {
     test('create equal number of players and seats and then random assign', async () => {
         const numPlayers = 12;
         const players = await createBasicPlayers(numPlayers);
-        const townsquare = await TownSquare.from(
+        const townsquare = await createTownSquare(
             players,
             SeatAssignmentMode.RandomInsert
         );
 
-        const seatAssignment = townsquare.seatAssignment;
-        expect(seatAssignment.unoccupied.size).toEqual(0);
-        expect(seatAssignment.unassigned.size).toEqual(0);
-        expect(seatAssignment.occupied.size).toEqual(numPlayers);
-        expect(seatAssignment.assigned.size).toEqual(numPlayers);
+        const seatOccupancy = Seating.getSeatOccupancy(
+            townsquare.seating,
+            players
+        );
+        expect(seatOccupancy.unoccupied.size).toEqual(0);
+        expect(seatOccupancy.unassigned.size).toEqual(0);
+        expect(seatOccupancy.occupied.size).toEqual(numPlayers);
+        expect(seatOccupancy.assigned.size).toEqual(numPlayers);
     });
 
     test('resit players after inserting new players', async () => {
         const numPlayers = 10;
         const players = await createBasicPlayers(numPlayers);
-        const townsquare = await TownSquare.from(
+        const townsquare = await createTownSquare(
             players,
             SeatAssignmentMode.NaturalInsert
         );
 
-        expect(townsquare.getPlayerOnSeat(4)).toEqual(players[4]);
-
-        const newPlayers = await createBasicPlayers(2);
-        await townsquare.resit(
-            (players) => players.unshift(...newPlayers),
-            SeatAssignmentMode.NaturalOverwrite
+        expect(Seating.getPlayerOnSeat(townsquare.seating, 4)).toEqual(
+            players[4]
         );
 
-        expect(townsquare.getPlayerOnSeat(0)).toEqual(newPlayers[0]);
+        const newPlayers = await createBasicPlayers(2);
+        expect(players.unshift(...newPlayers)).toEqual(12);
 
-        const newSeatAssignment = townsquare.seatAssignment;
-        expect(newSeatAssignment.unoccupied.size).toEqual(0);
-        expect(newSeatAssignment.unassigned.size).toEqual(0);
+        const seatAssignment =
+            SeatAssignmentFromMode.getInstance().getSeatAssignment(
+                SeatAssignmentMode.NaturalOverwrite
+            );
+        const _sitResults = await SeatAssignment.assignAll(
+            seatAssignment,
+            townsquare.seating,
+            players
+        );
+
+        expect(Seating.getPlayerOnSeat(townsquare.seating, 0)).toEqual(
+            newPlayers[0]
+        );
+
+        const newSeatOccupancy = Seating.getSeatOccupancy(
+            townsquare.seating,
+            players
+        );
+        expect(newSeatOccupancy.unoccupied.size).toEqual(0);
+        expect(newSeatOccupancy.unassigned.size).toEqual(0);
     });
 });

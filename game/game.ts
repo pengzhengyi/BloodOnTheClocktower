@@ -5,7 +5,7 @@ import { Players } from './players';
 import { Edition } from './edition';
 import { EffectTarget } from './effect/effect-target';
 import { StoryTeller } from './storyteller';
-import { TownSquare } from './town-square';
+import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
 import { InteractionEnvironment } from '~/interaction/environment';
 
@@ -29,7 +29,7 @@ export class Game extends EffectTarget<Game> {
 
     winningTeam?: Alignment;
 
-    declare townSquare: TownSquare;
+    declare townSquare: ITownSquare;
 
     declare storyTeller: StoryTeller;
 
