@@ -13,12 +13,12 @@ import {
     IStoryTellerInformationProvider,
 } from './provider';
 import { Generator, LazyMap } from '~/game/collections';
-import type { Grimoire } from '~/game/grimoire';
+import type { IGrimoire } from '~/game/grimoire';
 import type { SpyPlayer } from '~/game/types';
 import type { StoryTeller } from '~/game/storyteller';
 
 export interface SpyInformation {
-    grimoire: Grimoire;
+    grimoire: IGrimoire;
 }
 
 export class SpyInformationProvider<

@@ -1,5 +1,5 @@
 import { Generator } from '../collections';
-import { clockwise, counterclockwise } from '../common';
+import { clockwise, counterclockwise, iterableToString } from '../common';
 import type { IPlayer } from '../player';
 import { AnyPredicate, Direction, TAUTOLOGY } from '../types';
 import {
@@ -467,7 +467,6 @@ export class Seating implements ISeating {
     }
 
     toString(): string {
-        const seatsStr = this.seats.map((seat) => `  |  ${seat}`).join('\n');
-        return `Seating:\n${seatsStr}`;
+        return iterableToString(this.seats, 'Seating');
     }
 }

@@ -1,5 +1,5 @@
 import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
-import { Grimoire } from './grimoire';
+import { IGrimoire, Grimoire } from './grimoire';
 import type { Info } from './info/info';
 import type {
     InfoRequestContext,
@@ -19,11 +19,11 @@ export class StoryTeller {
     static DEFAULT_WAKE_REASON =
         'Player is awaken to act or receive information';
 
-    protected grimoire?: Grimoire;
+    protected grimoire?: IGrimoire;
 
     protected infoProviderLoader: InfoProviderLoader = new InfoProviderLoader();
 
-    async getGrimoire(_requestedPlayer?: IPlayer): Promise<Grimoire> {
+    async getGrimoire(_requestedPlayer?: IPlayer): Promise<IGrimoire> {
         await new BlankGrimoire(this).throwWhen(
             (error) => error.storyteller.grimoire === undefined
         );

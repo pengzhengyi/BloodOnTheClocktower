@@ -1,7 +1,7 @@
 import { Generator } from './collections';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
-import { Grimoire } from './grimoire';
+import { IGrimoire, Grimoire } from './grimoire';
 import type { Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating/seating';
@@ -135,7 +135,7 @@ export abstract class SetupSheet {
         ],
     ]);
 
-    static setupGrimoire(players: Players): Grimoire {
+    static setupGrimoire(players: Players): IGrimoire {
         return new Grimoire(players);
     }
 

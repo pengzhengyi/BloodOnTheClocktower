@@ -31,8 +31,20 @@ export enum State {
 
 export type NegativeState = Exclude<State, State.None>;
 
+export interface IPlayerState {
+    readonly drunk: boolean;
+    readonly sober: boolean;
+    readonly poisoned: boolean;
+    readonly healthy: boolean;
+    readonly alive: boolean;
+    readonly dead: boolean;
+    readonly mad: boolean;
+    readonly sane: boolean;
+    toString(): string;
+}
+
 @Exclude()
-export class PlayerState {
+export class PlayerState implements IPlayerState {
     static get NEGATIVE_STATES(): Iterable<NegativeState> {
         return Generator.filter(
             (state) => !isNaN(Number(state)) && state > 0,

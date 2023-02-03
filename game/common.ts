@@ -193,3 +193,36 @@ export function Singleton<
         }
     };
 }
+
+/**
+ * Create a nice string represent of iterable.
+ *
+ * The template looks like:
+ *
+ * ```
+ * <name>:
+ *   |  <element 0>
+ *   |  <element 1>
+ *   ...
+ *   |  <element n-1>
+ *   |  <element n>
+ * ```
+ */
+export function iterableToString<T>(
+    iterable: Iterable<T>,
+    name?: string,
+    branchSymbol = '|',
+    spacesBeforeBranchSymbol = 2,
+    spacesAfterBranchSymbol = 2
+): string {
+    const branchNotation =
+        ' '.repeat(spacesBeforeBranchSymbol) +
+        branchSymbol +
+        ' '.repeat(spacesAfterBranchSymbol);
+    const header = name === undefined ? '' : `${name}:\n`;
+    const elements = Array.from(iterable);
+    const elementsStr = elements
+        .map((element) => `${branchNotation}${element}`)
+        .join('\n');
+    return header + elementsStr;
+}

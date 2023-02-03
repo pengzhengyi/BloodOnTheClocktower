@@ -8,7 +8,7 @@ import { DeadReason } from './dead-reason';
 import { Death } from './death';
 import { EffectTarget, IEffectTarget } from './effect/effect-target';
 import { Nomination } from './nomination';
-import { PlayerState, State } from './player-state';
+import { IPlayerState, PlayerState, State } from './player-state';
 
 import {
     CharacterType,
@@ -124,6 +124,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     revokeVoteToken(reason?: string): Promise<boolean>;
 
     storytellerGet(key: '_isDemon'): boolean;
+    storytellerGet(key: '_alignment'): Alignment;
     storytellerGet(key: '_character'): CharacterToken;
     storytellerGet(key: '_characterType'): typeof CharacterType;
     storytellerGet(key: '_alive'): boolean;
@@ -132,6 +133,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     storytellerGet(key: '_poisoned'): boolean;
     storytellerGet(key: '_sober'): boolean;
     storytellerGet(key: '_drunk'): boolean;
+    storytellerGet(key: '_state'): IPlayerState;
     storytellerGet(key: '_isTheDemon'): boolean;
     storytellerGet(key: '_hasAbility'): boolean;
     storytellerGet(key: '_willGetTrueInformation'): boolean;
@@ -149,6 +151,13 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     equals(player: IPlayer): boolean;
     toString(): string;
 }
+
+type IPlayerBasicInfo = Pick<IPlayer, 'id' | 'username' | 'seatNumber'>;
+export type IPlayerInfo = IPlayerBasicInfo & {
+    state: IPlayerState;
+    character: CharacterToken;
+    alignment: Alignment;
+};
 
 /**
  * {@link `glossary["Player"]`}
@@ -212,6 +221,20 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         return player.getProxy();
     }
 
+    static format(playerInfo: IPlayerInfo) {
+        const basicInfo = this.formatBasicInfo(playerInfo);
+        const extendedInfo = `[${playerInfo.state} | ${playerInfo.alignment} ${playerInfo.character}]`;
+        return basicInfo + extendedInfo;
+    }
+
+    static formatBasicInfo(playerBasicInfo: IPlayerBasicInfo) {
+        const seatStr =
+            playerBasicInfo.seatNumber === undefined
+                ? 'no seat'
+                : `seat ${playerBasicInfo.seatNumber}`;
+        return `${playerBasicInfo.username}(${playerBasicInfo.id}, ${seatStr})`;
+    }
+
     protected static async isCharacterType(
         player: IPlayer,
         characterType: typeof CharacterType
@@ -263,7 +286,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _healthy() {
-        return this.state.healthy;
+        return this._state.healthy;
     }
 
     get poisoned() {
@@ -271,7 +294,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _poisoned() {
-        return this.state.poisoned;
+        return this._state.poisoned;
     }
 
     get alive() {
@@ -279,7 +302,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _alive() {
-        return this.state.alive;
+        return this._state.alive;
     }
 
     get dead() {
@@ -287,7 +310,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _dead() {
-        return this.state.dead;
+        return this._state.dead;
     }
 
     get sober() {
@@ -295,7 +318,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _sober() {
-        return this.state.sober;
+        return this._state.sober;
     }
 
     get drunk() {
@@ -303,15 +326,15 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     protected get _drunk() {
-        return this.state.drunk;
+        return this._state.drunk;
     }
 
     get sane() {
-        return Promise.resolve(this.state.sane);
+        return Promise.resolve(this._state.sane);
     }
 
     get mad() {
-        return Promise.resolve(this.state.mad);
+        return Promise.resolve(this._state.mad);
     }
 
     get canNominate() {
@@ -448,7 +471,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
      * {@link `glossary["State"]`}
      * A current property of a player. A player is always either drunk or sober, either poisoned or healthy, either alive or dead, and either mad or sane.
      */
-    protected readonly state: PlayerState = new PlayerState();
+    protected readonly _state: PlayerState = new PlayerState();
 
     protected constructor(
         id: string,
@@ -497,23 +520,23 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     setDead(reason: DeadReason = DeadReason.Other): Promise<Death> {
-        this.state.setNegativeState(State.Dead, true, reason);
+        this._state.setNegativeState(State.Dead, true, reason);
         // TODO lose ability and influences
         return Promise.resolve(new Death(this, reason));
     }
 
     setDrunk(reason: DrunkReason = DrunkReason.Other): Promise<boolean> {
-        this.state.setNegativeState(State.Drunk, true, reason);
+        this._state.setNegativeState(State.Drunk, true, reason);
         return this.drunk;
     }
 
     setPoison(reason: IPoisonedReason): Promise<boolean> {
-        this.state.setNegativeState(State.Poisoned, true, reason);
+        this._state.setNegativeState(State.Poisoned, true, reason);
         return this.poisoned;
     }
 
     removePoison(reason: IPoisonedReason): Promise<boolean> {
-        this.state.setNegativeState(State.Poisoned, false, reason);
+        this._state.setNegativeState(State.Poisoned, false, reason);
         return this.healthy;
     }
 
@@ -589,7 +612,11 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     toString() {
-        return `${this.username}(${this.id})`;
+        return Player.formatBasicInfo({
+            id: this.id,
+            username: this.username,
+            seatNumber: this.seatNumber,
+        });
     }
 
     protected formatPromptForRevokeVoteToken(reason?: string): string {
