@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { faker } from '@faker-js/faker';
-import { Effect, InteractionContext } from '~/game/effect/effect';
+import { Effect, type InteractionContext } from '~/game/effect/effect';
 import { EffectTarget } from '~/game/effect/effect-target';
 import { CompositeGamePhaseKind } from '~/game/game-phase-kind';
 import type { NextFunction } from '~/game/proxy/middleware';

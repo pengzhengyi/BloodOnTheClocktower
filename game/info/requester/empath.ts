@@ -1,6 +1,6 @@
 import type { EmpathInformation } from '../provider/empath';
 import { CharacterInformationRequester, IsAlive, EachNight } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Empath } from '~/content/characters/output/empath';
 
 class BaseEmpathInformationRequester<

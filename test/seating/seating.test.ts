@@ -1,7 +1,7 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { clockwise, getRandomIntInclusive } from '~/game/common';
 import type { IPlayer } from '~/game/player';
-import { Seating, ISeating } from '~/game/seating/seating';
+import { Seating, type ISeating } from '~/game/seating/seating';
 import { createBasicPlayers } from '~/__mocks__/player';
 import { createSeatingAndAssignPlayers } from '~/__mocks__/seating';
 

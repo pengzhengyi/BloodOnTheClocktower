@@ -1,4 +1,4 @@
-import { EditionData, EditionKeyName } from './types';
+import { type EditionData, EditionKeyName } from './types';
 import { IncompleteEditionData } from './exception';
 import { CharacterSheet } from './character-sheet';
 import { Generator } from './collections';

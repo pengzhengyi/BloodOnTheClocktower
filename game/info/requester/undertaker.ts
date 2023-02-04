@@ -8,7 +8,7 @@ import {
     IsAlive,
     EachNonfirstNight,
 } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Undertaker } from '~/content/characters/output/undertaker';
 
 export interface UndertakerInformationRequestContext<TInformation>

@@ -8,9 +8,9 @@ import { SafeFromDemonEffect } from '../effect/safe-from-demon';
 import { CharacterNightEffect } from '../effect/character';
 import {
     Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     RequireSetup,
 } from './ability';
 import {

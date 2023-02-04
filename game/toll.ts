@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Moment, moment } from './moment';
+import { type Moment, moment } from './moment';
 
 /**
  * A toll is a combination of something to record and a timestamp. For example, record player has been killed at third night.

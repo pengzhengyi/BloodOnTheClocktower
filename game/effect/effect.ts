@@ -1,5 +1,5 @@
 import { BasicGamePhaseKind } from '../game-phase-kind';
-import { Predicate } from '../types';
+import { type Predicate } from '../types';
 import type { IMiddleware, NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
 import { InteractionEnvironment } from '~/interaction/environment';

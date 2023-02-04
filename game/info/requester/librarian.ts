@@ -1,6 +1,6 @@
 import type { LibrarianInformation } from '../provider/librarian';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Librarian } from '~/content/characters/output/librarian';
 
 class BaseLibrarianInformationRequester<

@@ -3,7 +3,7 @@ import type {
     FortuneTellerInformation,
 } from '../provider/fortuneteller';
 import { CharacterInformationRequester, IsAlive, EachNight } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 
 export interface FortuneTellerInformationRequestContext<TInformation>

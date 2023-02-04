@@ -8,9 +8,9 @@ import type { IPlayers } from '../players';
 import { ThinkAsCharacterEffect } from '../effect/think-as';
 import {
     Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     RequireSetup,
 } from './ability';
 import { AbilityUseStatus } from './status';

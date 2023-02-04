@@ -2,7 +2,7 @@
 import type { CharacterToken } from '../character';
 import { Generator } from '../collections';
 import type { Constructor } from '../types';
-import { CharacterType, Demon, Minion } from '../character-type';
+import { type CharacterType, Demon, Minion } from '../character-type';
 import { ButlerAbility } from './butler';
 import { GetChefInformationAbility } from './chef';
 import { GetEmpathInformationAbility } from './empath';

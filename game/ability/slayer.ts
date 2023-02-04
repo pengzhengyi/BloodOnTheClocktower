@@ -3,7 +3,12 @@ import type { Death } from '../death';
 import { SlayerNotChoosePlayerToKill } from '../exception';
 import type { IPlayer } from '../player';
 import type { SlayerPlayer } from '../types';
-import { Ability, AbilityUseContext, AbilityUseResult, Once } from './ability';
+import {
+    Ability,
+    type AbilityUseContext,
+    type AbilityUseResult,
+    Once,
+} from './ability';
 import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,

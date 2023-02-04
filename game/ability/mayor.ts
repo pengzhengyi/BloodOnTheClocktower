@@ -1,6 +1,6 @@
 import { Alignment } from '../alignment';
 import { DeadReason } from '../dead-reason';
-import { Effect, InteractionContext } from '../effect/effect';
+import { Effect, type InteractionContext } from '../effect/effect';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { IGame } from '../game';
 import type { NextFunction } from '../proxy/middleware';
@@ -10,9 +10,9 @@ import type { MayorPlayer, RequireGame } from '../types';
 import { Generator } from '../collections';
 import {
     Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     RequireSetup,
 } from './ability';
 import {

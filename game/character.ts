@@ -12,7 +12,7 @@ import {
     CannotDetermineCharacterType,
     IncompleteCharacterRoleData,
 } from './exception';
-import { RoleDataKeyName, RoleData, ScriptCharacter } from './types';
+import { RoleDataKeyName, type RoleData, type ScriptCharacter } from './types';
 
 export interface Character extends Partial<RoleData> {}
 

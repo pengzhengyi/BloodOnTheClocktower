@@ -1,6 +1,6 @@
 import { SelfProxy } from '../proxy/proxy';
 import type { InteractionContext, InteractionInitiator } from './effect';
-import { Effects, IEffects } from './effects';
+import { Effects, type IEffects } from './effects';
 
 /**
  * IEffectTarget represents a proxy that intercept operations declared by `enabledProxyHandlerPropertyNames`. For example, if `get` is one of enabled proxy handler, then attempts to access properties in the target will be intercepted.

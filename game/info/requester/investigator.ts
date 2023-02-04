@@ -1,6 +1,6 @@
 import type { InvestigatorInformation } from '../provider/investigator';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Investigator } from '~/content/characters/output/investigator';
 
 class BaseInvestigatorInformationRequester<

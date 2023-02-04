@@ -10,7 +10,7 @@ import { Saint } from '~/content/characters/output/saint';
 import { Spy } from '~/content/characters/output/spy';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
-import { NightActOrdering, NightSheet } from '~/game/night-sheet';
+import { type NightActOrdering, NightSheet } from '~/game/night-sheet';
 
 describe('Test basic functionalities', () => {
     test.concurrent('determine will or will not act', async () => {

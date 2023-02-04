@@ -1,5 +1,5 @@
-import { Dayjs } from 'dayjs';
-import { fromError, StackFrame } from 'stacktrace-js';
+import { type Dayjs } from 'dayjs';
+import { fromError, type StackFrame } from 'stacktrace-js';
 import type { Execution } from './execution';
 import type { NightActOrdering } from './night-sheet';
 import type { Nomination } from './nomination';
@@ -31,7 +31,7 @@ import type {
     ScriptConstraintsHelper,
 } from './script-tool';
 import {
-    CharacterType,
+    type CharacterType,
     Demon,
     Minion,
     Outsider,
@@ -42,7 +42,7 @@ import type { IEffect } from './effect/effect';
 import type { Alignment } from './alignment';
 import type { IEffects } from './effect/effects';
 import type { ISeating } from './seating/seating';
-import { GamePhaseKind } from './game-phase-kind';
+import { type GamePhaseKind } from './game-phase-kind';
 import type {
     AbilityUseContext,
     AbilityUseResult,

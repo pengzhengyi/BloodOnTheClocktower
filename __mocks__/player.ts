@@ -5,7 +5,7 @@ import { mockWithPropertyValue, mockWithPropertyValues } from './common';
 import { storytellerConfirmMock } from './game-ui';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
-import { Player, IPlayer } from '~/game/player';
+import { Player, type IPlayer } from '~/game/player';
 import type { AsyncFactory } from '~/game/types';
 
 export async function createBasicPlayer(

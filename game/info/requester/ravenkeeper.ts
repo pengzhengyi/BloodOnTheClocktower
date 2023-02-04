@@ -4,7 +4,7 @@ import type {
     RavenkeeperInformation,
 } from '../provider/ravenkeeper';
 import { CharacterInformationRequester, OnceAtNight } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 
 export interface RavenkeeperInformationRequestContext<TInformation>

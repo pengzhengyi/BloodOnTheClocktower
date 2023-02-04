@@ -1,11 +1,15 @@
-import { Effect, InteractionContext } from '../effect/effect';
+import { Effect, type InteractionContext } from '../effect/effect';
 import { ButlerNotChooseMasterToFollow } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
 import type { IPlayers } from '../players';
 import type { ButlerPlayer } from '../types';
-import { Ability, AbilityUseContext, AbilityUseResult } from './ability';
+import {
+    Ability,
+    type AbilityUseContext,
+    type AbilityUseResult,
+} from './ability';
 import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,

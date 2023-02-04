@@ -1,4 +1,4 @@
-import { GamePhaseKind } from '../game-phase-kind';
+import { type GamePhaseKind } from '../game-phase-kind';
 import type { IEffect } from './effect';
 
 export abstract class EffectPrecedence {

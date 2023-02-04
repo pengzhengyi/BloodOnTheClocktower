@@ -6,10 +6,10 @@ import {
     Type,
     instanceToPlain,
 } from 'class-transformer';
-import { CharactersToIDs, CharacterToken } from './character';
+import { CharactersToIDs, type CharacterToken } from './character';
 import { CharacterLoader } from './character-loader';
 import {
-    CharacterType,
+    type CharacterType,
     Demon,
     Fabled,
     Minion,

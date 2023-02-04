@@ -1,5 +1,5 @@
 import { ExileNonTraveller, NoVoteInExile } from './exception';
-import { Nomination, NominationState } from './nomination';
+import { Nomination, type NominationState } from './nomination';
 import type { IPlayer } from './player';
 import { Vote } from './vote';
 

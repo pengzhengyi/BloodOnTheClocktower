@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { Vote } from './vote';
-import { IPlayer, Player } from './player';
+import { type IPlayer, Player } from './player';
 
 export enum NominationState {
     NotStarted,

@@ -1,5 +1,5 @@
 import { binarySearch } from './common';
-import { Moment } from './moment';
+import { type Moment } from './moment';
 import type { IToll } from './toll';
 
 /**

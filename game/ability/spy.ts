@@ -1,6 +1,6 @@
 import type { CharacterToken } from '../character';
 import type { CharacterSheet } from '../character-sheet';
-import { CachingGenerator, Generator } from '../collections';
+import { type CachingGenerator, Generator } from '../collections';
 import type { InteractionContext } from '../effect/effect';
 import {
     RegisterAsCharacterEffect,
@@ -12,10 +12,10 @@ import type { InformationRequestContext } from '../info/requester/requester';
 import { SpyInformationRequester } from '../info/requester/spy';
 import type { SpyPlayer } from '../types';
 import {
-    Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type Ability,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     GetCharacterInformationAbility,
     RequireSetup,
 } from './ability';

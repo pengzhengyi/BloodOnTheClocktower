@@ -1,14 +1,17 @@
 import { Generator } from './collections';
-import { Edition } from './edition';
+import { type Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
-import { IGrimoire, Grimoire } from './grimoire';
-import { IPlayers, Players } from './players';
+import { type IGrimoire, Grimoire } from './grimoire';
+import { type IPlayers, Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating/seating';
-import { TownSquare, ITownSquare } from './town-square';
+import { TownSquare, type ITownSquare } from './town-square';
 import { Clocktower } from './clocktower';
 import type { IPlayer } from './player';
-import { ISeatAssignment, SeatAssignment } from './seating/seat-assignment';
+import {
+    type ISeatAssignment,
+    SeatAssignment,
+} from './seating/seat-assignment';
 import { SeatAssignmentFromMode } from './seating/seat-assignment-factory';
 import {
     isSeatAssignmentMode,

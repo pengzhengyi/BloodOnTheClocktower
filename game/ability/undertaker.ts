@@ -2,11 +2,11 @@ import { UndertakerRequestInfoWhenNoExecution } from '../exception';
 import type { UndertakerInformation } from '../info/provider/undertaker';
 import {
     UndertakerInformationRequester,
-    UndertakerInformationRequestContext,
+    type UndertakerInformationRequestContext,
 } from '../info/requester/undertaker';
 import {
     GetCharacterInformationAbility,
-    GetInfoAbilityUseContext,
+    type GetInfoAbilityUseContext,
 } from './ability';
 
 export class GetUndertakerInformationAbility extends GetCharacterInformationAbility<

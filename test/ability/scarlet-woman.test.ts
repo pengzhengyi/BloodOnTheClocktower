@@ -30,7 +30,7 @@ import {
     storytellerChooseOneMock,
 } from '~/__mocks__/game-ui';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
-import { IPlayer } from '~/game/player';
+import { type IPlayer } from '~/game/player';
 import { Virgin } from '~/content/characters/output/virgin';
 
 describe('test ScarletWomanAbility', () => {

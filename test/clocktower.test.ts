@@ -1,5 +1,5 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
-import { Clocktower, IClocktower } from '~/game/clocktower';
+import { Clocktower, type IClocktower } from '~/game/clocktower';
 import { GamePhase } from '~/game/game-phase';
 import { RecallFutureDate } from '~/game/exception';
 import { Phase } from '~/game/phase';

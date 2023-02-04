@@ -15,21 +15,21 @@ import { DemonInformationRequester } from '~/game/info/requester/demon';
 import { EmpathInformationRequester } from '~/game/info/requester/empath';
 import {
     FortuneTellerInformationRequester,
-    FortuneTellerInformationRequestContext,
+    type FortuneTellerInformationRequestContext,
 } from '~/game/info/requester/fortuneteller';
 import { InvestigatorInformationRequester } from '~/game/info/requester/investigator';
 import { LibrarianInformationRequester } from '~/game/info/requester/librarian';
 import { MinionInformationRequester } from '~/game/info/requester/minion';
 import {
     RavenkeeperInformationRequester,
-    RavenkeeperInformationRequestContext,
+    type RavenkeeperInformationRequestContext,
 } from '~/game/info/requester/ravenkeeper';
-import { InformationRequestContext } from '~/game/info/requester/requester';
+import { type InformationRequestContext } from '~/game/info/requester/requester';
 import { SpyInformationRequester } from '~/game/info/requester/spy';
 import { TravellerInformationRequester } from '~/game/info/requester/traveller';
 import {
     UndertakerInformationRequester,
-    UndertakerInformationRequestContext,
+    type UndertakerInformationRequestContext,
 } from '~/game/info/requester/undertaker';
 import { WasherwomanInformationRequester } from '~/game/info/requester/washerwoman';
 import {

@@ -1,7 +1,7 @@
 import { createGamePhase, mockGamePhase } from './game-phase';
 import { Effects } from '~/game/effect/effects';
 import type { GamePhase } from '~/game/game-phase';
-import { Action } from '~/game/types';
+import { type Action } from '~/game/types';
 
 export function setupEffects(gamePhase?: GamePhase, force = false) {
     if (Effects.gamePhase === undefined || force) {

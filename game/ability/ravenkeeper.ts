@@ -2,13 +2,13 @@ import { RavenkeeperNotChoosePlayerToProtect } from '../exception';
 import type { RavenkeeperInformation } from '../info/provider/ravenkeeper';
 import {
     RavenkeeperInformationRequester,
-    RavenkeeperInformationRequestContext,
+    type RavenkeeperInformationRequestContext,
 } from '../info/requester/ravenkeeper';
 import type { IPlayer } from '../player';
 import type { RavenkeeperPlayer } from '../types';
 import {
     GetCharacterInformationAbility,
-    GetInfoAbilityUseContext,
+    type GetInfoAbilityUseContext,
 } from './ability';
 import { InteractionEnvironment } from '~/interaction/environment';
 

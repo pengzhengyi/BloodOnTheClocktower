@@ -1,5 +1,5 @@
 import { mockDeep } from 'jest-mock-extended';
-import { IGame, Game } from '~/game/game';
+import { type IGame, Game } from '~/game/game';
 
 export function mockGame(): IGame {
     return mockDeep<IGame>();

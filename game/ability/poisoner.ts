@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
 import type { CharacterToken } from '../character';
 import { CharacterNightEffect } from '../effect/character';
-import { Effect, InteractionContext } from '../effect/effect';
+import { Effect, type InteractionContext } from '../effect/effect';
 import type {
     IEvent,
     INonBlockingSubscriber,
@@ -16,9 +16,9 @@ import type { PoisonerPlayer } from '../types';
 import type { IGamePhaseNotification } from '../event-notification/notification/game-phase';
 import {
     Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     RequireSetup,
 } from './ability';
 import {
@@ -37,7 +37,7 @@ class BasePoisonEffect
 
     static readonly origin: CharacterToken = Poisoner;
 
-    blocking: false = false;
+    blocking = false as const;
 
     get reason(): string {
         return BasePoisonEffect.description;

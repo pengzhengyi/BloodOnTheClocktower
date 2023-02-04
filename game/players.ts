@@ -1,7 +1,7 @@
 import type { Alignment } from './alignment';
 import type { CharacterToken, TravellerCharacterToken } from './character';
 import {
-    CharacterType,
+    type CharacterType,
     Demon,
     Fabled,
     Minion,

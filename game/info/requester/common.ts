@@ -1,10 +1,10 @@
 import type { Info } from '../info';
 import type { InfoProvideContext } from '../provider/provider';
 import {
-    IInformationRequester,
-    InfoRequestContext,
-    InfoRequester,
-    InformationRequestContext,
+    type IInformationRequester,
+    type InfoRequestContext,
+    type InfoRequester,
+    type InformationRequestContext,
     InformationRequester,
 } from './requester';
 import type { Constructor } from '~/game/types';

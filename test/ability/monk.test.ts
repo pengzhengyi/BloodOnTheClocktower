@@ -8,7 +8,7 @@ import {
 } from './common';
 import { Monk } from '~/content/characters/output/monk';
 import { MayorAbility } from '~/game/ability/mayor';
-import { MonkProtectAbility } from '~/game/ability/monk';
+import { type MonkProtectAbility } from '~/game/ability/monk';
 import type { GamePhase } from '~/game/game-phase';
 import { StoryTeller } from '~/game/storyteller';
 import type { Action, ImpPlayer, MonkPlayer } from '~/game/types';

@@ -1,5 +1,5 @@
 import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
-import { IGrimoire, Grimoire } from './grimoire';
+import { type IGrimoire, Grimoire } from './grimoire';
 import type { Info } from './info/info';
 import type {
     InfoRequestContext,
@@ -8,7 +8,7 @@ import type {
 import { InfoProviderLoader } from './info/provider/loader';
 import type { IPlayer } from './player';
 import type { IPlayers } from './players';
-import { AsyncTask } from './types';
+import { type AsyncTask } from './types';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 /**

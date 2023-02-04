@@ -1,6 +1,6 @@
 import {
     BecomeDemonCategory,
-    ICharacterTypeChangeCategory,
+    type ICharacterTypeChangeCategory,
     LoseDemonCategory,
 } from '../event-category/character-type-change';
 import type { INotification } from '../types';

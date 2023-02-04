@@ -1,6 +1,6 @@
 import type { WasherwomanInformation } from '../provider/washerwoman';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 
 class BaseWasherwomanInformationRequester<

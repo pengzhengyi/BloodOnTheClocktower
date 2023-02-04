@@ -1,7 +1,7 @@
 import type { CharacterToken } from '../character';
 import type { IPlayer } from '../player';
 import type { NextFunction } from '../proxy/middleware';
-import { Effect, InteractionContext } from './effect';
+import { Effect, type InteractionContext } from './effect';
 
 export abstract class ThinkAsEffect<
     TPlayer extends IPlayer,

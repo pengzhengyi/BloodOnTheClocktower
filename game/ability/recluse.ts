@@ -1,6 +1,6 @@
 import type { CharacterToken } from '../character';
 import type { CharacterSheet } from '../character-sheet';
-import { CachingGenerator, Generator } from '../collections';
+import { type CachingGenerator, Generator } from '../collections';
 import type { InteractionContext } from '../effect/effect';
 import {
     RegisterAsCharacterEffect,
@@ -10,9 +10,9 @@ import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { ReclusePlayer } from '../types';
 import {
     Ability,
-    AbilityUseContext,
-    AbilityUseResult,
-    AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
+    type AbilitySetupContext,
     RequireSetup,
 } from './ability';
 import { AbilityUseStatus } from './status';

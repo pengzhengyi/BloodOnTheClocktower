@@ -1,7 +1,7 @@
 import type { OneOfTwoPlayersIsTownsfolk } from '../information';
 import { OneOfTwoPlayersHasCharacterTypeInformationProvider } from './common';
 import type { InfoProvideContext } from './provider';
-import { CharacterType, Townsfolk } from '~/game/character-type';
+import { type CharacterType, Townsfolk } from '~/game/character-type';
 
 export type WasherwomanInformation = OneOfTwoPlayersIsTownsfolk;
 

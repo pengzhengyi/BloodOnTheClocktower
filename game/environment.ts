@@ -1,5 +1,5 @@
 import { Singleton } from './common';
-import { EditionLoader, IEditionLoader } from './edition-loader';
+import { EditionLoader, type IEditionLoader } from './edition-loader';
 import type { IEnvironment, IEnvironmentProvider } from './types';
 
 export interface IGameEnvironment extends IEnvironment {

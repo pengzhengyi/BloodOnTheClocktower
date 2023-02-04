@@ -1,11 +1,11 @@
 import {
-    TrueInformationOptions,
+    type TrueInformationOptions,
     Information,
-    FalseInformationOptions,
-    FalseInformation,
+    type FalseInformationOptions,
+    type FalseInformation,
 } from '../information';
-import { InfoProvideContext, InformationProvider } from './provider';
-import { Generator, LazyMap } from '~/game/collections';
+import { type InfoProvideContext, InformationProvider } from './provider';
+import { Generator, type LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
 
 /**

@@ -1,7 +1,7 @@
 import type { CharacterToken } from '../character';
 import { DeadReason } from '../dead-reason';
 import { CharacterNightEffect } from '../effect/character';
-import { Effect, InteractionContext } from '../effect/effect';
+import { Effect, type InteractionContext } from '../effect/effect';
 import type { IPlayers } from '../players';
 import type { NextFunction } from '../proxy/middleware';
 import type { AnyFactory, ImpPlayer, MinionPlayer } from '../types';
@@ -15,9 +15,9 @@ import {
 } from './status';
 import {
     Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     RequireSetup,
 } from './ability';
 import { Imp } from '~/content/characters/output/imp';

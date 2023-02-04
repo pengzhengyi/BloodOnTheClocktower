@@ -1,8 +1,8 @@
 /* eslint-disable no-dupe-class-members */
 import {
     ChangeType,
-    ICharacterTypeChange,
-    ICharacterTypeChangeEvent,
+    type ICharacterTypeChange,
+    type ICharacterTypeChangeEvent,
 } from '../event/character-type-change';
 import type { IEvent, IEventCategory } from '../types';
 import { Demon } from '~/game/character-type';

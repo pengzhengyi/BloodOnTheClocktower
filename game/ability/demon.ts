@@ -1,6 +1,6 @@
-import { DemonInformation } from '../info/provider/demon';
+import { type DemonInformation } from '../info/provider/demon';
 import { DemonInformationRequester } from '../info/requester/demon';
-import { InformationRequestContext } from '../info/requester/requester';
+import { type InformationRequestContext } from '../info/requester/requester';
 import { GetCharacterTypeInformationAbility } from './ability';
 
 export class GetDemonInformationAbility extends GetCharacterTypeInformationAbility<

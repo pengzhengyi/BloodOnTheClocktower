@@ -1,6 +1,6 @@
 /* eslint-disable no-dupe-class-members */
 import { Deque } from 'js-sdsl';
-import { RecoverableGameError, RecoveryAction } from './exception';
+import { type RecoverableGameError, type RecoveryAction } from './exception';
 import type {
     AnyPredicate,
     AsyncPredicate,

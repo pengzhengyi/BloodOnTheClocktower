@@ -16,6 +16,7 @@ module.exports = {
     'no-redeclare': 'off',
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-redeclare': ['error'],
+    '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/no-empty-interface': [
       'error',
       {

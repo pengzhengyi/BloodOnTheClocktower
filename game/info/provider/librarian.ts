@@ -1,14 +1,14 @@
 import {
-    OneOfTwoPlayersIsOutsider,
-    TrueInformationOptions,
+    type OneOfTwoPlayersIsOutsider,
+    type TrueInformationOptions,
     Information,
-    FalseInformationOptions,
-    FalseInformation,
+    type FalseInformationOptions,
+    type FalseInformation,
 } from '../information';
 import { OneOfTwoPlayersHasCharacterTypeInformationProvider } from './common';
-import { InfoProvideContext } from './provider';
-import { CharacterType, Outsider } from '~/game/character-type';
-import { Generator } from '~/game/collections';
+import { type InfoProvideContext } from './provider';
+import { type CharacterType, Outsider } from '~/game/character-type';
+import { type Generator } from '~/game/collections';
 
 export type LibrarianNoOutsiderInformation = {
     noOutsiders: true;

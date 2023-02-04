@@ -1,6 +1,6 @@
 import type { DeadReason } from '../dead-reason';
 import type { NextFunction } from '../proxy/middleware';
-import { Effect, InteractionContext } from './effect';
+import { Effect, type InteractionContext } from './effect';
 
 export abstract class SafeFromDemonEffect<
     TPlayer extends object

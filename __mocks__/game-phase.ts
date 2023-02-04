@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { mockWithPropertyValue, mockWithPropertyValues } from './common';
-import { GamePhase, IGamePhase } from '~/game/game-phase';
+import { GamePhase, type IGamePhase } from '~/game/game-phase';
 import type { Phase } from '~/game/phase';
 
 export function mockGamePhase(): GamePhase {

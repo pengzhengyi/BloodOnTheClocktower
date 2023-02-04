@@ -6,10 +6,10 @@ import {
 } from './exception';
 import { Execution } from './execution';
 import { Exile } from './exile';
-import { moment, Moment } from './moment';
+import { moment, type Moment } from './moment';
 import { isPhase, Phase } from './phase';
 import type { IPlayer } from './player';
-import { IToll, Toll } from './toll';
+import { type IToll, Toll } from './toll';
 
 type MomentQuery =
     | 'isSameOrBefore'

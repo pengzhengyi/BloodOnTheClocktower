@@ -5,7 +5,7 @@ import {
     hasEnoughPlayerForDemonMinionInformation,
     AtFirstNight,
 } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Demon } from '~/game/character-type';
 
 class BaseDemonInformationRequester<

@@ -1,13 +1,13 @@
 import {
-    OneOfTwoPlayersHasCharacterType,
-    TrueInformationOptions,
+    type OneOfTwoPlayersHasCharacterType,
+    type TrueInformationOptions,
     Information,
-    FalseInformationOptions,
+    type FalseInformationOptions,
 } from '../information';
-import { InfoProvideContext, InformationProvider } from './provider';
+import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
-import { CharacterType } from '~/game/character-type';
+import { type CharacterType } from '~/game/character-type';
 import type { MinionPlayer } from '~/game/types';
 
 export abstract class DemonMinionInformationProvider<

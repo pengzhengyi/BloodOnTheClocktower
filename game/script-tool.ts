@@ -1,12 +1,17 @@
-import { EditionData, EditionKeyName, RoleDataKeyName, Script } from './types';
+import {
+    type EditionData,
+    EditionKeyName,
+    RoleDataKeyName,
+    type Script,
+} from './types';
 import { CharacterSheet } from './character-sheet';
-import { Character, CharacterToken } from './character';
-import { createCustomEdition, Edition, EditionName } from './edition';
+import { Character, type CharacterToken } from './character';
+import { createCustomEdition, type Edition, EditionName } from './edition';
 import { Generator } from './collections';
 import { EditionLoader } from './edition-loader';
 import { CharacterLoader } from './character-loader';
 import {
-    CharacterType,
+    type CharacterType,
     Demon,
     Minion,
     Outsider,

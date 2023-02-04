@@ -11,7 +11,7 @@ import { Players } from '~/game/players';
 import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/dead-reason';
 import type { IPlayer } from '~/game/player';
-import { ISeating } from '~/game/seating/seating';
+import { type ISeating } from '~/game/seating/seating';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Librarian } from '~/content/characters/output/librarian';
 import { Saint } from '~/content/characters/output/saint';
@@ -34,26 +34,26 @@ import type {
 import { ChefInformationProvider } from '~/game/info/provider/chef';
 import {
     DemonInformationProvider,
-    DemonInformation,
+    type DemonInformation,
 } from '~/game/info/provider/demon';
 import { EmpathInformationProvider } from '~/game/info/provider/empath';
 import {
-    FortuneTellerInformationProviderContext,
+    type FortuneTellerInformationProviderContext,
     FortuneTellerInformationProvider,
 } from '~/game/info/provider/fortuneteller';
 import { InvestigatorInformationProvider } from '~/game/info/provider/investigator';
 import {
     LibrarianInformationProvider,
-    LibrarianNoOutsiderInformation,
+    type LibrarianNoOutsiderInformation,
 } from '~/game/info/provider/librarian';
 import { MinionInformationProvider } from '~/game/info/provider/minion';
 import {
-    RavenkeeperInformationProviderContext,
+    type RavenkeeperInformationProviderContext,
     RavenkeeperInformationProvider,
 } from '~/game/info/provider/ravenkeeper';
 import { TravellerInformationProvider } from '~/game/info/provider/traveller';
 import {
-    UndertakerInformationProviderContext,
+    type UndertakerInformationProviderContext,
     UndertakerInformationProvider,
 } from '~/game/info/provider/undertaker';
 import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman';

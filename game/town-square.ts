@@ -1,5 +1,5 @@
-import { IClocktower } from './clocktower';
-import { ISeating } from './seating/seating';
+import { type IClocktower } from './clocktower';
+import { type ISeating } from './seating/seating';
 
 export interface ResitResult {
     oldSeating: ISeating;

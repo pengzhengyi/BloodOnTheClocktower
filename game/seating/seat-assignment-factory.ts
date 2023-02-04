@@ -3,7 +3,7 @@ import type { IPlayer } from '../player';
 import {
     AssignEmptySeats,
     AssignNotSatPlayers,
-    ISeatAssignment,
+    type ISeatAssignment,
     RandomAssign,
     SeatAssignment,
 } from './seat-assignment';

@@ -8,7 +8,7 @@ import {
 } from './common';
 import { Soldier } from '~/content/characters/output/soldier';
 import { SoldierAbility } from '~/game/ability/soldier';
-import { ImpPlayer, SoldierPlayer } from '~/game/types';
+import { type ImpPlayer, type SoldierPlayer } from '~/game/types';
 import { mockAbilitySetupContext } from '~/__mocks__/ability';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { Drunk } from '~/content/characters/output/drunk';

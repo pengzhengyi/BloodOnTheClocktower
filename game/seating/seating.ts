@@ -1,7 +1,7 @@
 import { Generator } from '../collections';
 import { clockwise, counterclockwise, iterableToString } from '../common';
 import type { IPlayer } from '../player';
-import { AnyPredicate, Direction, TAUTOLOGY } from '../types';
+import { type AnyPredicate, Direction, TAUTOLOGY } from '../types';
 import {
     AccessInvalidSeatPosition,
     NumberOfSeatNotPositive,
@@ -10,8 +10,8 @@ import {
     PlayerNotSat,
     UnexpectedEmptySeat,
 } from '../exception';
-import { ISeat, Seat, SitResult } from './seat';
-import { ISeatOccupancy, SeatOccupancy } from './seat-occupancy';
+import { type ISeat, Seat, type SitResult } from './seat';
+import { type ISeatOccupancy, SeatOccupancy } from './seat-occupancy';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface ISeating extends Iterable<ISeat> {

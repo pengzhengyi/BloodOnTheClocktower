@@ -1,13 +1,13 @@
 import { RecallFutureDate, RecallFutureEvent } from './exception';
-import { GamePhase, IGamePhase } from './game-phase';
+import { GamePhase, type IGamePhase } from './game-phase';
 import { Phase, toString } from './phase';
-import { Diary, Event, IDiary } from './diary';
-import { Chronology, IChronology } from './chronology';
+import { Diary, type Event, type IDiary } from './diary';
+import { Chronology, type IChronology } from './chronology';
 import type { IToll } from './toll';
-import { moment, Moment } from './moment';
+import { moment, type Moment } from './moment';
 import {
     GamePhaseNotification,
-    IGamePhaseNotification,
+    type IGamePhaseNotification,
 } from './event-notification/notification/game-phase';
 import { GamePhaseEvent } from './event-notification/event/game-phase';
 

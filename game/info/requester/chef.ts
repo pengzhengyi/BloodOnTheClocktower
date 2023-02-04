@@ -1,6 +1,6 @@
 import type { ChefInformation } from '../provider/chef';
 import { AtFirstNight, CharacterInformationRequester, IsAlive } from './common';
-import { InformationRequestContext } from './requester';
+import { type InformationRequestContext } from './requester';
 import { Chef } from '~/content/characters/output/chef';
 
 class BaseChefInformationRequester<

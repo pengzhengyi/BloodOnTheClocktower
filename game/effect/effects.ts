@@ -1,14 +1,14 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator, LazyMap } from '../collections';
 import { EffectsNotSetup } from '../exception';
-import { GamePhase } from '../game-phase';
+import { type GamePhase } from '../game-phase';
 import {
     ALL_GAME_PHASE_KINDS,
     BasicGamePhaseKind,
     CompositeGamePhaseKind,
-    GamePhaseKind,
+    type GamePhaseKind,
 } from '../game-phase-kind';
-import { IPipeline, Pipeline } from '../proxy/pipeline';
+import { type IPipeline, Pipeline } from '../proxy/pipeline';
 import type { Transform } from '../types';
 import type { IEffect, InteractionContext } from './effect';
 import { Forwarding } from './forwarding';

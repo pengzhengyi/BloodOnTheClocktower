@@ -1,6 +1,6 @@
 import type { GamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
-import { Effect, InteractionContext } from './effect';
+import { Effect, type InteractionContext } from './effect';
 
 export class Forwarding<TTarget extends object> extends Effect<TTarget> {
     // eslint-disable-next-line no-use-before-define

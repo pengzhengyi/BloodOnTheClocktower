@@ -1,18 +1,18 @@
 import {
-    StoryTellerInformationOptions,
+    type StoryTellerInformationOptions,
     StoryTellerInformation,
 } from '../storyteller-information';
 import {
-    FalseInformationOptions,
+    type FalseInformationOptions,
     Information,
-    TrueInformationOptions,
+    type TrueInformationOptions,
 } from '../information';
 import {
-    InfoProvideContext,
+    type InfoProvideContext,
     InformationProvider,
-    IStoryTellerInformationProvider,
+    type IStoryTellerInformationProvider,
 } from './provider';
-import { Generator, LazyMap } from '~/game/collections';
+import { Generator, type LazyMap } from '~/game/collections';
 import type { IGrimoire } from '~/game/grimoire';
 import type { SpyPlayer } from '~/game/types';
 import type { StoryTeller } from '~/game/storyteller';

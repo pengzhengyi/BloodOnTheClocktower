@@ -6,7 +6,7 @@ import {
     mockRecluseRegisterAs,
 } from './common';
 import { ScarletWoman } from '~/content/characters/output/scarletwoman';
-import { GetInformationAbilityUseResult } from '~/game/ability/ability';
+import { type GetInformationAbilityUseResult } from '~/game/ability/ability';
 import { MayorAbility } from '~/game/ability/mayor';
 import { GetRavenkeeperInformationAbility } from '~/game/ability/ravenkeeper';
 import { AbilitySuccessCommunicatedInfo } from '~/game/ability/status';

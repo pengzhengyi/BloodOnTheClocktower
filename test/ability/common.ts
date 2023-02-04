@@ -7,7 +7,10 @@ import type {
     GetInfoAbilityUseContext,
     GetInformationAbilityUseResult,
 } from '~/game/ability/ability';
-import { MonkProtectAbility, MonkAbilityUseResult } from '~/game/ability/monk';
+import {
+    MonkProtectAbility,
+    type MonkAbilityUseResult,
+} from '~/game/ability/monk';
 import { RecluseAbility } from '~/game/ability/recluse';
 import {
     AbilitySuccessCommunicatedFalseInfo,
@@ -16,7 +19,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from '~/game/ability/status';
-import { Generator } from '~/game/collections';
+import { type Generator } from '~/game/collections';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character';
 import type { CharacterSheet } from '~/game/character-sheet';
@@ -76,26 +79,29 @@ import { DrunkAbility } from '~/game/ability/drunk';
 import { AbilityLoader } from '~/game/ability/loader';
 import {
     PoisonerAbility,
-    PoisonerAbilityUseResult,
+    type PoisonerAbilityUseResult,
 } from '~/game/ability/poisoner';
 import { Poisoner } from '~/content/characters/output/poisoner';
 import type { NightSheet } from '~/game/night-sheet';
-import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
+import { type GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import { mockClocktowerForUndertaker } from '~/__mocks__/information';
 import {
     SaintAbility,
-    SaintAbilitySetupContext,
-    SaintAbilityUseContext,
+    type SaintAbilitySetupContext,
+    type SaintAbilityUseContext,
 } from '~/game/ability/saint';
-import { IPlayers, Players } from '~/game/players';
+import { type IPlayers, Players } from '~/game/players';
 import { SpyAbility } from '~/game/ability/spy';
-import { VirginAbility, VirginAbilityUseContext } from '~/game/ability/virgin';
+import {
+    VirginAbility,
+    type VirginAbilityUseContext,
+} from '~/game/ability/virgin';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import type { IClocktower } from '~/game/clocktower';
 import { Demon } from '~/game/character-type';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';
-import { ImpAbility, ImpAbilityUseResult } from '~/game/ability/imp';
+import { ImpAbility, type ImpAbilityUseResult } from '~/game/ability/imp';
 import { Imp } from '~/content/characters/output/imp';
 
 export async function expectCharacterGetInformation<

@@ -22,7 +22,7 @@ import { Undertaker } from '~/content/characters/output/undertaker';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Spy } from '~/content/characters/output/spy';
 import {
-    CharacterType,
+    type CharacterType,
     Demon,
     Minion,
     Outsider,

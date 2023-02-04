@@ -3,14 +3,14 @@ import {
     DayPhaseCategory,
     DuskPhaseCategory,
     GameEndPhaseCategory,
-    IGamePhaseCategory,
+    type IGamePhaseCategory,
     NightPhaseCategory,
     SetupPhaseCategory,
 } from '../event-category/game-phase';
 import type { IGamePhaseEvent } from '../event/game-phase';
 import type { IEvent, INotification, ISubscriber } from '../types';
 import { AbstractNotification } from './common';
-import { isPhase, Phase } from '~/game/phase';
+import { isPhase, type Phase } from '~/game/phase';
 import { NightSheet } from '~/game/night-sheet';
 import { Generator } from '~/game/collections';
 

@@ -5,7 +5,7 @@ import type {
     Factory,
     ScarletWomanPlayer,
 } from '../types';
-import { Effect, InteractionContext } from '../effect/effect';
+import { Effect, type InteractionContext } from '../effect/effect';
 import type { NextFunction } from '../proxy/middleware';
 import { CharacterNightEffect } from '../effect/character';
 import type { DeadReason } from '../dead-reason';
@@ -14,7 +14,7 @@ import type { IPlayers } from '../players';
 import type { INonBlockingSubscriber } from '../event-notification/types';
 import {
     ChangeType,
-    ICharacterTypeChangeEvent,
+    type ICharacterTypeChangeEvent,
 } from '../event-notification/event/character-type-change';
 import type { ICharacterTypeChangeNotification } from '../event-notification/notification/character-type-change';
 import {
@@ -24,9 +24,9 @@ import {
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import {
     Ability,
-    AbilitySetupContext,
-    AbilityUseContext,
-    AbilityUseResult,
+    type AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
     RequireSetup,
 } from './ability';
 import {
@@ -46,7 +46,7 @@ class BaseScarletWomanBecomeDemonEffect
 
     static MINIMUM_NUM_PLAYER_FOR_SCARLET_WOMAN_TO_BECOME_DEMON = 5;
 
-    blocking: false = false;
+    blocking = false as const;
 
     constructor(
         protected readonly scarletWomanPlayer: ScarletWomanPlayer,

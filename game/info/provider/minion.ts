@@ -1,10 +1,10 @@
 import {
-    TrueInformationOptions,
+    type TrueInformationOptions,
     Information,
-    FalseInformationOptions,
+    type FalseInformationOptions,
 } from '../information';
 import { DemonMinionInformationProvider } from './common';
-import { InfoProvideContext } from './provider';
+import { type InfoProvideContext } from './provider';
 import { Generator } from '~/game/collections';
 import type { DemonPlayer, MinionPlayer } from '~/game/types';
 

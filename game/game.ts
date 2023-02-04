@@ -1,10 +1,10 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
-import { IPlayer } from './player';
+import { type IPlayer } from './player';
 import type { IPlayers } from './players';
-import { Edition } from './edition';
-import { EffectTarget, IEffectTarget } from './effect/effect-target';
-import { StoryTeller } from './storyteller';
+import { type Edition } from './edition';
+import { EffectTarget, type IEffectTarget } from './effect/effect-target';
+import { type StoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
 import type { ISetupSheet } from './setup-sheet';

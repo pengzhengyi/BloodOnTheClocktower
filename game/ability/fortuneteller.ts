@@ -1,11 +1,11 @@
 import type { CharacterToken } from '../character';
-import { Effect, InteractionContext } from '../effect/effect';
+import { Effect, type InteractionContext } from '../effect/effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 
 import type { FortuneTellerInformation } from '../info/provider/fortuneteller';
 import {
-    FortuneTellerInformationRequestContext,
+    type FortuneTellerInformationRequestContext,
     FortuneTellerInformationRequester,
 } from '../info/requester/fortuneteller';
 import type { NextFunction } from '../proxy/middleware';
@@ -14,9 +14,9 @@ import type { IPlayer } from '../player';
 import type { FortuneTellerPlayer } from '../types';
 import { CharacterNightEffect } from '../effect/character';
 import {
-    AbilitySetupContext,
+    type AbilitySetupContext,
     GetCharacterInformationAbility,
-    GetInfoAbilityUseContext,
+    type GetInfoAbilityUseContext,
     RequireSetup,
 } from './ability';
 import { InteractionEnvironment } from '~/interaction/environment';

@@ -1,12 +1,12 @@
 import {
-    FalseInformationOptions,
+    type FalseInformationOptions,
     Information,
-    TrueInformationOptions,
+    type TrueInformationOptions,
 } from '../information';
 import { DemonMinionInformationProvider } from './common';
-import { InfoProvideContext } from './provider';
+import { type InfoProvideContext } from './provider';
 import type { CharacterToken } from '~/game/character';
-import { Generator, LazyMap } from '~/game/collections';
+import { Generator, type LazyMap } from '~/game/collections';
 import type { MinionPlayer } from '~/game/types';
 
 /**

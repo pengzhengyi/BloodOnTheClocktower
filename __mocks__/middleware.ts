@@ -1,4 +1,4 @@
-import { IMiddleware, NextFunction } from '~/game/proxy/middleware';
+import { type IMiddleware, type NextFunction } from '~/game/proxy/middleware';
 
 export class Operation<TContext> implements IMiddleware<TContext> {
     constructor(

@@ -4,9 +4,9 @@ import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { SoldierPlayer } from '../types';
 import {
     Ability,
-    AbilityUseContext,
-    AbilityUseResult,
-    AbilitySetupContext,
+    type AbilityUseContext,
+    type AbilityUseResult,
+    type AbilitySetupContext,
     RequireSetup,
 } from './ability';
 import {
