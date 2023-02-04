@@ -103,6 +103,7 @@ import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';
 import { ImpAbility, type ImpAbilityUseResult } from '~/game/ability/imp';
 import { Imp } from '~/content/characters/output/imp';
+import type { ISetupContext } from '~/game/setup-sheet';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -565,7 +566,11 @@ export async function expectScarletWomanBecomeDemonAfterDemonDeath(
     );
 
     if (validateGameNotEnd) {
-        const game = createBasicGame();
+        const setupSheetContext: Partial<ISetupContext> = {};
+        if (players !== undefined) {
+            setupSheetContext.initialPlayers = Array.from(players);
+        }
+        const game = await createBasicGame(undefined, setupSheetContext);
         const winningAlignment = await game.getWinningTeam(
             setupContext!.players
         );

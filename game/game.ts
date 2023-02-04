@@ -7,7 +7,7 @@ import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import { type StoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
-import type { ISetupSheet } from './setup-sheet';
+import type { ISetupContext, ISetupSheet } from './setup-sheet';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface IGame extends IEffectTarget<IGame> {
@@ -23,7 +23,7 @@ export interface IGame extends IEffectTarget<IGame> {
 
     // capabilities of IGame
     setWinningTeam(winningTeam: Alignment, reason?: string): void;
-    getWinningTeam(players: Iterable<IPlayer>): Promise<Alignment | undefined>;
+    getWinningTeam(players?: Iterable<IPlayer>): Promise<Alignment | undefined>;
 }
 
 export class Game extends EffectTarget<Game> implements IGame {
@@ -31,7 +31,9 @@ export class Game extends EffectTarget<Game> implements IGame {
         keyof ProxyHandler<Game>
     > = ['get'];
 
-    static init(
+    static async init(
+        setupSheet: ISetupSheet,
+        setupContext: ISetupContext,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Game>>
     ) {
         if (enabledProxyHandlerPropertyNames === undefined) {
@@ -39,16 +41,17 @@ export class Game extends EffectTarget<Game> implements IGame {
                 this.defaultEnabledProxyHandlerPropertyNames;
         }
 
-        const game = new this(enabledProxyHandlerPropertyNames);
+        const game = new this(setupSheet, enabledProxyHandlerPropertyNames);
+        await game.setup(setupContext);
 
         return game.getProxy();
     }
 
-    winningTeam?: Alignment;
-
-    declare setupSheet: ISetupSheet;
+    readonly setupSheet: ISetupSheet;
 
     declare townSquare: ITownSquare;
+
+    declare edition: Edition;
 
     declare storyTeller: StoryTeller;
 
@@ -58,17 +61,28 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     protected declare _players: IPlayers;
 
-    declare edition: Edition;
-
     get today(): IDiary {
         return this.townSquare.clockTower.today;
     }
 
-    // eslint-disable-next-line no-useless-constructor
+    protected winningTeam?: Alignment;
+
     protected constructor(
+        setupSheet: ISetupSheet,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Game>>
     ) {
         super(enabledProxyHandlerPropertyNames);
+        this.setupSheet = setupSheet;
+    }
+
+    async setup(setupContext: ISetupContext): Promise<void> {
+        const setupResult = await this.setupSheet.setup(setupContext);
+
+        ({
+            edition: this.edition,
+            townSquare: this.townSquare,
+            players: this._players,
+        } = setupResult);
     }
 
     async setWinningTeam(winningTeam: Alignment, reason?: string) {
@@ -84,8 +98,10 @@ export class Game extends EffectTarget<Game> implements IGame {
     }
 
     async getWinningTeam(
-        players: Iterable<IPlayer>
+        players?: Iterable<IPlayer>
     ): Promise<Alignment | undefined> {
+        players ??= this.players;
+
         let evilWinConditionReached = true;
         let goodWinConditionReached = true;
 

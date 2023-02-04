@@ -22,6 +22,18 @@ import { Singleton } from './common';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
+export interface ISetupContext {
+    initialPlayers?: Array<IPlayer>;
+    seatAssignment?: ISeatAssignment | SeatAssignmentMode;
+}
+
+export interface ISetupResult {
+    players: IPlayers;
+    townSquare: ITownSquare;
+    grimoire: IGrimoire;
+    edition: typeof Edition;
+}
+
 /**
  * {@link `glossary["Setup sheet"]`}
  * The sheet that details what the Storyteller needs to do before beginning a game.
@@ -30,16 +42,47 @@ export interface ISetupSheet {
     setupPlayers(initialPlayers?: Array<IPlayer>): Promise<IPlayers>;
 
     setupTownSquare(
-        initialPlayers: Array<IPlayer>,
+        initialPlayers?: Array<IPlayer>,
         seatAssignment?: ISeatAssignment | SeatAssignmentMode
     ): Promise<ITownSquare>;
 
     setupGrimoire(players: IPlayers): Promise<IGrimoire>;
 
     setupEdition(): Promise<typeof Edition>;
+
+    setup(context: ISetupContext): Promise<ISetupResult>;
 }
 
-class BaseSetupSheet implements ISetupSheet {
+// eslint-disable-next-line unused-imports/no-unused-vars
+interface AbstractSetupSheet extends ISetupSheet {}
+/**
+ * `AbstractSetupSheet` provides a default template for `setup` using other `setup*` methods implemented by subclasses.
+ */
+abstract class AbstractSetupSheet implements ISetupSheet {
+    async setup(context: ISetupContext): Promise<ISetupResult> {
+        const [players, townSquare, edition] = await Promise.all([
+            this.setupPlayers(context.initialPlayers),
+            this.setupTownSquare(
+                context.initialPlayers,
+                context.seatAssignment
+            ),
+            this.setupEdition(),
+        ]);
+
+        const grimoire = await this.setupGrimoire(players);
+
+        const setupResult: ISetupResult = {
+            players,
+            townSquare,
+            edition,
+            grimoire,
+        };
+
+        return setupResult;
+    }
+}
+
+class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
     static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;
 
     static readonly SUPPORTED_EDITIONS: Array<typeof Edition> = [
@@ -233,18 +276,25 @@ class BaseSetupSheet implements ISetupSheet {
     }
 
     async setupTownSquare(
-        initialPlayers: IPlayer[],
+        initialPlayers?: IPlayer[],
         _seatAssignment:
             | ISeatAssignment
             | SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
     ): Promise<ITownSquare> {
-        const numPlayers = initialPlayers.length;
         const clocktower = await this.setupClocktower();
+        const numPlayers = initialPlayers?.length;
         const seating = await this.setupSeating(numPlayers);
         const townsquare = new TownSquare(seating, clocktower);
 
         const seatAssignment = this.getSeatAssignment(_seatAssignment);
-        await SeatAssignment.assignAll(seatAssignment, seating, initialPlayers);
+
+        if (initialPlayers !== undefined) {
+            await SeatAssignment.assignAll(
+                seatAssignment,
+                seating,
+                initialPlayers
+            );
+        }
 
         return townsquare;
     }

@@ -70,7 +70,9 @@ describe('test ScarletWomanAbility', () => {
 
         expect(await impPlayer.dead).toBeTrue();
 
-        const game = createBasicGame();
+        const game = await createBasicGame(undefined, {
+            initialPlayers: Array.from(infoProvideContext.players),
+        });
         const winningAlignment = await game.getWinningTeam(
             infoProvideContext.players
         );
