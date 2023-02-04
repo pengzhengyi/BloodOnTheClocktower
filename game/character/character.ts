@@ -155,6 +155,12 @@ export abstract class Character {
             }
         }
     }
+
+    protected constructor() {
+        throw new Error(
+            'Cannot instantiate Character, meant to use as static class.'
+        );
+    }
 }
 
 /**

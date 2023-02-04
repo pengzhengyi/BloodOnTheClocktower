@@ -17,6 +17,8 @@ import {
     isSeatAssignmentMode,
     SeatAssignmentMode,
 } from './seating/seat-assignment-mode';
+import { GameEnvironment } from './environment';
+import { Singleton } from './common';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
@@ -33,9 +35,11 @@ export interface ISetupSheet {
     ): Promise<ITownSquare>;
 
     setupGrimoire(players: IPlayers): Promise<IGrimoire>;
+
+    setupEdition(): Promise<typeof Edition>;
 }
 
-export abstract class SetupSheet implements ISetupSheet {
+class BaseSetupSheet implements ISetupSheet {
     static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;
 
     static readonly SUPPORTED_EDITIONS: Array<typeof Edition> = [
@@ -160,12 +164,6 @@ export abstract class SetupSheet implements ISetupSheet {
         ],
     ]);
 
-    static setupEdition(): Promise<typeof Edition> {
-        return InteractionEnvironment.current.gameUI.storytellerChooseOne(
-            this.SUPPORTED_EDITIONS
-        );
-    }
-
     static recommend(numPlayers: number): NumberOfCharacters {
         if (
             numPlayers >
@@ -226,6 +224,14 @@ export abstract class SetupSheet implements ISetupSheet {
         return Promise.resolve(new Players(initialPlayers ?? []));
     }
 
+    async setupEdition(): Promise<typeof Edition> {
+        const supportedEditions: Array<typeof Edition> =
+            await GameEnvironment.current.getSupportedEditions();
+        return InteractionEnvironment.current.gameUI.storytellerChooseOne(
+            supportedEditions
+        );
+    }
+
     async setupTownSquare(
         initialPlayers: IPlayer[],
         _seatAssignment:
@@ -269,3 +275,7 @@ export abstract class SetupSheet implements ISetupSheet {
         return Promise.resolve(new Seating(initialNumPlayers));
     }
 }
+
+export const SetupSheet = Singleton<BaseSetupSheet, typeof BaseSetupSheet>(
+    BaseSetupSheet
+);

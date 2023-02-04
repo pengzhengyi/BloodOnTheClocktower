@@ -109,6 +109,12 @@ export abstract class Edition {
             }
         }
     }
+
+    protected constructor() {
+        throw new Error(
+            'Cannot instantiate Edition, meant to use as static class.'
+        );
+    }
 }
 
 export function createCustomEdition(

@@ -1,5 +1,7 @@
+import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from '~/game/exception';
 import { SetupSheet } from '~/game/setup-sheet';
+import { storytellerChooseOneMock } from '~/__mocks__/game-ui';
 
 describe('Test validateNumberOfPlayers', () => {
     test.concurrent('3 players', () => {
@@ -74,5 +76,13 @@ describe('test recommend assignments', () => {
 
             expect(assignment).toEqual(expectedAssignment);
         }
+    });
+});
+
+describe('test setup edition', () => {
+    test('setup edition', async () => {
+        storytellerChooseOneMock.mockResolvedValue(TroubleBrewing);
+        const edition = await SetupSheet.getInstance().setupEdition();
+        expect(edition).toBe(TroubleBrewing);
     });
 });
