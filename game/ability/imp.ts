@@ -1,4 +1,4 @@
-import type { CharacterToken } from '../character';
+import type { CharacterToken } from '../character/character';
 import { DeadReason } from '../dead-reason';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, type InteractionContext } from '../effect/effect';

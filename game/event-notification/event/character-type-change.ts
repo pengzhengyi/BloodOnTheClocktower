@@ -1,6 +1,6 @@
 import type { IEvent } from '../types';
 import { type IPlayer } from '~/game/player';
-import { type CharacterType, Demon } from '~/game/character-type';
+import { type CharacterType, Demon } from '~/game/character/character-type';
 import { PlayerCharacterTypeBecomeUndefined } from '~/game/exception';
 
 export enum ChangeType {

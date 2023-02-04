@@ -4,7 +4,7 @@ import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
-import { Minion, Outsider, Townsfolk } from '~/game/character-type';
+import { Minion, Outsider, Townsfolk } from '~/game/character/character-type';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Chef } from '~/content/characters/output/chef';
 import { Players } from '~/game/players';

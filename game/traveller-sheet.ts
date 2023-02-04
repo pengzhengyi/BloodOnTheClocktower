@@ -1,5 +1,5 @@
 import type { NumberOfCharacters as Assignment } from './script-tool';
-import type { TravellerCharacterToken } from './character';
+import type { TravellerCharacterToken } from './character/character';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 /**

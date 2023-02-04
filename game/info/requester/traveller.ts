@@ -6,7 +6,7 @@ import {
     IsAlive,
 } from './common';
 import { type InformationRequestContext } from './requester';
-import { Traveller } from '~/game/character-type';
+import { Traveller } from '~/game/character/character-type';
 
 class BaseTravellerInformationRequester<
     TInformationRequestContext extends InformationRequestContext<TravellerInformation>

@@ -1,4 +1,4 @@
-import type { CharacterToken } from '../character';
+import type { CharacterToken } from '../character/character';
 import { Effect, type InteractionContext } from '../effect/effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception';
 import { CompositeGamePhaseKind } from '../game-phase-kind';

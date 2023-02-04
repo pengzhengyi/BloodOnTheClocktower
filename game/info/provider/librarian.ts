@@ -7,7 +7,7 @@ import {
 } from '../information';
 import { OneOfTwoPlayersHasCharacterTypeInformationProvider } from './common';
 import { type InfoProvideContext } from './provider';
-import { type CharacterType, Outsider } from '~/game/character-type';
+import { type CharacterType, Outsider } from '~/game/character/character-type';
 import { type Generator } from '~/game/collections';
 
 export type LibrarianNoOutsiderInformation = {

@@ -1,5 +1,5 @@
 import roleData from './chambermaid.json';
-import { Character } from '~/game/character';
+import { Character } from '~/game/character/character';
 
 export abstract class Chambermaid extends Character {}
 

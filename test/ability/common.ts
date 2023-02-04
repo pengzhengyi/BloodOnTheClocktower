@@ -21,8 +21,8 @@ import {
 } from '~/game/ability/status';
 import { type Generator } from '~/game/collections';
 import { Alignment } from '~/game/alignment';
-import type { CharacterToken } from '~/game/character';
-import type { CharacterSheet } from '~/game/character-sheet';
+import type { CharacterToken } from '~/game/character/character';
+import type { CharacterSheet } from '~/game/character/character-sheet';
 import { DeadReason } from '~/game/dead-reason';
 import type { Death } from '~/game/death';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
@@ -98,7 +98,7 @@ import {
 } from '~/game/ability/virgin';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import type { IClocktower } from '~/game/clocktower';
-import { Demon } from '~/game/character-type';
+import { Demon } from '~/game/character/character-type';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';
 import { ImpAbility, type ImpAbilityUseResult } from '~/game/ability/imp';

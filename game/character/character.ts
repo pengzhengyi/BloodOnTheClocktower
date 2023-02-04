@@ -1,3 +1,9 @@
+import { lowercaseLetters } from '../common';
+import {
+    CannotDetermineCharacterType,
+    IncompleteCharacterRoleData,
+} from '../exception';
+import { RoleDataKeyName, type RoleData, type ScriptCharacter } from '../types';
 import {
     CharacterType,
     Demon,
@@ -7,12 +13,6 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
-import { lowercaseLetters } from './common';
-import {
-    CannotDetermineCharacterType,
-    IncompleteCharacterRoleData,
-} from './exception';
-import { RoleDataKeyName, type RoleData, type ScriptCharacter } from './types';
 
 export interface Character extends Partial<RoleData> {}
 

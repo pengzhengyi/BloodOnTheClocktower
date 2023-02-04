@@ -1,5 +1,5 @@
 import roleData from './politician.json';
-import { Character } from '~/game/character';
+import { Character } from '~/game/character/character';
 
 export abstract class Politician extends Character {}
 

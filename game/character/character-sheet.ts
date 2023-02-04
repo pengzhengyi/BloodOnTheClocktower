@@ -6,6 +6,14 @@ import {
     Type,
     instanceToPlain,
 } from 'class-transformer';
+import { Generator } from '../collections';
+import { parsePromiseSettledResults } from '../common';
+import {
+    CharacterLoadFailures,
+    CharacterSheetCreationFailure,
+    GameError,
+    NoCharacterMatchingId,
+} from '../exception';
 import { CharactersToIDs, type CharacterToken } from './character';
 import { CharacterLoader } from './character-loader';
 import {
@@ -17,14 +25,6 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
-import { Generator } from './collections';
-import { parsePromiseSettledResults } from './common';
-import {
-    CharacterLoadFailures,
-    CharacterSheetCreationFailure,
-    GameError,
-    NoCharacterMatchingId,
-} from './exception';
 
 /**
  * {@link `glossary["Character sheet"]`}

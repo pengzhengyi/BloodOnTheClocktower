@@ -1,8 +1,13 @@
 import type { Execution } from './execution';
 import type { IGame } from './game';
 import type { IPlayer } from './player';
-import type { Minion, Demon, Townsfolk, CharacterType } from './character-type';
-import type { CharacterToken } from './character';
+import type {
+    Minion,
+    Demon,
+    Townsfolk,
+    CharacterType,
+} from './character/character-type';
+import type { CharacterToken } from './character/character';
 import type { Phase } from './phase';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';

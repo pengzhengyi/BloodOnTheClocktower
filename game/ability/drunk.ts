@@ -1,5 +1,8 @@
-import type { CharacterToken, TownsfolkCharacterToken } from '../character';
-import type { CharacterSheet } from '../character-sheet';
+import type {
+    CharacterToken,
+    TownsfolkCharacterToken,
+} from '../character/character';
+import type { CharacterSheet } from '../character/character-sheet';
 import { Generator } from '../collections';
 import { DrunkReason } from '../drunk-reason';
 import { CompositeGamePhaseKind } from '../game-phase-kind';

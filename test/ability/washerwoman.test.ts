@@ -6,7 +6,7 @@ import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { AbilityUseStatus } from '~/game/ability/status';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
-import { Townsfolk } from '~/game/character-type';
+import { Townsfolk } from '~/game/character/character-type';
 import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
 import {
     mockStorytellerChooseFirstOne,

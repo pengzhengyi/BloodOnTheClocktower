@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
-import type { CharacterToken } from '../character';
+import type { CharacterToken } from '../character/character';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, type InteractionContext } from '../effect/effect';
 import type {

@@ -1,4 +1,4 @@
-import type { CharacterToken } from '../character';
+import type { CharacterToken } from '../character/character';
 import type {
     AnyFactory,
     DemonPlayer,

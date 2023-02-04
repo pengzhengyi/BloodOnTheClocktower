@@ -1,8 +1,8 @@
 /* eslint-disable no-dupe-class-members */
-import type { CharacterToken } from '../character';
+import type { CharacterToken } from '../character/character';
 import { Generator } from '../collections';
 import type { Constructor } from '../types';
-import { type CharacterType, Demon, Minion } from '../character-type';
+import { type CharacterType, Demon, Minion } from '../character/character-type';
 import { ButlerAbility } from './butler';
 import { GetChefInformationAbility } from './chef';
 import { GetEmpathInformationAbility } from './empath';

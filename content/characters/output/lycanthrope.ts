@@ -1,5 +1,5 @@
 import roleData from './lycanthrope.json';
-import { Character } from '~/game/character';
+import { Character } from '~/game/character/character';
 
 export abstract class Lycanthrope extends Character {}
 

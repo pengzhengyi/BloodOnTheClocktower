@@ -21,7 +21,7 @@ import { GetEmpathInformationAbility } from '~/game/ability/empath';
 import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
 import { SlayerAbility } from '~/game/ability/slayer';
 import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
-import { Minion } from '~/game/character-type';
+import { Minion } from '~/game/character/character-type';
 import {
     mockClocktowerWithIsFirstNight,
     mockClocktowerWithIsNonfirstNight,

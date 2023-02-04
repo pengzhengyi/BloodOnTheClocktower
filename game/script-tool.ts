@@ -4,12 +4,12 @@ import {
     RoleDataKeyName,
     type Script,
 } from './types';
-import { CharacterSheet } from './character-sheet';
-import { Character, type CharacterToken } from './character';
+import { CharacterSheet } from './character/character-sheet';
+import { Character, type CharacterToken } from './character/character';
 import { createCustomEdition, type Edition, EditionName } from './edition';
 import { Generator } from './collections';
 import { EditionLoader } from './edition-loader';
-import { CharacterLoader } from './character-loader';
+import { CharacterLoader } from './character/character-loader';
 import {
     type CharacterType,
     Demon,
@@ -17,7 +17,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './character-type';
+} from './character/character-type';
 import {
     InvalidScriptConstraints,
     NegativeNumberForCharacterTypeInScriptConstraint,

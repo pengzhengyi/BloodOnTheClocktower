@@ -11,7 +11,7 @@ import type { PoisonerPlayer, SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
 import type { IGame } from '~/game/game';
 import type { NightSheet } from '~/game/night-sheet';
-import type { CharacterSheet } from '~/game/character-sheet';
+import type { CharacterSheet } from '~/game/character/character-sheet';
 import type {
     AbilityUseContext,
     AbilitySetupContext,

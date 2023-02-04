@@ -1,5 +1,8 @@
 import type { Alignment } from './alignment';
-import type { CharacterToken, TravellerCharacterToken } from './character';
+import type {
+    CharacterToken,
+    TravellerCharacterToken,
+} from './character/character';
 import {
     type CharacterType,
     Demon,
@@ -7,7 +10,7 @@ import {
     Minion,
     Outsider,
     Townsfolk,
-} from './character-type';
+} from './character/character-type';
 import { Generator } from './collections';
 import type { InteractionInitiator } from './effect/effect';
 import { IncorrectNumberOfCharactersToAssign } from './exception';

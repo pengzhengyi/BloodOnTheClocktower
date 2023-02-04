@@ -5,7 +5,7 @@ import {
 } from '../information';
 import { DemonMinionInformationProvider } from './common';
 import { type InfoProvideContext } from './provider';
-import type { CharacterToken } from '~/game/character';
+import type { CharacterToken } from '~/game/character/character';
 import { Generator, type LazyMap } from '~/game/collections';
 import type { MinionPlayer } from '~/game/types';
 

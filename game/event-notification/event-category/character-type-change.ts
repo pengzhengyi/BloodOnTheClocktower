@@ -5,7 +5,7 @@ import {
     type ICharacterTypeChangeEvent,
 } from '../event/character-type-change';
 import type { IEvent, IEventCategory } from '../types';
-import { Demon } from '~/game/character-type';
+import { Demon } from '~/game/character/character-type';
 import { Singleton } from '~/game/common';
 
 export interface ICharacterTypeChangeCategory extends IEventCategory {}

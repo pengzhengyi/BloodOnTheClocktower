@@ -1,5 +1,5 @@
 import { createBasicPlayer, createBasicPlayers } from './player';
-import type { CharacterToken } from '~/game/character';
+import type { CharacterToken } from '~/game/character/character';
 import type { AsyncFactory } from '~/game/types';
 import type { IPlayer } from '~/game/player';
 import { Players, type IPlayers } from '~/game/players';

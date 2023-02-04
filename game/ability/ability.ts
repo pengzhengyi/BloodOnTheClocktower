@@ -10,7 +10,7 @@ import type {
     IBindToCharacterType,
     StaticThis,
 } from '../types';
-import type { CharacterSheet } from '../character-sheet';
+import type { CharacterSheet } from '../character/character-sheet';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
 import type { IPlayers } from '../players';

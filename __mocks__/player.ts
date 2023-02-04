@@ -4,7 +4,7 @@ import { randomCharacter } from './character';
 import { mockWithPropertyValue, mockWithPropertyValues } from './common';
 import { storytellerConfirmMock } from './game-ui';
 import { Alignment } from '~/game/alignment';
-import type { CharacterToken } from '~/game/character';
+import type { CharacterToken } from '~/game/character/character';
 import { Player, type IPlayer } from '~/game/player';
 import type { AsyncFactory } from '~/game/types';
 

@@ -1,5 +1,5 @@
 import roleData from './scarletwoman.json';
-import { Character } from '~/game/character';
+import { Character } from '~/game/character/character';
 
 export abstract class ScarletWoman extends Character {}
 

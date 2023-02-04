@@ -1,5 +1,5 @@
 import { PriorityQueue } from 'js-sdsl';
-import type { CharacterToken } from './character';
+import type { CharacterToken } from './character/character';
 import {
     CharacterNotInNightActOrdering,
     IncompleteCharacterRoleData,

@@ -23,7 +23,7 @@ import type {
 import type { IPlayer } from './player';
 import type { IPlayers } from './players';
 import type { ISeat } from './seating/seat';
-import type { CharacterToken } from './character';
+import type { CharacterToken } from './character/character';
 import type { StoryTeller } from './storyteller';
 import type {
     NumberOfCharacters,
@@ -37,7 +37,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './character-type';
+} from './character/character-type';
 import type { IEffect } from './effect/effect';
 import type { Alignment } from './alignment';
 import type { IEffects } from './effect/effects';

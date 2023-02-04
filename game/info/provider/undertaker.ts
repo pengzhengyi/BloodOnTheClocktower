@@ -7,7 +7,7 @@ import {
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
-import type { CharacterToken } from '~/game/character';
+import type { CharacterToken } from '~/game/character/character';
 
 /**
  * {@link `undertaker["ability"]`}

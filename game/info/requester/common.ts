@@ -8,8 +8,8 @@ import {
     InformationRequester,
 } from './requester';
 import type { Constructor } from '~/game/types';
-import type { CharacterType } from '~/game/character-type';
-import type { CharacterToken } from '~/game/character';
+import type { CharacterType } from '~/game/character/character-type';
+import type { CharacterToken } from '~/game/character/character';
 
 type InfoRequesterConstructor<TInfoRequester> = Constructor<TInfoRequester>;
 

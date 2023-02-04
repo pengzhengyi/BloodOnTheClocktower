@@ -35,7 +35,7 @@ import { Investigator } from '~/content/characters/output/investigator';
 import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
 import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
 import { Baron } from '~/content/characters/output/baron';
-import { Minion } from '~/game/character-type';
+import { Minion } from '~/game/character/character-type';
 import type { InvestigatorInformation } from '~/game/info/provider/investigator';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 import { Undertaker } from '~/content/characters/output/undertaker';

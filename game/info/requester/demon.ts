@@ -6,7 +6,7 @@ import {
     AtFirstNight,
 } from './common';
 import { type InformationRequestContext } from './requester';
-import { Demon } from '~/game/character-type';
+import { Demon } from '~/game/character/character-type';
 
 class BaseDemonInformationRequester<
     TInformationRequestContext extends InformationRequestContext<DemonInformation>

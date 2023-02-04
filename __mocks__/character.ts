@@ -1,5 +1,5 @@
-import type { CharacterToken } from '~/game/character';
-import { CharacterLoader } from '~/game/character-loader';
+import type { CharacterToken } from '~/game/character/character';
+import { CharacterLoader } from '~/game/character/character-loader';
 import { Generator } from '~/game/collections';
 
 export function randomCharacter(): CharacterToken {

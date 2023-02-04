@@ -3,7 +3,7 @@ import type {
     TrueInformationOptions,
 } from '../information';
 import type { StoryTellerInformationOptions } from '../storyteller-information';
-import type { CharacterSheet } from '~/game/character-sheet';
+import type { CharacterSheet } from '~/game/character/character-sheet';
 import type { IClocktower } from '~/game/clocktower';
 import { LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';

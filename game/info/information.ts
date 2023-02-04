@@ -1,11 +1,11 @@
-import type { CharacterToken } from '../character';
+import type { CharacterToken } from '../character/character';
 import type {
     Townsfolk,
     Outsider,
     Minion,
     Demon,
     CharacterType,
-} from '../character-type';
+} from '../character/character-type';
 import type { Generator } from '../collections';
 import type { IPlayer } from '../player';
 import { Info } from './info';

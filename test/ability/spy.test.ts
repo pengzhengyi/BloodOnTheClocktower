@@ -13,7 +13,7 @@ import { Monk } from '~/content/characters/output/monk';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
-import { Minion, Townsfolk } from '~/game/character-type';
+import { Minion, Townsfolk } from '~/game/character/character-type';
 import {
     mockClocktowerForUndertaker,
     mockClocktowerWithIsFirstNight,

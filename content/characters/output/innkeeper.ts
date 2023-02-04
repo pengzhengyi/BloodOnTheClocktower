@@ -1,5 +1,5 @@
 import roleData from './innkeeper.json';
-import { Character } from '~/game/character';
+import { Character } from '~/game/character/character';
 
 export abstract class Innkeeper extends Character {}
 

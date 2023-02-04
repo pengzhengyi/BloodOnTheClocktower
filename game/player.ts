@@ -3,7 +3,7 @@ import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
 import { Alignment } from './alignment';
-import type { CharacterToken } from './character';
+import type { CharacterToken } from './character/character';
 import { DeadReason } from './dead-reason';
 import { Death } from './death';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
@@ -18,7 +18,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './character-type';
+} from './character/character-type';
 import {
     DeadPlayerCannotNominate,
     PlayerHasUnclearAlignment,

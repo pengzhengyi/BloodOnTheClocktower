@@ -1,8 +1,8 @@
 import axios, { type AxiosRequestConfig } from 'axios';
+import { randomChoice } from '../common';
+import { CharacterLoadFailure, NoCharacterMatchingId } from '../exception';
+import type { RoleData } from '../types';
 import { Character, type CharacterToken } from './character';
-import { randomChoice } from './common';
-import { CharacterLoadFailure, NoCharacterMatchingId } from './exception';
-import type { RoleData } from './types';
 import {
     CHARACTERS,
     ID_TO_CHARACTER,

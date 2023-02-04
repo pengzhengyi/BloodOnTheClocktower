@@ -1,5 +1,5 @@
-import type { CharacterToken } from '../character';
-import type { CharacterSheet } from '../character-sheet';
+import type { CharacterToken } from '../character/character';
+import type { CharacterSheet } from '../character/character-sheet';
 import { type CachingGenerator, Generator } from '../collections';
 import type { InteractionContext } from '../effect/effect';
 import {

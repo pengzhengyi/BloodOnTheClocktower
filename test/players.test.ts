@@ -7,7 +7,10 @@ import {
     PlayerHasUnclearAlignment,
 } from '~/game/exception';
 import { Players } from '~/game/players';
-import type { CharacterToken, TravellerCharacterToken } from '~/game/character';
+import type {
+    CharacterToken,
+    TravellerCharacterToken,
+} from '~/game/character/character';
 import { randomCharacters } from '~/__mocks__/character';
 import { createBasicPlayers, createUnassignedPlayer } from '~/__mocks__/player';
 

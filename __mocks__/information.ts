@@ -5,7 +5,7 @@ import {
     mockWithPropertyValues,
 } from './common';
 import { mockGamePhaseForDay, mockGamePhaseForNight } from './game-phase';
-import type { CharacterSheet } from '~/game/character-sheet';
+import type { CharacterSheet } from '~/game/character/character-sheet';
 import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
 import type { IPlayers } from '~/game/players';
@@ -28,7 +28,7 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from '~/game/character-type';
+} from '~/game/character/character-type';
 import type { ChefInformation } from '~/game/info/provider/chef';
 import type { DemonInformation } from '~/game/info/provider/demon';
 import type { EmpathInformation } from '~/game/info/provider/empath';
