@@ -10,7 +10,7 @@ import { PoisonerNotChoosePlayerToPoison } from '../exception';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import { Phase } from '../phase';
 import type { IPlayer } from '../player';
-import type { Players } from '../players';
+import type { IPlayers } from '../players';
 import type { IPoisonedReason } from '../poisoned-reason';
 import type { PoisonerPlayer } from '../types';
 import type { IGamePhaseNotification } from '../event-notification/notification/game-phase';
@@ -178,7 +178,7 @@ class BasePoisonerAbility extends Ability<
 
     protected async choosePlayerToPoison(
         poisonerPlayer: PoisonerPlayer,
-        players: Players,
+        players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
         let chosen = (await InteractionEnvironment.current.gameUI.choose(

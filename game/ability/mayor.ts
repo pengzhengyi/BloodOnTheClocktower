@@ -5,7 +5,7 @@ import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { Game } from '../game';
 import type { NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
-import type { Players } from '../players';
+import type { IPlayers } from '../players';
 import type { MayorPlayer, RequireGame } from '../types';
 import { Generator } from '../collections';
 import {
@@ -72,7 +72,7 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
     static readonly description =
         'If mayor die at night, another player might die instead.';
 
-    constructor(protected readonly players: Players) {
+    constructor(protected readonly players: IPlayers) {
         super();
     }
 

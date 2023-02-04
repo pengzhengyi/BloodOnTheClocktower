@@ -2,13 +2,28 @@ import { Generator } from './collections';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { IGrimoire, Grimoire } from './grimoire';
-import type { Players } from './players';
+import type { IPlayers } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating/seating';
 import { TownSquare, ITownSquare } from './town-square';
 import { Clocktower } from './clocktower';
+import type { IPlayer } from './player';
+import type { ISeatAssignment } from './seating/seat-assignment';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
+
+/**
+ * {@link `glossary["Setup sheet"]`}
+ * The sheet that details what the Storyteller needs to do before beginning a game.
+ */
+export interface ISetupSheet {
+    setupPlayers(initialPlayers: Array<IPlayer>): Promise<IPlayers>;
+
+    setupTownSquare(
+        initialPlayers: Array<IPlayer>,
+        seatAssignment: ISeatAssignment
+    ): Promise<ITownSquare>;
+}
 
 export abstract class SetupSheet {
     static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;
@@ -135,7 +150,7 @@ export abstract class SetupSheet {
         ],
     ]);
 
-    static setupGrimoire(players: Players): IGrimoire {
+    static setupGrimoire(players: IPlayers): IGrimoire {
         return new Grimoire(players);
     }
 

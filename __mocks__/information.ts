@@ -8,7 +8,7 @@ import { mockGamePhaseForDay, mockGamePhaseForNight } from './game-phase';
 import type { CharacterSheet } from '~/game/character-sheet';
 import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
-import type { Players } from '~/game/players';
+import type { IPlayers } from '~/game/players';
 import type { ISeating } from '~/game/seating/seating';
 import type { StoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
@@ -55,7 +55,7 @@ export function mockInfoProvideContext(): InfoProvideContext {
         characterSheet: mock<CharacterSheet>(),
         travellerSheet: mock<TravellerSheet>(),
         requestedPlayer: mock<IPlayer>(),
-        players: mock<Players>(),
+        players: mock<IPlayers>(),
         seating: mock<ISeating>(),
         storyteller: mock<StoryTeller>(),
     };
@@ -91,7 +91,7 @@ export function mockContextForDemonInformation(
         willGetTrueInformation
     );
 
-    context.players = mockWithPropertyValue<Players, number>(
+    context.players = mockWithPropertyValue<IPlayers, number>(
         'length',
         numPlayers
     );
@@ -130,7 +130,7 @@ export function mockContextForMinionInformation(
         willGetTrueInformation
     );
 
-    context.players = mockWithPropertyValue<Players, number>(
+    context.players = mockWithPropertyValue<IPlayers, number>(
         'length',
         numPlayers
     );

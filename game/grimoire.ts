@@ -1,7 +1,7 @@
 import { Generator } from './collections';
 import { iterableToString } from './common';
 import { IPlayer, IPlayerInfo, Player } from './player';
-import type { Players } from './players';
+import type { IPlayers } from './players';
 
 export interface IGrimoire {
     getPlayerActualInfo(player: IPlayer): IPlayerInfo;
@@ -14,9 +14,9 @@ export interface IGrimoire {
  * The box that stores the Clocktower pieces, held and updated by the Storyteller. Players cannot look in the Grimoire. The Grimoire shows the actual states of all the characters, such as who is alive or dead, who is poisoned, who is acting at night, etc.
  */
 export class Grimoire implements IGrimoire {
-    protected readonly players: Players;
+    protected readonly players: IPlayers;
 
-    constructor(players: Players) {
+    constructor(players: IPlayers) {
         this.players = players;
     }
 

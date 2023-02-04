@@ -2,7 +2,7 @@ import type { CharacterToken } from '../character';
 import { DeadReason } from '../dead-reason';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, InteractionContext } from '../effect/effect';
-import type { Players } from '../players';
+import type { IPlayers } from '../players';
 import type { NextFunction } from '../proxy/middleware';
 import type { AnyFactory, ImpPlayer, MinionPlayer } from '../types';
 import type { IPlayer } from '../player';
@@ -29,7 +29,7 @@ class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
 
     static readonly origin: CharacterToken = Imp;
 
-    constructor(protected getPlayers: AnyFactory<Players>) {
+    constructor(protected getPlayers: AnyFactory<IPlayers>) {
         super();
     }
 
@@ -169,7 +169,7 @@ class BaseImpAbility extends Ability<AbilityUseContext, ImpAbilityUseResult> {
 
     protected async choosePlayerToKill(
         impPlayer: ImpPlayer,
-        players: Players,
+        players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
         let chosen = (await InteractionEnvironment.current.gameUI.choose(

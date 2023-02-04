@@ -13,7 +13,7 @@ import type {
 import type { CharacterSheet } from '../character-sheet';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
-import type { Players } from '../players';
+import type { IPlayers } from '../players';
 import type { Info } from '../info/info';
 import type { InfoProvideContext } from '../info/provider/provider';
 import type {
@@ -34,7 +34,7 @@ import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface AbilityUseContext {
     requestedPlayer: IPlayer;
-    players: Players;
+    players: IPlayers;
 }
 
 export interface AbilitySetupContext extends AbilityUseContext {

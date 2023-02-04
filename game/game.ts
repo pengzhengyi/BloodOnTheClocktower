@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
 import { IPlayer } from './player';
-import { Players } from './players';
+import type { IPlayers } from './players';
 import { Edition } from './edition';
 import { EffectTarget } from './effect/effect-target';
 import { StoryTeller } from './storyteller';
@@ -33,7 +33,7 @@ export class Game extends EffectTarget<Game> {
 
     declare storyTeller: StoryTeller;
 
-    declare players: Players;
+    declare players: IPlayers;
 
     declare edition: Edition;
 

@@ -3,7 +3,7 @@ import { ButlerNotChooseMasterToFollow } from '../exception';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
-import type { Players } from '../players';
+import type { IPlayers } from '../players';
 import type { ButlerPlayer } from '../types';
 import { Ability, AbilityUseContext, AbilityUseResult } from './ability';
 import {
@@ -124,7 +124,7 @@ export class ButlerAbility extends Ability<
 
     protected async chooseMaster(
         butlerPlayer: ButlerPlayer,
-        players: Players,
+        players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
         let chosen = (await InteractionEnvironment.current.gameUI.choose(

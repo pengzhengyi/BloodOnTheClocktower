@@ -21,7 +21,7 @@ import type {
     ImpPlayer,
 } from './types';
 import type { IPlayer } from './player';
-import type { Players } from './players';
+import type { IPlayers } from './players';
 import type { ISeat } from './seating/seat';
 import type { CharacterToken } from './character';
 import type { StoryTeller } from './storyteller';
@@ -444,7 +444,7 @@ export class IncorrectNumberOfCharactersToAssign extends RecoverableGameError {
         'the number of characters to assign does not match the number of players';
 
     constructor(
-        readonly players: Players,
+        readonly players: IPlayers,
         readonly characters: Array<CharacterToken>
     ) {
         super(IncorrectNumberOfCharactersToAssign.description);

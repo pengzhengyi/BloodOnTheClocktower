@@ -6,7 +6,7 @@ import { mockInfoProvideContext as _mockInfoProvideContext } from './information
 import { mockNightSheet } from './night-sheet';
 import { mockClocktower } from './clocktower';
 import type { IPlayer } from '~/game/player';
-import type { Players } from '~/game/players';
+import type { IPlayers } from '~/game/players';
 import type { PoisonerPlayer, SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
 import type { Game } from '~/game/game';
@@ -29,17 +29,17 @@ import type { IClocktower } from '~/game/clocktower';
 
 export function mockAbilityUseContext(
     player?: IPlayer,
-    players?: Players
+    players?: IPlayers
 ): AbilityUseContext {
     return {
         requestedPlayer: player ?? mock<IPlayer>(),
-        players: players ?? mock<Players>(),
+        players: players ?? mock<IPlayers>(),
     };
 }
 
 export function mockAbilitySetupContext(
     player?: IPlayer,
-    players?: Players,
+    players?: IPlayers,
     context?: AbilityUseContext,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet,
@@ -89,7 +89,7 @@ export function mockVirginAbilityUseContext(
 
 export function mockMayorAbilitySetupContext(
     player?: IPlayer,
-    players?: Players,
+    players?: IPlayers,
     game?: Game,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet
@@ -111,7 +111,7 @@ export function mockMayorAbilitySetupContext(
 
 export function mockSaintAbilitySetupContext(
     player?: SaintPlayer,
-    players?: Players,
+    players?: IPlayers,
     game?: Game,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet

@@ -7,7 +7,7 @@ import type {
 } from './info/requester/requester';
 import { InfoProviderLoader } from './info/provider/loader';
 import type { IPlayer } from './player';
-import type { Players } from './players';
+import type { IPlayers } from './players';
 import { AsyncTask } from './types';
 import { InteractionEnvironment } from '~/interaction/environment';
 
@@ -44,7 +44,7 @@ export class StoryTeller {
         await action(player);
     }
 
-    initializeGrimoire(players: Players) {
+    initializeGrimoire(players: IPlayers) {
         this.grimoire = new Grimoire(players);
     }
 

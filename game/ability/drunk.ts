@@ -4,7 +4,7 @@ import { Generator } from '../collections';
 import { DrunkReason } from '../drunk-reason';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { IPlayer } from '../player';
-import type { Players } from '../players';
+import type { IPlayers } from '../players';
 import { ThinkAsCharacterEffect } from '../effect/think-as';
 import {
     Ability,
@@ -76,7 +76,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
 
     protected async chooseThinkAsCharacter(
         characterSheet: CharacterSheet,
-        players: Players
+        players: IPlayers
     ): Promise<TownsfolkCharacterToken> {
         const townsfolkOptions = characterSheet.townsfolk;
         const inPlayCharacters = players.map((player) =>

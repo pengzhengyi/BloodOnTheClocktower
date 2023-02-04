@@ -80,7 +80,7 @@ export function createInfoProvideContext(
 ) {
     const context = mockInfoProvideContext();
     context.requestedPlayer = player;
-    context.players = Players.of(player, ...otherPlayers);
+    context.players = new Players([player, ...otherPlayers]);
     return context;
 }
 

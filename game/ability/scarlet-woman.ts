@@ -10,7 +10,7 @@ import type { NextFunction } from '../proxy/middleware';
 import { CharacterNightEffect } from '../effect/character';
 import type { DeadReason } from '../dead-reason';
 import type { IPlayer } from '../player';
-import { Players } from '../players';
+import type { IPlayers } from '../players';
 import type { INonBlockingSubscriber } from '../event-notification/types';
 import {
     ChangeType,
@@ -50,7 +50,7 @@ class BaseScarletWomanBecomeDemonEffect
 
     constructor(
         protected readonly scarletWomanPlayer: ScarletWomanPlayer,
-        protected getPlayers: AnyFactory<Players>
+        protected getPlayers: AnyFactory<IPlayers>
     ) {
         super();
     }
@@ -208,7 +208,7 @@ class BaseScarletWomanAbility extends Ability<
 
     protected initializeBecomeDemonEffect(
         scarletWomanPlayer: ScarletWomanPlayer,
-        getPlayers: Factory<Players>
+        getPlayers: Factory<IPlayers>
     ) {
         this.becomeDemonEffect = new ScarletWomanBecomeDemonEffect(
             scarletWomanPlayer,

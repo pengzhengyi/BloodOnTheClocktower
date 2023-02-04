@@ -87,7 +87,7 @@ import {
     SaintAbilitySetupContext,
     SaintAbilityUseContext,
 } from '~/game/ability/saint';
-import { Players } from '~/game/players';
+import { IPlayers, Players } from '~/game/players';
 import { SpyAbility } from '~/game/ability/spy';
 import { VirginAbility, VirginAbilityUseContext } from '~/game/ability/virgin';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
@@ -189,7 +189,7 @@ export async function expectAfterImpKill(
     impAbility?: ImpAbility,
     setupContext?: AbilitySetupContext,
     useContext?: AbilityUseContext,
-    players?: Players,
+    players?: IPlayers,
     expectToBeDead = true
 ): Promise<Death | undefined> {
     expect(await playerToKill.alive).toBeTrue();
@@ -223,7 +223,7 @@ export async function expectAfterImpSelfKill(
     impAbility?: ImpAbility,
     setupContext?: AbilitySetupContext,
     useContext?: AbilityUseContext,
-    players?: Players
+    players?: IPlayers
 ): Promise<Death | undefined> {
     mockStorytellerChooseMatchingOne<MinionPlayer>((player) =>
         player.equals(minionPlayerToBecomeDemon)
@@ -538,7 +538,7 @@ export async function expectScarletWomanBecomeDemonAfterDemonDeath(
     demonPlayer: DemonPlayer,
     scarletWomanAbility?: ScarletWomanAbility,
     setupContext?: AbilitySetupContext,
-    players?: Players,
+    players?: IPlayers,
     deadReason: DeadReason = DeadReason.Other,
     validateGameNotEnd = false
 ) {
@@ -574,7 +574,7 @@ export async function expectAfterExecuteSaint(
     saintPlayer: SaintPlayer,
     expectGameEnd = true,
     ability?: SaintAbility,
-    players?: Players,
+    players?: IPlayers,
     numAlivePlayer?: number,
     setupContext?: SaintAbilitySetupContext,
     useContext?: SaintAbilityUseContext,
