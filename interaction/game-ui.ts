@@ -52,10 +52,6 @@ export interface IGameUIFactory {
     ): IGameUI;
 }
 
-export interface IGameUIProvider {
-    gameUI: IGameUI;
-}
-
 abstract class AbstractGameUI implements IGameUI {
     protected static instance?: IGameUI;
 

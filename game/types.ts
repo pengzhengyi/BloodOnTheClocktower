@@ -264,3 +264,10 @@ export interface IBindToCharacterType {
 export interface ISingleton<T> {
     getInstance(): T;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IEnvironment {}
+
+export interface IEnvironmentProvider<TEnvironment extends IEnvironment> {
+    readonly current: TEnvironment;
+}
