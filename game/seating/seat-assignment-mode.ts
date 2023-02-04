@@ -19,3 +19,9 @@ export enum SeatAssignmentMode {
      */
     RandomOverwrite = 3,
 }
+
+export function isSeatAssignmentMode(
+    value: unknown
+): value is SeatAssignmentMode {
+    return Number.isInteger(value) && (value as number) in SeatAssignmentMode;
+}

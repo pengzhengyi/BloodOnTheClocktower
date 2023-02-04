@@ -3,13 +3,30 @@ import { Alignment } from './alignment';
 import { IPlayer } from './player';
 import type { IPlayers } from './players';
 import { Edition } from './edition';
-import { EffectTarget } from './effect/effect-target';
+import { EffectTarget, IEffectTarget } from './effect/effect-target';
 import { StoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
+import type { ISetupSheet } from './setup-sheet';
 import { InteractionEnvironment } from '~/interaction/environment';
 
-export class Game extends EffectTarget<Game> {
+export interface IGame extends IEffectTarget<IGame> {
+    // fundamental properties of IGame
+    readonly setupSheet: ISetupSheet;
+    readonly townSquare: ITownSquare;
+    readonly storyTeller: StoryTeller;
+    readonly players: IPlayers;
+    readonly edition: Edition;
+
+    // utility properties of IGame
+    readonly today: IDiary;
+
+    // capabilities of IGame
+    setWinningTeam(winningTeam: Alignment, reason?: string): void;
+    getWinningTeam(players: Iterable<IPlayer>): Promise<Alignment | undefined>;
+}
+
+export class Game extends EffectTarget<Game> implements IGame {
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
         keyof ProxyHandler<Game>
     > = ['get'];
@@ -29,24 +46,22 @@ export class Game extends EffectTarget<Game> {
 
     winningTeam?: Alignment;
 
+    declare setupSheet: ISetupSheet;
+
     declare townSquare: ITownSquare;
 
     declare storyTeller: StoryTeller;
 
-    declare players: IPlayers;
+    get players(): IPlayers {
+        return this._players.clone();
+    }
+
+    protected declare _players: IPlayers;
 
     declare edition: Edition;
 
-    get alivePlayers() {
-        return this.players.clone().alive;
-    }
-
-    protected get today(): IDiary {
+    get today(): IDiary {
         return this.townSquare.clockTower.today;
-    }
-
-    get hasExecution(): boolean {
-        return this.today.hasExecution;
     }
 
     // eslint-disable-next-line no-useless-constructor

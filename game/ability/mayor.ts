@@ -2,7 +2,7 @@ import { Alignment } from '../alignment';
 import { DeadReason } from '../dead-reason';
 import { Effect, InteractionContext } from '../effect/effect';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
-import type { Game } from '../game';
+import type { IGame } from '../game';
 import type { NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
 import type { IPlayers } from '../players';
@@ -21,7 +21,7 @@ import {
 } from './status';
 import { InteractionEnvironment } from '~/interaction/environment';
 
-export class MayorPeacefulWinEffect extends Effect<Game> {
+export class MayorPeacefulWinEffect extends Effect<IGame> {
     static readonly description =
         'The Mayor can win by peaceful means on the final day.';
 
@@ -29,7 +29,7 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         super();
     }
 
-    isApplicable(context: InteractionContext<Game>): boolean {
+    isApplicable(context: InteractionContext<IGame>): boolean {
         return (
             super.isApplicable(context) &&
             this.mayorPlayer.storytellerGet('_hasAbility') &&
@@ -38,9 +38,9 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
     }
 
     protected applyCooperativelyImpl(
-        context: InteractionContext<Game>,
-        next: NextFunction<InteractionContext<Game>>
-    ): InteractionContext<Game> {
+        context: InteractionContext<IGame>,
+        next: NextFunction<InteractionContext<IGame>>
+    ): InteractionContext<IGame> {
         const game = context.interaction.target;
         const getWinningTeamMethod = game.getWinningTeam.bind(game);
 
@@ -58,11 +58,11 @@ export class MayorPeacefulWinEffect extends Effect<Game> {
         return updatedContext;
     }
 
-    protected async isPeacefulWin(game: Game) {
-        if (game.hasExecution) {
+    protected async isPeacefulWin(game: IGame) {
+        if (game.today.hasExecution) {
             return false;
         } else {
-            const numAlivePlayers = Generator.count(await game.alivePlayers);
+            const numAlivePlayers = Generator.count(await game.players.alive);
             return numAlivePlayers === 3;
         }
     }

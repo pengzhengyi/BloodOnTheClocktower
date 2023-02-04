@@ -1,10 +1,10 @@
 import { mockDeep } from 'jest-mock-extended';
-import { Game } from '~/game/game';
+import { IGame, Game } from '~/game/game';
 
-export function mockGame(): Game {
-    return mockDeep<Game>();
+export function mockGame(): IGame {
+    return mockDeep<IGame>();
 }
 
-export function createBasicGame(): Game {
+export function createBasicGame(): IGame {
     return Game.init();
 }

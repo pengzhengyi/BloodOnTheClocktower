@@ -85,6 +85,9 @@ export interface IPlayers extends Generator<IPlayer> {
      */
     hasPlayer(player: IPlayer): boolean;
 
+    allGood(): Promise<boolean>;
+    allEvil(): Promise<boolean>;
+
     /**
      * Equivalent of invoking `from` on every player.
      */
@@ -105,11 +108,10 @@ export interface IPlayers extends Generator<IPlayer> {
 
 export class Players extends Generator<IPlayer> implements IPlayers {
     static async allGood(players: Iterable<IPlayer>): Promise<boolean> {
-        const areAlignmentsGood = await Promise.all(
-            Generator.map((player) => player.isGood, players)
+        const isPlayerGood = Generator.promiseRaceAll(
+            Generator.toPromise((player) => player.isGood, players)
         );
-
-        return areAlignmentsGood.every((isGood) => isGood);
+        return await Generator.everyAsync((isGood) => isGood, isPlayerGood);
     }
 
     static async allEvil(players: Iterable<IPlayer>): Promise<boolean> {
@@ -197,6 +199,14 @@ export class Players extends Generator<IPlayer> implements IPlayers {
         return this.players.some((playerToMatch) =>
             playerToMatch.equals(player)
         );
+    }
+
+    allGood(): Promise<boolean> {
+        return Players.allGood(this);
+    }
+
+    allEvil(): Promise<boolean> {
+        return Players.allEvil(this);
     }
 
     from(initiator?: InteractionInitiator): this {

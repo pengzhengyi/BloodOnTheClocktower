@@ -2,13 +2,18 @@ import { Generator } from './collections';
 import { Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { IGrimoire, Grimoire } from './grimoire';
-import type { IPlayers } from './players';
+import { IPlayers, Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating/seating';
 import { TownSquare, ITownSquare } from './town-square';
 import { Clocktower } from './clocktower';
 import type { IPlayer } from './player';
-import type { ISeatAssignment } from './seating/seat-assignment';
+import { ISeatAssignment, SeatAssignment } from './seating/seat-assignment';
+import { SeatAssignmentFromMode } from './seating/seat-assignment-factory';
+import {
+    isSeatAssignmentMode,
+    SeatAssignmentMode,
+} from './seating/seat-assignment-mode';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
@@ -17,15 +22,17 @@ import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
  * The sheet that details what the Storyteller needs to do before beginning a game.
  */
 export interface ISetupSheet {
-    setupPlayers(initialPlayers: Array<IPlayer>): Promise<IPlayers>;
+    setupPlayers(initialPlayers?: Array<IPlayer>): Promise<IPlayers>;
 
     setupTownSquare(
         initialPlayers: Array<IPlayer>,
-        seatAssignment: ISeatAssignment
+        seatAssignment?: ISeatAssignment | SeatAssignmentMode
     ): Promise<ITownSquare>;
+
+    setupGrimoire(players: IPlayers): Promise<IGrimoire>;
 }
 
-export abstract class SetupSheet {
+export abstract class SetupSheet implements ISetupSheet {
     static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;
 
     static readonly SUPPORTED_EDITIONS: Array<typeof Edition> = [
@@ -150,20 +157,10 @@ export abstract class SetupSheet {
         ],
     ]);
 
-    static setupGrimoire(players: IPlayers): IGrimoire {
-        return new Grimoire(players);
-    }
-
     static setupEdition(): Promise<typeof Edition> {
         return InteractionEnvironment.current.gameUI.storytellerChooseOne(
             this.SUPPORTED_EDITIONS
         );
-    }
-
-    static setupTownSquare(numPlayers?: number): ITownSquare {
-        const seating = new Seating(numPlayers);
-        const clocktower = new Clocktower();
-        return new TownSquare(seating, clocktower);
     }
 
     static recommend(numPlayers: number): NumberOfCharacters {
@@ -220,5 +217,52 @@ export abstract class SetupSheet {
                 this.RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS
             );
         }
+    }
+
+    setupPlayers(initialPlayers?: IPlayer[]): Promise<IPlayers> {
+        return Promise.resolve(new Players(initialPlayers ?? []));
+    }
+
+    async setupTownSquare(
+        initialPlayers: IPlayer[],
+        _seatAssignment:
+            | ISeatAssignment
+            | SeatAssignmentMode = SeatAssignmentMode.NaturalInsert
+    ): Promise<ITownSquare> {
+        const numPlayers = initialPlayers.length;
+        const clocktower = await this.setupClocktower();
+        const seating = await this.setupSeating(numPlayers);
+        const townsquare = new TownSquare(seating, clocktower);
+
+        const seatAssignment = this.getSeatAssignment(_seatAssignment);
+        await SeatAssignment.assignAll(seatAssignment, seating, initialPlayers);
+
+        return townsquare;
+    }
+
+    setupGrimoire(players: IPlayers) {
+        return Promise.resolve(new Grimoire(players));
+    }
+
+    protected getSeatAssignment(
+        seatAssignment: ISeatAssignment | SeatAssignmentMode
+    ): ISeatAssignment {
+        if (isSeatAssignmentMode(seatAssignment)) {
+            return SeatAssignmentFromMode.getInstance().getSeatAssignment(
+                seatAssignment
+            );
+        } else {
+            return seatAssignment;
+        }
+    }
+
+    protected setupClocktower(): Promise<Clocktower> {
+        return Promise.resolve(new Clocktower());
+    }
+
+    protected setupSeating(
+        initialNumPlayers?: number | undefined
+    ): Promise<Seating> {
+        return Promise.resolve(new Seating(initialNumPlayers));
     }
 }

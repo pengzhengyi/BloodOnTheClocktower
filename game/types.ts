@@ -1,5 +1,5 @@
 import type { Execution } from './execution';
-import type { Game } from './game';
+import type { IGame } from './game';
 import type { IPlayer } from './player';
 import type { Minion, Demon, Townsfolk, CharacterType } from './character-type';
 import type { CharacterToken } from './character';
@@ -232,7 +232,7 @@ export interface RequirePhase {
 }
 
 export interface RequireGame {
-    game: Game;
+    game: IGame;
 }
 
 export interface RequireReason {

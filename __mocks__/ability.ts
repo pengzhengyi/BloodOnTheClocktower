@@ -9,7 +9,7 @@ import type { IPlayer } from '~/game/player';
 import type { IPlayers } from '~/game/players';
 import type { PoisonerPlayer, SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
-import type { Game } from '~/game/game';
+import type { IGame } from '~/game/game';
 import type { NightSheet } from '~/game/night-sheet';
 import type { CharacterSheet } from '~/game/character-sheet';
 import type {
@@ -90,7 +90,7 @@ export function mockVirginAbilityUseContext(
 export function mockMayorAbilitySetupContext(
     player?: IPlayer,
     players?: IPlayers,
-    game?: Game,
+    game?: IGame,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet
 ): MayorAbilitySetupContext {
@@ -112,7 +112,7 @@ export function mockMayorAbilitySetupContext(
 export function mockSaintAbilitySetupContext(
     player?: SaintPlayer,
     players?: IPlayers,
-    game?: Game,
+    game?: IGame,
     nightSheet?: NightSheet,
     characterSheet?: CharacterSheet
 ): SaintAbilitySetupContext {

@@ -1,6 +1,6 @@
 import { Effect, InteractionContext } from '../effect/effect';
 import type { Execution } from '../execution';
-import type { Game } from '../game';
+import type { IGame } from '../game';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { SaintPlayer, RequireGame, RequireExecution } from '../types';
@@ -22,7 +22,7 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
 
     constructor(
         protected readonly saintPlayer: SaintPlayer,
-        protected readonly game: Game
+        protected readonly game: IGame
     ) {
         super();
     }
