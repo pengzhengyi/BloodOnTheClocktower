@@ -1,6 +1,5 @@
-import { Generator } from './collections';
+import type { EditionName } from './edition';
 import { type Edition } from './edition';
-import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
 import { Grimoire } from './grimoire';
 import { type IPlayers, Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
@@ -22,7 +21,6 @@ import { Singleton } from './common';
 import type { IStoryTeller } from './storyteller';
 import { StoryTeller } from './storyteller';
 import { InteractionEnvironment } from '~/interaction/environment';
-import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
 export interface ISetupContext {
     initialPlayers?: Array<IPlayer>;
@@ -34,6 +32,7 @@ export interface ISetupResult {
     townSquare: ITownSquare;
     storyTeller: IStoryTeller;
     edition: typeof Edition;
+    characterTypeComposition: NumberOfCharacters;
 }
 
 /**
@@ -51,6 +50,11 @@ export interface ISetupSheet {
     setupStoryTeller(players: IPlayers): Promise<IStoryTeller>;
 
     setupEdition(): Promise<typeof Edition>;
+
+    recommendCharacterTypeComposition(
+        numPlayers: number,
+        editionName: EditionName
+    ): Promise<NumberOfCharacters>;
 
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
@@ -71,13 +75,20 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             this.setupEdition(),
         ]);
 
-        const storyTeller = await this.setupStoryTeller(players);
+        const [storyTeller, characterTypeComposition] = await Promise.all([
+            this.setupStoryTeller(players),
+            this.recommendCharacterTypeComposition(
+                players.length,
+                edition.name as EditionName
+            ),
+        ]);
 
         const setupResult: ISetupResult = {
             players,
             townSquare,
             edition,
             storyTeller,
+            characterTypeComposition,
         };
 
         return setupResult;
@@ -85,12 +96,6 @@ abstract class AbstractSetupSheet implements ISetupSheet {
 }
 
 class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
-    static readonly RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS = 20;
-
-    static readonly SUPPORTED_EDITIONS: Array<typeof Edition> = [
-        TroubleBrewing,
-    ];
-
     static readonly MAXIMUM_NUMBER_OF_PLAYERS_BEFORE_NECESSARY_TRAVELLER = 15;
 
     static readonly RECOMMENDED_ASSIGNMENTS = new Map<
@@ -209,62 +214,6 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         ],
     ]);
 
-    static recommend(numPlayers: number): NumberOfCharacters {
-        if (
-            numPlayers >
-            this.MAXIMUM_NUMBER_OF_PLAYERS_BEFORE_NECESSARY_TRAVELLER
-        ) {
-            const assignment = this.RECOMMENDED_ASSIGNMENTS.get(
-                this.MAXIMUM_NUMBER_OF_PLAYERS_BEFORE_NECESSARY_TRAVELLER
-            )!;
-            assignment.traveller =
-                numPlayers -
-                this.MAXIMUM_NUMBER_OF_PLAYERS_BEFORE_NECESSARY_TRAVELLER;
-            return assignment;
-        } else {
-            return this.RECOMMENDED_ASSIGNMENTS.get(numPlayers)!;
-        }
-    }
-
-    static recommendWithOptionalTraveller(
-        numPlayers: number,
-        maximumNumTravellers = 0
-    ): Iterable<NumberOfCharacters> {
-        return Generator.map((numTravellersToAssign) => {
-            const assignment = this.recommend(
-                numPlayers - numTravellersToAssign
-            );
-            assignment.traveller = numTravellersToAssign;
-            return assignment;
-        }, Generator.range(0, maximumNumTravellers + 1));
-    }
-
-    static getRecommendedMinimumNumberOfPlayers(
-        isTroubleBrewing: boolean
-    ): number {
-        if (isTroubleBrewing) {
-            return 5;
-        }
-
-        return 7;
-    }
-
-    static validateNumberOfPlayers(
-        numPlayers: number,
-        isTroubleBrewing: boolean
-    ): void {
-        const recommendedMinimum =
-            this.getRecommendedMinimumNumberOfPlayers(isTroubleBrewing);
-        if (numPlayers < recommendedMinimum) {
-            throw new GameHasTooFewPlayers(numPlayers, recommendedMinimum);
-        } else if (numPlayers > this.RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS) {
-            throw new GameHasTooManyPlayers(
-                numPlayers,
-                this.RECOMMENDED_MAXIMUM_NUMBER_OF_PLAYERS
-            );
-        }
-    }
-
     setupPlayers(initialPlayers?: IPlayer[]): Promise<IPlayers> {
         return Promise.resolve(new Players(initialPlayers ?? []));
     }
@@ -272,9 +221,12 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
     async setupEdition(): Promise<typeof Edition> {
         const supportedEditions: Array<typeof Edition> =
             await GameEnvironment.current.getSupportedEditions();
-        return InteractionEnvironment.current.gameUI.storytellerChooseOne(
-            supportedEditions
-        );
+        const chosenEdition =
+            await InteractionEnvironment.current.gameUI.storytellerChooseOne(
+                supportedEditions
+            );
+
+        return chosenEdition;
     }
 
     async setupTownSquare(
@@ -304,6 +256,18 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
     async setupStoryTeller(players: IPlayers) {
         const grimoire = await this.setupGrimoire(players);
         return new StoryTeller(grimoire);
+    }
+
+    async recommendCharacterTypeComposition(
+        numPlayers: number,
+        editionName: EditionName
+    ): Promise<NumberOfCharacters> {
+        const assignment =
+            await GameEnvironment.current.recommendCharacterTypeComposition(
+                numPlayers,
+                editionName
+            );
+        return assignment;
     }
 
     protected getSeatAssignment(

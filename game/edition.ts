@@ -3,7 +3,7 @@ import { IncompleteEditionData } from './exception';
 import { CharacterSheet } from './character/character-sheet';
 import { Generator } from './collections';
 import type { CharacterToken } from './character/character';
-import { onlyLetters } from './common';
+import { lowercaseLetters } from './common';
 import type { CharacterType } from './character/character-type';
 
 export enum EditionName {
@@ -75,6 +75,10 @@ export abstract class Edition {
         return this.characterSheet.fabled;
     }
 
+    static get canonicalName(): string {
+        return this.getCanonicalName(this.name);
+    }
+
     private static _characterSheet?: CharacterSheet;
 
     static is(edition: typeof Edition): boolean {
@@ -82,7 +86,14 @@ export abstract class Edition {
     }
 
     static getCanonicalName(name: string) {
-        return onlyLetters(name);
+        return lowercaseLetters(name);
+    }
+
+    static areSameNames(firstEditionName: string, secondEditionName: string) {
+        return (
+            this.getCanonicalName(firstEditionName) ===
+            this.getCanonicalName(secondEditionName)
+        );
     }
 
     static initialize(editionData: Partial<EditionData>) {
@@ -94,6 +105,10 @@ export abstract class Edition {
         characterType: typeof CharacterType
     ): Array<CharacterToken> {
         return this.characterSheet.getCharactersByType(characterType);
+    }
+
+    static equals(otherEdition: typeof Edition) {
+        return this.canonicalName === otherEdition.canonicalName;
     }
 
     static toJSON() {

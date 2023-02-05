@@ -1,4 +1,4 @@
-import { Edition } from './edition';
+import type { Edition } from './edition';
 import { NoEditionMatchingName } from './exception';
 import { NAME_TO_EDITION } from '~/content/editions/editions';
 
@@ -9,7 +9,7 @@ export interface IEditionLoader {
 
 export const EditionLoader: IEditionLoader = class EditionLoader {
     static tryLoad(editionName: string): typeof Edition | undefined {
-        return NAME_TO_EDITION.get(Edition.getCanonicalName(editionName));
+        return NAME_TO_EDITION[editionName];
     }
 
     static async loadAsync(editionName: string): Promise<typeof Edition> {

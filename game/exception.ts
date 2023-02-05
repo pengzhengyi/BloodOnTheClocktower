@@ -54,6 +54,7 @@ import type { IInfoProviderLoader } from './info/provider/loader';
 import type { IDiary, Event as ClocktowerEvent } from './diary';
 import type { TCharacterEffect } from './effect/character';
 import type { InfoType } from './info/info-type';
+import type { EditionName } from './edition';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export class BaseError extends Error {
@@ -913,5 +914,16 @@ export class GameHasTooFewPlayers extends RecoverableGameError {
         readonly recommendedMinimum: number
     ) {
         super(GameHasTooFewPlayers.description);
+    }
+}
+
+export class EditionNotSpecifiedMinimumNumberOfPlayers extends RecoverableGameError {
+    static description =
+        'Edition not specified minimum number of players required to play';
+
+    declare correctedMinimumNumberOfPlayers: number;
+
+    constructor(readonly edition: EditionName | string) {
+        super(EditionNotSpecifiedMinimumNumberOfPlayers.description);
     }
 }

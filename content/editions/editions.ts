@@ -2,10 +2,19 @@ import { TroubleBrewing } from './TroubleBrewing';
 import { SectsViolets } from './SectsViolets';
 import { BadMoonRising } from './BadMoonRising';
 import { ExperimentalCharacters } from './ExperimentalCharacters';
-import { type Edition } from '~/game/edition';
+import { Edition } from '~/game/edition';
+import { createRecordProxy } from '~/game/proxy/proxy';
 
-export const NAME_TO_EDITION: Map<string, typeof Edition> = new Map();
-NAME_TO_EDITION.set('TroubleBrewing', TroubleBrewing);
-NAME_TO_EDITION.set('SectsViolets', SectsViolets);
-NAME_TO_EDITION.set('BadMoonRising', BadMoonRising);
-NAME_TO_EDITION.set('ExperimentalCharacters', ExperimentalCharacters);
+const canonicalNameToEdition: Map<string, typeof Edition> = new Map();
+canonicalNameToEdition.set(TroubleBrewing.canonicalName, TroubleBrewing);
+canonicalNameToEdition.set(SectsViolets.canonicalName, SectsViolets);
+canonicalNameToEdition.set(BadMoonRising.canonicalName, BadMoonRising);
+canonicalNameToEdition.set(
+    ExperimentalCharacters.canonicalName,
+    ExperimentalCharacters
+);
+
+export const NAME_TO_EDITION: Record<string, typeof Edition> =
+    createRecordProxy((name) =>
+        canonicalNameToEdition.get(Edition.getCanonicalName(name))
+    );

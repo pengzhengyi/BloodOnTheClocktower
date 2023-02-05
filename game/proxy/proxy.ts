@@ -1,3 +1,6 @@
+import type { Loader } from '../types';
+import { isString } from '~/utils/common';
+
 export abstract class SelfProxy {
     readonly proxyHandlerPropertyNames: Array<keyof ProxyHandler<this>> = [
         'apply',
@@ -32,4 +35,19 @@ export abstract class SelfProxy {
     protected getProxy(): this {
         return new Proxy(this, this.handler);
     }
+}
+
+export function createRecordProxy<V>(
+    loader: Loader<string, V>
+): Record<string, V> {
+    const obj = {};
+    return new Proxy(obj, {
+        get(target, p, receiver) {
+            if (isString(p)) {
+                return loader(p);
+            } else {
+                return Reflect.get(target, p, receiver);
+            }
+        },
+    });
 }

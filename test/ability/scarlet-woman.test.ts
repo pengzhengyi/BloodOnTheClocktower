@@ -161,6 +161,7 @@ describe('test ScarletWomanAbility', () => {
 
             [(context) => mockClocktowerWithIsFirstNight(context, true)]
         );
+        storytellerChooseOneMock.mockReset();
 
         expect(fortuneTellerFirstNightInfo.hasDemon).toBeFalse();
 
@@ -178,6 +179,7 @@ describe('test ScarletWomanAbility', () => {
             true
         );
 
+        mockStorytellerChooseFirstOne();
         const fortuneTellerLaterNightInfo = await expectCharacterGetInformation(
             fortuneTellerAbility,
             () => infoProvideContext,
