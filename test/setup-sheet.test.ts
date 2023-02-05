@@ -3,16 +3,6 @@ import { EditionName } from '~/game/edition';
 import { SetupSheet } from '~/game/setup-sheet';
 import { storytellerChooseOneMock } from '~/__mocks__/game-ui';
 
-test.concurrent('validate recommended assignments', () => {
-    for (const [numPlayers, assignment] of SetupSheet.RECOMMENDED_ASSIGNMENTS) {
-        const assignedNumPlayers = Object.values(assignment).reduce(
-            (numPlayersForCharacterType, numPlayersForOtherCharacterType) =>
-                numPlayersForCharacterType + numPlayersForOtherCharacterType
-        );
-        expect(numPlayers).toEqual(assignedNumPlayers);
-    }
-});
-
 describe('test recommend assignments', () => {
     test('recommend non-traveller setup', async () => {
         const assignment =

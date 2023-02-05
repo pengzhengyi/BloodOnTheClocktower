@@ -1,3 +1,4 @@
+import { Singleton } from '../common';
 import { Edition, EditionName } from '../edition';
 import { createRecordProxy } from '../proxy/proxy';
 import type { NumberOfCharacters } from '../script-tool';
@@ -20,26 +21,24 @@ export interface IGameConfiguration {
 /**
  * TODO This is an initial implementation for game configuration. Should substitute with more mature configuration like JSON file based.
  */
-export const DefaultStaticGameConfiguration: IGameConfiguration = class DefaultStaticGameConfiguration {
-    static readonly maximumNumberOfPlayers: number = 20;
+class BaseDefaultStaticGameConfiguration implements IGameConfiguration {
+    readonly maximumNumberOfPlayers: number = 20;
 
-    static readonly supportedEditions: Array<string> = [
-        EditionName.TroubleBrewing,
-    ];
+    readonly supportedEditions: Array<string> = [EditionName.TroubleBrewing];
 
-    static readonly minimumNumberOfPlayers: Record<EditionName, number> =
+    readonly minimumNumberOfPlayers: Record<EditionName, number> =
         createRecordProxy<number>((editionName) =>
             Edition.areSameNames(editionName, EditionName.TroubleBrewing)
                 ? 5
                 : 7
         );
 
-    static readonly maximumNumberOfPlayersBeforeNecessaryTraveller: Record<
+    readonly maximumNumberOfPlayersBeforeNecessaryTraveller: Record<
         EditionName,
         number
     > = createRecordProxy<number>((_editionName) => 15);
 
-    static readonly recommendedCharacterTypeCompositions: Map<
+    readonly recommendedCharacterTypeCompositions: Map<
         number,
         NumberOfCharacters
     > = new Map([
@@ -154,4 +153,9 @@ export const DefaultStaticGameConfiguration: IGameConfiguration = class DefaultS
             },
         ],
     ]);
-};
+}
+
+export const DefaultStaticGameConfiguration =
+    Singleton<BaseDefaultStaticGameConfiguration>(
+        BaseDefaultStaticGameConfiguration
+    );

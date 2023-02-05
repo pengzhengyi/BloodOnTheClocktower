@@ -39,18 +39,20 @@ export interface IGameEnvironment extends IEnvironment {
 export interface IGameEnvironmentProvider
     extends IEnvironmentProvider<IGameEnvironment> {}
 
-const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
-    static editionLoader: IEditionLoader = EditionLoader;
+class BaseGameEnvironment implements IGameEnvironment {
+    editionLoader: IEditionLoader = EditionLoader;
 
-    static get infoProviderLoader(): IInfoProviderLoader {
+    get infoProviderLoader(): IInfoProviderLoader {
         return InfoProviderLoader.getInstance();
     }
 
-    static configuration: IGameConfiguration = DefaultStaticGameConfiguration;
+    get configuration(): IGameConfiguration {
+        return DefaultStaticGameConfiguration.getInstance();
+    }
 
-    protected static supportedEditions?: Array<typeof Edition>;
+    protected supportedEditions?: Array<typeof Edition>;
 
-    static async getSupportedEditions(): Promise<Array<typeof Edition>> {
+    async getSupportedEditions(): Promise<Array<typeof Edition>> {
         if (this.supportedEditions === undefined) {
             const supportedEditionNames: Array<string> =
                 this.configuration.supportedEditions;
@@ -67,7 +69,7 @@ const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
         return this.supportedEditions;
     }
 
-    static async recommendCharacterTypeComposition(
+    async recommendCharacterTypeComposition(
         numPlayers: number,
         editionName: EditionName
     ): Promise<NumberOfCharacters> {
@@ -88,7 +90,7 @@ const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
         return assignment;
     }
 
-    static async recommendCharacterTypeCompositionWithTravellerUpperbound(
+    async recommendCharacterTypeCompositionWithTravellerUpperbound(
         numPlayers: number,
         editionName: EditionName,
         maximumAcceptableNumTravellers = 0
@@ -121,7 +123,7 @@ const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
         return assignments;
     }
 
-    protected static validateNumberOfPlayers(
+    protected validateNumberOfPlayers(
         numPlayers: number,
         editionName: EditionName
     ): void {
@@ -142,7 +144,7 @@ const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
         }
     }
 
-    protected static async manuallyDetermineCharacterTypeComposition(
+    protected async manuallyDetermineCharacterTypeComposition(
         numPlayers: number,
         editionName: EditionName,
         error: RecoverableGameError
@@ -156,7 +158,7 @@ const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
         return assignment!;
     }
 
-    protected static tryRecommendCharacterTypeComposition(
+    protected tryRecommendCharacterTypeComposition(
         numPlayers: number,
         editionName: EditionName
     ): Promise<NumberOfCharacters> {
@@ -177,16 +179,15 @@ const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
         assignment.traveller = numTraveller;
         return Promise.resolve(assignment);
     }
+}
+
+const GameEnvironment = Singleton<BaseGameEnvironment>(BaseGameEnvironment);
+
+// since singleton once exposes getInstance, we need to wrap in a utility class so that it has a current property meeting requirement
+const GameEnvironmentProvider: IGameEnvironmentProvider = class GameEnvironmentProvider {
+    static get current(): IGameEnvironment {
+        return GameEnvironment.getInstance();
+    }
 };
 
-class BaseGameEnvironmentProvider implements IGameEnvironmentProvider {
-    get current(): IGameEnvironment {
-        return BaseGameEnvironment;
-    }
-}
-const GameEnvironmentProvider = Singleton<BaseGameEnvironmentProvider>(
-    BaseGameEnvironmentProvider
-);
-
-export const GameEnvironment: IGameEnvironmentProvider =
-    GameEnvironmentProvider.getInstance();
+export { GameEnvironmentProvider as GameEnvironment };

@@ -64,7 +64,7 @@ const InfoProviderClasses: Array<
 ];
 
 class BaseInfoProviderLoader implements IInfoProviderLoader {
-    protected static providers: Map<
+    protected providers: Map<
         InfoType,
         IInfoProvider<InfoProvideContext, unknown>
     > = new Map(
@@ -118,7 +118,7 @@ class BaseInfoProviderLoader implements IInfoProviderLoader {
     protected loadProvider(
         infoType: InfoType
     ): IInfoProvider<InfoProvideContext, unknown> | undefined {
-        return BaseInfoProviderLoader.providers.get(infoType);
+        return this.providers.get(infoType);
     }
 
     protected getLoadMethod<TInformation>(
