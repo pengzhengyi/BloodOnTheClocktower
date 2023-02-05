@@ -4,7 +4,7 @@ import { type IPlayer } from './player';
 import type { IPlayers } from './players';
 import { type Edition } from './edition';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
-import { type StoryTeller } from './storyteller';
+import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
 import type { ISetupContext, ISetupSheet } from './setup-sheet';
@@ -14,7 +14,7 @@ export interface IGame extends IEffectTarget<IGame> {
     // fundamental properties of IGame
     readonly setupSheet: ISetupSheet;
     readonly townSquare: ITownSquare;
-    readonly storyTeller: StoryTeller;
+    readonly storyTeller: IStoryTeller;
     readonly players: IPlayers;
     readonly edition: Edition;
 
@@ -53,7 +53,7 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     declare edition: Edition;
 
-    declare storyTeller: StoryTeller;
+    declare storyTeller: IStoryTeller;
 
     get players(): IPlayers {
         return this._players.clone();

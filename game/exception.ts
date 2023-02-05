@@ -24,7 +24,7 @@ import type { IPlayer } from './player';
 import type { IPlayers } from './players';
 import type { ISeat } from './seating/seat';
 import type { CharacterToken } from './character/character';
-import type { StoryTeller } from './storyteller';
+import type { IStoryTeller } from './storyteller';
 import type {
     NumberOfCharacters,
     ScriptConstraints,
@@ -526,7 +526,7 @@ export class NoMatchingCharacterType extends RecoverableGameError {
 export class BlankGrimoire extends RecoverableGameError {
     static description = "Storyteller's grimoire is not initialized";
 
-    constructor(readonly storyteller: StoryTeller) {
+    constructor(readonly storyteller: IStoryTeller) {
         super(BlankGrimoire.description);
     }
 }

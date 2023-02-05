@@ -15,7 +15,7 @@ import {
 import { Generator, type LazyMap } from '~/game/collections';
 import type { IGrimoire } from '~/game/grimoire';
 import type { SpyPlayer } from '~/game/types';
-import type { StoryTeller } from '~/game/storyteller';
+import type { IStoryTeller } from '~/game/storyteller';
 
 export interface SpyInformation {
     grimoire: IGrimoire;
@@ -83,7 +83,7 @@ export class SpyInformationProvider<
     }
 
     protected async getGrimoire(
-        storyteller: StoryTeller,
+        storyteller: IStoryTeller,
         spyPlayer: SpyPlayer
     ) {
         return await storyteller.getGrimoire(spyPlayer);

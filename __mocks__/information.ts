@@ -10,7 +10,7 @@ import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
 import type { IPlayers } from '~/game/players';
 import type { ISeating } from '~/game/seating/seating';
-import type { StoryTeller } from '~/game/storyteller';
+import type { IStoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Librarian } from '~/content/characters/output/librarian';
@@ -57,7 +57,7 @@ export function mockInfoProvideContext(): InfoProvideContext {
         requestedPlayer: mock<IPlayer>(),
         players: mock<IPlayers>(),
         seating: mock<ISeating>(),
-        storyteller: mock<StoryTeller>(),
+        storyteller: mock<IStoryTeller>(),
     };
 }
 

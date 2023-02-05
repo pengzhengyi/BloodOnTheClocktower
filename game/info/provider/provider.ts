@@ -9,7 +9,7 @@ import { LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
 import type { IPlayers } from '~/game/players';
 import type { ISeating } from '~/game/seating/seating';
-import type { StoryTeller } from '~/game/storyteller';
+import type { IStoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
 
 export interface InfoProvideContext {
@@ -18,7 +18,7 @@ export interface InfoProvideContext {
     travellerSheet: TravellerSheet;
     requestedPlayer: IPlayer;
     players: IPlayers;
-    storyteller: StoryTeller;
+    storyteller: IStoryTeller;
     seating: ISeating;
     reason?: string;
 }

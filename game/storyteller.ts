@@ -1,4 +1,4 @@
-import { BlankGrimoire, NoDefinedInfoProvider } from './exception';
+import { NoDefinedInfoProvider } from './exception';
 import { type IGrimoire, Grimoire } from './grimoire';
 import type { Info } from './info/info';
 import type {
@@ -11,11 +11,31 @@ import type { IPlayers } from './players';
 import { type AsyncTask } from './types';
 import { InteractionEnvironment } from '~/interaction/environment';
 
+export interface IStoryTeller {
+    /**
+     * Request a grimoire from the storyteller.
+     *
+     * @param requestedPlayer The player to request grimoire. If unspecified, consider it as the storyteller who is requesting grimoire.
+     * @returns The grimoire, might (not) be the actual grimoire depending on requester.
+     */
+    getGrimoire(requestedPlayer?: IPlayer): Promise<IGrimoire>;
+
+    /**
+     * Request information from storyteller.
+     *
+     * @param context The context for this information request.
+     * @returns The requested information.
+     */
+    giveInfo<TInformation, InfoType extends Info<TInformation>>(
+        context: InfoRequestContext<TInformation>
+    ): Promise<InfoType>;
+}
+
 /**
  * {@link `glossary["Storyteller"]`}
  * The person who runs the game. The Storyteller keeps the Grimoire, follows the rules of the game, and makes the final decision on what happens when a situation needs adjudication.
  */
-export class StoryTeller {
+export class StoryTeller implements IStoryTeller {
     static DEFAULT_WAKE_REASON =
         'Player is awaken to act or receive information';
 
@@ -23,13 +43,13 @@ export class StoryTeller {
 
     protected infoProviderLoader: InfoProviderLoader = new InfoProviderLoader();
 
-    async getGrimoire(_requestedPlayer?: IPlayer): Promise<IGrimoire> {
-        await new BlankGrimoire(this).throwWhen(
-            (error) => error.storyteller.grimoire === undefined
-        );
+    getGrimoire(_requestedPlayer?: IPlayer): Promise<IGrimoire> {
+        // await new BlankGrimoire(this).throwWhen(
+        //     (error) => error.storyteller.grimoire === undefined
+        // );
 
-        // TODO
-        return this.grimoire!;
+        // TODO mdoify this to get grimoire based on player
+        return Promise.resolve(this.grimoire!);
     }
 
     async interact(
