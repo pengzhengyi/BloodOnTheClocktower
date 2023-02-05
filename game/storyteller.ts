@@ -1,13 +1,13 @@
 import { NoDefinedInfoProvider } from './exception';
 import { type IGrimoire } from './grimoire';
-import type { Info } from './info/info';
+import type { Info, InfoOptions } from './info/info';
 import type {
     InfoRequestContext,
     InformationRequestContext,
 } from './info/requester/requester';
-import { InfoProviderLoader } from './info/provider/loader';
 import type { IPlayer } from './player';
 import { type AsyncTask } from './types';
+import { GameEnvironment } from './environment';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface IStoryTeller {
@@ -39,8 +39,6 @@ export class StoryTeller implements IStoryTeller {
         'Player is awaken to act or receive information';
 
     protected grimoire?: IGrimoire;
-
-    protected infoProviderLoader: InfoProviderLoader = new InfoProviderLoader();
 
     getGrimoire(_requestedPlayer?: IPlayer): Promise<IGrimoire> {
         // await new BlankGrimoire(this).throwWhen(
@@ -79,31 +77,61 @@ export class StoryTeller implements IStoryTeller {
         await this.interact(player, action, reason);
     }
 
-    async giveInfo<TInformation, InfoType extends Info<TInformation>>(
+    async giveInfo<TInformation, TInfoType extends Info<TInformation>>(
         context: InfoRequestContext<TInformation>
-    ): Promise<InfoType> {
-        const provideInfo = this.infoProviderLoader.loadMethod(
-            context.requester,
-            context.isStoryTellerInformation,
-            (context as InformationRequestContext<TInformation>)
-                .willGetTrueInformation
+    ): Promise<TInfoType> {
+        return await NoDefinedInfoProvider.catch<
+            NoDefinedInfoProvider,
+            TInfoType
+        >(
+            () => this.tryGiveInfo(context),
+            (error) => this.giveInfoManually(context, error)
         );
+    }
 
-        if (provideInfo === undefined) {
-            const error = new NoDefinedInfoProvider<InfoType, TInformation>(
-                context,
-                this.infoProviderLoader
+    protected async tryGiveInfo<
+        TInformation,
+        TInfoType extends Info<TInformation>
+    >(context: InfoRequestContext<TInformation>): Promise<TInfoType> {
+        const provideInfo =
+            GameEnvironment.current.infoProviderLoader.loadMethod<TInformation>(
+                context.requester.infoType,
+                context.isStoryTellerInformation,
+                (context as InformationRequestContext<TInformation>)
+                    .willGetTrueInformation
             );
-            await error.throwWhen((error) => error.correctedInfo === undefined);
-            return error.correctedInfo!;
-        } else {
-            const infoOptions = await provideInfo(context);
-            const info =
-                (await InteractionEnvironment.current.gameUI.storytellerChooseOne(
-                    infoOptions,
-                    context.reason
-                )) as InfoType;
-            return info;
-        }
+        const infoOptions = await provideInfo(context);
+        return this.chooseInfoToGive(infoOptions);
+    }
+
+    protected async giveInfoManually<
+        TInformation,
+        TInfoType extends Info<TInformation>
+    >(
+        _context: InfoRequestContext<TInformation>,
+        error: NoDefinedInfoProvider
+    ): Promise<TInfoType> {
+        // TODO properly get info from storyteller
+        const info =
+            await InteractionEnvironment.current.gameUI.storytellerDecide<TInfoType>(
+                error.toString(),
+                false
+            );
+        return info!;
+    }
+
+    protected async chooseInfoToGive<
+        TInformation,
+        TInfoType extends Info<TInformation>
+    >(
+        infoOptions: InfoOptions<TInformation>,
+        reason?: string
+    ): Promise<TInfoType> {
+        const info =
+            (await InteractionEnvironment.current.gameUI.storytellerChooseOne(
+                infoOptions,
+                reason
+            )) as TInfoType;
+        return info;
     }
 }

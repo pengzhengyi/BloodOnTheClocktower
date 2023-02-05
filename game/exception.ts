@@ -50,10 +50,10 @@ import type {
     IAbility,
     GetInfoAbilityUseContext,
 } from './ability/ability';
-import type { InfoRequestContext } from './info/requester/requester';
-import type { InfoProviderLoader } from './info/provider/loader';
+import type { IInfoProviderLoader } from './info/provider/loader';
 import type { IDiary, Event as ClocktowerEvent } from './diary';
 import type { TCharacterEffect } from './effect/character';
+import type { InfoType } from './info/info-type';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export class BaseError extends Error {
@@ -882,18 +882,13 @@ export class EventNotExistInDate extends RecoverableGameError {
     }
 }
 
-export class NoDefinedInfoProvider<
-    InfoType,
-    TInformation
-> extends RecoverableGameError {
+export class NoDefinedInfoProvider extends RecoverableGameError {
     static description =
         'Cannot process an information request because there is no associated info provider';
 
-    correctedInfo?: InfoType;
-
     constructor(
-        readonly context: InfoRequestContext<TInformation>,
-        readonly infoProviderLoader: InfoProviderLoader
+        readonly infoType: InfoType,
+        readonly infoProviderLoader: IInfoProviderLoader
     ) {
         super(NoDefinedInfoProvider.description);
     }

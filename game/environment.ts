@@ -4,10 +4,13 @@ import type { IGameConfiguration } from './configuration/configuration';
 import { DefaultStaticGameConfiguration } from './configuration/configuration';
 import type { Edition } from './edition';
 import { EditionLoader, type IEditionLoader } from './edition-loader';
+import type { IInfoProviderLoader } from './info/provider/loader';
+import { InfoProviderLoader } from './info/provider/loader';
 import type { IEnvironment, IEnvironmentProvider } from './types';
 
 export interface IGameEnvironment extends IEnvironment {
     editionLoader: IEditionLoader;
+    infoProviderLoader: IInfoProviderLoader;
     configuration: IGameConfiguration;
 
     // utility methods
@@ -19,6 +22,11 @@ export interface IGameEnvironmentProvider
 
 const BaseGameEnvironment: IGameEnvironment = class BaseGameEnvironment {
     static editionLoader: IEditionLoader = EditionLoader;
+
+    static get infoProviderLoader(): IInfoProviderLoader {
+        return InfoProviderLoader.getInstance();
+    }
+
     static configuration: IGameConfiguration = DefaultStaticGameConfiguration;
 
     protected static supportedEditions?: Array<typeof Edition>;

@@ -1,21 +1,7 @@
 /* eslint-disable no-dupe-class-members */
 import type { InfoOptions } from '../info';
-import type {
-    IInfoRequester,
-    InfoRequestContext,
-} from '../requester/requester';
-import { ChefInformationRequester } from '../requester/chef';
-import { DemonInformationRequester } from '../requester/demon';
-import { EmpathInformationRequester } from '../requester/empath';
-import { FortuneTellerInformationRequester } from '../requester/fortuneteller';
-import { InvestigatorInformationRequester } from '../requester/investigator';
-import { LibrarianInformationRequester } from '../requester/librarian';
-import { MinionInformationRequester } from '../requester/minion';
-import { RavenkeeperInformationRequester } from '../requester/ravenkeeper';
-import { SpyInformationRequester } from '../requester/spy';
-import { TravellerInformationRequester } from '../requester/traveller';
-import { UndertakerInformationRequester } from '../requester/undertaker';
-import { WasherwomanInformationRequester } from '../requester/washerwoman';
+import type { InfoRequestContext } from '../requester/requester';
+import type { InfoType } from '../info-type';
 import { ChefInformationProvider } from './chef';
 import { DemonInformationProvider } from './demon';
 import { EmpathInformationProvider } from './empath';
@@ -29,70 +15,121 @@ import { TravellerInformationProvider } from './traveller';
 import { UndertakerInformationProvider } from './undertaker';
 import { WasherwomanInformationProvider } from './washerwoman';
 import type {
-    InfoProvider,
     InfoProvideContext,
     IStoryTellerInformationProvider,
     IInformationProvider,
+    IInfoProvider,
 } from './provider';
-import type { Constructor } from '~/game/types';
-import { LazyMap } from '~/game/collections';
-
-type InfoProviderConstructor<TInformation> = Constructor<
-    InfoProvider<TInformation>
->;
+import type { NoParamConstructor } from '~/game/types';
+import { Generator } from '~/game/collections';
+import { NoDefinedInfoProvider } from '~/game/exception';
+import { Singleton } from '~/game/common';
 
 type InfoProviderMethod<
     TInformation,
     TInfoProvideContext extends InfoProvideContext
 > = (context: TInfoProvideContext) => Promise<InfoOptions<TInformation>>;
 
-export interface IInfoProviderLoader<TInformation = any> {
-    loadMethod(
-        requester: IInfoRequester<
-            TInformation,
-            InfoRequestContext<TInformation>
-        >,
+export interface IInfoProviderLoader {
+    tryLoadMethod<TInformation>(
+        infoTye: InfoType,
         isStoryTellerInformation: boolean,
         willGetTrueInformation?: boolean
     ):
         | InfoProviderMethod<TInformation, InfoRequestContext<TInformation>>
         | undefined;
 
-    loadProvider(
-        requester: IInfoRequester<
-            TInformation,
-            InfoRequestContext<TInformation>
-        >
-    ): InfoProvider<TInformation> | undefined;
+    loadMethod<TInformation>(
+        infoType: InfoType,
+        isStoryTellerInformation: boolean,
+        willGetTrueInformation: boolean | undefined
+    ): InfoProviderMethod<TInformation, InfoRequestContext<TInformation>>;
 }
 
-export class InfoProviderLoader<TInformation = any>
-    implements IInfoProviderLoader<TInformation>
-{
-    protected providers: LazyMap<
-        InfoProviderConstructor<TInformation>,
-        InfoProvider<TInformation>
-    > = new LazyMap((InfoProviderClass) => new InfoProviderClass());
+const InfoProviderClasses: Array<
+    NoParamConstructor<IInfoProvider<InfoProvideContext, any>>
+> = [
+    WasherwomanInformationProvider,
+    LibrarianInformationProvider,
+    InvestigatorInformationProvider,
+    ChefInformationProvider,
+    EmpathInformationProvider,
+    FortuneTellerInformationProvider,
+    UndertakerInformationProvider,
+    RavenkeeperInformationProvider,
+    SpyInformationProvider,
+    DemonInformationProvider,
+    MinionInformationProvider,
+    TravellerInformationProvider,
+];
 
-    loadMethod(
-        requester: IInfoRequester<
-            TInformation,
-            InfoRequestContext<TInformation>
-        >,
+class BaseInfoProviderLoader implements IInfoProviderLoader {
+    protected static providers: Map<
+        InfoType,
+        IInfoProvider<InfoProvideContext, unknown>
+    > = new Map(
+        Generator.map(
+            (infoProvider) => [infoProvider.infoType, infoProvider],
+            Generator.map(
+                (InfoProviderClass) => new InfoProviderClass(),
+                InfoProviderClasses
+            )
+        )
+    );
+
+    tryLoadMethod<TInformation>(
+        infoType: InfoType,
         isStoryTellerInformation: boolean,
         willGetTrueInformation?: boolean
     ):
         | InfoProviderMethod<TInformation, InfoRequestContext<TInformation>>
         | undefined {
-        const infoProvider = this.loadProvider(requester);
+        const infoProvider = this.loadProvider(infoType);
 
         if (infoProvider === undefined) {
             return undefined;
         }
 
-        let method:
-            | InfoProviderMethod<TInformation, InfoRequestContext<TInformation>>
-            | undefined;
+        return this.getLoadMethod(
+            infoProvider,
+            isStoryTellerInformation,
+            willGetTrueInformation
+        );
+    }
+
+    loadMethod<TInformation>(
+        infoType: InfoType,
+        isStoryTellerInformation: boolean,
+        willGetTrueInformation?: boolean
+    ): InfoProviderMethod<TInformation, InfoRequestContext<TInformation>> {
+        const provideInfo = this.tryLoadMethod<TInformation>(
+            infoType,
+            isStoryTellerInformation,
+            willGetTrueInformation
+        );
+
+        if (provideInfo === undefined) {
+            throw new NoDefinedInfoProvider(infoType, this);
+        } else {
+            return provideInfo;
+        }
+    }
+
+    protected loadProvider(
+        infoType: InfoType
+    ): IInfoProvider<InfoProvideContext, unknown> | undefined {
+        return BaseInfoProviderLoader.providers.get(infoType);
+    }
+
+    protected getLoadMethod<TInformation>(
+        infoProvider: IInfoProvider<InfoProvideContext, unknown>,
+        isStoryTellerInformation: boolean,
+        willGetTrueInformation?: boolean
+    ): InfoProviderMethod<TInformation, InfoRequestContext<TInformation>> {
+        let method: InfoProviderMethod<
+            TInformation,
+            InfoRequestContext<TInformation>
+        >;
         if (isStoryTellerInformation) {
             method = (
                 infoProvider as IStoryTellerInformationProvider<
@@ -110,39 +147,10 @@ export class InfoProviderLoader<TInformation = any>
                 : informationProvider.getFalseInformationOptions;
         }
 
-        return method?.bind(infoProvider);
-    }
-
-    loadProvider(
-        requester: IInfoRequester<
-            TInformation,
-            InfoRequestContext<TInformation>
-        >
-    ): InfoProvider<TInformation> | undefined {
-        if (requester instanceof WasherwomanInformationRequester) {
-            return this.providers.get(WasherwomanInformationProvider);
-        } else if (requester instanceof LibrarianInformationRequester) {
-            return this.providers.get(LibrarianInformationProvider);
-        } else if (requester instanceof InvestigatorInformationRequester) {
-            return this.providers.get(InvestigatorInformationProvider);
-        } else if (requester instanceof ChefInformationRequester) {
-            return this.providers.get(ChefInformationProvider);
-        } else if (requester instanceof EmpathInformationRequester) {
-            return this.providers.get(EmpathInformationProvider);
-        } else if (requester instanceof FortuneTellerInformationRequester) {
-            return this.providers.get(FortuneTellerInformationProvider);
-        } else if (requester instanceof UndertakerInformationRequester) {
-            return this.providers.get(UndertakerInformationProvider);
-        } else if (requester instanceof RavenkeeperInformationRequester) {
-            return this.providers.get(RavenkeeperInformationProvider);
-        } else if (requester instanceof SpyInformationRequester) {
-            return this.providers.get(SpyInformationProvider);
-        } else if (requester instanceof DemonInformationRequester) {
-            return this.providers.get(DemonInformationProvider);
-        } else if (requester instanceof MinionInformationRequester) {
-            return this.providers.get(MinionInformationProvider);
-        } else if (requester instanceof TravellerInformationRequester) {
-            return this.providers.get(TravellerInformationProvider);
-        }
+        return method!.bind(infoProvider);
     }
 }
+
+export const InfoProviderLoader = Singleton<BaseInfoProviderLoader>(
+    BaseInfoProviderLoader
+);
