@@ -7,7 +7,7 @@ export interface IEditionLoader {
     loadAsync(editionName: string): Promise<typeof Edition>;
 }
 
-export abstract class EditionLoader {
+export const EditionLoader: IEditionLoader = class EditionLoader {
     static tryLoad(editionName: string): typeof Edition | undefined {
         return NAME_TO_EDITION.get(Edition.getCanonicalName(editionName));
     }
@@ -20,4 +20,4 @@ export abstract class EditionLoader {
 
         return this.tryLoad(error.correctedEditionName)!;
     }
-}
+};

@@ -1,4 +1,5 @@
 import type { MinionInformation } from '../provider/minion';
+import { InfoType } from '../info-type';
 import {
     CharacterTypeInformationRequester,
     IsAlive,
@@ -14,6 +15,7 @@ class BaseMinionInformationRequester<
     MinionInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.MinionInformation;
     readonly expectedCharacterType = Minion;
 }
 

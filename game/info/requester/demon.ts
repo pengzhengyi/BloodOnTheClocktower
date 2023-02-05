@@ -1,4 +1,5 @@
 import type { DemonInformation } from '../provider/demon';
+import { InfoType } from '../info-type';
 import {
     CharacterTypeInformationRequester,
     IsAlive,
@@ -14,6 +15,7 @@ class BaseDemonInformationRequester<
     DemonInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.DemonInformation;
     readonly expectedCharacterType = Demon;
 }
 

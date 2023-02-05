@@ -4,6 +4,7 @@ import {
     type FalseInformationOptions,
     type FalseInformation,
 } from '../information';
+import { InfoType } from '../info-type';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
@@ -22,6 +23,8 @@ export class EmpathInformationProvider<
 > extends InformationProvider<TInfoProvideContext, EmpathInformation> {
     protected static readonly cachedKeyForNumEvilAliveNeighbors =
         'actualNumEvilAliveNeighbors';
+
+    readonly infoType = InfoType.EmpathInformation;
 
     async getTrueInformationOptions(
         context: TInfoProvideContext

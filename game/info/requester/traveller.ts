@@ -1,4 +1,5 @@
 import type { TravellerInformation } from '../provider/traveller';
+import { InfoType } from '../info-type';
 import {
     CharacterTypeInformationRequester,
     AtFirstNight,
@@ -14,6 +15,7 @@ class BaseTravellerInformationRequester<
     TravellerInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.TravellerInformation;
     readonly expectedCharacterType = Traveller;
 }
 

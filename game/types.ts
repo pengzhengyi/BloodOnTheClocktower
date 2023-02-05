@@ -9,6 +9,7 @@ import type {
 } from './character/character-type';
 import type { CharacterToken } from './character/character';
 import type { Phase } from './phase';
+import type { InfoType } from './info/info-type';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';
 import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
@@ -246,6 +247,10 @@ export interface RequireReason {
 
 export interface RequireExecution {
     execution: Execution;
+}
+
+export interface RequireInfoType {
+    readonly infoType: InfoType;
 }
 
 export type MinionPlayer = IPlayer & {

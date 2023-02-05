@@ -1,4 +1,5 @@
 import type { EmpathInformation } from '../provider/empath';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, EachNight } from './common';
 import { type InformationRequestContext } from './requester';
 import { Empath } from '~/content/characters/output/empath';
@@ -9,6 +10,7 @@ class BaseEmpathInformationRequester<
     EmpathInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.EmpathInformation;
     readonly expectedCharacter = Empath;
 }
 

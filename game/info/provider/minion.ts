@@ -3,6 +3,7 @@ import {
     Information,
     type FalseInformationOptions,
 } from '../information';
+import { InfoType } from '../info-type';
 import { DemonMinionInformationProvider } from './common';
 import { type InfoProvideContext } from './provider';
 import { Generator } from '~/game/collections';
@@ -23,6 +24,8 @@ export class MinionInformationProvider<
     TInfoProvideContext,
     MinionInformation
 > {
+    readonly infoType = InfoType.MinionInformation;
+
     async getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<MinionInformation>> {

@@ -46,13 +46,35 @@ type InfoProviderMethod<
     TInfoProvideContext extends InfoProvideContext
 > = (context: TInfoProvideContext) => Promise<InfoOptions<TInformation>>;
 
-export class InfoProviderLoader<TInformation = any> {
+export interface IInfoProviderLoader<TInformation = any> {
+    loadMethod(
+        requester: IInfoRequester<
+            TInformation,
+            InfoRequestContext<TInformation>
+        >,
+        isStoryTellerInformation: boolean,
+        willGetTrueInformation?: boolean
+    ):
+        | InfoProviderMethod<TInformation, InfoRequestContext<TInformation>>
+        | undefined;
+
+    loadProvider(
+        requester: IInfoRequester<
+            TInformation,
+            InfoRequestContext<TInformation>
+        >
+    ): InfoProvider<TInformation> | undefined;
+}
+
+export class InfoProviderLoader<TInformation = any>
+    implements IInfoProviderLoader<TInformation>
+{
     protected providers: LazyMap<
         InfoProviderConstructor<TInformation>,
         InfoProvider<TInformation>
     > = new LazyMap((InfoProviderClass) => new InfoProviderClass());
 
-    loadProvide(
+    loadMethod(
         requester: IInfoRequester<
             TInformation,
             InfoRequestContext<TInformation>

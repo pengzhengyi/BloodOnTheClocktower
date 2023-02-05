@@ -7,6 +7,7 @@ import {
     Information,
     type TrueInformationOptions,
 } from '../information';
+import { InfoType } from '../info-type';
 import {
     type InfoProvideContext,
     InformationProvider,
@@ -28,6 +29,8 @@ export class SpyInformationProvider<
     implements
         IStoryTellerInformationProvider<TInfoProvideContext, SpyInformation>
 {
+    readonly infoType = InfoType.SpyInformation;
+
     async getStoryTellerInformationOptions(
         context: TInfoProvideContext
     ): Promise<StoryTellerInformationOptions<SpyInformation>> {

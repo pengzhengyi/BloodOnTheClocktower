@@ -3,6 +3,7 @@ import type {
     RavenkeeperInformationProviderContext,
     RavenkeeperInformation,
 } from '../provider/ravenkeeper';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, OnceAtNight } from './common';
 import { type InformationRequestContext } from './requester';
 import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
@@ -17,6 +18,7 @@ class BaseRavenkeeperInformationRequester<
     RavenkeeperInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.RavenkeeperInformation;
     readonly expectedCharacter = Ravenkeeper;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {

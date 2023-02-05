@@ -3,6 +3,7 @@ import {
     Information,
     type TrueInformationOptions,
 } from '../information';
+import { InfoType } from '../info-type';
 import { DemonMinionInformationProvider } from './common';
 import { type InfoProvideContext } from './provider';
 import type { CharacterToken } from '~/game/character/character';
@@ -26,6 +27,8 @@ export class DemonInformationProvider<
 > {
     protected static readonly cachedKeyForGoodCharactersNotInPlay =
         'actualGoodCharactersNotInPlay';
+
+    readonly infoType = InfoType.DemonInformation;
 
     async getTrueInformationOptions(
         context: TInfoProvideContext

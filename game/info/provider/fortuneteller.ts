@@ -4,6 +4,7 @@ import {
     type FalseInformationOptions,
     type FalseInformation,
 } from '../information';
+import { InfoType } from '../info-type';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
@@ -26,6 +27,8 @@ export class FortuneTellerInformationProvider<
     TInfoProvideContext extends FortuneTellerInformationProviderContext
 > extends InformationProvider<TInfoProvideContext, FortuneTellerInformation> {
     protected static readonly cachedKeyForHasDemon = 'actualHasDemon';
+
+    readonly infoType = InfoType.FortuneTellerInformation;
 
     async getTrueInformationOptions(
         context: FortuneTellerInformationProviderContext

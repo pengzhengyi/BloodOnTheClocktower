@@ -1,7 +1,9 @@
 import type { Info } from '../info';
+import type { InfoType } from '../info-type';
 import type { Information } from '../information';
 import type { InfoProvideContext } from '../provider/provider';
 import type { StoryTellerInformation } from '../storyteller-information';
+import type { RequireInfoType } from '~/game/types';
 
 export interface InfoRequestContext<TInformation> extends InfoProvideContext {
     // eslint-disable-next-line no-use-before-define
@@ -18,7 +20,7 @@ export interface InformationRequestContext<TInformation>
 export interface IInfoRequester<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>
-> {
+> extends RequireInfoType {
     isEligible(context: InfoProvideContext): Promise<boolean>;
 
     request(context: TInfoRequestContext): Promise<Info<TInformation>>;
@@ -26,13 +28,15 @@ export interface IInfoRequester<
     createContext(...args: any[]): Promise<TInfoRequestContext>;
 }
 
-export class InfoRequester<
+export abstract class InfoRequester<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>
 > implements IInfoRequester<TInformation, TInfoRequestContext>
 {
+    abstract readonly infoType: InfoType;
+
     request(context: TInfoRequestContext): Promise<Info<TInformation>> {
-        return this._request(context);
+        return this.getInfo(context);
     }
 
     isEligible(_context: InfoProvideContext): Promise<boolean> {
@@ -43,7 +47,9 @@ export class InfoRequester<
         throw new Error('Method not implemented.');
     }
 
-    _request(context: TInfoRequestContext): Promise<Info<TInformation>> {
+    protected getInfo(
+        context: TInfoRequestContext
+    ): Promise<Info<TInformation>> {
         return context.storyteller.giveInfo(context);
     }
 }
@@ -59,7 +65,7 @@ export interface IInformationRequester<
     ): Promise<Information<TInformation>>;
 }
 
-export class InformationRequester<
+export abstract class InformationRequester<
         TInformation,
         TInformationRequestContext extends InformationRequestContext<TInformation>
     >
@@ -70,20 +76,10 @@ export class InformationRequester<
         return context.requestedPlayer.willGetTrueInformation;
     }
 
-    createContext(..._args: any[]): Promise<TInformationRequestContext> {
-        throw new Error('Method not implemented.');
-    }
-
     request(
         context: TInformationRequestContext
     ): Promise<Information<TInformation>> {
-        return this._request(context);
-    }
-
-    _request(
-        context: TInformationRequestContext
-    ): Promise<Information<TInformation>> {
-        return context.storyteller.giveInfo(context);
+        return super.request(context) as Promise<Information<TInformation>>;
     }
 }
 

@@ -4,6 +4,7 @@ import {
     type FalseInformationOptions,
     type FalseInformation,
 } from '../information';
+import { InfoType } from '../info-type';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
@@ -26,6 +27,8 @@ export interface RavenkeeperInformationProviderContext
 export class RavenkeeperInformationProvider<
     TInfoProvideContext extends RavenkeeperInformationProviderContext
 > extends InformationProvider<TInfoProvideContext, RavenkeeperInformation> {
+    readonly infoType = InfoType.RavenkeeperInformation;
+
     async getTrueInformationOptions(
         context: RavenkeeperInformationProviderContext
     ): Promise<TrueInformationOptions<RavenkeeperInformation>> {

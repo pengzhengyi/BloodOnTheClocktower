@@ -2,6 +2,7 @@ import type {
     FortuneTellerInformationProviderContext,
     FortuneTellerInformation,
 } from '../provider/fortuneteller';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, EachNight } from './common';
 import { type InformationRequestContext } from './requester';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
@@ -16,6 +17,7 @@ class BaseFortuneTellerInformationRequester<
     FortuneTellerInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.FortuneTellerInformation;
     readonly expectedCharacter = FortuneTeller;
 }
 

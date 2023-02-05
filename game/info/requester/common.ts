@@ -1,5 +1,6 @@
 import type { Info } from '../info';
 import type { InfoProvideContext } from '../provider/provider';
+import type { IInfoRequester } from './requester';
 import {
     type IInformationRequester,
     type InfoRequestContext,
@@ -7,17 +8,27 @@ import {
     type InformationRequestContext,
     InformationRequester,
 } from './requester';
-import type { Constructor } from '~/game/types';
+import type { Constructor, RequireInfoType } from '~/game/types';
 import type { CharacterType } from '~/game/character/character-type';
 import type { CharacterToken } from '~/game/character/character';
 
-type InfoRequesterConstructor<TInfoRequester> = Constructor<TInfoRequester>;
+type WithInfoType<T> = RequireInfoType & T;
+
+type InfoRequesterConstructor<
+    TInformation,
+    TInfoRequestContext extends InfoRequestContext<TInformation>,
+    TInfoRequester extends WithInfoType<
+        IInfoRequester<TInformation, TInfoRequestContext>
+    >
+> = Constructor<TInfoRequester>;
 
 export function OncePerGame<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class OncePerGame extends InfoRequesterClass {
@@ -37,7 +48,7 @@ export function OncePerGame<
         async request(
             context: TInfoRequestContext
         ): Promise<Info<TInformation>> {
-            const info = await this._request(context);
+            const info = await this.getInfo(context);
             this._hasRequested = true;
             return info;
         }
@@ -48,7 +59,9 @@ export function AtNight<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class AtNight extends InfoRequesterClass {
@@ -65,7 +78,9 @@ export function OnceAtNight<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return OncePerGame(AtNight(InfoRequesterClass));
@@ -75,7 +90,9 @@ export function AtFirstNight<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return OncePerGame(
@@ -96,7 +113,9 @@ export function EachNonfirstNight<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class EachNonfirstNight extends InfoRequesterClass {
@@ -113,7 +132,9 @@ export function IsAlive<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsAlive extends InfoRequesterClass {
@@ -130,7 +151,9 @@ export function IsEvil<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class IsEvil extends InfoRequesterClass {
@@ -147,7 +170,9 @@ export function hasEnoughPlayerForDemonMinionInformation<
     TInformation,
     TInfoRequestContext extends InfoRequestContext<TInformation>,
     TInfoRequesterConstructor extends InfoRequesterConstructor<
-        InfoRequester<TInformation, TInfoRequestContext>
+        TInformation,
+        TInfoRequestContext,
+        WithInfoType<InfoRequester<TInformation, TInfoRequestContext>>
     >
 >(InfoRequesterClass: TInfoRequesterConstructor) {
     return class HasEnoughPlayerForDemonMinionInformation extends InfoRequesterClass {

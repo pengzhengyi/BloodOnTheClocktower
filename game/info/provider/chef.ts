@@ -3,6 +3,7 @@ import {
     Information,
     type FalseInformationOptions,
 } from '../information';
+import { InfoType } from '../info-type';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
 import { Players } from '~/game/players';
@@ -17,6 +18,8 @@ export class ChefInformationProvider<
 > extends InformationProvider<TInfoProvideContext, ChefInformation> {
     protected static readonly cachedKeyForNumPairEvilPlayers =
         'actualNumPairEvilPlayers';
+
+    readonly infoType = InfoType.ChefInformation;
 
     async getTrueInformationOptions(
         context: TInfoProvideContext

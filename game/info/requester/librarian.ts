@@ -1,4 +1,5 @@
 import type { LibrarianInformation } from '../provider/librarian';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
 import { type InformationRequestContext } from './requester';
 import { Librarian } from '~/content/characters/output/librarian';
@@ -9,6 +10,7 @@ class BaseLibrarianInformationRequester<
     LibrarianInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.LibrarianInformation;
     readonly expectedCharacter = Librarian;
 }
 

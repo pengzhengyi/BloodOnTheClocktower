@@ -1,4 +1,5 @@
 import type { SpyInformation } from '../provider/spy';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, EachNight, IsAlive } from './common';
 import { type InformationRequestContext } from './requester';
 import { Spy } from '~/content/characters/output/spy';
@@ -9,6 +10,7 @@ class BaseSpyInformationRequester<
     SpyInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.SpyInformation;
     readonly expectedCharacter = Spy;
 }
 

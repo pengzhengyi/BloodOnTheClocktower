@@ -1,4 +1,5 @@
 import type { ChefInformation } from '../provider/chef';
+import { InfoType } from '../info-type';
 import { AtFirstNight, CharacterInformationRequester, IsAlive } from './common';
 import { type InformationRequestContext } from './requester';
 import { Chef } from '~/content/characters/output/chef';
@@ -9,6 +10,7 @@ class BaseChefInformationRequester<
     ChefInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.ChefInformation;
     readonly expectedCharacter = Chef;
 }
 

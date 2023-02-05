@@ -3,6 +3,7 @@ import type {
     TrueInformationOptions,
 } from '../information';
 import type { StoryTellerInformationOptions } from '../storyteller-information';
+import type { InfoType } from '../info-type';
 import type { CharacterSheet } from '~/game/character/character-sheet';
 import type { IClocktower } from '~/game/clocktower';
 import { LazyMap } from '~/game/collections';
@@ -11,6 +12,7 @@ import type { IPlayers } from '~/game/players';
 import type { ISeating } from '~/game/seating/seating';
 import type { IStoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
+import type { RequireInfoType } from '~/game/types';
 
 export interface InfoProvideContext {
     clocktower: IClocktower;
@@ -26,7 +28,7 @@ export interface InfoProvideContext {
 export interface IInformationProvider<
     TInfoProvideContext extends InfoProvideContext,
     TInformation
-> {
+> extends RequireInfoType {
     /**
      * Give a score for a piece of information based on its "goodness". Positive score means this information is helpful while negative score means it is misleading. Zero means no evaluation is provided. This score can be used in UI to sort options available for storyteller to choose from.
      * @param information The information to be evaluated.
@@ -52,7 +54,7 @@ export interface IInformationProvider<
 export interface IStoryTellerInformationProvider<
     TInfoProvideContext extends InfoProvideContext,
     TInformation
-> {
+> extends RequireInfoType {
     getStoryTellerInformationOptions(
         context: TInfoProvideContext
     ): Promise<StoryTellerInformationOptions<TInformation>>;
@@ -74,6 +76,8 @@ export abstract class InformationProvider<
     extends InfoProvider<TInformation>
     implements IInformationProvider<TInfoProvideContext, TInformation>
 {
+    abstract readonly infoType: InfoType;
+
     abstract getTrueInformationOptions(
         context: TInfoProvideContext
     ): Promise<TrueInformationOptions<TInformation>>;

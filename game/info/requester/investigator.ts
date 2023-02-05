@@ -1,4 +1,5 @@
 import type { InvestigatorInformation } from '../provider/investigator';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
 import { type InformationRequestContext } from './requester';
 import { Investigator } from '~/content/characters/output/investigator';
@@ -9,6 +10,7 @@ class BaseInvestigatorInformationRequester<
     InvestigatorInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.InvestigatorInformation;
     readonly expectedCharacter = Investigator;
 }
 

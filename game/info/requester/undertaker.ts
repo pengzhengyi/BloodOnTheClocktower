@@ -3,6 +3,7 @@ import type {
     UndertakerInformationProviderContext,
     UndertakerInformation,
 } from '../provider/undertaker';
+import { InfoType } from '../info-type';
 import {
     CharacterInformationRequester,
     IsAlive,
@@ -21,6 +22,7 @@ class BaseUndertakerInformationRequester<
     UndertakerInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.UndertakerInformation;
     readonly expectedCharacter = Undertaker;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {

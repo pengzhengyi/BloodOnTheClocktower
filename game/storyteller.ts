@@ -82,7 +82,7 @@ export class StoryTeller implements IStoryTeller {
     async giveInfo<TInformation, InfoType extends Info<TInformation>>(
         context: InfoRequestContext<TInformation>
     ): Promise<InfoType> {
-        const provideInfo = this.infoProviderLoader.loadProvide(
+        const provideInfo = this.infoProviderLoader.loadMethod(
             context.requester,
             context.isStoryTellerInformation,
             (context as InformationRequestContext<TInformation>)

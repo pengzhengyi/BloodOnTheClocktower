@@ -1,4 +1,5 @@
 import type { WasherwomanInformation } from '../provider/washerwoman';
+import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
 import { type InformationRequestContext } from './requester';
 import { Washerwoman } from '~/content/characters/output/washerwoman';
@@ -9,6 +10,7 @@ class BaseWasherwomanInformationRequester<
     WasherwomanInformation,
     TInformationRequestContext
 > {
+    readonly infoType = InfoType.WasherwomanInformation;
     readonly expectedCharacter = Washerwoman;
 }
 

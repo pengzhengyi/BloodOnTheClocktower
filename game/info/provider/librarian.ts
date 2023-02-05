@@ -5,6 +5,7 @@ import {
     type FalseInformationOptions,
     type FalseInformation,
 } from '../information';
+import { InfoType } from '../info-type';
 import { OneOfTwoPlayersHasCharacterTypeInformationProvider } from './common';
 import { type InfoProvideContext } from './provider';
 import { type CharacterType, Outsider } from '~/game/character/character-type';
@@ -26,6 +27,8 @@ export class LibrarianInformationProvider<
     static readonly NO_OUTSIDER_INFORMATION: LibrarianInformation = {
         noOutsiders: true,
     };
+
+    readonly infoType = InfoType.LibrarianInformation;
 
     protected expectedCharacterType: typeof CharacterType = Outsider;
 
