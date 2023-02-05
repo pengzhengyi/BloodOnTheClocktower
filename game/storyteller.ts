@@ -1,5 +1,5 @@
 import { NoDefinedInfoProvider } from './exception';
-import { type IGrimoire, Grimoire } from './grimoire';
+import { type IGrimoire } from './grimoire';
 import type { Info } from './info/info';
 import type {
     InfoRequestContext,
@@ -7,7 +7,6 @@ import type {
 } from './info/requester/requester';
 import { InfoProviderLoader } from './info/provider/loader';
 import type { IPlayer } from './player';
-import type { IPlayers } from './players';
 import { type AsyncTask } from './types';
 import { InteractionEnvironment } from '~/interaction/environment';
 
@@ -64,8 +63,8 @@ export class StoryTeller implements IStoryTeller {
         await action(player);
     }
 
-    initializeGrimoire(players: IPlayers) {
-        this.grimoire = new Grimoire(players);
+    constructor(grimoire: IGrimoire) {
+        this.grimoire = grimoire;
     }
 
     /**

@@ -82,6 +82,7 @@ export class Game extends EffectTarget<Game> implements IGame {
             edition: this.edition,
             townSquare: this.townSquare,
             players: this._players,
+            storyTeller: this.storyTeller,
         } = setupResult);
     }
 

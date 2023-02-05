@@ -31,7 +31,6 @@ import type {
     IInformationRequester,
 } from '~/game/info/requester/requester';
 import type { IPlayer } from '~/game/player';
-import { StoryTeller } from '~/game/storyteller';
 import type {
     AsyncFactory,
     DemonPlayer,
@@ -104,6 +103,7 @@ import { createBasicGame } from '~/__mocks__/game';
 import { ImpAbility, type ImpAbilityUseResult } from '~/game/ability/imp';
 import { Imp } from '~/content/characters/output/imp';
 import type { ISetupContext } from '~/game/setup-sheet';
+import { createBasicStoryTeller } from '~/__mocks__/storyteller';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -130,7 +130,7 @@ export async function expectCharacterGetInformation<
         contextModifications
     );
 
-    context.storyteller = new StoryTeller();
+    context.storyteller = createBasicStoryTeller();
 
     if (ability === undefined) {
         ability = await abilityInitializer!(context);

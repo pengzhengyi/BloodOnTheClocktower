@@ -1,7 +1,7 @@
 import { Generator } from './collections';
 import { type Edition } from './edition';
 import { GameHasTooFewPlayers, GameHasTooManyPlayers } from './exception';
-import { type IGrimoire, Grimoire } from './grimoire';
+import { Grimoire } from './grimoire';
 import { type IPlayers, Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
 import { Seating } from './seating/seating';
@@ -19,6 +19,8 @@ import {
 } from './seating/seat-assignment-mode';
 import { GameEnvironment } from './environment';
 import { Singleton } from './common';
+import type { IStoryTeller } from './storyteller';
+import { StoryTeller } from './storyteller';
 import { InteractionEnvironment } from '~/interaction/environment';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 
@@ -30,7 +32,7 @@ export interface ISetupContext {
 export interface ISetupResult {
     players: IPlayers;
     townSquare: ITownSquare;
-    grimoire: IGrimoire;
+    storyTeller: IStoryTeller;
     edition: typeof Edition;
 }
 
@@ -46,7 +48,7 @@ export interface ISetupSheet {
         seatAssignment?: ISeatAssignment | SeatAssignmentMode
     ): Promise<ITownSquare>;
 
-    setupGrimoire(players: IPlayers): Promise<IGrimoire>;
+    setupStoryTeller(players: IPlayers): Promise<IStoryTeller>;
 
     setupEdition(): Promise<typeof Edition>;
 
@@ -69,13 +71,13 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             this.setupEdition(),
         ]);
 
-        const grimoire = await this.setupGrimoire(players);
+        const storyTeller = await this.setupStoryTeller(players);
 
         const setupResult: ISetupResult = {
             players,
             townSquare,
             edition,
-            grimoire,
+            storyTeller,
         };
 
         return setupResult;
@@ -299,8 +301,9 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         return townsquare;
     }
 
-    setupGrimoire(players: IPlayers) {
-        return Promise.resolve(new Grimoire(players));
+    async setupStoryTeller(players: IPlayers) {
+        const grimoire = await this.setupGrimoire(players);
+        return new StoryTeller(grimoire);
     }
 
     protected getSeatAssignment(
@@ -313,6 +316,10 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         } else {
             return seatAssignment;
         }
+    }
+
+    protected setupGrimoire(players: IPlayers) {
+        return Promise.resolve(new Grimoire(players));
     }
 
     protected setupClocktower(): Promise<Clocktower> {

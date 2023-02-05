@@ -10,7 +10,6 @@ import { Monk } from '~/content/characters/output/monk';
 import { MayorAbility } from '~/game/ability/mayor';
 import { type MonkProtectAbility } from '~/game/ability/monk';
 import type { GamePhase } from '~/game/game-phase';
-import { StoryTeller } from '~/game/storyteller';
 import type { Action, ImpPlayer, MonkPlayer } from '~/game/types';
 import {
     mockGetInfoAbilityUseContext,
@@ -20,6 +19,7 @@ import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { mockClocktowerWithIsNonfirstNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { createBasicStoryTeller } from '~/__mocks__/storyteller';
 
 describe('test MonkProtectAbility', () => {
     let ability: MonkProtectAbility;
@@ -62,7 +62,7 @@ describe('test MonkProtectAbility', () => {
                 ]),
             [(context) => mockClocktowerWithIsNonfirstNight(context, true)]
         );
-        context.storyteller = new StoryTeller();
+        context.storyteller = createBasicStoryTeller();
 
         const _result = await monkProtectPlayer(
             ability,
@@ -85,7 +85,7 @@ describe('test MonkProtectAbility', () => {
                 createInfoProvideContext(monkPlayer, [impPlayer, mayorPlayer]),
             [(context) => mockClocktowerWithIsNonfirstNight(context, true)]
         );
-        context.storyteller = new StoryTeller();
+        context.storyteller = createBasicStoryTeller();
 
         const mayorAbility = await MayorAbility.init(
             mockMayorAbilitySetupContext(
@@ -112,7 +112,7 @@ describe('test MonkProtectAbility', () => {
             () => createInfoProvideContext(monkPlayer, [impPlayer]),
             [(context) => mockClocktowerWithIsNonfirstNight(context, true)]
         );
-        context.storyteller = new StoryTeller();
+        context.storyteller = createBasicStoryTeller();
 
         const _result = await monkProtectPlayer(ability, context, impPlayer);
 

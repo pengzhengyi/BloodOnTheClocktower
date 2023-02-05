@@ -12,7 +12,6 @@ import { GetRavenkeeperInformationAbility } from '~/game/ability/ravenkeeper';
 import { AbilitySuccessCommunicatedInfo } from '~/game/ability/status';
 import { DeadReason } from '~/game/dead-reason';
 import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
-import { StoryTeller } from '~/game/storyteller';
 import {
     mockGetInfoAbilityUseContext,
     mockMayorAbilitySetupContext,
@@ -20,6 +19,7 @@ import {
 import { chooseMock, sendMock } from '~/__mocks__/game-ui';
 import { mockClocktowerForDeathAtNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
+import { createBasicStoryTeller } from '~/__mocks__/storyteller';
 
 describe('test GetRavenkeeperInformationAbility', () => {
     /**
@@ -61,7 +61,7 @@ describe('test GetRavenkeeperInformationAbility', () => {
         const mayorAbility = await MayorAbility.init(setupContext);
         expect(await mayorAbility.isEligible(context)).toBeTrue();
 
-        context.storyteller = new StoryTeller();
+        context.storyteller = createBasicStoryTeller();
         await expectDieInsteadAfterDemonAttack(
             mayorPlayer,
             impPlayer,
