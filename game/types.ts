@@ -6,6 +6,7 @@ import type {
     Demon,
     Townsfolk,
     CharacterType,
+    Traveller,
 } from './character/character-type';
 import type { CharacterToken } from './character/character';
 import type { Phase } from './phase';
@@ -261,6 +262,9 @@ export type DemonPlayer = IPlayer & {
 };
 export type TownsfolkPlayer = IPlayer & {
     characterType: Promise<Townsfolk>;
+};
+export type TravellerPlayer = IPlayer & {
+    characterType: Promise<Traveller>;
 };
 
 export interface IBindToCharacter {

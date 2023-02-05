@@ -20,6 +20,8 @@ import { GameEnvironment } from './environment';
 import { Singleton } from './common';
 import type { IStoryTeller } from './storyteller';
 import { StoryTeller } from './storyteller';
+import type { TravellerCharacterToken } from './character/character';
+import type { TravellerPlayer } from './types';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface ISetupContext {
@@ -55,6 +57,11 @@ export interface ISetupSheet {
         numPlayers: number,
         editionName: EditionName
     ): Promise<NumberOfCharacters>;
+
+    setupTraveller(
+        volunteers: Iterable<IPlayer>,
+        travellerCharacters: Array<TravellerCharacterToken>
+    ): Promise<Array<TravellerPlayer>>;
 
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
@@ -268,6 +275,14 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
                 editionName
             );
         return assignment;
+    }
+
+    setupTraveller(
+        _volunteers: Iterable<IPlayer>,
+        _travellerCharacters: Array<TravellerCharacterToken>
+    ): Promise<Array<TravellerPlayer>> {
+        // TODO implement traveller selection
+        throw new Error('method not implemented');
     }
 
     protected getSeatAssignment(
