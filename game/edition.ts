@@ -1,10 +1,6 @@
 import { type EditionData, EditionKeyName } from './types';
 import { IncompleteEditionData } from './exception';
-import { CharacterSheet } from './character/character-sheet';
-import { Generator } from './collections';
-import type { CharacterToken } from './character/character';
 import { lowercaseLetters } from './common';
-import type { CharacterType } from './character/character-type';
 
 export enum EditionName {
     TroubleBrewing = 'Trouble Brewing',
@@ -22,64 +18,9 @@ export abstract class Edition {
 
     static editionData: Partial<EditionData>;
 
-    static get characterSheet(): CharacterSheet {
-        if (this._characterSheet === undefined) {
-            const characterTypeToCharacters =
-                this.editionData[EditionKeyName.CHARACTERS];
-            if (characterTypeToCharacters === undefined) {
-                throw new IncompleteEditionData(
-                    this.editionData,
-                    EditionKeyName.CHARACTERS
-                );
-            }
-            const characters = Generator.empty<string>();
-
-            for (const key in characterTypeToCharacters) {
-                const characterNames = characterTypeToCharacters[key];
-                if (Array.isArray(characterNames)) {
-                    characters.concat(characterNames);
-                }
-            }
-
-            this._characterSheet = CharacterSheet.from(characters);
-        }
-
-        return this._characterSheet;
-    }
-
-    static get characters(): Array<CharacterToken> {
-        return this.characterSheet.characters;
-    }
-
-    static get minion(): Array<CharacterToken> {
-        return this.characterSheet.minion;
-    }
-
-    static get demon(): Array<CharacterToken> {
-        return this.characterSheet.demon;
-    }
-
-    static get townsfolk(): Array<CharacterToken> {
-        return this.characterSheet.townsfolk;
-    }
-
-    static get outsider(): Array<CharacterToken> {
-        return this.characterSheet.outsider;
-    }
-
-    static get traveller(): Array<CharacterToken> {
-        return this.characterSheet.traveller;
-    }
-
-    static get fabled(): Array<CharacterToken> {
-        return this.characterSheet.fabled;
-    }
-
     static get canonicalName(): string {
         return this.getCanonicalName(this.name);
     }
-
-    private static _characterSheet?: CharacterSheet;
 
     static is(edition: typeof Edition): boolean {
         return Object.is(this, edition);
@@ -99,12 +40,6 @@ export abstract class Edition {
     static initialize(editionData: Partial<EditionData>) {
         this.checkForRequiredKeyNames(editionData);
         this.editionData = editionData;
-    }
-
-    static getCharactersByType(
-        characterType: typeof CharacterType
-    ): Array<CharacterToken> {
-        return this.characterSheet.getCharactersByType(characterType);
     }
 
     static equals(otherEdition: typeof Edition) {

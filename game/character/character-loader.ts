@@ -1,14 +1,18 @@
-import axios, { type AxiosRequestConfig } from 'axios';
 import { randomChoice } from '../common';
-import { CharacterLoadFailure, NoCharacterMatchingId } from '../exception';
-import type { RoleData } from '../types';
+import { NoCharacterMatchingId } from '../exception';
 import { Character, type CharacterToken } from './character';
 import {
     CHARACTERS,
     ID_TO_CHARACTER,
 } from '~/content/characters/output/characters';
 
-export abstract class CharacterLoader {
+export interface ICharacterLoader {
+    randomLoad(): CharacterToken;
+    tryLoad(id: string): CharacterToken | undefined;
+    loadAsync(id: string): Promise<CharacterToken>;
+}
+
+export const CharacterLoader: ICharacterLoader = class CharacterLoader {
     static randomLoad(): CharacterToken {
         return randomChoice(CHARACTERS);
     }
@@ -25,34 +29,4 @@ export abstract class CharacterLoader {
 
         return this.tryLoad(error.correctedId)!;
     }
-
-    protected static loadWithRoleData(roleData: Partial<RoleData>) {
-        const character = this.loadCharacterClass();
-        character.initialize(roleData);
-        return character;
-    }
-
-    protected static loadCharacterClass(): CharacterToken {
-        return class extends Character {};
-    }
-
-    protected static async loadCharacterRoleDataAsync(
-        id: string
-    ): Promise<Partial<RoleData>> {
-        const config: AxiosRequestConfig = {};
-
-        return await axios
-            .get<Partial<RoleData>>(
-                this.getCharacterRoleDataApiEndpoint(id),
-                config
-            )
-            .catch((error) => {
-                throw new CharacterLoadFailure(id, error);
-            })
-            .then((response) => response.data);
-    }
-
-    protected static getCharacterRoleDataApiEndpoint(id: string): string {
-        return `/api/_content/characters/output/${id}`;
-    }
-}
+};

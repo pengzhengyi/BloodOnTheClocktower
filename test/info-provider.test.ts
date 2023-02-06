@@ -26,7 +26,6 @@ import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import { Mayor } from '~/content/characters/output/mayor';
 import { Undertaker } from '~/content/characters/output/undertaker';
 import { Poisoner } from '~/content/characters/output/poisoner';
-import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 import type {
     TrueInformation,
     OneOfTwoPlayersIsOutsider,
@@ -58,6 +57,7 @@ import {
 } from '~/game/info/provider/undertaker';
 import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman';
 import { createSeatingAndAssignPlayers } from '~/__mocks__/seating';
+import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 
 export async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>
@@ -153,6 +153,7 @@ function createRavenkeeperInfoProviderContext(
 describe('test DemonInformationProvider and MinionInformationProvider', () => {
     const demonInformationProvider = new DemonInformationProvider();
     const minionInformationProvider = new MinionInformationProvider();
+    const troubleBrewingCharacterSheet = getTroubleBrewingCharacterSheet();
 
     test('get correct minion and demon information', async () => {
         const playerDescriptions = [
@@ -171,14 +172,14 @@ describe('test DemonInformationProvider and MinionInformationProvider', () => {
                 async (player) => (await player.character) === Imp,
                 ...playerDescriptions
             );
-        demonContext.characterSheet = TroubleBrewing.characterSheet;
+        demonContext.characterSheet = troubleBrewingCharacterSheet;
 
         const minionContext =
             await createInfoProvideContextFromPlayerDescriptions(
                 async (player) => (await player.character) === Poisoner,
                 ...playerDescriptions
             );
-        minionContext.characterSheet = TroubleBrewing.characterSheet;
+        minionContext.characterSheet = troubleBrewingCharacterSheet;
 
         const demonTrueInfoOptions = (
             await demonInformationProvider.getTrueInformationOptions(

@@ -10,7 +10,7 @@ import type {
     IBindToCharacterType,
     StaticThis,
 } from '../types';
-import type { CharacterSheet } from '../character/character-sheet';
+import type { ICharacterSheet } from '../character/character-sheet';
 import type { NightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
 import type { IPlayers } from '../players';
@@ -39,7 +39,7 @@ export interface AbilityUseContext {
 
 export interface AbilitySetupContext extends AbilityUseContext {
     nightSheet: NightSheet;
-    characterSheet: CharacterSheet;
+    characterSheet: ICharacterSheet;
     abilityLoader: IAbilityLoader;
     clocktower: IClocktower;
 }

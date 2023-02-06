@@ -2,7 +2,7 @@ import type {
     CharacterToken,
     TownsfolkCharacterToken,
 } from '../character/character';
-import type { CharacterSheet } from '../character/character-sheet';
+import type { ICharacterSheet } from '../character/character-sheet';
 import { Generator } from '../collections';
 import { DrunkReason } from '../drunk-reason';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
@@ -78,7 +78,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     }
 
     protected async chooseThinkAsCharacter(
-        characterSheet: CharacterSheet,
+        characterSheet: ICharacterSheet,
         players: IPlayers
     ): Promise<TownsfolkCharacterToken> {
         const townsfolkOptions = characterSheet.townsfolk;

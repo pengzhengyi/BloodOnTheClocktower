@@ -1,7 +1,7 @@
 import { Generator } from './collections';
-import { iterableToString } from './common';
 import { type IPlayer, type IPlayerInfo, Player } from './player';
 import type { IPlayers } from './players';
+import { iterableToString } from '~/utils/common';
 
 export interface IGrimoire {
     getPlayerActualInfo(player: IPlayer): IPlayerInfo;

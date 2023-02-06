@@ -22,7 +22,7 @@ import {
 import { type Generator } from '~/game/collections';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character/character';
-import type { CharacterSheet } from '~/game/character/character-sheet';
+import type { ICharacterSheet } from '~/game/character/character-sheet';
 import { DeadReason } from '~/game/dead-reason';
 import type { Death } from '~/game/death';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
@@ -261,7 +261,7 @@ export async function mockRecluseRegisterAs<T>(
     registerAsAlignment?: Alignment,
     recluseAbility?: RecluseAbility,
     setupContext?: AbilitySetupContext,
-    characterSheet?: CharacterSheet,
+    characterSheet?: ICharacterSheet,
     requireAbilitySetup = true
 ): Promise<T> {
     if (requireAbilitySetup) {
@@ -306,7 +306,7 @@ export async function mockSpyRegisterAs<T>(
     registerAsAlignment?: Alignment,
     spyAbility?: SpyAbility,
     setupContext?: AbilitySetupContext,
-    characterSheet?: CharacterSheet,
+    characterSheet?: ICharacterSheet,
     requireAbilitySetup = true
 ): Promise<T> {
     if (requireAbilitySetup) {
@@ -418,7 +418,7 @@ export async function expectUndertakerToLearn(
     shouldBeCharacter: CharacterToken,
     _context?: GetInfoAbilityUseContext,
     undertakerPlayer?: UndertakerPlayer,
-    characterSheet?: CharacterSheet
+    characterSheet?: ICharacterSheet
 ) {
     characterSheet ??= mockCharacterSheet();
     const infoProviderContext =

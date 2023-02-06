@@ -1,11 +1,12 @@
 import { mock } from 'jest-mock-extended';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
-import type { CharacterSheet } from '~/game/character/character-sheet';
+import type { ICharacterSheet } from '~/game/character/character-sheet';
+import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 
-export function mockCharacterSheet(): CharacterSheet {
-    return mock<CharacterSheet>();
+export function mockCharacterSheet(): ICharacterSheet {
+    return mock<ICharacterSheet>();
 }
 
-export function getTroubleBrewingCharacterSheet(): CharacterSheet {
-    return TroubleBrewing.characterSheet;
+export function getTroubleBrewingCharacterSheet(): ICharacterSheet {
+    return CharacterSheetFactory.getInstance().getFromEdition(TroubleBrewing);
 }

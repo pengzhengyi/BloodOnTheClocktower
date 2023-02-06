@@ -7,6 +7,7 @@ import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 import { Virgin } from '~/content/characters/output/virgin';
 import { Judge } from '~/content/characters/output/judge';
 import { Mathematician } from '~/content/characters/output/mathematician';
+import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 
 describe('Load Custom Script', () => {
     const characterSheet = ScriptTool.load(script);
@@ -34,8 +35,16 @@ describe('Load Custom Script', () => {
                 }
             );
 
-            expect(customEdition.townsfolk.includes(Mathematician)).toBeTrue();
-            expect(customEdition.characters).toHaveLength(script.length);
+            const characterSheetFromEdition =
+                CharacterSheetFactory.getInstance().getFromEdition(
+                    customEdition
+                );
+            expect(
+                characterSheetFromEdition.townsfolk.includes(Mathematician)
+            ).toBeTrue();
+            expect(characterSheetFromEdition.characters).toHaveLength(
+                script.length
+            );
         }
     );
 });

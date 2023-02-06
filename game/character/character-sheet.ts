@@ -7,15 +7,8 @@ import {
     instanceToPlain,
 } from 'class-transformer';
 import { Generator } from '../collections';
-import { parsePromiseSettledResults } from '../common';
-import {
-    CharacterLoadFailures,
-    CharacterSheetCreationFailure,
-    GameError,
-    NoCharacterMatchingId,
-} from '../exception';
+import { CharacterSheetCreationFailure, GameError } from '../exception';
 import { CharactersToIDs, type CharacterToken } from './character';
-import { CharacterLoader } from './character-loader';
 import {
     type CharacterType,
     Demon,
@@ -25,74 +18,81 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
+import { iterableToString } from '~/utils/common';
+
+export interface ICharacterSheet {
+    readonly characters: Array<CharacterToken>;
+
+    readonly characterTypeToCharacters: Map<
+        typeof CharacterType,
+        Array<CharacterToken>
+    >;
+
+    readonly minion: Array<CharacterToken>;
+    readonly demon: Array<CharacterToken>;
+    readonly townsfolk: Array<CharacterToken>;
+    readonly outsider: Array<CharacterToken>;
+    readonly traveller: Array<CharacterToken>;
+    readonly fabled: Array<CharacterToken>;
+
+    toJSON(): Record<string, any>;
+    toString(): string;
+    getCharactersByType(
+        characterType: typeof CharacterType
+    ): Array<CharacterToken>;
+    getCharactersNotInPlay(
+        charactersInPlay: Iterable<CharacterToken>
+    ): Iterable<CharacterToken>;
+}
+
+/**
+ * A small utility class intended to improve `toString` on a set of characters.
+ */
+class CharacterGroup {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        readonly characters: Array<CharacterToken>,
+        readonly groupName?: string
+    ) {}
+
+    toString() {
+        const groupName = this.groupName ? this.groupName + ':' : '';
+        return `${groupName}${this.characters}`;
+    }
+}
+
+interface AbstractCharacterSheet extends ICharacterSheet {}
+
+abstract class AbstractCharacterSheet {
+    toString(): string {
+        const characterGroups = [
+            new CharacterGroup(this.minion, 'minion'),
+            new CharacterGroup(this.demon, 'demon'),
+            new CharacterGroup(this.townsfolk, 'townsfolk'),
+            new CharacterGroup(this.outsider, 'outsider'),
+            new CharacterGroup(this.traveller, 'traveller'),
+            new CharacterGroup(this.fabled, 'fabled'),
+        ];
+
+        return iterableToString(characterGroups, 'CharacterSheet');
+    }
+}
 
 /**
  * {@link `glossary["Character sheet"]`}
  * The cardboard sheets that list all of the possible characters and their abilities for the chosen edition.
  */
 @Exclude()
-export class CharacterSheet {
-    static find(id: string) {
-        const character = CharacterLoader.tryLoad(id);
-        return this._validateFoundCharacter(id, character);
-    }
-
-    static async findAsync(id: string) {
-        const character = await CharacterLoader.loadAsync(id);
-        return this._validateFoundCharacter(id, character);
-    }
-
-    static from(characterIds: Iterable<string>): CharacterSheet {
-        const characters = Generator.once(characterIds).map((id) =>
-            CharacterSheet.find(id)
-        );
-        return new this(characters);
-    }
-
-    static fromTypeToCharacters(
-        characterTypeToCharacters: Map<
-            typeof CharacterType,
-            Array<CharacterToken>
-        >
-    ) {
-        return new this(undefined, characterTypeToCharacters);
-    }
-
-    static async fromAsync(
-        characterIds: Iterable<string>
-    ): Promise<CharacterSheet> {
-        const characterPromises = new Generator(characterIds).map(
-            (characterId) => this.findAsync(characterId)
-        );
-        const characterSettledResults = await Promise.allSettled(
-            characterPromises
-        );
-        const characters = parsePromiseSettledResults<
-            CharacterToken,
-            GameError
-        >(characterSettledResults, (errors, values) => {
-            throw new CharacterLoadFailures(errors, values);
-        });
-        return new this(characters);
-    }
-
-    protected static _validateFoundCharacter(
-        id: string,
-        character?: CharacterToken
-    ) {
-        if (character === undefined) {
-            throw new NoCharacterMatchingId(id);
-        }
-
-        return character;
-    }
-
+export class CharacterSheet
+    extends AbstractCharacterSheet
+    implements ICharacterSheet
+{
     @Expose({ groups: ['compact'], toPlainOnly: true })
     @Transform(({ value }) => CharactersToIDs(value), { toPlainOnly: true })
     @Type(() => String)
-    declare characters: Array<CharacterToken>;
+    readonly characters: Array<CharacterToken>;
 
-    declare characterTypeToCharacters: Map<
+    readonly characterTypeToCharacters: Map<
         typeof CharacterType,
         Array<CharacterToken>
     >;
@@ -140,26 +140,18 @@ export class CharacterSheet {
     }
 
     constructor(
-        characters?: Iterable<CharacterToken>,
-        characterTypes?: Map<typeof CharacterType, Array<CharacterToken>>
+        characterTypes: Map<typeof CharacterType, Array<CharacterToken>>
     ) {
-        if (characters !== undefined) {
-            this.initFromCharacters(characters);
-        } else if (characterTypes !== undefined) {
-            this.initFromTypeToCharacters(characterTypes);
-        } else {
-            throw new CharacterSheetCreationFailure(characters, characterTypes);
-        }
+        super();
 
-        if (this.characters.length === 0) {
-            const innerError = new GameError(
-                'No character id is provided when initializing character sheet'
-            );
-            throw new CharacterSheetCreationFailure(
-                characters,
-                characterTypes
-            ).from(innerError);
-        }
+        this.characterTypeToCharacters = characterTypes;
+        this.characters = Array.from(
+            Generator.chain_from_iterable(
+                this.characterTypeToCharacters.values()
+            )
+        );
+
+        this.validateCharacters();
     }
 
     toJSON() {
@@ -172,23 +164,6 @@ export class CharacterSheet {
         return this.characterTypeToCharacters.get(characterType) || [];
     }
 
-    protected initFromCharacters(characters: Iterable<CharacterToken>) {
-        if (Array.isArray(characters)) {
-            this.characters = characters;
-            this.characterTypeToCharacters = Generator.groupBy(
-                characters,
-                (character) => character.characterType
-            );
-        } else {
-            const generator = Generator.cache(characters);
-            this.characterTypeToCharacters = generator.groupBy(
-                (character) => character.characterType
-            );
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this.characters = generator.cached!;
-        }
-    }
-
     /**
      * {@link `glossary["Not in play"]`}
      * A character that does not exist in the current game, but is on the character sheet.
@@ -199,17 +174,15 @@ export class CharacterSheet {
         return Generator.exclude(this.characters, charactersInPlay);
     }
 
-    protected initFromTypeToCharacters(
-        characterTypeToCharacters: Map<
-            typeof CharacterType,
-            Array<CharacterToken>
-        >
-    ) {
-        this.characterTypeToCharacters = characterTypeToCharacters;
-        this.characters = Array.from(
-            Generator.chain_from_iterable(
-                this.characterTypeToCharacters.values()
-            )
-        );
+    protected validateCharacters() {
+        if (this.characters.length === 0) {
+            const innerError = new GameError(
+                'No character id is provided when initializing character sheet'
+            );
+            throw new CharacterSheetCreationFailure(
+                this.characters,
+                this.characterTypeToCharacters
+            ).from(innerError);
+        }
     }
 }

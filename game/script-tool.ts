@@ -4,12 +4,11 @@ import {
     RoleDataKeyName,
     type Script,
 } from './types';
-import { CharacterSheet } from './character/character-sheet';
+import type { ICharacterSheet } from './character/character-sheet';
 import { Character, type CharacterToken } from './character/character';
 import { createCustomEdition, type Edition, EditionName } from './edition';
 import { Generator } from './collections';
 import { EditionLoader } from './edition-loader';
-import { CharacterLoader } from './character/character-loader';
 import {
     type CharacterType,
     Demon,
@@ -23,6 +22,8 @@ import {
     NegativeNumberForCharacterTypeInScriptConstraint,
     TooManyMustIncludedCharacters,
 } from './exception';
+import { GameEnvironment } from './environment';
+import { CharacterSheetFactory } from './character/character-sheet-factory';
 
 export interface NumberOfCharacters {
     townsfolk: number;
@@ -178,7 +179,7 @@ export class ScriptConstraintsHelper {
         return this._travellerCandidates;
     }
 
-    protected _candidateCharacterSheets?: Generator<CharacterSheet>;
+    protected _candidateCharacterSheets?: Generator<ICharacterSheet>;
     get candidateCharacterSheets() {
         if (this._candidateCharacterSheets === undefined) {
             const numberOfCharacters = this.simplified;
@@ -244,11 +245,13 @@ export class ScriptConstraintsHelper {
                     );
 
                 if (this.hasIncludes) {
-                    return new CharacterSheet(
+                    return CharacterSheetFactory.getInstance().getFromCharacters(
                         Generator.chain(characters, this.includes, this.fabled)
                     );
                 } else {
-                    return new CharacterSheet(characters);
+                    return CharacterSheetFactory.getInstance().getFromCharacters(
+                        characters
+                    );
                 }
             });
         }
@@ -302,11 +305,11 @@ export class ScriptConstraintsHelper {
         ).throwWhen((error) => !Array.isArray(error.constraints.fabled));
 
         for (const character of constraints.fabled) {
-            await CharacterLoader.loadAsync(character);
+            await GameEnvironment.current.characterLoader.loadAsync(character);
         }
         this.fabled = await Promise.all(
             constraints.fabled.map((character) =>
-                CharacterLoader.loadAsync(character)
+                GameEnvironment.current.characterLoader.loadAsync(character)
             )
         );
     }
@@ -321,7 +324,7 @@ export class ScriptConstraintsHelper {
 
         this.excludes = await Promise.all(
             constraints.excludes.map((character) =>
-                CharacterLoader.loadAsync(character)
+                GameEnvironment.current.characterLoader.loadAsync(character)
             )
         );
     }
@@ -337,7 +340,7 @@ export class ScriptConstraintsHelper {
         await new TooManyMustIncludedCharacters(this).validateOrThrow();
         this.includes = await Promise.all(
             constraints.includes.map((character) =>
-                CharacterLoader.loadAsync(character)
+                GameEnvironment.current.characterLoader.loadAsync(character)
             )
         );
     }
@@ -345,7 +348,8 @@ export class ScriptConstraintsHelper {
     simplify() {
         this.characterTypeToIncludedCharacters = Generator.groupBy(
             Generator.map(
-                (include) => CharacterLoader.tryLoad(include)!,
+                (include) =>
+                    GameEnvironment.current.characterLoader.tryLoad(include)!,
                 this.constraints.includes
             ),
             (character) => character.characterType
@@ -380,10 +384,13 @@ export class ScriptConstraintsHelper {
     ): Generator<CharacterToken> {
         const candidates = Generator.cache(
             Generator.chain_from_iterable(
-                Generator.map(
-                    (edition) => edition.getCharactersByType(characterType),
-                    this.editions
-                )
+                Generator.map((edition) => {
+                    const characterSheet =
+                        CharacterSheetFactory.getInstance().getFromEdition(
+                            edition
+                        );
+                    return characterSheet.getCharactersByType(characterType);
+                }, this.editions)
             )
         );
 
@@ -406,12 +413,14 @@ export abstract class ScriptTool {
         );
     }
 
-    static load(script: Script): CharacterSheet {
-        return CharacterSheet.from(this.getScriptCharacterIds(script));
+    static load(script: Script): ICharacterSheet {
+        return CharacterSheetFactory.getInstance().getFromCharacterIds(
+            this.getScriptCharacterIds(script)
+        );
     }
 
-    static async loadAsync(script: Script): Promise<CharacterSheet> {
-        return await CharacterSheet.fromAsync(
+    static async loadAsync(script: Script): Promise<ICharacterSheet> {
+        return await CharacterSheetFactory.getInstance().getFromCharacterIdsAsync(
             this.getScriptCharacterIds(script)
         );
     }
@@ -419,13 +428,13 @@ export abstract class ScriptTool {
     static async candidates(
         constraints: Partial<ScriptConstraints>,
         numCandidateUpperbound = 1
-    ): Promise<Iterable<CharacterSheet>> {
+    ): Promise<Iterable<ICharacterSheet>> {
         const solver = await ScriptConstraintsHelper.fromDefaults(constraints);
         return solver.candidateCharacterSheets.limit(numCandidateUpperbound);
     }
 
     static createCustomEdition(
-        characterSheet: CharacterSheet,
+        characterSheet: ICharacterSheet,
         otherEditionData: Partial<Omit<EditionData, EditionKeyName.CHARACTERS>>
     ): typeof Edition {
         const characterEditionData: Pick<

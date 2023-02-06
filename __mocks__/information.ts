@@ -5,7 +5,7 @@ import {
     mockWithPropertyValues,
 } from './common';
 import { mockGamePhaseForDay, mockGamePhaseForNight } from './game-phase';
-import type { CharacterSheet } from '~/game/character/character-sheet';
+import type { ICharacterSheet } from '~/game/character/character-sheet';
 import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
 import type { IPlayers } from '~/game/players';
@@ -52,7 +52,7 @@ import type { IGamePhase } from '~/game/game-phase';
 export function mockInfoProvideContext(): InfoProvideContext {
     return {
         clocktower: mock<IClocktower>(),
-        characterSheet: mock<CharacterSheet>(),
+        characterSheet: mock<ICharacterSheet>(),
         travellerSheet: mock<TravellerSheet>(),
         requestedPlayer: mock<IPlayer>(),
         players: mock<IPlayers>(),

@@ -1,5 +1,5 @@
 import type { CharacterToken } from '../character/character';
-import type { CharacterSheet } from '../character/character-sheet';
+import type { ICharacterSheet } from '../character/character-sheet';
 import { type CachingGenerator, Generator } from '../collections';
 import type { InteractionContext } from '../effect/effect';
 import {
@@ -29,7 +29,7 @@ class RecluseRegisterAsEvilAlignmentEffect extends RegisterAsEvilAlignmentEffect
 class RecluseRegisterAsEvilCharacterEffect extends RegisterAsCharacterEffect<ReclusePlayer> {
     readonly recommended = undefined;
 
-    static fromCharacterSheet(characterSheet: CharacterSheet) {
+    static fromCharacterSheet(characterSheet: ICharacterSheet) {
         return this.from(characterSheet.minion, characterSheet.demon);
     }
 

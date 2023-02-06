@@ -1,5 +1,5 @@
 import { Generator } from '../collections';
-import { clockwise, counterclockwise, iterableToString } from '../common';
+import { clockwise, counterclockwise } from '../common';
 import type { IPlayer } from '../player';
 import { type AnyPredicate, Direction, TAUTOLOGY } from '../types';
 import {
@@ -13,6 +13,7 @@ import {
 import { type ISeat, Seat, type SitResult } from './seat';
 import { type ISeatOccupancy, SeatOccupancy } from './seat-occupancy';
 import { InteractionEnvironment } from '~/interaction/environment';
+import { iterableToString } from '~/utils/common';
 
 export interface ISeating extends Iterable<ISeat> {
     readonly numSeats: number;

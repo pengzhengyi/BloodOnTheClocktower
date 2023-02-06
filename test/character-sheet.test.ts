@@ -1,10 +1,14 @@
 import { Chef } from '~/content/characters/output/chef';
 import { Imp } from '~/content/characters/output/imp';
-import { CharacterSheet } from '~/game/character/character-sheet';
+import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 import { Demon, Townsfolk } from '~/game/character/character-type';
 
 describe('test CharacterSheet serialization', () => {
-    const characterSheet = CharacterSheet.from([Imp.id, Chef.id]);
+    const characterSheet =
+        CharacterSheetFactory.getInstance().getFromCharacterIds([
+            Imp.id,
+            Chef.id,
+        ]);
 
     test.concurrent('convert to object', () => {
         const characterSheetObj = characterSheet.toJSON();

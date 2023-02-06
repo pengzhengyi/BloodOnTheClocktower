@@ -14,12 +14,15 @@ import type { IInfoProviderLoader } from './info/provider/loader';
 import { InfoProviderLoader } from './info/provider/loader';
 import type { NumberOfCharacters } from './script-tool';
 import type { IEnvironment, IEnvironmentProvider } from './types';
+import type { ICharacterLoader } from './character/character-loader';
+import { CharacterLoader } from './character/character-loader';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface IGameEnvironment extends IEnvironment {
     editionLoader: IEditionLoader;
     infoProviderLoader: IInfoProviderLoader;
     configuration: IGameConfiguration;
+    characterLoader: ICharacterLoader;
 
     // utility methods
     getSupportedEditions(): Promise<Array<typeof Edition>>;
@@ -41,6 +44,7 @@ export interface IGameEnvironmentProvider
 
 class BaseGameEnvironment implements IGameEnvironment {
     editionLoader: IEditionLoader = EditionLoader;
+    characterLoader: ICharacterLoader = CharacterLoader;
 
     get infoProviderLoader(): IInfoProviderLoader {
         return InfoProviderLoader.getInstance();
@@ -184,10 +188,13 @@ class BaseGameEnvironment implements IGameEnvironment {
 const GameEnvironment = Singleton<BaseGameEnvironment>(BaseGameEnvironment);
 
 // since singleton once exposes getInstance, we need to wrap in a utility class so that it has a current property meeting requirement
-const GameEnvironmentProvider: IGameEnvironmentProvider = class GameEnvironmentProvider {
+abstract class GameEnvironmentProvider {
     static get current(): IGameEnvironment {
         return GameEnvironment.getInstance();
     }
-};
+}
+// enforce GameEnvironmentProvider not instantiable
+const GameEnvironmentProvider_: IGameEnvironmentProvider =
+    GameEnvironmentProvider;
 
-export { GameEnvironmentProvider as GameEnvironment };
+export { GameEnvironmentProvider_ as GameEnvironment };

@@ -1,5 +1,5 @@
 import { mock } from 'jest-mock-extended';
-import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
+import { getTroubleBrewingCharacterSheet } from './character-sheet';
 import { NightSheet } from '~/game/night-sheet';
 
 export function mockNightSheet(): NightSheet {
@@ -10,7 +10,8 @@ let troubleBrewingNightSheet: NightSheet;
 
 export async function getTroubleBrewingNightSheet(): Promise<NightSheet> {
     if (troubleBrewingNightSheet === undefined) {
-        const nightSheet = await NightSheet.init(TroubleBrewing.characters);
+        const troubleBrewing = getTroubleBrewingCharacterSheet();
+        const nightSheet = await NightSheet.init(troubleBrewing.characters);
         troubleBrewingNightSheet = nightSheet;
     }
 

@@ -1,9 +1,10 @@
 import type { CharacterToken } from '~/game/character/character';
-import { CharacterLoader } from '~/game/character/character-loader';
+
 import { Generator } from '~/game/collections';
+import { GameEnvironment } from '~/game/environment';
 
 export function randomCharacter(): CharacterToken {
-    return CharacterLoader.randomLoad();
+    return GameEnvironment.current.characterLoader.randomLoad();
 }
 
 export function randomCharacters(

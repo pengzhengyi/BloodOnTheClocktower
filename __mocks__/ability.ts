@@ -11,7 +11,7 @@ import type { PoisonerPlayer, SaintPlayer, Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
 import type { IGame } from '~/game/game';
 import type { NightSheet } from '~/game/night-sheet';
-import type { CharacterSheet } from '~/game/character/character-sheet';
+import type { ICharacterSheet } from '~/game/character/character-sheet';
 import type {
     AbilityUseContext,
     AbilitySetupContext,
@@ -42,7 +42,7 @@ export function mockAbilitySetupContext(
     players?: IPlayers,
     context?: AbilityUseContext,
     nightSheet?: NightSheet,
-    characterSheet?: CharacterSheet,
+    characterSheet?: ICharacterSheet,
     abilityLoader?: IAbilityLoader,
     clocktower?: IClocktower
 ): AbilitySetupContext {
@@ -92,7 +92,7 @@ export function mockMayorAbilitySetupContext(
     players?: IPlayers,
     game?: IGame,
     nightSheet?: NightSheet,
-    characterSheet?: CharacterSheet
+    characterSheet?: ICharacterSheet
 ): MayorAbilitySetupContext {
     return Object.assign(
         {},
@@ -114,7 +114,7 @@ export function mockSaintAbilitySetupContext(
     players?: IPlayers,
     game?: IGame,
     nightSheet?: NightSheet,
-    characterSheet?: CharacterSheet
+    characterSheet?: ICharacterSheet
 ): SaintAbilitySetupContext {
     return Object.assign(
         {},

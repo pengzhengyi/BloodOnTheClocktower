@@ -1,5 +1,5 @@
 import { Alignment } from '~/game/alignment';
-import { CharacterLoader } from '~/game/character/character-loader';
+import { GameEnvironment } from '~/game/environment';
 import { Player } from '~/game/player';
 
 const regex = /(.*) is\s?(?:the|a|an)?\s(evil|good|)\s?(.*)/i;
@@ -10,7 +10,9 @@ export async function playerFromDescription(description: string) {
         throw new Error(`Cannot initialize a player form ${description}`);
     }
     const [_, username, alignmentDescription, characterName] = matchResult;
-    const character = await CharacterLoader.loadAsync(characterName);
+    const character = await GameEnvironment.current.characterLoader.loadAsync(
+        characterName
+    );
 
     let alignment: Alignment | undefined;
     if (alignmentDescription === 'evil') {
