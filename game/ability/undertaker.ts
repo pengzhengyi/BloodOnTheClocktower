@@ -1,4 +1,4 @@
-import { UndertakerRequestInfoWhenNoExecution } from '../exception';
+import { UndertakerRequestInfoWhenNoExecution } from '../exception/undertaker-request-info-when-no-execution';
 import type { UndertakerInformation } from '../info/provider/undertaker';
 import {
     UndertakerInformationRequester,

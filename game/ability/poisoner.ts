@@ -6,7 +6,7 @@ import type {
     IEvent,
     INonBlockingSubscriber,
 } from '../event-notification/types';
-import { PoisonerNotChoosePlayerToPoison } from '../exception';
+import { PoisonerNotChoosePlayerToPoison } from '../exception/poisoner-not-choose-player-to-poison';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import { Phase } from '../phase';
 import type { IPlayer } from '../player';

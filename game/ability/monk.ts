@@ -1,4 +1,4 @@
-import { MonkNotChoosePlayerToProtect } from '../exception';
+import { MonkNotChoosePlayerToProtect } from '../exception/monk-not-choose-player-to-protect';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { CharacterToken } from '../character/character';
 import type { IPlayer } from '../player';

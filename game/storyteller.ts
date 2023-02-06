@@ -1,4 +1,4 @@
-import { NoDefinedInfoProvider } from './exception';
+import { NoDefinedInfoProvider } from './exception/no-defined-info-provider';
 import { type IGrimoire } from './grimoire';
 import type { Info, InfoOptions } from './info/info';
 import type {

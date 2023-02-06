@@ -13,7 +13,7 @@ import {
 } from './character/character-type';
 import { Generator } from './collections';
 import type { InteractionInitiator } from './effect/effect';
-import { IncorrectNumberOfCharactersToAssign } from './exception';
+import { IncorrectNumberOfCharactersToAssign } from './exception/incorrect-number-of-characters-to-assign';
 import type { CharacterAssignmentResult, IPlayer } from './player';
 
 /**

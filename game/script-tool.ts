@@ -17,13 +17,11 @@ import {
     Townsfolk,
     Traveller,
 } from './character/character-type';
-import {
-    InvalidScriptConstraints,
-    NegativeNumberForCharacterTypeInScriptConstraint,
-    TooManyMustIncludedCharacters,
-} from './exception';
+import { NegativeNumberForCharacterTypeInScriptConstraint } from './exception/negative-number-for-character-type-in-script-constraint';
 import { GameEnvironment } from './environment';
 import { CharacterSheetFactory } from './character/character-sheet-factory';
+import { InvalidScriptConstraints } from './exception/invalid-script-constraints';
+import { TooManyMustIncludedCharacters } from './exception/too-many-must-included-characters';
 
 export interface NumberOfCharacters {
     townsfolk: number;

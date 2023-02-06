@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
+import { UnsupportedOperation } from './exception/unsupported-operation';
 import { GamePhase } from './game-phase';
-import { UnsupportedOperation } from './exception';
 
 export interface IDuration {
     atSameDate: boolean;

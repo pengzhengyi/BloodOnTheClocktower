@@ -1,8 +1,6 @@
 import { lowercaseLetters } from '../common';
-import {
-    CannotDetermineCharacterType,
-    IncompleteCharacterRoleData,
-} from '../exception';
+import { CannotDetermineCharacterType } from '../exception/cannot-determine-character-type';
+import { IncompleteCharacterRoleData } from '../exception/incomplete-character-role-data';
 import { RoleDataKeyName, type RoleData, type ScriptCharacter } from '../types';
 import {
     CharacterType,

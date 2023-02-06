@@ -1,4 +1,5 @@
-import { ExileNonTraveller, NoVoteInExile } from './exception';
+import { ExileNonTraveller } from './exception/exile-non-traveller';
+import { NoVoteInExile } from './exception/no-vote-in-exile';
 import { Nomination, type NominationState } from './nomination';
 import type { IPlayer } from './player';
 import { Vote } from './vote';

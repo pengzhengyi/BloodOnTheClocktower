@@ -7,7 +7,8 @@ import {
     instanceToPlain,
 } from 'class-transformer';
 import { Generator } from '../collections';
-import { CharacterSheetCreationFailure, GameError } from '../exception';
+import { GameError } from '../exception/exception';
+import { CharacterSheetCreationFailure } from '../exception/character-sheet-creation-failure';
 import { CharactersToIDs, type CharacterToken } from './character';
 import {
     type CharacterType,

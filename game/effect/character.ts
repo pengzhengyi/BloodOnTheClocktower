@@ -1,5 +1,5 @@
 import type { CharacterToken } from '../character/character';
-import { CharacterEffectOriginNotSetup } from '../exception';
+import { CharacterEffectOriginNotSetup } from '../exception/character-effect-origin-not-setup';
 import type { NightSheet } from '../night-sheet';
 import type { Constructor, IBindToCharacter } from '../types';
 import type { Effect } from './effect';

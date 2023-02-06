@@ -11,7 +11,7 @@ import {
 } from '~/__mocks__/player';
 import type { IPlayer } from '~/game/player';
 import { Generator } from '~/game/collections';
-import { AttemptMoreThanOneExecution } from '~/game/exception';
+import { AttemptMoreThanOneExecution } from '~/game/exception/attempt-more-than-one-execution';
 
 beforeAll(() => {
     storytellerConfirmMock.mockImplementation(() => Promise.resolve(true));

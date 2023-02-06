@@ -1,4 +1,4 @@
-import { RavenkeeperNotChoosePlayerToProtect } from '../exception';
+import { RavenkeeperNotChoosePlayerToProtect } from '../exception/ravenkeeper-not-choose-player-to-protect';
 import type { RavenkeeperInformation } from '../info/provider/ravenkeeper';
 import {
     RavenkeeperInformationRequester,

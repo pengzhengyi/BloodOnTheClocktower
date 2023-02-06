@@ -1,0 +1,11 @@
+{
+	"detectiveOptions": {
+		"es6": {
+			"skipTypeImports": true
+		},
+		"ts": {
+			"skipTypeImports": true
+		}
+	},
+    "tsConfig": "tsconfig.json"
+}

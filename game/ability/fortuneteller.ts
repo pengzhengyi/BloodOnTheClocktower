@@ -1,6 +1,6 @@
 import type { CharacterToken } from '../character/character';
 import { Effect, type InteractionContext } from '../effect/effect';
-import { FortuneTellerChooseInvalidPlayers } from '../exception';
+import { FortuneTellerChooseInvalidPlayers } from '../exception/fortune-teller-choose-invalid-players';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 
 import type { FortuneTellerInformation } from '../info/provider/fortuneteller';

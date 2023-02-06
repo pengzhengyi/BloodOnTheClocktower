@@ -1,6 +1,6 @@
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { clockwise } from './common';
-import { NoVotesWhenCountingVote } from './exception';
+import { NoVotesWhenCountingVote } from './exception/no-votes-when-counting-vote';
 import { Player, type IPlayer } from './player';
 import { type PlayerOrdering } from './types';
 import { InteractionEnvironment } from '~/interaction/environment';

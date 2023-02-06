@@ -1,5 +1,5 @@
 import { Duration, IndefiniteDuration } from '~/game/duration';
-import { UnsupportedOperation } from '~/game/exception';
+import { UnsupportedOperation } from '~/game/exception/unsupported-operation';
 import { GamePhase } from '~/game/game-phase';
 
 describe('test basic Duration functionality', () => {

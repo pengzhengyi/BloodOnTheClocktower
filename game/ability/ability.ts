@@ -1,8 +1,4 @@
-import {
-    AbilityCanOnlyUseOnce,
-    AbilityRequiresSetup,
-    RecoverableGameError,
-} from '../exception';
+import { RecoverableGameError } from '../exception/exception';
 import type {
     AsyncFactory,
     Constructor,
@@ -24,6 +20,8 @@ import type {
 } from '../info/requester/requester';
 import type { IClocktower } from '../clocktower';
 import type { ICharacterTypeInformationRequester } from '../info/requester/common';
+import { AbilityRequiresSetup } from '../exception/ability-requires-setup';
+import { AbilityCanOnlyUseOnce } from '../exception/ability-can-only-use-once';
 import type { IAbilityLoader } from './loader';
 import {
     AbilitySuccessCommunicatedInfo,

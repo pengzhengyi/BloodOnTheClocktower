@@ -1,5 +1,5 @@
 import { randomChoice } from '../common';
-import { NoCharacterMatchingId } from '../exception';
+import { NoCharacterMatchingId } from '../exception/no-character-matching-id';
 import { Character, type CharacterToken } from './character';
 import {
     CHARACTERS,

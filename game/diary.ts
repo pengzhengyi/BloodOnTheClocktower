@@ -1,9 +1,7 @@
 import { Death } from './death';
-import {
-    EventNotExistInDate,
-    PastMomentRewrite,
-    RecordUnknownEventInDiary,
-} from './exception';
+import { EventNotExistInDate } from './exception/event-not-exist-in-date';
+import { PastMomentRewrite } from './exception/past-moment-rewrite';
+import { RecordUnknownEventInDiary } from './exception/record-unknown-event-in-diary';
 import { Execution } from './execution';
 import { Exile } from './exile';
 import { moment, type Moment } from './moment';

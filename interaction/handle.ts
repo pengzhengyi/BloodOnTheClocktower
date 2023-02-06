@@ -1,4 +1,4 @@
-import { type RecoverableGameError } from '~/game/exception';
+import { type RecoverableGameError } from '~/game/exception/exception';
 
 export interface IHandle {
     /**

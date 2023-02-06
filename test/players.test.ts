@@ -2,10 +2,7 @@ import { handleMock } from '~/__mocks__/game-ui';
 import { randomChoice } from '~/game/common';
 import { Alignment } from '~/game/alignment';
 import { Generator } from '~/game/collections';
-import {
-    IncorrectNumberOfCharactersToAssign,
-    PlayerHasUnclearAlignment,
-} from '~/game/exception';
+import { IncorrectNumberOfCharactersToAssign } from '~/game/exception/incorrect-number-of-characters-to-assign';
 import { Players } from '~/game/players';
 import type {
     CharacterToken,
@@ -13,6 +10,7 @@ import type {
 } from '~/game/character/character';
 import { randomCharacters } from '~/__mocks__/character';
 import { createBasicPlayers, createUnassignedPlayer } from '~/__mocks__/player';
+import { PlayerHasUnclearAlignment } from '~/game/exception/player-has-unclear-alignment';
 
 export function createRandomCharactersAndOptionalAlignmentForTraveller(
     numCharacters: number

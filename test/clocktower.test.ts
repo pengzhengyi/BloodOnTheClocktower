@@ -1,7 +1,7 @@
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { Clocktower, type IClocktower } from '~/game/clocktower';
 import { GamePhase } from '~/game/game-phase';
-import { RecallFutureDate } from '~/game/exception';
+import { RecallFutureDate } from '~/game/exception/recall-future-date';
 import { Phase } from '~/game/phase';
 
 async function createClocktower(phaseIndex: number): Promise<IClocktower> {

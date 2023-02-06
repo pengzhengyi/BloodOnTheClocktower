@@ -7,13 +7,11 @@ import { Nomination } from './nomination';
 import { type IPlayer, Player } from './player';
 import { type Predicate } from './types';
 import type { Death } from './death';
-import {
-    AttemptMoreThanOneExecution,
-    NominatedNominatedBefore,
-    NominatorNominatedBefore,
-    NoVoteInNomination,
-    NoVotesWhenCountingVote,
-} from './exception';
+import { NoVoteInNomination } from './exception/no-vote-in-nomination';
+import { AttemptMoreThanOneExecution } from './exception/attempt-more-than-one-execution';
+import { NoVotesWhenCountingVote } from './exception/no-votes-when-counting-vote';
+import { NominatedNominatedBefore } from './exception/nominated-nominated-before';
+import { NominatorNominatedBefore } from './exception/nominator-nominated-before';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 /**

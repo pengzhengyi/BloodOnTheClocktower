@@ -19,15 +19,13 @@ import {
     Townsfolk,
     Traveller,
 } from './character/character-type';
-import {
-    DeadPlayerCannotNominate,
-    PlayerHasUnclearAlignment,
-    ReassignCharacterToPlayer,
-} from './exception';
+import { DeadPlayerCannotNominate } from './exception/dead-player-cannot-nominate';
 import type { Execution } from './execution';
 import { DrunkReason } from './drunk-reason';
 import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';
+import { PlayerHasUnclearAlignment } from './exception/player-has-unclear-alignment';
+import { ReassignCharacterToPlayer } from './exception/reassign-character-to-player';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface CharacterAssignmentResult {

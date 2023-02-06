@@ -4,18 +4,16 @@ import type { IGameConfiguration } from './configuration/configuration';
 import { DefaultStaticGameConfiguration } from './configuration/configuration';
 import type { Edition, EditionName } from './edition';
 import { EditionLoader, type IEditionLoader } from './edition-loader';
-import {
-    EditionNotSpecifiedMinimumNumberOfPlayers,
-    GameHasTooFewPlayers,
-    GameHasTooManyPlayers,
-    RecoverableGameError,
-} from './exception';
+import { RecoverableGameError } from './exception/exception';
 import type { IInfoProviderLoader } from './info/provider/loader';
 import { InfoProviderLoader } from './info/provider/loader';
 import type { NumberOfCharacters } from './script-tool';
 import type { IEnvironment, IEnvironmentProvider } from './types';
 import type { ICharacterLoader } from './character/character-loader';
 import { CharacterLoader } from './character/character-loader';
+import { GameHasTooFewPlayers } from './exception/game-has-too-few-players';
+import { GameHasTooManyPlayers } from './exception/game-has-too-many-players';
+import { EditionNotSpecifiedMinimumNumberOfPlayers } from './exception/edition-not-specified-minimum-number-of-players';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface IGameEnvironment extends IEnvironment {

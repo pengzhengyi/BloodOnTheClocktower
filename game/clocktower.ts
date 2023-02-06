@@ -1,4 +1,4 @@
-import { RecallFutureDate, RecallFutureEvent } from './exception';
+import { RecallFutureDate } from './exception/recall-future-date';
 import { GamePhase, type IGamePhase } from './game-phase';
 import { Phase, toString } from './phase';
 import { Diary, type Event, type IDiary } from './diary';
@@ -10,6 +10,7 @@ import {
     type IGamePhaseNotification,
 } from './event-notification/notification/game-phase';
 import { GamePhaseEvent } from './event-notification/event/game-phase';
+import { RecallFutureEvent } from './exception/recall-future-event';
 
 export interface IClocktower {
     readonly gamePhase: IGamePhase;

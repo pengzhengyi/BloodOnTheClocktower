@@ -1,5 +1,5 @@
 import type { Edition } from './edition';
-import { NoEditionMatchingName } from './exception';
+import { NoEditionMatchingName } from './exception/no-edition-matching-name';
 import { NAME_TO_EDITION } from '~/content/editions/editions';
 
 export interface IEditionLoader {

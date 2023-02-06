@@ -19,7 +19,8 @@
         "test:log": "yarn test --silent=false --collectCoverage=false --verbose=false",
         "test:dev": "yarn test --maxWorkers=50% --verbose",
         "test:ci": "yarn test --runInBand",
-        "test:profile": "ndb --prof yarn test:ci --verbose --collectCoverage=false"
+        "test:profile": "ndb --prof yarn test:ci --verbose --collectCoverage=false",
+        "validate:no-circular": "npx madge --extensions js,ts --circular ."
     },
     "lint-staged": {
         "*.{js,ts,vue}": "eslint --cache",
@@ -79,6 +80,7 @@
         "jest-extended": "^3.0.1",
         "jest-mock-extended": "^2.0.6",
         "lint-staged": "^13.0.3",
+        "madge": "^6.0.0",
         "ndb": "^1.1.5",
         "postcss-html": "^1.3.0",
         "prettier": "^2.5.1",

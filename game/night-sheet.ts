@@ -1,9 +1,7 @@
 import { PriorityQueue } from 'js-sdsl';
 import type { CharacterToken } from './character/character';
-import {
-    CharacterNotInNightActOrdering,
-    IncompleteCharacterRoleData,
-} from './exception';
+import { CharacterNotInNightActOrdering } from './exception/character-not-in-night-act-ordering';
+import { IncompleteCharacterRoleData } from './exception/incomplete-character-role-data';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export enum NightActOrderNotDefinedHandleStrategy {

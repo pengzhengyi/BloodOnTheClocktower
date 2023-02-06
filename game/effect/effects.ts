@@ -1,6 +1,6 @@
 import { OrderedMap, LinkList } from 'js-sdsl';
 import { Generator, LazyMap } from '../collections';
-import { EffectsNotSetup } from '../exception';
+import { EffectsNotSetup } from '../exception/effects-not-setup';
 import { type GamePhase } from '../game-phase';
 import {
     ALL_GAME_PHASE_KINDS,

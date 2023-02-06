@@ -6,7 +6,7 @@ import type { IPlayers } from '../players';
 import type { NextFunction } from '../proxy/middleware';
 import type { AnyFactory, ImpPlayer, MinionPlayer } from '../types';
 import type { IPlayer } from '../player';
-import { ImpNotChoosePlayerToKill } from '../exception';
+import { ImpNotChoosePlayerToKill } from '../exception/imp-not-choose-player-to-kill';
 import type { Death } from '../death';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import {

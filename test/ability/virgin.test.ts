@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { playerFromDescription } from '../utils';
 import { expectAfterNominateVirgin } from './common';
 import { DeadReason } from '~/game/dead-reason';
-import { DeadPlayerCannotNominate } from '~/game/exception';
+import { DeadPlayerCannotNominate } from '~/game/exception/dead-player-cannot-nominate';
 import type { VirginPlayer } from '~/game/types';
 import { handleMock } from '~/__mocks__/game-ui';
 

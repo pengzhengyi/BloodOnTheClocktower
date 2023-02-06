@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
 import { Vote } from './vote';
-import { type IPlayer, Player } from './player';
+import type { IPlayer } from './player';
 
 export enum NominationState {
     NotStarted,
@@ -21,11 +21,9 @@ export class Nomination {
     vote?: Vote;
 
     @Expose({ toPlainOnly: true })
-    @Type(() => Player)
     nominator: IPlayer;
 
     @Expose({ toPlainOnly: true })
-    @Type(() => Player)
     nominated: IPlayer;
 
     get state(): NominationState {

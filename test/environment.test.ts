@@ -1,6 +1,7 @@
 import { EditionName } from '~/game/edition';
 import { GameEnvironment } from '~/game/environment';
-import { GameHasTooFewPlayers, GameHasTooManyPlayers } from '~/game/exception';
+import { GameHasTooManyPlayers } from '~/game/exception/game-has-too-many-players';
+import { GameHasTooFewPlayers } from '~/game/exception/game-has-too-few-players';
 
 describe('Test validateNumberOfPlayers', () => {
     const validator = GameEnvironment.current as any;

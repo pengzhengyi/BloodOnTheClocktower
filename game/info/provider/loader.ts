@@ -22,7 +22,7 @@ import type {
 } from './provider';
 import type { NoParamConstructor } from '~/game/types';
 import { Generator } from '~/game/collections';
-import { NoDefinedInfoProvider } from '~/game/exception';
+import { NoDefinedInfoProvider } from '~/game/exception/no-defined-info-provider';
 import { Singleton } from '~/game/common';
 
 type InfoProviderMethod<

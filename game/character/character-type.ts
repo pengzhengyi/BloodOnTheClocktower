@@ -1,5 +1,5 @@
 import { Alignment } from '../alignment';
-import { NoMatchingCharacterType } from '../exception';
+import { NoMatchingCharacterType } from '../exception/no-matching-character-type';
 
 /**
  * {@link `glossary["Type"]`}

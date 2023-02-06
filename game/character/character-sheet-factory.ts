@@ -2,12 +2,10 @@ import { Generator, LazyMap } from '../collections';
 import { parsePromiseSettledResults, Singleton } from '../common';
 import type { Edition } from '../edition';
 import { GameEnvironment } from '../environment';
-import type { GameError } from '../exception';
-import {
-    CharacterLoadFailures,
-    IncompleteEditionData,
-    NoCharacterMatchingId,
-} from '../exception';
+import { CharacterLoadFailures } from '../exception/character-load-failures';
+import type { GameError } from '../exception/exception';
+import { NoCharacterMatchingId } from '../exception/no-character-matching-id';
+import { IncompleteEditionData } from '../exception/incomplete-edition-data';
 import type { ISingleton } from '../types';
 import { EditionKeyName } from '../types';
 import type { CharacterToken } from './character';
