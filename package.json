@@ -20,7 +20,8 @@
         "test:dev": "yarn test --maxWorkers=50% --verbose",
         "test:ci": "yarn test --runInBand",
         "test:profile": "ndb --prof yarn test:ci --verbose --collectCoverage=false",
-        "validate:no-circular": "npx madge --extensions js,ts --circular ."
+        "deps:check": "madge --circular .",
+        "deps:image": "madge --image coverage/dependencies.svg  ."
     },
     "lint-staged": {
         "*.{js,ts,vue}": "eslint --cache",

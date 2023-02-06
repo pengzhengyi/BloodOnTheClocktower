@@ -7,5 +7,7 @@
 			"skipTypeImports": true
 		}
 	},
-    "tsConfig": "tsconfig.json"
+    "tsConfig": "tsconfig.json",
+	"fileExtensions": ["js", "ts"],
+	"excludeRegExp": ["test", "__mocks__"]
 }
