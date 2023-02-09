@@ -84,5 +84,6 @@
         "proxymiddleware",
         "unproxied"
     ],
-    "jest.jestCommandLine": "yarn test:ci"
+    "jest.jestCommandLine": "yarn test:ci",
+    "editor.formatOnSave": false
 }

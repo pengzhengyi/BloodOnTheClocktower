@@ -17,7 +17,10 @@
             "files.trimTrailingWhitespace": false,
             "editor.wordWrap": "on"
         },
+        "editor.formatOnPaste": true,
         "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.formatOnSaveMode": "modificationsIfAvailable",
         "files.trimTrailingWhitespace": true,
         "python.formatting.blackArgs": ["--line-length=99"],
         "python.formatting.provider": "black",
