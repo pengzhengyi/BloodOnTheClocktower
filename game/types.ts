@@ -285,3 +285,12 @@ export interface IEnvironment {}
 export interface IEnvironmentProvider<TEnvironment extends IEnvironment> {
     readonly current: TEnvironment;
 }
+
+export interface ICharacterTypeToCharacter {
+    readonly minion: Array<CharacterToken>;
+    readonly demon: Array<CharacterToken>;
+    readonly townsfolk: Array<CharacterToken>;
+    readonly outsider: Array<CharacterToken>;
+    readonly traveller: Array<CharacterToken>;
+    readonly fabled: Array<CharacterToken>;
+}

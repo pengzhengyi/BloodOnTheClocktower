@@ -9,6 +9,7 @@ import {
 import { Generator } from '../collections';
 import { GameError } from '../exception/exception';
 import { CharacterSheetCreationFailure } from '../exception/character-sheet-creation-failure';
+import type { ICharacterTypeToCharacter } from '../types';
 import { CharactersToIDs, type CharacterToken } from './character';
 import {
     type CharacterType,
@@ -21,20 +22,13 @@ import {
 } from './character-type';
 import { iterableToString } from '~/utils/common';
 
-export interface ICharacterSheet {
+export interface ICharacterSheet extends ICharacterTypeToCharacter {
     readonly characters: Array<CharacterToken>;
 
     readonly characterTypeToCharacters: Map<
         typeof CharacterType,
         Array<CharacterToken>
     >;
-
-    readonly minion: Array<CharacterToken>;
-    readonly demon: Array<CharacterToken>;
-    readonly townsfolk: Array<CharacterToken>;
-    readonly outsider: Array<CharacterToken>;
-    readonly traveller: Array<CharacterToken>;
-    readonly fabled: Array<CharacterToken>;
 
     toJSON(): Record<string, any>;
     toString(): string;

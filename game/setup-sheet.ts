@@ -22,6 +22,8 @@ import type { IStoryTeller } from './storyteller';
 import { StoryTeller } from './storyteller';
 import type { TravellerCharacterToken } from './character/character';
 import type { TravellerPlayer } from './types';
+import type { ICharacterSheet } from './character/character-sheet';
+import { CharacterSheetFactory } from './character/character-sheet-factory';
 import { InteractionEnvironment } from '~/interaction/environment';
 
 export interface ISetupContext {
@@ -34,6 +36,7 @@ export interface ISetupResult {
     townSquare: ITownSquare;
     storyTeller: IStoryTeller;
     edition: typeof Edition;
+    editionCharacterSheet: ICharacterSheet;
     characterTypeComposition: NumberOfCharacters;
 }
 
@@ -52,6 +55,10 @@ export interface ISetupSheet {
     setupStoryTeller(players: IPlayers): Promise<IStoryTeller>;
 
     setupEdition(): Promise<typeof Edition>;
+
+    setupEditionCharacterSheet(
+        edition: typeof Edition
+    ): Promise<ICharacterSheet>;
 
     recommendCharacterTypeComposition(
         numPlayers: number,
@@ -82,19 +89,22 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             this.setupEdition(),
         ]);
 
-        const [storyTeller, characterTypeComposition] = await Promise.all([
-            this.setupStoryTeller(players),
-            this.recommendCharacterTypeComposition(
-                players.length,
-                edition.name as EditionName
-            ),
-        ]);
+        const [storyTeller, characterTypeComposition, editionCharacterSheet] =
+            await Promise.all([
+                this.setupStoryTeller(players),
+                this.recommendCharacterTypeComposition(
+                    players.length,
+                    edition.name as EditionName
+                ),
+                this.setupEditionCharacterSheet(edition),
+            ]);
 
         const setupResult: ISetupResult = {
             players,
             townSquare,
             edition,
             storyTeller,
+            editionCharacterSheet,
             characterTypeComposition,
         };
 
@@ -157,6 +167,14 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
                 editionName
             );
         return assignment;
+    }
+
+    setupEditionCharacterSheet(
+        edition: typeof Edition
+    ): Promise<ICharacterSheet> {
+        const characterSheet =
+            CharacterSheetFactory.getInstance().getFromEdition(edition);
+        return Promise.resolve(characterSheet);
     }
 
     setupTraveller(

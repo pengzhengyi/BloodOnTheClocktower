@@ -1,5 +1,4 @@
 import { Alignment } from '../alignment';
-import { NoMatchingCharacterType } from '../exception/no-matching-character-type';
 
 /**
  * {@link `glossary["Type"]`}
@@ -33,24 +32,6 @@ export abstract class CharacterType {
         }
 
         return undefined;
-    }
-
-    static async from(type?: string): Promise<typeof CharacterType> {
-        const errorForUndefinedType = new NoMatchingCharacterType(type);
-        await errorForUndefinedType.throwWhen(
-            (error) => error.correctedType === undefined
-        );
-
-        // short circuiting with map
-        const errorForNotFoundType = new NoMatchingCharacterType(
-            errorForUndefinedType.correctedType
-        );
-        await errorForNotFoundType.throwWhen(
-            (error) =>
-                TEAM_CHARACTER_TYPES.get(error.correctedType) === undefined
-        );
-
-        return TEAM_CHARACTER_TYPES.get(errorForNotFoundType.correctedType)!;
     }
 
     static toJSON(): string {
@@ -108,7 +89,7 @@ export abstract class Fabled extends CharacterType {
     static defaultAlignment = Alignment.Neutral;
 }
 
-export const CHARACTER_TYPES: Array<typeof CharacterType> = [
+const CHARACTER_TYPES: Array<typeof CharacterType> = [
     Townsfolk,
     Outsider,
     Minion,
