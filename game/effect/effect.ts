@@ -2,7 +2,7 @@ import { BasicGamePhaseKind } from '../game-phase-kind';
 import { type Predicate } from '../types';
 import type { IMiddleware, NextFunction } from '../proxy/middleware';
 import type { IPlayer } from '../player';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 interface ProxyHandlerRequest<TTarget extends object> {
     trap: keyof ProxyHandler<TTarget>;

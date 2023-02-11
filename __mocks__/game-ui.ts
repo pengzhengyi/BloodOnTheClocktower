@@ -1,7 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { Generator } from '~/game/collections';
 import type { Predicate } from '~/game/types';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 import type { IGameUI } from '~/interaction/game-ui';
 
 export const hasRaisedHandForVoteMock = InteractionEnvironment.current.gameUI

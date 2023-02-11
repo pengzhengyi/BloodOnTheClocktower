@@ -1,13 +1,9 @@
-import type { IGameUI } from './game-ui';
+import type { IGameUI } from '../game-ui';
+import type {
+    IInteractionEnvironment,
+    IInteractionEnvironmentProvider,
+} from './types';
 import { mockInteractionEnvironment } from '~/__mocks__/interaction-environment';
-import type { IEnvironment, IEnvironmentProvider } from '~/game/types';
-
-export interface IInteractionEnvironment extends IEnvironment {
-    gameUI: IGameUI;
-}
-
-export interface IInteractionEnvironmentProvider
-    extends IEnvironmentProvider<IInteractionEnvironment> {}
 
 abstract class AbstractInteractionEnvironment
     implements IInteractionEnvironment

@@ -8,7 +8,7 @@ import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
 import type { ISetupContext, ISetupSheet } from './setup-sheet';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGame extends IEffectTarget<IGame> {
     // fundamental properties of IGame

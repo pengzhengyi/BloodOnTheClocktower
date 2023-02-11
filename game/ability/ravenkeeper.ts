@@ -10,7 +10,7 @@ import {
     GetCharacterInformationAbility,
     type GetInfoAbilityUseContext,
 } from './ability';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
     RavenkeeperInformation,

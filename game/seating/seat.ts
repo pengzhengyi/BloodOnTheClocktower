@@ -1,5 +1,5 @@
 import type { IPlayer } from '../player';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface SitResult {
     player: IPlayer;

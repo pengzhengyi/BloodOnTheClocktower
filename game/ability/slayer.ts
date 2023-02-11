@@ -14,7 +14,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from './status';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface SlayerAbilityUseResult extends AbilityUseResult {
     chosenPlayer: IPlayer;

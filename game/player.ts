@@ -26,7 +26,7 @@ import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';
 import { PlayerHasUnclearAlignment } from './exception/player-has-unclear-alignment';
 import { ReassignCharacterToPlayer } from './exception/reassign-character-to-player';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface CharacterAssignmentResult {
     player: IPlayer;

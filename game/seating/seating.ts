@@ -11,7 +11,7 @@ import { PlayerNoNeighbors } from '../exception/player-no-neighbors';
 import { type ISeatOccupancy, SeatOccupancy } from './seat-occupancy';
 import { type ISeat, Seat, type SitResult } from './seat';
 import { iterableToString } from '~/utils/common';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface ISeating extends Iterable<ISeat> {
     readonly numSeats: number;

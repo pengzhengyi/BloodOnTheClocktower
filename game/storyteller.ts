@@ -8,7 +8,7 @@ import type {
 import type { IPlayer } from './player';
 import { type AsyncTask } from './types';
 import { GameEnvironment } from './environment';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IStoryTeller {
     /**

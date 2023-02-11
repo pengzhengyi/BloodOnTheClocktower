@@ -4,7 +4,7 @@ import type {
     FalseInformationOptions,
 } from './information';
 import type { StoryTellerInformationOptions } from './storyteller-information';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 /**
  * There are two classifications for info:

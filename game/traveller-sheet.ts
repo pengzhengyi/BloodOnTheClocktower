@@ -1,6 +1,6 @@
 import type { NumberOfCharacters as Assignment } from './script-tool';
 import type { TravellerCharacterToken } from './character/character';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 /**
  * {@link `glossary["Traveller Sheet"]`}

@@ -6,7 +6,7 @@ import type {
     AsyncPredicate,
 } from '../types';
 
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export class BaseError extends Error {
     declare cause?: Error;

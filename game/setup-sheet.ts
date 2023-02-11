@@ -24,7 +24,7 @@ import type { TravellerCharacterToken } from './character/character';
 import type { TravellerPlayer } from './types';
 import type { ICharacterSheet } from './character/character-sheet';
 import { CharacterSheetFactory } from './character/character-sheet-factory';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface ISetupContext {
     initialPlayers?: Array<IPlayer>;

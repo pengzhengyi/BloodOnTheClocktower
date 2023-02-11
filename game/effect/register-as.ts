@@ -3,7 +3,7 @@ import type { CharacterToken } from '../character/character';
 import type { IPlayer } from '../player';
 import type { NextFunction } from '../proxy/middleware';
 import { Effect, type InteractionContext } from './effect';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 abstract class RegisterAsEffect<
     TPlayer extends IPlayer,

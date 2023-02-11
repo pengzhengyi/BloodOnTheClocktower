@@ -19,7 +19,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export class MayorPeacefulWinEffect extends Effect<IGame> {
     static readonly description =

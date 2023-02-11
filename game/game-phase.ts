@@ -2,7 +2,7 @@ import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
 import { BasicGamePhaseKind } from './game-phase-kind';
 import { Phase, getPhase, getPhaseIndex, toString } from './phase';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGamePhase {
     /**

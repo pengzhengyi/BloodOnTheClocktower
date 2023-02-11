@@ -21,7 +21,7 @@ import {
     RequireSetup,
 } from './ability';
 import { Imp } from '~/content/characters/output/imp';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
     static readonly description =

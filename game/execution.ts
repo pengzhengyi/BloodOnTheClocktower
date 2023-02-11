@@ -12,7 +12,7 @@ import { AttemptMoreThanOneExecution } from './exception/attempt-more-than-one-e
 import { NoVotesWhenCountingVote } from './exception/no-votes-when-counting-vote';
 import { NominatedNominatedBefore } from './exception/nominated-nominated-before';
 import { NominatorNominatedBefore } from './exception/nominator-nominated-before';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 /**
  * {@link `glossary["Execution"]`}

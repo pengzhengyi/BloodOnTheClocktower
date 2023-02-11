@@ -14,7 +14,7 @@ import { CharacterLoader } from './character/character-loader';
 import { GameHasTooFewPlayers } from './exception/game-has-too-few-players';
 import { GameHasTooManyPlayers } from './exception/game-has-too-many-players';
 import { EditionNotSpecifiedMinimumNumberOfPlayers } from './exception/edition-not-specified-minimum-number-of-players';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGameEnvironment extends IEnvironment {
     editionLoader: IEditionLoader;

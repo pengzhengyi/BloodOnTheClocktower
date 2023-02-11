@@ -17,7 +17,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 import { Monk } from '~/content/characters/output/monk';
 
 class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {

@@ -19,7 +19,7 @@ import {
     type GetInfoAbilityUseContext,
     RequireSetup,
 } from './ability';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =

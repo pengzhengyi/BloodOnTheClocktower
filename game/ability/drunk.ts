@@ -17,7 +17,7 @@ import {
     RequireSetup,
 } from './ability';
 import { AbilityUseStatus } from './status';
-import { InteractionEnvironment } from '~/interaction/environment';
+import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     /**
