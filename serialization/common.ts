@@ -1,4 +1,5 @@
-import type { IJSONSerializable } from './types';
+import type { IJSONSerializable, ISerializable } from './types';
+import type { TJSON } from '~/game/types';
 
 export interface AbstractJSONSerializable<T> extends IJSONSerializable<T> {}
 
@@ -15,3 +16,13 @@ export abstract class AbstractJSONSerializable<T>
         return await this.decode(jsonData);
     }
 }
+
+export const JSONSerializable: ISerializable<TJSON> = class JSONSerializable {
+    static serialize(data: TJSON): Promise<string> {
+        return Promise.resolve(JSON.stringify(data));
+    }
+
+    static deserialize(data: string): Promise<TJSON> {
+        return Promise.resolve(JSON.parse(data));
+    }
+};

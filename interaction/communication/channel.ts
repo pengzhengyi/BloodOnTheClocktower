@@ -1,17 +1,13 @@
 import type { ISocket } from './socket';
 import type { IDeserializer, ISerializer } from '~/serialization/types';
 
-export interface IChannel<
-    TIn,
-    TOut,
-    TOptions extends RequestInit = RequestInit
-> {
+export interface IChannel<TIn, TOut, TOptions = RequestInit> {
     send(url: string, data: TIn, options?: TOptions): void;
 
-    communicate(url: string, data: TIn, options: TOptions): Promise<TOut>;
+    communicate(url: string, data: TIn, options?: TOptions): Promise<TOut>;
 }
 
-export class Channel<TIn, TOut, TOptions extends RequestInit = RequestInit>
+export class Channel<TIn, TOut, TOptions = RequestInit>
     implements IChannel<TIn, TOut, TOptions>
 {
     // eslint-disable-next-line no-useless-constructor
