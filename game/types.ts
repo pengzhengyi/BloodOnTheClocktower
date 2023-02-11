@@ -63,6 +63,14 @@ export type AnyFactory<V> = Factory<V> | AsyncFactory<V>;
 export type ResolveCallback<T> = (value: T | PromiseLike<T>) => void;
 export type RejectCallback = (reason?: any) => void;
 
+export type TJSON =
+    | string
+    | number
+    | boolean
+    | null
+    | TJSON[]
+    | { [key: string]: TJSON };
+
 /**
  * Generate a random integer r with equal chance in  min <= r <= max.
  */

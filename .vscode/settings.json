@@ -76,6 +76,8 @@
         "whitespaces"
     ],
     "cSpell.ignoreWords": [
+        "TJSON",
+        "IJSON",
         "Nominateds",
         "effectprecedence",
         "infoprovider",
