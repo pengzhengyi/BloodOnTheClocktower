@@ -14,6 +14,7 @@ import type {
     IChooseOptions,
     ISendOptions,
     IStorytellerChooseOneOptions,
+    IStorytellerChooseOptions,
 } from './features/options/interaction-options';
 import type { IChooseFromOptions, IChosen } from './features/types';
 import type { StaticThis } from '~/game/types';
@@ -105,15 +106,8 @@ abstract class AbstractGameUI implements IGameUI {
     }
 
     storytellerChoose<T>(
-        ...args: [
-            Iterable<T>,
-            number | undefined,
-            string | undefined,
-            boolean | undefined,
-            T | Iterable<T> | undefined,
-            number | undefined
-        ]
-    ): Promise<T> | Promise<T[]> | Promise<undefined> {
+        ...args: [IChooseFromOptions<T>, IStorytellerChooseOptions | undefined]
+    ): Promise<IChosen<T>> {
         return this.tryUseProvider<IStorytellerChoose>(
             'storytellerChoose',
             args

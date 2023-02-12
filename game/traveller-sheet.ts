@@ -7,14 +7,16 @@ import { InteractionEnvironment } from '~/interaction/environment/environment';
  * The sheet placed under the Town Square. It lists how many Outsiders and Minions are in the current game and what the Travellers’ abilities are.
  */
 export class TravellerSheet {
-    static chooseTravellerCharacters(
+    static async chooseTravellerCharacters(
         travellerCharacters: Iterable<TravellerCharacterToken>,
         numTraveller: number
     ): Promise<Array<TravellerCharacterToken>> {
-        return InteractionEnvironment.current.gameUI.storytellerChoose(
-            travellerCharacters,
-            numTraveller
-        ) as Promise<Array<TravellerCharacterToken>>;
+        const chosen =
+            await InteractionEnvironment.current.gameUI.storytellerChoose(
+                { options: travellerCharacters },
+                { numToChoose: numTraveller }
+            );
+        return chosen.choices;
     }
 
     readonly defaultAssignment: Assignment;

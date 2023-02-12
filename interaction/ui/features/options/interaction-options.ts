@@ -43,4 +43,6 @@ export interface IStorytellerChooseOneOptions
     extends IInteractionOptions,
         Partial<ISerializationOptions> {}
 
+export interface IStorytellerChooseOptions extends IChooseOptions {}
+
 export interface IStorytellerConfirmOptions extends IInteractionOptions {}
