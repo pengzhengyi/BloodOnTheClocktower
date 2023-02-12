@@ -11,8 +11,24 @@ export interface IInteractionOptions {
     reason?: string;
 }
 
-export interface IStorytellerConfirmOptions extends IInteractionOptions {}
-
 export interface ICallForNominationOptions
     extends IInteractionOptions,
-        Partial<ISerializationOptions> {}
+        Partial<ISerializationOptions> {
+    /**
+     * If true, only the first proposed nomination will be returned.
+     */
+    firstOnly?: boolean;
+
+    /**
+     * The amount of time in milliseconds to wait after first proposed nomination for other "concurrently" proposed nominations. Grace period is used to allow storyteller to choose among nominations at "roughly the same" time.
+     */
+    gracePeriod?: number;
+}
+
+export interface IChooseOptions
+    extends IInteractionOptions,
+        Partial<ISerializationOptions> {
+    numToChoose?: number;
+}
+
+export interface IStorytellerConfirmOptions extends IInteractionOptions {}

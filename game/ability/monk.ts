@@ -17,7 +17,6 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { InteractionEnvironment } from '~/interaction/environment/environment';
 import { Monk } from '~/content/characters/output/monk';
 
 class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
@@ -122,12 +121,11 @@ class BaseMonkProtectAbility extends Ability<
         players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await InteractionEnvironment.current.gameUI.choose(
+        let chosen = await this.chooseOneOtherPlayer(
             monkPlayer,
-            players.isNot(monkPlayer),
-            1,
+            players,
             BaseMonkProtectAbility.description
-        )) as IPlayer | undefined;
+        );
 
         if (chosen === undefined) {
             const error = new MonkNotChoosePlayerToProtect(monkPlayer, context);

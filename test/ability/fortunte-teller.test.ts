@@ -11,7 +11,11 @@ import {
 } from '~/game/ability/fortuneteller';
 import type { IPlayer } from '~/game/player';
 import { mockAbilitySetupContext } from '~/__mocks__/ability';
-import { storytellerChooseOneMock, chooseMock } from '~/__mocks__/game-ui';
+import {
+    storytellerChooseOneMock,
+    chooseMock,
+    mockChooseImplementation,
+} from '~/__mocks__/game-ui';
 import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
 
@@ -39,7 +43,7 @@ describe('test GetFortuneTellerInformationAbility', () => {
             }
         );
 
-        chooseMock.mockImplementation(async (fortuneTellerPlayer, players) => {
+        mockChooseImplementation(async (fortuneTellerPlayer, players) => {
             expect(await fortuneTellerPlayer.character).toEqual(FortuneTeller);
             return Generator.take(2, players);
         });

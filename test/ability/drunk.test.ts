@@ -16,6 +16,7 @@ import type { GetEmpathInformationAbility } from '~/game/ability/empath';
 import type { EmpathInformation } from '~/game/info/provider/empath';
 import {
     chooseMock,
+    mockChoose,
     mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
 } from '~/__mocks__/game-ui';
@@ -116,7 +117,7 @@ describe('test DrunkAbility', () => {
 
         await expectAfterDemonAttack(drunkPlayer, impPlayer, true);
 
-        chooseMock.mockResolvedValue(saintPlayer);
+        mockChoose(saintPlayer);
         mockStorytellerChooseMatchingOne(
             (information: Information<RavenkeeperInformation>) =>
                 information.info.character === Poisoner

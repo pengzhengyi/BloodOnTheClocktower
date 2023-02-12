@@ -16,7 +16,7 @@ import {
     mockGetInfoAbilityUseContext,
     mockMayorAbilitySetupContext,
 } from '~/__mocks__/ability';
-import { chooseMock, sendMock } from '~/__mocks__/game-ui';
+import { chooseMock, mockChoose, sendMock } from '~/__mocks__/game-ui';
 import { mockClocktowerForDeathAtNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicStoryTeller } from '~/__mocks__/storyteller';
@@ -73,7 +73,7 @@ describe('test GetRavenkeeperInformationAbility', () => {
         );
         expect(await ravenKeeperAbility.isEligible(context)).toBeTrue();
 
-        chooseMock.mockResolvedValue(Douglas);
+        mockChoose(Douglas);
         const result = (await mockRecluseRegisterAs(
             Douglas,
             () => ravenKeeperAbility.use(context),

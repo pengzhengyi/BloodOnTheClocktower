@@ -25,6 +25,7 @@ import { GetFortuneTellerInformationAbility } from '~/game/ability/fortuneteller
 import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import {
     chooseMock,
+    mockChoose,
     mockStorytellerChooseFirstOne,
     mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
@@ -153,7 +154,7 @@ describe('test ScarletWomanAbility', () => {
         const virginPlayer = (await infoProvideContext.players.findByCharacter(
             Virgin
         )) as VirginPlayer;
-        chooseMock.mockResolvedValue([scarletWomanPlayer, virginPlayer]);
+        mockChoose([scarletWomanPlayer, virginPlayer]);
         mockStorytellerChooseFirstOne();
         const fortuneTellerFirstNightInfo = await expectCharacterGetInformation(
             fortuneTellerAbility,

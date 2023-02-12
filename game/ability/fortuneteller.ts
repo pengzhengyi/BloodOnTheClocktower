@@ -112,24 +112,23 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
         players: Iterable<IPlayer>,
         context: GetInfoAbilityUseContext
     ): Promise<[IPlayer, IPlayer]> {
-        let chosen = (await InteractionEnvironment.current.gameUI.choose(
+        let chosenPlayers = await this.chooseTwoPlayers(
             fortuneTellerPlayer,
             players,
-            2,
             BaseGetFortuneTellerInformationAbility.description
-        )) as Array<IPlayer> | undefined;
+        );
 
-        if (!BaseGetFortuneTellerInformationAbility.canChoose(chosen)) {
+        if (!BaseGetFortuneTellerInformationAbility.canChoose(chosenPlayers)) {
             const error = new FortuneTellerChooseInvalidPlayers(
                 fortuneTellerPlayer,
-                chosen,
+                chosenPlayers,
                 context
             );
             await error.resolve();
-            chosen = error.corrected;
+            chosenPlayers = error.corrected;
         }
 
-        return chosen as [IPlayer, IPlayer];
+        return chosenPlayers;
     }
 
     protected async setupRedHerring(

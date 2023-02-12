@@ -10,7 +10,6 @@ import {
     GetCharacterInformationAbility,
     type GetInfoAbilityUseContext,
 } from './ability';
-import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbility<
     RavenkeeperInformation,
@@ -37,7 +36,7 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
             RavenkeeperInformationRequestContext<RavenkeeperInformation>,
             'chosenPlayer'
         >;
-        const chosenPlayer = await this.choosePlayer(
+        const chosenPlayer = await this.choosePlayerToLearn(
             context.requestedPlayer,
             context.players,
             context
@@ -48,17 +47,16 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
         return infoRequestContext as RavenkeeperInformationRequestContext<RavenkeeperInformation>;
     }
 
-    protected async choosePlayer(
+    protected async choosePlayerToLearn(
         ravenkeeperPlayer: RavenkeeperPlayer,
         players: Iterable<IPlayer>,
         context: GetInfoAbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await InteractionEnvironment.current.gameUI.choose(
+        let chosen = await this.chooseOnePlayer(
             ravenkeeperPlayer,
             players,
-            1,
             GetRavenkeeperInformationAbility.description
-        )) as IPlayer;
+        );
 
         if (chosen === undefined) {
             const error = new RavenkeeperNotChoosePlayerToProtect(

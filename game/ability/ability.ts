@@ -238,6 +238,61 @@ export abstract class Ability<
             })
         );
     }
+
+    // utility methods
+    protected async choosePlayer(
+        playerToChoose: IPlayer,
+        playersToChooseFrom: Iterable<IPlayer>,
+        numToChoose: number,
+        reason?: string
+    ): Promise<Array<IPlayer>> {
+        const chosen = await InteractionEnvironment.current.gameUI.choose(
+            { player: playerToChoose, options: playersToChooseFrom },
+            { numToChoose, reason }
+        );
+        return chosen.choices;
+    }
+
+    protected async chooseOnePlayer(
+        playerToChoose: IPlayer,
+        playersToChooseFrom: Iterable<IPlayer>,
+        reason?: string
+    ): Promise<IPlayer> {
+        const chosen = await this.choosePlayer(
+            playerToChoose,
+            playersToChooseFrom,
+            1,
+            reason
+        );
+        return chosen[0];
+    }
+
+    protected async chooseOneOtherPlayer(
+        playerToChoose: IPlayer,
+        players: IPlayers,
+        reason?: string
+    ): Promise<IPlayer> {
+        const chosen = await this.chooseOnePlayer(
+            playerToChoose,
+            players.isNot(playerToChoose),
+            reason
+        );
+        return chosen;
+    }
+
+    protected async chooseTwoPlayers(
+        playerToChoose: IPlayer,
+        playersToChooseFrom: Iterable<IPlayer>,
+        reason?: string
+    ): Promise<[IPlayer, IPlayer]> {
+        const chosen = await this.choosePlayer(
+            playerToChoose,
+            playersToChooseFrom,
+            2,
+            reason
+        );
+        return chosen as [IPlayer, IPlayer];
+    }
 }
 
 export function RequireSetup<

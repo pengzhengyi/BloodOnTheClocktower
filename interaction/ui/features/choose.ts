@@ -1,4 +1,15 @@
+import type { IChooseOptions } from './options/interaction-options';
 import type { IPlayer } from '~/game/player';
+
+export interface IChooseFrom<T> {
+    player: IPlayer;
+    options: Iterable<T>;
+    recommendation?: T | Iterable<T>;
+}
+
+export interface IChosen<T> {
+    choices: Array<T>;
+}
 
 export interface IChoose {
     /**
@@ -7,10 +18,7 @@ export interface IChoose {
      * It can be specified either as single select (default) or multi-select.
      */
     choose<T>(
-        player: IPlayer,
-        options: Iterable<T>,
-        n?: number,
-        reason?: string,
-        timeout?: number
-    ): Promise<T> | Promise<T[]>;
+        chooseFrom: IChooseFrom<T>,
+        options?: IChooseOptions
+    ): Promise<IChosen<T>>;
 }

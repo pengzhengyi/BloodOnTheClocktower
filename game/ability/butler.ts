@@ -131,23 +131,22 @@ export class ButlerAbility extends Ability<
         players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await InteractionEnvironment.current.gameUI.choose(
+        let chosenPlayer = await this.chooseOneOtherPlayer(
             butlerPlayer,
-            players.isNot(butlerPlayer),
-            1,
+            players,
             ButlerAbility.description
-        )) as IPlayer;
+        );
 
-        if (chosen === undefined) {
+        if (chosenPlayer === undefined) {
             const error = new ButlerNotChooseMasterToFollow(
                 butlerPlayer,
                 context
             );
             await error.resolve();
-            chosen = error.correctedMaster;
+            chosenPlayer = error.correctedMaster;
         }
 
-        return chosen;
+        return chosenPlayer;
     }
 
     protected formatDescriptionForMalfunction(

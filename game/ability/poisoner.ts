@@ -25,7 +25,6 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { InteractionEnvironment } from '~/interaction/environment/environment';
 import { Poisoner } from '~/content/characters/output/poisoner';
 
 class BasePoisonEffect
@@ -181,12 +180,11 @@ class BasePoisonerAbility extends Ability<
         players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await InteractionEnvironment.current.gameUI.choose(
+        let chosen = await this.chooseOnePlayer(
             poisonerPlayer,
             players,
-            1,
             BasePoisonerAbility.description
-        )) as IPlayer | undefined;
+        );
 
         if (chosen === undefined) {
             const error = new PoisonerNotChoosePlayerToPoison(

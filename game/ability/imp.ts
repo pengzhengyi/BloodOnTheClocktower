@@ -172,20 +172,19 @@ class BaseImpAbility extends Ability<AbilityUseContext, ImpAbilityUseResult> {
         players: IPlayers,
         context: AbilityUseContext
     ): Promise<IPlayer> {
-        let chosen = (await InteractionEnvironment.current.gameUI.choose(
+        let chosenPlayer = await this.chooseOnePlayer(
             impPlayer,
             players,
-            1,
             BaseImpAbility.description
-        )) as IPlayer | undefined;
+        );
 
-        if (chosen === undefined) {
+        if (chosenPlayer === undefined) {
             const error = new ImpNotChoosePlayerToKill(impPlayer, context);
             await error.resolve();
-            chosen = error.correctedPlayerToKill;
+            chosenPlayer = error.correctedPlayerToKill;
         }
 
-        return chosen as IPlayer;
+        return chosenPlayer;
     }
 
     protected killPlayer(impPlayer: ImpPlayer, playerToKill: IPlayer) {

@@ -1,4 +1,5 @@
 import { type ICallForNomination } from './features/call-for-nomination';
+import type { IChooseFrom, IChosen } from './features/choose';
 import { type IChoose } from './features/choose';
 import { type IConfirm } from './features/confirm';
 import { type IHandle } from './features/handle';
@@ -8,6 +9,7 @@ import { type IStorytellerChooseOne } from './features/storyteller-choose-one';
 import { type IStorytellerConfirm } from './features/storyteller-confirm';
 import { type IStorytellerDecide } from './features/storyteller-decide';
 import type { IHasRaisedHandForVote } from './features/has-raised-hand-for-vote';
+import type { IChooseOptions } from './features/options/interaction-options';
 import type { IPlayer } from '~/game/player';
 import type { StaticThis } from '~/game/types';
 
@@ -89,14 +91,8 @@ abstract class AbstractGameUI implements IGameUI {
     }
 
     choose<T>(
-        ...args: [
-            IPlayer,
-            Iterable<T>,
-            number | undefined,
-            string | undefined,
-            number | undefined
-        ]
-    ): Promise<T> | Promise<T[]> {
+        ...args: [IChooseFrom<T>, IChooseOptions | undefined]
+    ): Promise<IChosen<T>> {
         return this.tryUseProvider<IChoose>('choose', args);
     }
 

@@ -63,6 +63,8 @@ import {
 } from '~/__mocks__/character-sheet';
 import {
     chooseMock,
+    mockChoose,
+    mockChooseImplementation,
     mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
     storytellerConfirmMock,
@@ -157,7 +159,7 @@ export async function monkProtectPlayer(
     context: GetInfoAbilityUseContext,
     playerToProtect: IPlayer
 ): Promise<MonkAbilityUseResult> {
-    chooseMock.mockImplementation(async (_monkPlayer, _players) => {
+    mockChooseImplementation(async (_monkPlayer, _players) => {
         expect(await _monkPlayer.character).toEqual(Monk);
         return playerToProtect;
     });
@@ -208,7 +210,7 @@ export async function expectAfterImpKill(
     }
 
     useContext ??= mockAbilityUseContext(impPlayer, players);
-    chooseMock.mockResolvedValue(playerToKill);
+    mockChoose(playerToKill);
     const result = (await impAbility.use(useContext)) as ImpAbilityUseResult;
     chooseMock.mockReset();
 
@@ -456,7 +458,7 @@ export async function expectAfterSlayerKill(
 
     expect(await ability.isEligible(context)).toBeTrue();
 
-    chooseMock.mockImplementation(async (_slayerPlayer, _players) => {
+    mockChooseImplementation(async (_slayerPlayer, _players) => {
         expect(await _slayerPlayer.character).toEqual(Slayer);
         return chosenPlayer;
     });
@@ -489,7 +491,7 @@ export async function expectAfterPoisonerPoison(
 
     expect(await ability.isEligible(context)).toBeTrue();
 
-    chooseMock.mockImplementation(async (_poisonerPlayer, _players) => {
+    mockChooseImplementation(async (_poisonerPlayer, _players) => {
         expect(await _poisonerPlayer.character).toEqual(Poisoner);
         return chosenPlayer;
     });
@@ -635,7 +637,7 @@ export async function mockButlerChooseMaster(
     context?: AbilityUseContext,
     butlerPlayer?: IPlayer
 ) {
-    chooseMock.mockResolvedValue(master);
+    mockChoose(master);
     await ability.use(context ?? mockAbilityUseContext(butlerPlayer));
     chooseMock.mockReset();
 }

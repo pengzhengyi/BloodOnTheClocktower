@@ -1,7 +1,10 @@
 import { mock } from 'jest-mock-extended';
 import { Generator } from '~/game/collections';
+import type { IPlayer } from '~/game/player';
 import type { Predicate } from '~/game/types';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
+import type { IChooseFrom } from '~/interaction/ui/features/choose';
+import type { IChooseOptions } from '~/interaction/ui/features/options/interaction-options';
 import type { IGameUI } from '~/interaction/ui/game-ui';
 
 export const hasRaisedHandForVoteMock = InteractionEnvironment.current.gameUI
@@ -53,4 +56,29 @@ export function mockStorytellerChooseFirstOne<T>() {
     storytellerChooseOneMock.mockImplementation((options: Iterable<T>) =>
         Promise.resolve(Generator.take(1, options))
     );
+}
+
+export function mockChoose<T>(value: T | Array<T>) {
+    const chosen = Array.isArray(value) ? value : [value];
+    const chosenChoices = { choices: chosen };
+    chooseMock.mockResolvedValue(chosenChoices);
+}
+
+type AsyncChooseImplementation<T> = (
+    playerToChoose: IPlayer,
+    options: Iterable<T>
+) => Promise<T>;
+export function mockChooseImplementation<T>(
+    chooseImpl: AsyncChooseImplementation<T>
+) {
+    const implementation = async (
+        chooseFrom: IChooseFrom<T>,
+        _options?: IChooseOptions
+    ) => {
+        const chosen = await chooseImpl(chooseFrom.player, chooseFrom.options);
+        const chosenAsArray = Array.isArray(chosen) ? chosen : [chosen];
+        const chosenChoices = { choices: chosenAsArray };
+        return chosenChoices;
+    };
+    chooseMock.mockImplementation(implementation);
 }
