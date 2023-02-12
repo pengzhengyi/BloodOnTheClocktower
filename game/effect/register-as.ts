@@ -35,9 +35,10 @@ abstract class RegisterAsEffect<
 
     protected async choose(context: InteractionContext<TPlayer>): Promise<V> {
         return await InteractionEnvironment.current.gameUI.storytellerChooseOne(
-            this.options,
-            this.formatPromptForChoose(context),
-            this.recommended
+            { options: this.options, recommendation: this.recommended },
+            {
+                reason: this.formatPromptForChoose(context),
+            }
         );
     }
 

@@ -3,8 +3,12 @@ import { Generator } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
 import type { Predicate } from '~/game/types';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
-import type { IChooseFrom } from '~/interaction/ui/features/choose';
-import type { IChooseOptions } from '~/interaction/ui/features/options/interaction-options';
+import type { IPlayerChooseFrom } from '~/interaction/ui/features/choose';
+import type {
+    IChooseOptions,
+    IStorytellerChooseOneOptions,
+} from '~/interaction/ui/features/options/interaction-options';
+import type { IChooseFromOptions } from '~/interaction/ui/features/types';
 import type { IGameUI } from '~/interaction/ui/game-ui';
 
 export const hasRaisedHandForVoteMock = InteractionEnvironment.current.gameUI
@@ -31,11 +35,36 @@ export function mockGameUI() {
     return mock<IGameUI>();
 }
 
+type AsyncStorytellerChooseOneImplementation<T> = (
+    options: Iterable<T>,
+    reason?: string
+) => Promise<T>;
+
+export function mockStorytellerChooseOne<T>(
+    chooseImpl: AsyncStorytellerChooseOneImplementation<T>
+) {
+    const implementation = async (
+        chooseFrom: IChooseFromOptions<T>,
+        options?: IStorytellerChooseOneOptions
+    ) => {
+        const chosen = await chooseImpl(chooseFrom.options, options?.reason);
+        return chosen;
+    };
+
+    storytellerChooseOneMock.mockImplementation(implementation);
+}
+
+export function mockStorytellerChooseFirstOne() {
+    mockStorytellerChooseOne((options) =>
+        Promise.resolve(Generator.take(1, options))
+    );
+}
+
 export function mockStorytellerChooseMatchingOne<T>(
     predicate: Predicate<T>,
     expectNumOptions?: number
 ) {
-    storytellerChooseOneMock.mockImplementation((options: Iterable<T>) => {
+    mockStorytellerChooseOne<T>((options) => {
         let _options: Iterable<T>;
 
         if (expectNumOptions === undefined) {
@@ -48,14 +77,8 @@ export function mockStorytellerChooseMatchingOne<T>(
         const found = Generator.find(predicate, _options);
 
         expect(found).toBeDefined();
-        return Promise.resolve(found);
+        return Promise.resolve(found!);
     });
-}
-
-export function mockStorytellerChooseFirstOne<T>() {
-    storytellerChooseOneMock.mockImplementation((options: Iterable<T>) =>
-        Promise.resolve(Generator.take(1, options))
-    );
 }
 
 export function mockChoose<T>(value: T | Array<T>) {
@@ -72,7 +95,7 @@ export function mockChooseImplementation<T>(
     chooseImpl: AsyncChooseImplementation<T>
 ) {
     const implementation = async (
-        chooseFrom: IChooseFrom<T>,
+        chooseFrom: IPlayerChooseFrom<T>,
         _options?: IChooseOptions
     ) => {
         const chosen = await chooseImpl(chooseFrom.player, chooseFrom.options);

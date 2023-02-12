@@ -80,9 +80,9 @@ class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
         );
 
         const chosenMinion =
-            await InteractionEnvironment.current.gameUI.storytellerChooseOne(
-                aliveMinions,
-                BaseImpMakeCopyEffect.description
+            await InteractionEnvironment.current.gameUI.storytellerChooseOne<MinionPlayer>(
+                { options: aliveMinions },
+                { reason: BaseImpMakeCopyEffect.description }
             );
         return chosenMinion;
     }

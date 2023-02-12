@@ -121,9 +121,9 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         const supportedEditions: Array<typeof Edition> =
             await GameEnvironment.current.getSupportedEditions();
         const chosenEdition =
-            await InteractionEnvironment.current.gameUI.storytellerChooseOne(
-                supportedEditions
-            );
+            await InteractionEnvironment.current.gameUI.storytellerChooseOne({
+                options: supportedEditions,
+            });
 
         return chosenEdition;
     }

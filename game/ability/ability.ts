@@ -293,6 +293,19 @@ export abstract class Ability<
         );
         return chosen as [IPlayer, IPlayer];
     }
+
+    protected async storytellerChooseOne<T>(
+        options: Iterable<T>,
+        reason?: string
+    ): Promise<T> {
+        const chosen =
+            await InteractionEnvironment.current.gameUI.storytellerChooseOne(
+                { options },
+                { reason }
+            );
+
+        return chosen;
+    }
 }
 
 export function RequireSetup<

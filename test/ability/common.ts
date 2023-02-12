@@ -19,7 +19,7 @@ import {
     AbilitySuccessUseWhenMalfunction,
     AbilityUseStatus,
 } from '~/game/ability/status';
-import { type Generator } from '~/game/collections';
+import { Generator } from '~/game/collections';
 import { Alignment } from '~/game/alignment';
 import type { CharacterToken } from '~/game/character/character';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
@@ -66,6 +66,7 @@ import {
     mockChoose,
     mockChooseImplementation,
     mockStorytellerChooseMatchingOne,
+    mockStorytellerChooseOne,
     storytellerChooseOneMock,
     storytellerConfirmMock,
 } from '~/__mocks__/game-ui';
@@ -284,17 +285,15 @@ export async function mockRecluseRegisterAs<T>(
 
     registerAsAlignment ??= registerAsCharacter.characterType.defaultAlignment;
 
-    storytellerChooseOneMock.mockImplementation(
-        (options: Generator<any>, reason?: string) => {
-            if (reason?.includes('character')) {
-                return Promise.resolve(registerAsCharacter);
-            } else if (reason?.includes('alignment')) {
-                return Promise.resolve(registerAsAlignment);
-            } else {
-                return Promise.resolve(options.take(1));
-            }
+    mockStorytellerChooseOne<unknown>((options, reason) => {
+        if (reason?.includes('character')) {
+            return Promise.resolve(registerAsCharacter);
+        } else if (reason?.includes('alignment')) {
+            return Promise.resolve(registerAsAlignment);
+        } else {
+            return Promise.resolve(Generator.take(1, options)!);
         }
-    );
+    });
     const result = await action();
     storytellerChooseOneMock.mockReset();
 
@@ -329,17 +328,15 @@ export async function mockSpyRegisterAs<T>(
 
     registerAsAlignment ??= registerAsCharacter.characterType.defaultAlignment;
 
-    storytellerChooseOneMock.mockImplementation(
-        (options: Generator<any>, reason?: string) => {
-            if (reason?.includes('character')) {
-                return Promise.resolve(registerAsCharacter);
-            } else if (reason?.includes('alignment')) {
-                return Promise.resolve(registerAsAlignment);
-            } else {
-                return Promise.resolve(options.take(1));
-            }
+    mockStorytellerChooseOne<unknown>((options, reason) => {
+        if (reason?.includes('character')) {
+            return Promise.resolve(registerAsCharacter);
+        } else if (reason?.includes('alignment')) {
+            return Promise.resolve(registerAsAlignment);
+        } else {
+            return Promise.resolve(Generator.take(1, options)!);
         }
-    );
+    });
     const result = await action();
     storytellerChooseOneMock.mockReset();
 

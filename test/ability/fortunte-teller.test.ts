@@ -15,33 +15,27 @@ import {
     storytellerChooseOneMock,
     chooseMock,
     mockChooseImplementation,
+    mockStorytellerChooseOne,
 } from '~/__mocks__/game-ui';
 import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
 
 describe('test GetFortuneTellerInformationAbility', () => {
     beforeAll(() => {
-        storytellerChooseOneMock.mockImplementation(
-            async (options: Generator<any>, reason?: string) => {
-                if (reason === RedHerringEffect.description) {
-                    const players = options as Iterable<IPlayer>;
-                    const saintPlayerCandidates =
-                        await Generator.filterAllAsync(
-                            async (player) =>
-                                (await player.character) === Saint,
-                            players
-                        );
-                    const saintPlayer = Generator.take(
-                        1,
-                        saintPlayerCandidates
-                    );
-                    expect(saintPlayer).toBeDefined();
-                    return saintPlayer;
-                }
-
-                return Promise.resolve(Generator.take(1, options));
+        mockStorytellerChooseOne<unknown>(async (options, reason) => {
+            if (reason === RedHerringEffect.description) {
+                const players = options as Iterable<IPlayer>;
+                const saintPlayerCandidates = await Generator.filterAllAsync(
+                    async (player) => (await player.character) === Saint,
+                    players
+                );
+                const saintPlayer = Generator.take(1, saintPlayerCandidates);
+                expect(saintPlayer).toBeDefined();
+                return saintPlayer;
             }
-        );
+
+            return Generator.take(1, options);
+        });
 
         mockChooseImplementation(async (fortuneTellerPlayer, players) => {
             expect(await fortuneTellerPlayer.character).toEqual(FortuneTeller);
