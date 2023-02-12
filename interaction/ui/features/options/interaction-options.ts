@@ -31,4 +31,6 @@ export interface IChooseOptions
     numToChoose?: number;
 }
 
-export interface IStorytellerConfirmOptions extends IInteractionOptions {}
+export interface IConfirmOptions extends IInteractionOptions {}
+
+export type IStorytellerConfirmOptions = IConfirmOptions;
