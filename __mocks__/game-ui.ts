@@ -9,8 +9,8 @@ import type { IGameUI } from '~/interaction/ui/game-ui';
 
 export const hasRaisedHandForVoteMock = InteractionEnvironment.current.gameUI
     .hasRaisedHandForVote as jest.Mock;
-export const handleMock = InteractionEnvironment.current.gameUI
-    .handle as jest.Mock;
+export const storytellerHandleMock = InteractionEnvironment.current.gameUI
+    .storytellerHandle as jest.Mock;
 export const chooseMock = InteractionEnvironment.current.gameUI
     .choose as jest.Mock;
 export const storytellerChooseMock = InteractionEnvironment.current.gameUI

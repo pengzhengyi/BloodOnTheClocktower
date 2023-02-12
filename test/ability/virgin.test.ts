@@ -4,7 +4,7 @@ import { expectAfterNominateVirgin } from './common';
 import { DeadReason } from '~/game/dead-reason';
 import { DeadPlayerCannotNominate } from '~/game/exception/dead-player-cannot-nominate';
 import type { VirginPlayer } from '~/game/types';
-import { handleMock } from '~/__mocks__/game-ui';
+import { storytellerHandleMock } from '~/__mocks__/game-ui';
 
 describe('test VirginAbility', () => {
     let virginPlayer: VirginPlayer;
@@ -57,7 +57,7 @@ describe('test VirginAbility', () => {
         await librarianPlayer.setDead(DeadReason.DemonAttack);
         expect(await librarianPlayer.dead).toBeTrue();
 
-        handleMock.mockImplementation((error) => {
+        storytellerHandleMock.mockImplementation((error) => {
             expect(error).toBeInstanceOf(DeadPlayerCannotNominate);
             return Promise.resolve(true);
         });
@@ -72,6 +72,6 @@ describe('test VirginAbility', () => {
             true
         );
 
-        handleMock.mockReset();
+        storytellerHandleMock.mockReset();
     });
 });

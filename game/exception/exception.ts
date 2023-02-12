@@ -88,7 +88,11 @@ export class RecoverableGameError extends GameError {
 
     async throwWhen(condition: Predicate<this>) {
         if (condition(this)) {
-            if (await InteractionEnvironment.current.gameUI.handle(this)) {
+            if (
+                await InteractionEnvironment.current.gameUI.storytellerHandle(
+                    this
+                )
+            ) {
                 this.handled_ = true;
                 if (condition(this)) {
                     this.throw();
@@ -101,7 +105,11 @@ export class RecoverableGameError extends GameError {
 
     async throwWhenAsync(condition: AsyncPredicate<this>) {
         if (await condition(this)) {
-            if (await InteractionEnvironment.current.gameUI.handle(this)) {
+            if (
+                await InteractionEnvironment.current.gameUI.storytellerHandle(
+                    this
+                )
+            ) {
                 this.handled_ = true;
                 if (await condition(this)) {
                     this.throw();
@@ -113,7 +121,9 @@ export class RecoverableGameError extends GameError {
     }
 
     async resolve() {
-        if (await InteractionEnvironment.current.gameUI.handle(this)) {
+        if (
+            await InteractionEnvironment.current.gameUI.storytellerHandle(this)
+        ) {
             this.handled_ = true;
         }
     }

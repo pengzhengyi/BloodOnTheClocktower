@@ -2,7 +2,7 @@ import { type ICallForNomination } from './features/call-for-nomination';
 import type { IChooseFrom, IChosen } from './features/choose';
 import { type IChoose } from './features/choose';
 import { type IConfirm } from './features/confirm';
-import { type IHandle } from './features/handle';
+import { type IStorytellerHandle } from './features/storyteller-handle';
 import { type ISend } from './features/send';
 import { type IStorytellerChoose } from './features/storyteller-choose';
 import { type IStorytellerChooseOne } from './features/storyteller-choose-one';
@@ -15,7 +15,7 @@ import type { StaticThis } from '~/game/types';
 
 export type IGameUIInteractions = [
     IHasRaisedHandForVote,
-    IHandle,
+    IStorytellerHandle,
     IChoose,
     IStorytellerChoose,
     IStorytellerChooseOne,
@@ -33,7 +33,7 @@ export type IGameUIInteractions = [
  */
 export interface IGameUI
     extends IHasRaisedHandForVote,
-        IHandle,
+        IStorytellerHandle,
         IChoose,
         IStorytellerChoose,
         IStorytellerChooseOne,
@@ -84,10 +84,13 @@ abstract class AbstractGameUI implements IGameUI {
         );
     }
 
-    handle(
-        ...args: Parameters<IHandle['handle']>
-    ): ReturnType<IHandle['handle']> {
-        return this.tryUseProvider<IHandle>('handle', args);
+    storytellerHandle(
+        ...args: Parameters<IStorytellerHandle['storytellerHandle']>
+    ): ReturnType<IStorytellerHandle['storytellerHandle']> {
+        return this.tryUseProvider<IStorytellerHandle>(
+            'storytellerHandle',
+            args
+        );
     }
 
     choose<T>(

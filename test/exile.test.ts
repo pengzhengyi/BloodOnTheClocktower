@@ -1,5 +1,5 @@
 import { collectVotesForNomination as collectVotesForExile } from './execution.test';
-import { handleMock } from '~/__mocks__/game-ui';
+import { storytellerHandleMock } from '~/__mocks__/game-ui';
 import { Exile } from '~/game/exile';
 import { ExileNonTraveller } from '~/game/exception/exile-non-traveller';
 import type { IPlayer } from '~/game/player';
@@ -29,14 +29,14 @@ describe('Test Exile Edge Cases', () => {
         const traveller = await createBasicPlayer(undefined, Scapegoat);
         const townsfolk = await createBasicPlayer(undefined, Washerwoman);
 
-        handleMock.mockClear();
-        handleMock.mockImplementation(() => Promise.resolve(false));
+        storytellerHandleMock.mockClear();
+        storytellerHandleMock.mockImplementation(() => Promise.resolve(false));
 
         await expect(
             async () => await Exile.init(traveller, townsfolk)
         ).rejects.toThrowError(ExileNonTraveller);
-        expect(handleMock).toHaveBeenCalledOnce();
-        handleMock.mockReset();
+        expect(storytellerHandleMock).toHaveBeenCalledOnce();
+        storytellerHandleMock.mockReset();
 
         const playersSupportExile = await createExileAndCollectVotes(
             traveller,

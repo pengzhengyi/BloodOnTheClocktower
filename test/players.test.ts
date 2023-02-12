@@ -1,4 +1,4 @@
-import { handleMock } from '~/__mocks__/game-ui';
+import { storytellerHandleMock } from '~/__mocks__/game-ui';
 import { randomChoice } from '~/game/common';
 import { Alignment } from '~/game/alignment';
 import { Generator } from '~/game/collections';
@@ -35,7 +35,7 @@ export function createRandomCharactersAndOptionalAlignmentForTraveller(
 
 describe('test basic functionalities', () => {
     beforeAll(() => {
-        handleMock.mockImplementation((error) => {
+        storytellerHandleMock.mockImplementation((error) => {
             expect(error).toBeInstanceOf(PlayerHasUnclearAlignment);
             (error as PlayerHasUnclearAlignment).correctedAlignment =
                 randomChoice([
@@ -48,7 +48,7 @@ describe('test basic functionalities', () => {
     });
 
     afterAll(() => {
-        handleMock.mockReset();
+        storytellerHandleMock.mockReset();
     });
 
     test.concurrent('get characters in player', async () => {
@@ -89,11 +89,11 @@ describe('test basic functionalities', () => {
 
 describe('test edge cases', () => {
     beforeAll(() => {
-        handleMock.mockImplementation(() => Promise.resolve(false));
+        storytellerHandleMock.mockImplementation(() => Promise.resolve(false));
     });
 
     afterAll(() => {
-        handleMock.mockReset();
+        storytellerHandleMock.mockReset();
     });
 
     test.concurrent('fewer characters than players', async () => {
