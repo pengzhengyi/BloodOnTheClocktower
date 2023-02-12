@@ -28,3 +28,8 @@ export interface ISerializationFactory<K = string> {
     getSerializer<T>(key: K): ISerializer<T>;
     getDeserializer<T>(key: K): IDeserializer<T>;
 }
+
+export interface ISerializationOptions<K = string> {
+    serializationType: K;
+    deserializationType: K;
+}

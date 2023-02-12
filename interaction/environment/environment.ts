@@ -1,4 +1,4 @@
-import type { IGameUI } from '../game-ui';
+import type { IGameUI } from '../ui/game-ui';
 import type {
     IInteractionEnvironment,
     IInteractionEnvironmentProvider,

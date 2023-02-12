@@ -1,7 +1,10 @@
 import type { IChannel } from './channel';
 import { Channel } from './channel';
 import type { ISocket } from './socket';
-import type { ISerializationFactory } from '~/serialization/types';
+import type {
+    ISerializationFactory,
+    ISerializationOptions,
+} from '~/serialization/types';
 
 export interface IChannelFactory<K = string, TOptions = RequestInit> {
     readonly socket: ISocket<TOptions>;
@@ -10,8 +13,7 @@ export interface IChannelFactory<K = string, TOptions = RequestInit> {
      * Create a channel that can transmit data of `TIn` and receive response of `TOut` type.
      */
     create<TIn, TOut>(
-        serializationType: K,
-        deserializationType: K
+        options: ISerializationOptions<K>
     ): IChannel<TIn, TOut, TOptions>;
 }
 
@@ -25,15 +27,14 @@ export class ChannelFactory<K = string, TOptions = RequestInit>
     ) {}
 
     create<TIn, TOut>(
-        serializationType: K,
-        deserializationType: K
+        options: ISerializationOptions<K>
     ): IChannel<TIn, TOut, TOptions> {
-        const serializer =
-            this.serializationFactory.getSerializer<TIn>(serializationType);
-        const deserializer =
-            this.serializationFactory.getDeserializer<TOut>(
-                deserializationType
-            );
+        const serializer = this.serializationFactory.getSerializer<TIn>(
+            options.serializationType
+        );
+        const deserializer = this.serializationFactory.getDeserializer<TOut>(
+            options.deserializationType
+        );
 
         return new Channel(this.socket, serializer, deserializer);
     }

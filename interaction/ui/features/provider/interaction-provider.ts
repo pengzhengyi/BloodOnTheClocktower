@@ -1,5 +1,5 @@
-import type { IChannel } from './communication/channel';
-import type { IInteractionOptions } from './interaction-options';
+import type { IChannel } from '../../../communication/channel';
+import type { IInteractionOptions } from '../options/interaction-options';
 
 export interface IInteractionProvider<
     TIn,

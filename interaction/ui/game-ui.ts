@@ -1,13 +1,13 @@
-import { type ICallForNomination } from './call-for-nomination';
-import { type IChoose } from './choose';
-import { type IConfirm } from './confirm';
-import { type IHandle } from './handle';
-import { type ISend } from './send';
-import { type IStorytellerChoose } from './storyteller-choose';
-import { type IStorytellerChooseOne } from './storyteller-choose-one';
-import { type IStorytellerConfirm } from './storyteller-confirm';
-import { type IStorytellerDecide } from './storyteller-decide';
-import type { IHasRaisedHandForVote } from './has-raised-hand-for-vote';
+import { type ICallForNomination } from './features/call-for-nomination';
+import { type IChoose } from './features/choose';
+import { type IConfirm } from './features/confirm';
+import { type IHandle } from './features/handle';
+import { type ISend } from './features/send';
+import { type IStorytellerChoose } from './features/storyteller-choose';
+import { type IStorytellerChooseOne } from './features/storyteller-choose-one';
+import { type IStorytellerConfirm } from './features/storyteller-confirm';
+import { type IStorytellerDecide } from './features/storyteller-decide';
+import type { IHasRaisedHandForVote } from './features/has-raised-hand-for-vote';
 import type { IPlayer } from '~/game/player';
 import type { StaticThis } from '~/game/types';
 
