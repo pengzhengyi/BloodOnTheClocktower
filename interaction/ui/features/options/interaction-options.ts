@@ -33,4 +33,6 @@ export interface IChooseOptions
 
 export interface IConfirmOptions extends IInteractionOptions {}
 
-export type IStorytellerConfirmOptions = IConfirmOptions;
+export interface IHasRaisedHandForVoteOptions extends IInteractionOptions {}
+
+export interface IStorytellerConfirmOptions extends IInteractionOptions {}
