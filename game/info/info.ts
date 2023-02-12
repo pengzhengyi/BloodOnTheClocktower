@@ -1,10 +1,8 @@
-import type { IPlayer } from '../player';
 import type {
     TrueInformationOptions,
     FalseInformationOptions,
 } from './information';
 import type { StoryTellerInformationOptions } from './storyteller-information';
-import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 /**
  * There are two classifications for info:
@@ -32,10 +30,6 @@ export abstract class Info<T> {
 
     constructor(info: T) {
         this.info = info;
-    }
-
-    send(player: IPlayer, reason?: string): Promise<void> {
-        return InteractionEnvironment.current.gameUI.send(player, this, reason);
     }
 }
 

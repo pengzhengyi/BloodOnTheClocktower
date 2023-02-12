@@ -424,11 +424,9 @@ abstract class GetInfoAbility<
             context,
             infoRequestContext
         );
-        await InteractionEnvironment.current.gameUI.send(
-            context.requestedPlayer,
-            info,
-            sendInfoReason
-        );
+
+        // ! deliberately fire and ignore
+        this.sendInfo(context.requestedPlayer, info, sendInfoReason);
 
         return await this.createRequestResult(
             {
@@ -503,6 +501,17 @@ abstract class GetInfoAbility<
             `Get info and send to player ${
                 context.requestedPlayer
             } for ability ${this.toString()}`
+        );
+    }
+
+    protected async sendInfo<T>(
+        recipientPlayer: IPlayer,
+        info: T,
+        reason?: string
+    ) {
+        await InteractionEnvironment.current.gameUI.send(
+            { recipient: recipientPlayer, content: info },
+            { reason }
         );
     }
 }

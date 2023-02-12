@@ -35,4 +35,8 @@ export interface IConfirmOptions extends IInteractionOptions {}
 
 export interface IHasRaisedHandForVoteOptions extends IInteractionOptions {}
 
+export interface ISendOptions
+    extends IInteractionOptions,
+        Partial<ISerializationOptions> {}
+
 export interface IStorytellerConfirmOptions extends IInteractionOptions {}

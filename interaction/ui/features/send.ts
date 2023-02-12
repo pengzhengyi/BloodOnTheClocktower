@@ -1,13 +1,14 @@
+import type { ISendOptions } from './options/interaction-options';
 import type { IPlayer } from '~/game/player';
+
+export interface IMessage<T> {
+    recipient: IPlayer;
+    content: T;
+}
 
 export interface ISend {
     /**
      * Send a player some data.
      */
-    send<T>(
-        player: IPlayer,
-        data: T,
-        reason?: string,
-        timeout?: number
-    ): Promise<void>;
+    send<T>(message: IMessage<T>, options?: ISendOptions): Promise<void>;
 }
