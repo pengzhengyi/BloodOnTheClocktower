@@ -1,9 +1,9 @@
 import type { IChannel } from '../../../communication/channel';
 import type { IStorytellerConfirmOptions } from '../options/interaction-options';
-import type { IInteractionProvider } from './interaction-provider';
+import type { IInteractionChannel } from './interaction-channel';
 
-export interface IStorytellerConfirmProvider<TOptions = RequestInit>
-    extends IInteractionProvider<
+export interface IStorytellerConfirmChannel<TOptions = RequestInit>
+    extends IInteractionChannel<
         string,
         boolean,
         IStorytellerConfirmOptions,

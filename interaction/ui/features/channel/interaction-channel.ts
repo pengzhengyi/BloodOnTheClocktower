@@ -1,7 +1,7 @@
 import type { IChannel } from '../../../communication/channel';
 import type { IInteractionOptions } from '../options/interaction-options';
 
-export interface IInteractionProvider<
+export interface IInteractionChannel<
     TIn,
     TOut,
     TInteractionOptions extends IInteractionOptions,
