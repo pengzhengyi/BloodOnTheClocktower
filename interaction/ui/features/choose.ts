@@ -1,14 +1,9 @@
 import type { IChooseOptions } from './options/interaction-options';
+import type { IChooseFromOptions, IChosen } from './types';
 import type { IPlayer } from '~/game/player';
 
-export interface IChooseFrom<T> {
+export interface IPlayerChooseFrom<T> extends IChooseFromOptions<T> {
     player: IPlayer;
-    options: Iterable<T>;
-    recommendation?: T | Iterable<T>;
-}
-
-export interface IChosen<T> {
-    choices: Array<T>;
 }
 
 export interface IChoose {
@@ -18,7 +13,7 @@ export interface IChoose {
      * It can be specified either as single select (default) or multi-select.
      */
     choose<T>(
-        chooseFrom: IChooseFrom<T>,
+        chooseFrom: IPlayerChooseFrom<T>,
         options?: IChooseOptions
     ): Promise<IChosen<T>>;
 }

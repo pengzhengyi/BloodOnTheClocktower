@@ -112,8 +112,8 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
         players: Iterable<IPlayer>
     ): Promise<IPlayer> {
         return (await InteractionEnvironment.current.gameUI.storytellerChooseOne(
-            players,
-            MayorDieInsteadEffect.description
+            { options: players },
+            { reason: MayorDieInsteadEffect.description }
         )) as IPlayer;
     }
 }

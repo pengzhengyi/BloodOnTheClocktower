@@ -129,8 +129,8 @@ export class StoryTeller implements IStoryTeller {
     ): Promise<TInfoType> {
         const info =
             (await InteractionEnvironment.current.gameUI.storytellerChooseOne(
-                infoOptions,
-                reason
+                { options: infoOptions },
+                { reason }
             )) as TInfoType;
         return info;
     }

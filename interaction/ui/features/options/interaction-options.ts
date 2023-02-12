@@ -39,4 +39,8 @@ export interface ISendOptions
     extends IInteractionOptions,
         Partial<ISerializationOptions> {}
 
+export interface IStorytellerChooseOneOptions
+    extends IInteractionOptions,
+        Partial<ISerializationOptions> {}
+
 export interface IStorytellerConfirmOptions extends IInteractionOptions {}

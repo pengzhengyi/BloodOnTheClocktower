@@ -1,5 +1,5 @@
 import { type ICallForNomination } from './features/call-for-nomination';
-import type { IChooseFrom, IChosen } from './features/choose';
+import type { IPlayerChooseFrom } from './features/choose';
 import { type IChoose } from './features/choose';
 import { type IConfirm } from './features/confirm';
 import { type IStorytellerHandle } from './features/storyteller-handle';
@@ -13,7 +13,9 @@ import type { IHasRaisedHandForVote } from './features/has-raised-hand-for-vote'
 import type {
     IChooseOptions,
     ISendOptions,
+    IStorytellerChooseOneOptions,
 } from './features/options/interaction-options';
+import type { IChooseFromOptions, IChosen } from './features/types';
 import type { StaticThis } from '~/game/types';
 
 export type IGameUIInteractions = [
@@ -97,7 +99,7 @@ abstract class AbstractGameUI implements IGameUI {
     }
 
     choose<T>(
-        ...args: [IChooseFrom<T>, IChooseOptions | undefined]
+        ...args: [IPlayerChooseFrom<T>, IChooseOptions | undefined]
     ): Promise<IChosen<T>> {
         return this.tryUseProvider<IChoose>('choose', args);
     }
@@ -120,10 +122,8 @@ abstract class AbstractGameUI implements IGameUI {
 
     storytellerChooseOne<T>(
         ...args: [
-            Iterable<T>,
-            string | undefined,
-            T | undefined,
-            number | undefined
+            IChooseFromOptions<T>,
+            IStorytellerChooseOneOptions | undefined
         ]
     ): Promise<T> {
         return this.tryUseProvider<IStorytellerChooseOne>(
