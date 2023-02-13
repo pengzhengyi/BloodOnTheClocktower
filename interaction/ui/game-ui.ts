@@ -16,6 +16,7 @@ import type {
     IStorytellerChooseOneOptions,
     IStorytellerChooseOptions,
     IStorytellerDecideOptions,
+    IStorytellerHandleOptions,
 } from './features/options/interaction-options';
 import type {
     IChooseFromOptions,
@@ -96,9 +97,9 @@ abstract class AbstractGameUI implements IGameUI {
         );
     }
 
-    storytellerHandle(
-        ...args: Parameters<IStorytellerHandle['storytellerHandle']>
-    ): ReturnType<IStorytellerHandle['storytellerHandle']> {
+    storytellerHandle<TError extends Error>(
+        ...args: [TError, IStorytellerHandleOptions | undefined]
+    ): Promise<boolean> {
         return this.tryUseProvider<IStorytellerHandle>(
             'storytellerHandle',
             args

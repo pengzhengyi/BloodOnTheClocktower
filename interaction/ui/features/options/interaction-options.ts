@@ -50,3 +50,7 @@ export interface IStorytellerConfirmOptions extends IInteractionOptions {}
 export interface IStorytellerDecideOptions
     extends IInteractionOptions,
         Partial<ISerializationOptions> {}
+
+export interface IStorytellerHandleOptions
+    extends IInteractionOptions,
+        Partial<ISerializationOptions> {}
