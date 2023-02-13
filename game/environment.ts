@@ -152,12 +152,13 @@ class BaseGameEnvironment implements IGameEnvironment {
         error: RecoverableGameError
     ): Promise<NumberOfCharacters> {
         // TODO properly get number of characters for each character type from storyteller
-        const assignment =
+        const reason = `choose number of characters for each character type for ${numPlayers} in ${editionName} as ${error}`;
+        const decision =
             await InteractionEnvironment.current.gameUI.storytellerDecide<NumberOfCharacters>(
-                `choose number of characters for each character type for ${numPlayers} in ${editionName} as ${error}`,
-                false
+                {},
+                { reason }
             );
-        return assignment!;
+        return decision.decided;
     }
 
     protected tryRecommendCharacterTypeComposition(

@@ -112,12 +112,12 @@ export class StoryTeller implements IStoryTeller {
         error: NoDefinedInfoProvider
     ): Promise<TInfoType> {
         // TODO properly get info from storyteller
-        const info =
+        const decision =
             await InteractionEnvironment.current.gameUI.storytellerDecide<TInfoType>(
-                error.toString(),
-                false
+                {},
+                { reason: error.toString() }
             );
-        return info!;
+        return decision.decided;
     }
 
     protected async chooseInfoToGive<

@@ -15,8 +15,14 @@ import type {
     ISendOptions,
     IStorytellerChooseOneOptions,
     IStorytellerChooseOptions,
+    IStorytellerDecideOptions,
 } from './features/options/interaction-options';
-import type { IChooseFromOptions, IChosen } from './features/types';
+import type {
+    IChooseFromOptions,
+    IChosen,
+    IDecideFrom,
+    IDecided,
+} from './features/types';
 import type { StaticThis } from '~/game/types';
 
 export type IGameUIInteractions = [
@@ -127,8 +133,8 @@ abstract class AbstractGameUI implements IGameUI {
     }
 
     storytellerDecide<T>(
-        ...args: [string | undefined, boolean | undefined, number | undefined]
-    ): Promise<T> | Promise<undefined> {
+        ...args: [IDecideFrom<T>, IStorytellerDecideOptions | undefined]
+    ): Promise<IDecided<T>> {
         return this.tryUseProvider<IStorytellerDecide>(
             'storytellerDecide',
             args

@@ -183,10 +183,12 @@ export class NightSheet {
                     character,
                     isFirstNight
                 );
-                return (await InteractionEnvironment.current.gameUI.storytellerDecide(
-                    reason,
-                    false
-                ))!;
+                const decision =
+                    await InteractionEnvironment.current.gameUI.storytellerDecide<number>(
+                        {},
+                        { reason }
+                    );
+                return decision.decided;
             }
         }
     }
