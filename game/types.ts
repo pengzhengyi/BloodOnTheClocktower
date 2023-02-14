@@ -11,6 +11,8 @@ import type {
 import type { CharacterToken } from './character/character';
 import type { Phase } from './phase';
 import type { InfoType } from './info/info-type';
+import type { ICharacterSheet } from './character/character-sheet';
+import type { NumberOfCharacters } from './script-tool';
 import type { Butler } from '~/content/characters/output/butler';
 import type { Drunk } from '~/content/characters/output/drunk';
 import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
@@ -295,10 +297,15 @@ export interface IEnvironmentProvider<TEnvironment extends IEnvironment> {
 }
 
 export interface ICharacterTypeToCharacter {
-    readonly minion: Array<CharacterToken>;
-    readonly demon: Array<CharacterToken>;
-    readonly townsfolk: Array<CharacterToken>;
-    readonly outsider: Array<CharacterToken>;
-    readonly traveller: Array<CharacterToken>;
-    readonly fabled: Array<CharacterToken>;
+    minion: Array<CharacterToken>;
+    demon: Array<CharacterToken>;
+    townsfolk: Array<CharacterToken>;
+    outsider: Array<CharacterToken>;
+    traveller: Array<CharacterToken>;
+    fabled: Array<CharacterToken>;
+}
+
+export interface IDecideInPlayCharactersContext {
+    characterSheet: ICharacterSheet;
+    numToChooseForEachCharacterType: NumberOfCharacters;
 }

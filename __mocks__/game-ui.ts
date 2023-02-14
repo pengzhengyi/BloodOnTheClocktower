@@ -8,7 +8,10 @@ import type {
     IChooseOptions,
     IStorytellerChooseOneOptions,
 } from '~/interaction/ui/features/options/interaction-options';
-import type { IChooseFromOptions } from '~/interaction/ui/features/types';
+import type {
+    IChooseFromOptions,
+    IDecideFrom,
+} from '~/interaction/ui/features/types';
 import type { IGameUI } from '~/interaction/ui/game-ui';
 
 export const hasRaisedHandForVoteMock = InteractionEnvironment.current.gameUI
@@ -104,4 +107,18 @@ export function mockChooseImplementation<T>(
         return chosenChoices;
     };
     chooseMock.mockImplementation(implementation);
+}
+
+type AsyncStorytellerDecideImplementation<TContext, T> = (
+    context: TContext
+) => Promise<T>;
+export function mockStorytellerDecideImplementation<TContext, T>(
+    decideImpl: AsyncStorytellerDecideImplementation<TContext, T>
+) {
+    const implementation = async (decideFrom: IDecideFrom<T>) => {
+        const context = decideFrom.context as TContext;
+        const decided = await decideImpl(context);
+        return { decided };
+    };
+    storytellerDecideMock.mockImplementation(implementation);
 }

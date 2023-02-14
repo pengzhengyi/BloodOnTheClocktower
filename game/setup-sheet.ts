@@ -21,7 +21,11 @@ import { Singleton } from './common';
 import type { IStoryTeller } from './storyteller';
 import { StoryTeller } from './storyteller';
 import type { TravellerCharacterToken } from './character/character';
-import type { TravellerPlayer } from './types';
+import type {
+    ICharacterTypeToCharacter,
+    IDecideInPlayCharactersContext,
+    TravellerPlayer,
+} from './types';
 import type { ICharacterSheet } from './character/character-sheet';
 import { CharacterSheetFactory } from './character/character-sheet-factory';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
@@ -38,6 +42,7 @@ export interface ISetupResult {
     edition: typeof Edition;
     editionCharacterSheet: ICharacterSheet;
     characterTypeComposition: NumberOfCharacters;
+    initialInPlayCharacters: ICharacterTypeToCharacter;
 }
 
 /**
@@ -70,6 +75,11 @@ export interface ISetupSheet {
         travellerCharacters: Array<TravellerCharacterToken>
     ): Promise<Array<TravellerPlayer>>;
 
+    setupInPlayCharacters(
+        editionCharacterSheet: ICharacterSheet,
+        characterTypeComposition: NumberOfCharacters
+    ): Promise<ICharacterTypeToCharacter>;
+
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
 
@@ -99,6 +109,11 @@ abstract class AbstractSetupSheet implements ISetupSheet {
                 this.setupEditionCharacterSheet(edition),
             ]);
 
+        const initialInPlayCharacters = await this.setupInPlayCharacters(
+            editionCharacterSheet,
+            characterTypeComposition
+        );
+
         const setupResult: ISetupResult = {
             players,
             townSquare,
@@ -106,6 +121,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             storyTeller,
             editionCharacterSheet,
             characterTypeComposition,
+            initialInPlayCharacters,
         };
 
         return setupResult;
@@ -185,6 +201,28 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         throw new Error('method not implemented');
     }
 
+    async setupInPlayCharacters(
+        editionCharacterSheet: ICharacterSheet,
+        characterTypeComposition: NumberOfCharacters
+    ): Promise<ICharacterTypeToCharacter> {
+        const reason = this.formatPromptForSetupInPlayCharacters(
+            characterTypeComposition
+        );
+        // TODO properly implement in-play character selection with serialization
+        const context: IDecideInPlayCharactersContext = {
+            characterSheet: editionCharacterSheet,
+            numToChooseForEachCharacterType: characterTypeComposition,
+        };
+        const decision =
+            await InteractionEnvironment.current.gameUI.storytellerDecide<ICharacterTypeToCharacter>(
+                {
+                    context,
+                },
+                { reason }
+            );
+        return decision.decided;
+    }
+
     protected getSeatAssignment(
         seatAssignment: ISeatAssignment | SeatAssignmentMode
     ): ISeatAssignment {
@@ -209,6 +247,20 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         initialNumPlayers?: number | undefined
     ): Promise<Seating> {
         return Promise.resolve(new Seating(initialNumPlayers));
+    }
+
+    protected formatPromptForSetupInPlayCharacters(
+        numberOfCharacters: NumberOfCharacters
+    ): string {
+        let reason = 'Choose';
+
+        for (const [characterType, numToChoose] of Object.entries(
+            numberOfCharacters
+        )) {
+            reason += ` ${numToChoose} ${characterType}s`;
+        }
+
+        return reason + ' from character sheet';
     }
 }
 
