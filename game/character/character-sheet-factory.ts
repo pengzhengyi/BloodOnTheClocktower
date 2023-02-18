@@ -1,6 +1,6 @@
 import { Generator, LazyMap } from '../collections';
 import { parsePromiseSettledResults, Singleton } from '../common';
-import type { Edition } from '../edition';
+import type { Edition } from '../edition/edition';
 import { GameEnvironment } from '../environment';
 import { CharacterLoadFailures } from '../exception/character-load-failures';
 import type { GameError } from '../exception/exception';

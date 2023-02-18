@@ -1,4 +1,4 @@
-import { EditionName } from '~/game/edition';
+import { EditionName } from '~/game/edition/edition';
 import { GameEnvironment } from '~/game/environment';
 import { GameHasTooManyPlayers } from '~/game/exception/game-has-too-many-players';
 import { GameHasTooFewPlayers } from '~/game/exception/game-has-too-few-players';

@@ -1,5 +1,5 @@
 import editionData from './TroubleBrewing.json';
-import { Edition } from '~/game/edition';
+import { Edition } from '~/game/edition/edition';
 
 export class TroubleBrewing extends Edition {}
 

@@ -10,7 +10,7 @@ import {
 } from './game-ui';
 import { type IGame, Game } from '~/game/game';
 import type { ISetupSheet, ISetupContext } from '~/game/setup-sheet';
-import type { Edition } from '~/game/edition';
+import type { Edition } from '~/game/edition/edition';
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
 import type { IDecideInPlayCharactersContext } from '~/game/types';
 

@@ -1,4 +1,4 @@
-import type { EditionName } from '../edition';
+import type { EditionName } from '../edition/edition';
 import { RecoverableGameError } from './exception';
 
 export class EditionNotSpecifiedMinimumNumberOfPlayers extends RecoverableGameError {

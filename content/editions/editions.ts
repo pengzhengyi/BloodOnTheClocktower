@@ -2,7 +2,7 @@ import { TroubleBrewing } from './TroubleBrewing';
 import { SectsViolets } from './SectsViolets';
 import { BadMoonRising } from './BadMoonRising';
 import { ExperimentalCharacters } from './ExperimentalCharacters';
-import { Edition } from '~/game/edition';
+import { Edition } from '~/game/edition/edition';
 import { createRecordProxy } from '~/game/proxy/proxy';
 
 const canonicalNameToEdition: Map<string, typeof Edition> = new Map();

@@ -6,9 +6,13 @@ import {
 } from './types';
 import type { ICharacterSheet } from './character/character-sheet';
 import { Character, type CharacterToken } from './character/character';
-import { createCustomEdition, type Edition, EditionName } from './edition';
+import {
+    createCustomEdition,
+    type Edition,
+    EditionName,
+} from './edition/edition';
 import { Generator } from './collections';
-import { EditionLoader } from './edition-loader';
+import { EditionLoader } from './edition/edition-loader';
 import {
     type CharacterType,
     Demon,

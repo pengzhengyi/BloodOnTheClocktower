@@ -1,5 +1,5 @@
 import editionData from './SectsViolets.json';
-import { Edition } from '~/game/edition';
+import { Edition } from '~/game/edition/edition';
 
 export class SectsViolets extends Edition {}
 

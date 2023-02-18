@@ -1,6 +1,6 @@
 import path from 'path';
 import { Singleton } from '../common';
-import { Edition, EditionName } from '../edition';
+import { Edition, EditionName } from '../edition/edition';
 import { createRecordProxy } from '../proxy/proxy';
 import type { NumberOfCharacters } from '../script-tool';
 

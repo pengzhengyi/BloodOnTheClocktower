@@ -1,6 +1,6 @@
-import { type EditionData, EditionKeyName } from './types';
-import { IncompleteEditionData } from './exception/incomplete-edition-data';
-import { lowercaseLetters } from './common';
+import { type EditionData, EditionKeyName } from '../types';
+import { IncompleteEditionData } from '../exception/incomplete-edition-data';
+import { lowercaseLetters } from '../common';
 
 export enum EditionName {
     TroubleBrewing = 'Trouble Brewing',

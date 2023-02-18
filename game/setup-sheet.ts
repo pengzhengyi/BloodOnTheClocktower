@@ -1,5 +1,5 @@
-import type { EditionName } from './edition';
-import { type Edition } from './edition';
+import type { EditionName } from './edition/edition';
+import { type Edition } from './edition/edition';
 import { Grimoire } from './grimoire';
 import { type IPlayers, Players } from './players';
 import type { NumberOfCharacters } from './script-tool';

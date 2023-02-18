@@ -1,5 +1,5 @@
 import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
-import { EditionName } from '~/game/edition';
+import { EditionName } from '~/game/edition/edition';
 import { SetupSheet } from '~/game/setup-sheet';
 import { storytellerChooseOneMock } from '~/__mocks__/game-ui';
 

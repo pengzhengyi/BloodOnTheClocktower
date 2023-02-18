@@ -1,7 +1,7 @@
 import script from './custom-script.json';
 import { ScriptConstraintsHelper, ScriptTool } from '~/game/script-tool';
 import { Generator } from '~/game/collections';
-import { EditionName } from '~/game/edition';
+import { EditionName } from '~/game/edition/edition';
 import { EditionKeyName } from '~/game/types';
 import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 import {

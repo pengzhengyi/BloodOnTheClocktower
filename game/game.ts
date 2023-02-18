@@ -2,7 +2,7 @@
 import { Alignment } from './alignment';
 import { type IPlayer } from './player';
 import type { IPlayers } from './players';
-import { type Edition } from './edition';
+import { type Edition } from './edition/edition';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
