@@ -10,7 +10,7 @@ export async function playerFromDescription(description: string) {
         throw new Error(`Cannot initialize a player form ${description}`);
     }
     const [_, username, alignmentDescription, characterName] = matchResult;
-    const character = await GameEnvironment.current.characterLoader.loadAsync(
+    const character = await GameEnvironment.current.loadCharacterAsync(
         characterName
     );
 

@@ -1,5 +1,3 @@
-import { ID_TO_CHARACTER } from '~/content/characters/output/characters';
-import { FangGu } from '~/content/characters/output/fanggu';
 import {
     Demon,
     Minion,
@@ -7,6 +5,7 @@ import {
     Townsfolk,
 } from '~/game/character/character-type';
 import { Generator } from '~/game/collections';
+import { ALL_CHARACTERS, FangGu } from '~/__mocks__/character';
 
 describe('test Generator', () => {
     const elements = ['Alice', 'Bob', 'Peter'];
@@ -148,7 +147,7 @@ describe('test Generator', () => {
     });
 
     test.concurrent('prioritize with characters', () => {
-        const generator = new Generator(ID_TO_CHARACTER.values());
+        const generator = new Generator(ALL_CHARACTERS);
         const characters = Array.from(
             generator.prioritize(
                 [
@@ -183,7 +182,7 @@ describe('test Generator', () => {
     });
 
     test.concurrent('Get Demons', () => {
-        const generator = new Generator(ID_TO_CHARACTER.values());
+        const generator = new Generator(ALL_CHARACTERS);
         const characters = Array.from(
             generator.prioritize(
                 [{ key: Demon }],

@@ -1,16 +1,12 @@
-import { Butler } from '~/content/characters/output/butler';
-import { Imp } from '~/content/characters/output/imp';
-import { Spy } from '~/content/characters/output/spy';
-import { Virgin } from '~/content/characters/output/virgin';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { Townsfolk } from '~/game/character/character-type';
+import { Washerwoman, Butler, Imp, Spy, Virgin } from '~/__mocks__/character';
 
 describe('test basic functionalities', () => {
     test.concurrent('determine good / evil', () => {
-        expect(Washerwoman.isGoodCharacter).toBeTrue();
-        expect(Butler.isEvilCharacter).toBeFalse();
-        expect(Imp.isGoodCharacter).toBeFalse();
-        expect(Spy.isEvilCharacter).toBeTrue();
+        expect(Washerwoman.isGood).toBeTrue();
+        expect(Butler.isEvil).toBeFalse();
+        expect(Imp.isGood).toBeFalse();
+        expect(Spy.isEvil).toBeTrue();
     });
 
     test.concurrent('assert character type', () => {

@@ -1,17 +1,17 @@
 import { mockButlerChooseMaster } from './common';
-import { Butler } from '~/content/characters/output/butler';
-import { Virgin } from '~/content/characters/output/virgin';
 import { ButlerAbility } from '~/game/ability/butler';
 import { DeadReason } from '~/game/dead-reason';
 import type { GamePhase } from '~/game/game-phase';
-import type { Action, ButlerPlayer } from '~/game/types';
+import type { Action } from '~/game/types';
 import { mockAbilityUseContext } from '~/__mocks__/ability';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { hasRaisedHandForVoteMock } from '~/__mocks__/game-ui';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { Butler, Virgin } from '~/__mocks__/character';
+import type { IPlayer } from '~/game/player';
 
 describe('test ButlerAbility', () => {
-    let butlerPlayer: ButlerPlayer;
+    let butlerPlayer: IPlayer;
     let butlerAbility: ButlerAbility;
     let _gamePhase: GamePhase | undefined;
     let recoverGamePhase: Action;

@@ -6,11 +6,10 @@ import {
     expectAfterDemonAttack,
     setupMonkProtectAbility,
 } from './common';
-import { Monk } from '~/content/characters/output/monk';
 import { MayorAbility } from '~/game/ability/mayor';
 import { type MonkProtectAbility } from '~/game/ability/monk';
 import type { GamePhase } from '~/game/game-phase';
-import type { Action, ImpPlayer, MonkPlayer } from '~/game/types';
+import type { Action } from '~/game/types';
 import {
     mockGetInfoAbilityUseContext,
     mockMayorAbilitySetupContext,
@@ -20,11 +19,13 @@ import { mockClocktowerWithIsNonfirstNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { createBasicStoryTeller } from '~/__mocks__/storyteller';
+import type { IPlayer } from '~/game/player';
+import { Monk } from '~/__mocks__/character';
 
 describe('test MonkProtectAbility', () => {
     let ability: MonkProtectAbility;
-    let impPlayer: ImpPlayer;
-    let monkPlayer: MonkPlayer;
+    let impPlayer: IPlayer;
+    let monkPlayer: IPlayer;
     let _gamePhase: GamePhase | undefined;
     let recoverGamePhase: Action;
 

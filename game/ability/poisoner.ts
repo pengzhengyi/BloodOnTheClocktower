@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
-import type { CharacterToken } from '../character/character';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, type InteractionContext } from '../effect/effect';
 import type {
@@ -9,11 +8,12 @@ import type {
 import { PoisonerNotChoosePlayerToPoison } from '../exception/poisoner-not-choose-player-to-poison';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import { Phase } from '../phase';
-import type { IPlayer } from '../player';
+import type { IPlayer, IPlayer as PoisonerPlayer } from '../player';
 import type { IPlayers } from '../players';
 import type { IPoisonedReason } from '../poisoned-reason';
-import type { PoisonerPlayer } from '../types';
 import type { IGamePhaseNotification } from '../event-notification/notification/game-phase';
+import type { CharacterId } from '../character/character-id';
+import { CharacterIds } from '../character/character-id';
 import {
     Ability,
     type AbilitySetupContext,
@@ -25,7 +25,6 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { Poisoner } from '~/content/characters/output/poisoner';
 
 class BasePoisonEffect
     extends Effect<IPlayer>
@@ -34,7 +33,7 @@ class BasePoisonEffect
     static readonly description =
         'The Poisoner secretly disrupts character abilities.';
 
-    static readonly origin: CharacterToken = Poisoner;
+    static readonly origin: CharacterId = CharacterIds.Poisoner;
 
     blocking = false as const;
 

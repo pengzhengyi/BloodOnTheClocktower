@@ -2,7 +2,7 @@ import type { LibrarianInformation } from '../provider/librarian';
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
 import { type InformationRequestContext } from './requester';
-import { Librarian } from '~/content/characters/output/librarian';
+import { CharacterIds } from '~/game/character/character-id';
 
 class BaseLibrarianInformationRequester<
     TInformationRequestContext extends InformationRequestContext<LibrarianInformation>
@@ -11,7 +11,7 @@ class BaseLibrarianInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.LibrarianInformation;
-    readonly expectedCharacter = Librarian;
+    readonly origin = CharacterIds.Librarian;
 }
 
 export interface LibrarianInformationRequester<

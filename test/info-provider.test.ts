@@ -1,31 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
 import { Minion, Outsider, Townsfolk } from '~/game/character/character-type';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Chef } from '~/content/characters/output/chef';
+
 import { Players } from '~/game/players';
 import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/dead-reason';
 import type { IPlayer } from '~/game/player';
 import { type ISeating } from '~/game/seating/seating';
-import { Virgin } from '~/content/characters/output/virgin';
-import { Librarian } from '~/content/characters/output/librarian';
-import { Saint } from '~/content/characters/output/saint';
-import { Drunk } from '~/content/characters/output/drunk';
-import { Investigator } from '~/content/characters/output/investigator';
-import { Baron } from '~/content/characters/output/baron';
-import { Empath } from '~/content/characters/output/empath';
-import { Imp } from '~/content/characters/output/imp';
-import { Monk } from '~/content/characters/output/monk';
-import { Soldier } from '~/content/characters/output/soldier';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import { Mayor } from '~/content/characters/output/mayor';
-import { Undertaker } from '~/content/characters/output/undertaker';
-import { Poisoner } from '~/content/characters/output/poisoner';
 import type {
     TrueInformation,
     OneOfTwoPlayersIsOutsider,
@@ -58,6 +42,25 @@ import {
 import { WasherwomanInformationProvider } from '~/game/info/provider/washerwoman';
 import { createSeatingAndAssignPlayers } from '~/__mocks__/seating';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
+import {
+    Imp,
+    Poisoner,
+    Librarian,
+    Monk,
+    Empath,
+    Investigator,
+    Ravenkeeper,
+    Washerwoman,
+    Chef,
+    Virgin,
+    Saint,
+    Drunk,
+    Baron,
+    Soldier,
+    FortuneTeller,
+    Undertaker,
+    Mayor,
+} from '~/__mocks__/character';
 
 export async function createSeatingAndPlayersFromDescriptions(
     ...playerDescriptions: Array<string>

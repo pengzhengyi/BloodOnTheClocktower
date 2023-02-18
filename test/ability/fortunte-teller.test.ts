@@ -3,8 +3,6 @@ import { createInfoProvideContext } from '../info-provider.test';
 import { playerFromDescription } from '../utils';
 import { expectCharacterGetInformation } from './common';
 import { Generator } from '~/game/collections';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import { Saint } from '~/content/characters/output/saint';
 import {
     RedHerringEffect,
     GetFortuneTellerInformationAbility,
@@ -19,6 +17,7 @@ import {
 } from '~/__mocks__/game-ui';
 import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { Saint, FortuneTeller } from '~/__mocks__/character';
 
 describe('test GetFortuneTellerInformationAbility', () => {
     beforeAll(() => {

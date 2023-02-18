@@ -1,11 +1,11 @@
 import { MonkNotChoosePlayerToProtect } from '../exception/monk-not-choose-player-to-protect';
 import { BasicGamePhaseKind } from '../game-phase-kind';
-import type { CharacterToken } from '../character/character';
-import type { IPlayer } from '../player';
+import type { IPlayer, IPlayer as MonkPlayer } from '../player';
 import type { IPlayers } from '../players';
-import type { MonkPlayer } from '../types';
 import { SafeFromDemonEffect } from '../effect/safe-from-demon';
 import { CharacterNightEffect } from '../effect/character';
+import type { CharacterId } from '../character/character-id';
+import { CharacterIds } from '../character/character-id';
 import {
     Ability,
     type AbilitySetupContext,
@@ -17,13 +17,12 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { Monk } from '~/content/characters/output/monk';
 
 class BaseMonkProtectionEffect extends SafeFromDemonEffect<MonkPlayer> {
     static readonly description =
         'The Monk protects other players from the Demon.';
 
-    static readonly origin: CharacterToken = Monk;
+    static readonly origin: CharacterId = CharacterIds.Monk;
 }
 
 export const MonkProtectionEffect = CharacterNightEffect(

@@ -1,6 +1,5 @@
 import type { GetInfoAbilityUseContext } from '../ability/ability';
 import type { IPlayer } from '../player';
-import type { UndertakerPlayer } from '../types';
 import { RecoverableGameError } from './exception';
 
 export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
@@ -10,7 +9,7 @@ export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {
     declare corrected: [IPlayer, IPlayer];
 
     constructor(
-        readonly undertakerPlayer: UndertakerPlayer,
+        readonly undertakerPlayer: IPlayer,
         readonly context: GetInfoAbilityUseContext
     ) {
         super(UndertakerRequestInfoWhenNoExecution.description);

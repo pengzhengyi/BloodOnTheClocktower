@@ -75,8 +75,7 @@ abstract class AbstractCharacterSheetFactory {
     }
 
     async findAsync(id: string) {
-        const character =
-            await GameEnvironment.current.characterLoader.loadAsync(id);
+        const character = await GameEnvironment.current.loadCharacterAsync(id);
         return this._validateFoundCharacter(id, character);
     }
 

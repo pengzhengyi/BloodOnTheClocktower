@@ -1,4 +1,4 @@
-import type { CharacterToken } from '../character/character';
+import type { ICharacter } from '../character/character';
 import type { IPlayer } from '../player';
 import { RecoverableGameError } from './exception';
 
@@ -7,7 +7,7 @@ export class CannotDetermineCharacterType extends RecoverableGameError {
 
     constructor(
         readonly player?: IPlayer,
-        readonly character?: CharacterToken,
+        readonly character?: ICharacter,
         readonly type?: string
     ) {
         super(CannotDetermineCharacterType.description);

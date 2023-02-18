@@ -4,16 +4,8 @@ import {
     expectCharacterGetInformation,
     expectScarletWomanBecomeDemonAfterDemonDeath,
 } from './common';
-import { Imp } from '~/content/characters/output/imp';
-import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { DeadReason } from '~/game/dead-reason';
-import type {
-    FortuneTellerPlayer,
-    ImpPlayer,
-    ScarletWomanPlayer,
-    VirginPlayer,
-} from '~/game/types';
 import { mockAbilitySetupContext } from '~/__mocks__/ability';
 import {
     mockClocktowerWithIsFirstNight,
@@ -22,7 +14,6 @@ import {
 import { createBasicGame } from '~/__mocks__/game';
 import { Alignment } from '~/game/alignment';
 import { GetFortuneTellerInformationAbility } from '~/game/ability/fortuneteller';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 import {
     chooseMock,
     mockChoose,
@@ -30,9 +21,14 @@ import {
     mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
 } from '~/__mocks__/game-ui';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { type IPlayer } from '~/game/player';
-import { Virgin } from '~/content/characters/output/virgin';
+import {
+    ScarletWoman,
+    Imp,
+    FortuneTeller,
+    Washerwoman,
+    Virgin,
+} from '~/__mocks__/character';
 
 describe('test ScarletWomanAbility', () => {
     /**
@@ -55,7 +51,7 @@ describe('test ScarletWomanAbility', () => {
         const scarletWomanPlayer =
             (await infoProvideContext.players.findByCharacter(
                 ScarletWoman
-            )) as ScarletWomanPlayer;
+            )) as IPlayer;
         const setupContext = mockAbilitySetupContext(
             scarletWomanPlayer,
             undefined,
@@ -66,7 +62,7 @@ describe('test ScarletWomanAbility', () => {
 
         const impPlayer = (await infoProvideContext.players.findByCharacter(
             Imp
-        )) as ImpPlayer;
+        )) as IPlayer;
         const _death = await impPlayer.setDead(DeadReason.Executed);
 
         expect(await impPlayer.dead).toBeTrue();
@@ -97,11 +93,11 @@ describe('test ScarletWomanAbility', () => {
         const scarletWomanPlayer =
             (await infoProvideContext.players.findByCharacter(
                 ScarletWoman
-            )) as ScarletWomanPlayer;
+            )) as IPlayer;
 
         const impPlayer = (await infoProvideContext.players.findByCharacter(
             Imp
-        )) as ImpPlayer;
+        )) as IPlayer;
         await expectScarletWomanBecomeDemonAfterDemonDeath(
             scarletWomanPlayer,
             impPlayer,
@@ -130,12 +126,12 @@ describe('test ScarletWomanAbility', () => {
         const scarletWomanPlayer =
             (await infoProvideContext.players.findByCharacter(
                 ScarletWoman
-            )) as ScarletWomanPlayer;
+            )) as IPlayer;
 
         const fortuneTellerPlayer =
             (await infoProvideContext.players.findByCharacter(
                 FortuneTeller
-            )) as FortuneTellerPlayer;
+            )) as IPlayer;
         infoProvideContext.requestedPlayer = fortuneTellerPlayer;
 
         mockStorytellerChooseMatchingOne<IPlayer>(
@@ -153,7 +149,7 @@ describe('test ScarletWomanAbility', () => {
 
         const virginPlayer = (await infoProvideContext.players.findByCharacter(
             Virgin
-        )) as VirginPlayer;
+        )) as IPlayer;
         mockChoose([scarletWomanPlayer, virginPlayer]);
         mockStorytellerChooseFirstOne();
         const fortuneTellerFirstNightInfo = await expectCharacterGetInformation(
@@ -168,7 +164,7 @@ describe('test ScarletWomanAbility', () => {
 
         const impPlayer = (await infoProvideContext.players.findByCharacter(
             Imp
-        )) as ImpPlayer;
+        )) as IPlayer;
 
         await expectScarletWomanBecomeDemonAfterDemonDeath(
             scarletWomanPlayer,

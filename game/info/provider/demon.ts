@@ -67,7 +67,7 @@ export class DemonInformationProvider<
             this.getHypotheticalCombinationsForMinionPlayers(context);
 
         const perceivedNotInPlayerGoodCharacters = Generator.filter(
-            (character) => character.isGoodCharacter,
+            (character) => character.isGood,
             context.characterSheet.characters
         );
 
@@ -159,7 +159,7 @@ export class DemonInformationProvider<
             .promiseAll();
 
         return Generator.filter(
-            (character) => character.isGoodCharacter,
+            (character) => character.isGood,
             context.characterSheet.getCharactersNotInPlay(charactersInPlay)
         );
     }

@@ -1,4 +1,5 @@
-import type { CharacterToken } from '../character/character';
+import type { CharacterId } from '../character/character-id';
+import { GameEnvironment } from '../environment';
 import { CharacterEffectOriginNotSetup } from '../exception/character-effect-origin-not-setup';
 import type { NightSheet } from '../night-sheet';
 import type { Constructor, IBindToCharacter } from '../types';
@@ -19,10 +20,11 @@ export function CharacterEffect<
         extends effectConstructor
         implements TCharacterEffect<TTarget>
     {
-        declare static readonly origin: CharacterToken;
+        declare static readonly origin: CharacterId;
 
-        get origin(): CharacterToken {
-            const origin = (this.constructor as any).origin;
+        get origin(): CharacterId {
+            const origin = (this.constructor as unknown as IBindToCharacter)
+                .origin;
             if (origin === undefined) {
                 throw new CharacterEffectOriginNotSetup(this);
             }
@@ -48,12 +50,15 @@ export function CharacterNightEffect<
         }
 
         protected setupNightPriority(nightSheet: NightSheet): [number, number] {
+            const character = GameEnvironment.current.loadCharacter(
+                this.origin
+            );
             this.firstNightPriority = nightSheet.getNightPriority(
-                this.origin,
+                character,
                 true
             );
             this.otherNightPriority = nightSheet.getNightPriority(
-                this.origin,
+                character,
                 false
             );
 

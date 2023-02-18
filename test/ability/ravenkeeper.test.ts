@@ -5,7 +5,6 @@ import {
     expectDieInsteadAfterDemonAttack,
     mockRecluseRegisterAs,
 } from './common';
-import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 import { type GetInformationAbilityUseResult } from '~/game/ability/ability';
 import { MayorAbility } from '~/game/ability/mayor';
 import { GetRavenkeeperInformationAbility } from '~/game/ability/ravenkeeper';
@@ -20,6 +19,7 @@ import { chooseMock, mockChoose, sendMock } from '~/__mocks__/game-ui';
 import { mockClocktowerForDeathAtNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicStoryTeller } from '~/__mocks__/storyteller';
+import { ScarletWoman } from '~/__mocks__/character';
 
 describe('test GetRavenkeeperInformationAbility', () => {
     /**

@@ -8,14 +8,6 @@ import {
     expectAfterSlayerKill,
     expectCharacterGetInformation,
 } from './common';
-import { Chef } from '~/content/characters/output/chef';
-import { Empath } from '~/content/characters/output/empath';
-import { Imp } from '~/content/characters/output/imp';
-import { Investigator } from '~/content/characters/output/investigator';
-import { Recluse } from '~/content/characters/output/recluse';
-import { ScarletWoman } from '~/content/characters/output/scarletwoman';
-import { Slayer } from '~/content/characters/output/slayer';
-import { Undertaker } from '~/content/characters/output/undertaker';
 import { GetChefInformationAbility } from '~/game/ability/chef';
 import { GetEmpathInformationAbility } from '~/game/ability/empath';
 import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
@@ -28,7 +20,17 @@ import {
     mockClocktowerForUndertaker,
 } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
-import { Poisoner } from '~/content/characters/output/poisoner';
+import {
+    Recluse,
+    Slayer,
+    Imp,
+    Empath,
+    Investigator,
+    ScarletWoman,
+    Undertaker,
+    Chef,
+    Poisoner,
+} from '~/__mocks__/character';
 
 describe('test RecluseAbility', () => {
     /**

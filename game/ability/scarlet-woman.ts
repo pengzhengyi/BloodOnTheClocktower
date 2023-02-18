@@ -1,15 +1,9 @@
-import type { CharacterToken } from '../character/character';
-import type {
-    AnyFactory,
-    DemonPlayer,
-    Factory,
-    ScarletWomanPlayer,
-} from '../types';
+import type { AnyFactory, DemonPlayer, Factory } from '../types';
 import { Effect, type InteractionContext } from '../effect/effect';
 import type { NextFunction } from '../proxy/middleware';
 import { CharacterNightEffect } from '../effect/character';
 import type { DeadReason } from '../dead-reason';
-import type { IPlayer } from '../player';
+import type { IPlayer, IPlayer as ScarletWomanPlayer } from '../player';
 import type { IPlayers } from '../players';
 import type { INonBlockingSubscriber } from '../event-notification/types';
 import {
@@ -22,6 +16,8 @@ import {
     LoseDemonCategory,
 } from '../event-notification/event-category/character-type-change';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
+import type { CharacterId } from '../character/character-id';
+import { CharacterIds } from '../character/character-id';
 import {
     Ability,
     type AbilitySetupContext,
@@ -33,7 +29,6 @@ import {
     AbilitySuccessUseWhenHasEffect,
     AbilitySuccessUseWhenMalfunction,
 } from './status';
-import { ScarletWoman } from '~/content/characters/output/scarletwoman';
 
 class BaseScarletWomanBecomeDemonEffect
     extends Effect<DemonPlayer>
@@ -42,7 +37,7 @@ class BaseScarletWomanBecomeDemonEffect
     static readonly description =
         'The Scarlet Woman becomes the Demon when the Demon dies.';
 
-    static readonly origin: CharacterToken = ScarletWoman;
+    static readonly origin: CharacterId = CharacterIds.ScarletWoman;
 
     static MINIMUM_NUM_PLAYER_FOR_SCARLET_WOMAN_TO_BECOME_DEMON = 5;
 

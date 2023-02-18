@@ -3,9 +3,8 @@ import { storytellerHandleMock } from '~/__mocks__/game-ui';
 import { Exile } from '~/game/exile';
 import { ExileNonTraveller } from '~/game/exception/exile-non-traveller';
 import type { IPlayer } from '~/game/player';
-import { Scapegoat } from '~/content/characters/output/scapegoat';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { createBasicPlayer, setPlayerDead } from '~/__mocks__/player';
+import { Scapegoat, Washerwoman } from '~/__mocks__/character';
 
 async function createExileAndCollectVotes(
     nominated: IPlayer,

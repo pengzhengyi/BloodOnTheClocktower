@@ -14,6 +14,20 @@ import { CharacterLoader } from './character/character-loader';
 import { GameHasTooFewPlayers } from './exception/game-has-too-few-players';
 import { GameHasTooManyPlayers } from './exception/game-has-too-many-players';
 import { EditionNotSpecifiedMinimumNumberOfPlayers } from './exception/edition-not-specified-minimum-number-of-players';
+import type {
+    ICharacterFromDefinition,
+    ICharacterFromId,
+} from './character/character-factory';
+import {
+    CharacterFromDefinition,
+    CharacterFromId,
+} from './character/character-factory';
+import type {
+    IAsyncCharacterDefinitionProvider,
+    ICharacterDefinitionProvider,
+} from './character/character-definition-provider';
+import { FileReaderBasedProvider } from './character/character-definition-provider';
+import type { ICharacter } from './character/character';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGameEnvironment extends IEnvironment {
@@ -24,6 +38,10 @@ export interface IGameEnvironment extends IEnvironment {
 
     // utility methods
     getSupportedEditions(): Promise<Array<typeof Edition>>;
+
+    loadCharacter(characterId: string): ICharacter;
+
+    loadCharacterAsync(characterId: string): Promise<ICharacter>;
 
     recommendCharacterTypeComposition(
         numPlayers: number,
@@ -42,7 +60,24 @@ export interface IGameEnvironmentProvider
 
 class BaseGameEnvironment implements IGameEnvironment {
     editionLoader: IEditionLoader = EditionLoader;
-    characterLoader: ICharacterLoader = CharacterLoader;
+    characterLoader: ICharacterLoader;
+
+    protected characterFromDefinition: ICharacterFromDefinition;
+    protected characterFromId: ICharacterFromId;
+    protected characterDefinitionProvider: ICharacterDefinitionProvider &
+        IAsyncCharacterDefinitionProvider;
+
+    constructor() {
+        this.characterFromDefinition = new CharacterFromDefinition();
+        this.characterDefinitionProvider = new FileReaderBasedProvider(
+            this.configuration.characterDefinitionFolderPath
+        );
+        this.characterFromId = new CharacterFromId(
+            this.characterFromDefinition,
+            this.characterDefinitionProvider
+        );
+        this.characterLoader = new CharacterLoader(this.characterFromId);
+    }
 
     get infoProviderLoader(): IInfoProviderLoader {
         return InfoProviderLoader.getInstance();
@@ -53,6 +88,14 @@ class BaseGameEnvironment implements IGameEnvironment {
     }
 
     protected supportedEditions?: Array<typeof Edition>;
+
+    loadCharacter(characterId: string): ICharacter {
+        return this.characterLoader.load(characterId);
+    }
+
+    loadCharacterAsync(characterId: string): Promise<ICharacter> {
+        return this.characterLoader.loadAsync(characterId);
+    }
 
     async getSupportedEditions(): Promise<Array<typeof Edition>> {
         if (this.supportedEditions === undefined) {

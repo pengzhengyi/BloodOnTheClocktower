@@ -1,8 +1,11 @@
+/* eslint-disable lines-between-class-members */
 /* eslint-disable no-dupe-class-members */
-import type { CharacterToken } from '../character/character';
 import { Generator } from '../collections';
 import type { Constructor } from '../types';
 import { type CharacterType, Demon, Minion } from '../character/character-type';
+import type { CharacterId } from '../character/character-id';
+import { CharacterIds } from '../character/character-id';
+import type { ICharacterLoader } from '../character/character-loader';
 import { ButlerAbility } from './butler';
 import { GetChefInformationAbility } from './chef';
 import { GetEmpathInformationAbility } from './empath';
@@ -31,28 +34,11 @@ import { DrunkAbility } from './drunk';
 import { PoisonerAbility } from './poisoner';
 import { GetMinionInformationAbility } from './minion';
 import { GetDemonInformationAbility } from './demon';
-import { Butler } from '~/content/characters/output/butler';
-import { Chef } from '~/content/characters/output/chef';
-import { Empath } from '~/content/characters/output/empath';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import { Investigator } from '~/content/characters/output/investigator';
-import { Librarian } from '~/content/characters/output/librarian';
-import { Mayor } from '~/content/characters/output/mayor';
-import { Monk } from '~/content/characters/output/monk';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Recluse } from '~/content/characters/output/recluse';
-import { Saint } from '~/content/characters/output/saint';
-import { Slayer } from '~/content/characters/output/slayer';
-import { Soldier } from '~/content/characters/output/soldier';
-import { Undertaker } from '~/content/characters/output/undertaker';
-import { Virgin } from '~/content/characters/output/virgin';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
-import { Drunk } from '~/content/characters/output/drunk';
-import { Poisoner } from '~/content/characters/output/poisoner';
+import type { CHARACTERS } from '~/content/characters/output/characters';
 
 export interface IAbilityLoader {
     load(
-        character: CharacterToken
+        characterId: CharacterId
     ): Array<
         Constructor<
             IAbility<AbilityUseContext, AbilityUseResult, AbilitySetupContext>
@@ -60,10 +46,24 @@ export interface IAbilityLoader {
     >;
 
     /**
-     *
+     * Load ability related to character.
      */
     loadCharacterAbility(
-        character: CharacterToken
+        characterId: CharacterId
+    ):
+        | ICharacterAbilityClass<
+              AbilityUseContext,
+              AbilityUseResult,
+              AbilitySetupContext
+          >
+        | undefined;
+
+    /**
+     * Load ability related to setup in play characters.
+     * @param character
+     */
+    loadSetupAbility(
+        characterId: CharacterId
     ):
         | ICharacterAbilityClass<
               AbilityUseContext,
@@ -81,60 +81,68 @@ const CharacterAbilityClasses: Array<
     >
 > = [
     class extends GetWasherwomanInformationAbility {
-        static origin: CharacterToken = Washerwoman;
+        static origin: CharacterId = CharacterIds.Washerwoman;
     },
     class extends GetLibrarianInformationAbility {
-        static origin: CharacterToken = Librarian;
+        static origin: CharacterId = CharacterIds.Librarian;
     },
     class extends GetInvestigatorInformationAbility {
-        static origin: CharacterToken = Investigator;
+        static origin: CharacterId = CharacterIds.Investigator;
     },
     class extends GetChefInformationAbility {
-        static origin: CharacterToken = Chef;
+        static origin: CharacterId = CharacterIds.Chef;
     },
     class extends GetEmpathInformationAbility {
-        static origin: CharacterToken = Empath;
+        static origin: CharacterId = CharacterIds.Empath;
     },
     class extends GetFortuneTellerInformationAbility {
-        static origin: CharacterToken = FortuneTeller;
+        static origin: CharacterId = CharacterIds.FortuneTeller;
     },
     class extends GetUndertakerInformationAbility {
-        static origin: CharacterToken = Undertaker;
+        static origin: CharacterId = CharacterIds.Undertaker;
     },
     class extends MonkProtectAbility {
-        static origin: CharacterToken = Monk;
+        static origin: CharacterId = CharacterIds.Monk;
     },
     class extends GetRavenkeeperInformationAbility {
-        static origin: CharacterToken = Ravenkeeper;
+        static origin: CharacterId = CharacterIds.Ravenkeeper;
     },
     class extends VirginAbility {
-        static origin: CharacterToken = Virgin;
+        static origin: CharacterId = CharacterIds.Virgin;
     },
     class extends SlayerAbility {
-        static origin: CharacterToken = Slayer;
+        static origin: CharacterId = CharacterIds.Slayer;
     },
     class extends SoldierAbility {
-        static origin: CharacterToken = Soldier;
+        static origin: CharacterId = CharacterIds.Soldier;
     },
     class extends MayorAbility {
-        static origin: CharacterToken = Mayor;
+        static origin: CharacterId = CharacterIds.Mayor;
     },
     class extends ButlerAbility {
-        static origin: CharacterToken = Butler;
+        static origin: CharacterId = CharacterIds.Butler;
     },
     class extends DrunkAbility {
-        static origin: CharacterToken = Drunk;
+        static origin: CharacterId = CharacterIds.Drunk;
     },
     class extends RecluseAbility {
-        static origin: CharacterToken = Recluse;
+        static origin: CharacterId = CharacterIds.Recluse;
     },
     class extends SaintAbility {
-        static origin: CharacterToken = Saint;
+        static origin: CharacterId = CharacterIds.Saint;
     },
     class extends PoisonerAbility {
-        static origin: CharacterToken = Poisoner;
+        static origin: CharacterId = CharacterIds.Poisoner;
     },
 ];
+
+const CharacterSetupAbilityClasses: Array<
+    ICharacterAbilityClass<
+        AbilityUseContext,
+        AbilityUseResult,
+        AbilitySetupContext
+    >
+> = [];
 
 const CharacterTypeAbilityClasses: Array<
     ICharacterTypeAbilityClass<
@@ -153,7 +161,7 @@ const CharacterTypeAbilityClasses: Array<
 
 export class AbilityLoader implements IAbilityLoader {
     static characterToAbility: Map<
-        CharacterToken,
+        CharacterId,
         ICharacterAbilityClass<
             AbilityUseContext,
             AbilityUseResult,
@@ -186,42 +194,59 @@ export class AbilityLoader implements IAbilityLoader {
         )
     );
 
+    static characterToSetupAbility: Map<
+        CharacterId,
+        ICharacterAbilityClass<
+            AbilityUseContext,
+            AbilityUseResult,
+            AbilitySetupContext
+        >
+    > = new Map(
+        Generator.map(
+            (CharacterSetupAbilityClass) => [
+                CharacterSetupAbilityClass.origin,
+                CharacterSetupAbilityClass,
+            ],
+            CharacterSetupAbilityClasses
+        )
+    );
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(protected readonly characterLoader: ICharacterLoader) {}
+
     load(
-        character: typeof Washerwoman
+        characterId: CHARACTERS.Washerwoman
     ): [typeof GetWasherwomanInformationAbility];
 
-    load(character: typeof Librarian): [typeof GetLibrarianInformationAbility];
     load(
-        character: typeof Investigator
+        characterId: CHARACTERS.Librarian
+    ): [typeof GetLibrarianInformationAbility];
+    load(
+        characterId: CHARACTERS.Investigator
     ): [typeof GetInvestigatorInformationAbility];
-
-    load(character: typeof Chef): [typeof GetChefInformationAbility];
-    load(character: typeof Empath): [typeof GetEmpathInformationAbility];
+    load(characterId: CHARACTERS.Chef): [typeof GetChefInformationAbility];
+    load(characterId: CHARACTERS.Empath): [typeof GetEmpathInformationAbility];
     load(
-        character: typeof FortuneTeller
+        characterId: CHARACTERS.FortuneTeller
     ): [typeof GetFortuneTellerInformationAbility];
-
     load(
-        character: typeof Undertaker
+        characterId: CHARACTERS.Undertaker
     ): [typeof GetUndertakerInformationAbility];
-
-    load(character: typeof Monk): [typeof MonkProtectAbility];
+    load(characterId: CHARACTERS.Monk): [typeof MonkProtectAbility];
     load(
-        character: typeof Ravenkeeper
+        characterId: CHARACTERS.Ravenkeeper
     ): [typeof GetRavenkeeperInformationAbility];
-
-    load(character: typeof Virgin): [typeof VirginAbility];
-    load(character: typeof Slayer): [typeof SlayerAbility];
-    load(character: typeof Soldier): [typeof SoldierAbility];
-    load(character: typeof Mayor): [typeof MayorAbility];
-    load(character: typeof Butler): [typeof ButlerAbility];
-    load(character: typeof Drunk): [typeof DrunkAbility];
-    load(character: typeof Recluse): [typeof RecluseAbility];
-    load(character: typeof Saint): [typeof SaintAbility];
-    load(character: typeof Poisoner): [typeof PoisonerAbility];
-
+    load(characterId: CHARACTERS.Virgin): [typeof VirginAbility];
+    load(characterId: CHARACTERS.Slayer): [typeof SlayerAbility];
+    load(characterId: CHARACTERS.Soldier): [typeof SoldierAbility];
+    load(characterId: CHARACTERS.Mayor): [typeof MayorAbility];
+    load(characterId: CHARACTERS.Butler): [typeof ButlerAbility];
+    load(characterId: CHARACTERS.Drunk): [typeof DrunkAbility];
+    load(characterId: CHARACTERS.Recluse): [typeof RecluseAbility];
+    load(characterId: CHARACTERS.Saint): [typeof SaintAbility];
+    load(characterId: CHARACTERS.Poisoner): [typeof PoisonerAbility];
     load(
-        character: CharacterToken
+        characterId: CharacterId
     ): Array<
         Constructor<
             IAbility<AbilityUseContext, AbilityUseResult, AbilitySetupContext>
@@ -229,11 +254,11 @@ export class AbilityLoader implements IAbilityLoader {
     > {
         const abilities = [];
 
-        const characterAbility = this.loadCharacterAbility(character);
+        const characterAbility = this.loadCharacterAbility(characterId);
         if (characterAbility !== undefined) {
             abilities.push(characterAbility);
         }
-        const characterTypeAbility = this.loadCharacterTypeAbility(character);
+        const characterTypeAbility = this.loadCharacterTypeAbility(characterId);
         if (characterTypeAbility !== undefined) {
             abilities.push(characterTypeAbility);
         }
@@ -241,13 +266,17 @@ export class AbilityLoader implements IAbilityLoader {
         return abilities;
     }
 
-    loadCharacterAbility(character: CharacterToken) {
-        return AbilityLoader.characterToAbility.get(character);
+    loadCharacterAbility(characterId: CharacterId) {
+        return AbilityLoader.characterToAbility.get(characterId);
     }
 
-    loadCharacterTypeAbility(character: CharacterToken) {
-        return AbilityLoader.characterTypeToAbility.get(
-            character.characterType
-        );
+    loadCharacterTypeAbility(characterId: CharacterId) {
+        const character = this.characterLoader.load(characterId);
+        const characterType = character.characterType;
+        return AbilityLoader.characterTypeToAbility.get(characterType);
+    }
+
+    loadSetupAbility(characterId: CharacterId) {
+        return AbilityLoader.characterToSetupAbility.get(characterId);
     }
 }

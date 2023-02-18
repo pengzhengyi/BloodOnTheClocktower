@@ -4,8 +4,7 @@ import {
     RavenkeeperInformationRequester,
     type RavenkeeperInformationRequestContext,
 } from '../info/requester/ravenkeeper';
-import type { IPlayer } from '../player';
-import type { RavenkeeperPlayer } from '../types';
+import type { IPlayer, IPlayer as RavenkeeperPlayer } from '../player';
 import {
     GetCharacterInformationAbility,
     type GetInfoAbilityUseContext,

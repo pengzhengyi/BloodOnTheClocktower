@@ -1,17 +1,19 @@
 import { createExecutionAndAddVotedNominations } from '../execution.test';
 import { expectAfterExecuteSaint } from './common';
-import { Baron } from '~/content/characters/output/baron';
-import { Imp } from '~/content/characters/output/imp';
-import { Investigator } from '~/content/characters/output/investigator';
-import { Librarian } from '~/content/characters/output/librarian';
-import { Monk } from '~/content/characters/output/monk';
-import { Recluse } from '~/content/characters/output/recluse';
-import { Saint } from '~/content/characters/output/saint';
 import type { GamePhase } from '~/game/game-phase';
 import type { Action } from '~/game/types';
 
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { mockPlayers } from '~/__mocks__/players';
+import {
+    Saint,
+    Baron,
+    Imp,
+    Librarian,
+    Investigator,
+    Monk,
+    Recluse,
+} from '~/__mocks__/character';
 
 describe('test SaintAbility', () => {
     let _gamePhase: GamePhase | undefined;

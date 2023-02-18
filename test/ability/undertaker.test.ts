@@ -2,19 +2,17 @@ import { faker } from '@faker-js/faker';
 import { createInfoProvideContext } from '../info-provider.test';
 import { playerFromDescription } from '../utils';
 import { expectCharacterGetInformation, mockSpyRegisterAs } from './common';
-import { Undertaker } from '~/content/characters/output/undertaker';
 import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import { mockGetInfoAbilityUseContext } from '~/__mocks__/ability';
 import { mockClocktowerForUndertaker } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
-import type { UndertakerPlayer } from '~/game/types';
-import { Spy } from '~/content/characters/output/spy';
-import { Butler } from '~/content/characters/output/butler';
 import { DeadReason } from '~/game/dead-reason';
+import { Undertaker, Spy, Butler } from '~/__mocks__/character';
+import type { IPlayer } from '~/game/player';
 
 describe('test GetUndertakerInformationAbility', () => {
     let ability: GetUndertakerInformationAbility;
-    let undertakerPlayer: UndertakerPlayer;
+    let undertakerPlayer: IPlayer;
 
     beforeEach(async () => {
         ability = new GetUndertakerInformationAbility();

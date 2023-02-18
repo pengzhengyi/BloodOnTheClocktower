@@ -1,7 +1,9 @@
 import { lowercaseLetters } from '../common';
 import { CannotDetermineCharacterType } from '../exception/cannot-determine-character-type';
 import { IncompleteCharacterRoleData } from '../exception/incomplete-character-role-data';
+import type { TJSON } from '../types';
 import { RoleDataKeyName, type RoleData, type ScriptCharacter } from '../types';
+import type { CharacterId } from './character-id';
 import {
     CharacterType,
     Demon,
@@ -12,128 +14,168 @@ import {
     Traveller,
 } from './character-type';
 
-export interface Character extends Partial<RoleData> {}
+export interface ICharacter {
+    readonly definition: Partial<RoleData>;
+
+    /* basic properties */
+    readonly id: CharacterId;
+    readonly name: string;
+    readonly characterType: typeof CharacterType;
+    readonly firstNightOrder: number;
+    readonly otherNightOrder: number;
+
+    /* utility properties */
+    readonly isMinion: boolean;
+    readonly isDemon: boolean;
+    readonly isTownsfolk: boolean;
+    readonly isOutsider: boolean;
+    readonly isTraveller: boolean;
+    readonly isFabled: boolean;
+    readonly isEvil: boolean;
+    readonly isGood: boolean;
+
+    /* utility methods */
+    is(characterType: typeof CharacterType): boolean;
+
+    toJSON(): TJSON;
+    toString(): string;
+    toScriptCharacter(): ScriptCharacter;
+}
 
 /**
  * {@link `glossary["Character"]`}
  * The role that a player plays, such as the Butler, as listed on the character sheet and character almanac for the chosen edition. Characters may be in play or not in play.
  */
-// eslint-disable-next-line no-redeclare
-export abstract class Character {
+export abstract class Character implements ICharacter {
     static REQUIRED_KEYNAMES = [
         RoleDataKeyName.NAME,
         RoleDataKeyName.TEAM,
         RoleDataKeyName.ABILITY,
     ];
 
-    static characterType: typeof CharacterType;
-
-    static roleData: Partial<RoleData>;
-
-    static getCanonicalId(name: string) {
-        return lowercaseLetters(name);
+    static getCanonicalId(name: string): CharacterId {
+        return lowercaseLetters(name) as CharacterId;
     }
 
-    static get id() {
-        const id = this.roleData[RoleDataKeyName.ID];
+    declare characterType: typeof CharacterType;
+
+    definition: Partial<RoleData>;
+
+    get id() {
+        const id = this.definition[RoleDataKeyName.ID];
         if (id === undefined) {
             throw new IncompleteCharacterRoleData(
-                this.roleData,
+                this.definition,
                 RoleDataKeyName.ID
             );
         }
-        return id;
+        return Character.getCanonicalId(id);
     }
 
-    static get readableName() {
-        const name = this.roleData[RoleDataKeyName.NAME];
+    get name() {
+        const name = this.definition[RoleDataKeyName.NAME];
         if (name === undefined) {
             throw new IncompleteCharacterRoleData(
-                this.roleData,
+                this.definition,
                 RoleDataKeyName.NAME
             );
         }
         return name;
     }
 
-    static get firstNightOrder(): number {
-        const order = this.roleData[RoleDataKeyName.FIRSTNIGHT];
+    get firstNightOrder(): number {
+        const order = this.definition[RoleDataKeyName.FIRSTNIGHT];
         if (order === undefined) {
             throw new IncompleteCharacterRoleData(
-                this.roleData,
+                this.definition,
                 RoleDataKeyName.FIRSTNIGHT
             );
         }
         return order;
     }
 
-    static get otherNightOrder(): number {
-        const order = this.roleData[RoleDataKeyName.OTHERNIGHT];
+    get otherNightOrder(): number {
+        const order = this.definition[RoleDataKeyName.OTHERNIGHT];
         if (order === undefined) {
             throw new IncompleteCharacterRoleData(
-                this.roleData,
+                this.definition,
                 RoleDataKeyName.OTHERNIGHT
             );
         }
         return order;
     }
 
-    static get isMinion() {
+    get isMinion() {
         return this.is(Minion);
     }
 
-    static get isDemon() {
+    get isDemon() {
         return this.is(Demon);
     }
 
-    static get isTownsfolk() {
+    get isTownsfolk() {
         return this.is(Townsfolk);
     }
 
-    static get isOutsider() {
+    get isOutsider() {
         return this.is(Outsider);
     }
 
-    static get isTraveller() {
+    get isTraveller() {
         return this.is(Traveller);
     }
 
-    static get isFabled() {
+    get isFabled() {
         return this.is(Fabled);
     }
 
-    static get isEvilCharacter() {
+    get isEvil() {
         return this.isDemon || this.isMinion;
     }
 
-    static get isGoodCharacter() {
+    get isGood() {
         return this.isTownsfolk || this.isOutsider;
     }
 
-    static initialize(roleData: Partial<RoleData>) {
-        this.checkForRequiredKeyNames(roleData);
-        this.roleData = roleData;
-        this.setCharacterType(roleData);
+    protected constructor(definition: Partial<RoleData>) {
+        this.definition = definition;
+        this.initialize(definition);
     }
 
-    static toJSON(): string {
-        return this.id;
-    }
-
-    static toString() {
-        return `${this.readableName}`;
-    }
-
-    static toScriptCharacter(): ScriptCharacter {
-        return { [RoleDataKeyName.ID]: this.toJSON() };
-    }
-
-    static is(characterType: typeof CharacterType): boolean {
+    is(characterType: typeof CharacterType): boolean {
         return this.characterType.is(characterType);
     }
 
-    protected static setCharacterType(roleData: Partial<RoleData>) {
-        const type = roleData[RoleDataKeyName.TEAM];
+    toJSON(): string {
+        return this.id;
+    }
+
+    toString() {
+        return `${this.name}`;
+    }
+
+    toScriptCharacter(): ScriptCharacter {
+        return { [RoleDataKeyName.ID]: this.toJSON() };
+    }
+
+    protected initialize(definition: Partial<RoleData>) {
+        this.checkForRequiredKeyNames(definition);
+        this.setCharacterType(definition);
+    }
+
+    protected checkForRequiredKeyNames(definition: Partial<RoleData>) {
+        for (const requiredKeyName of Character.REQUIRED_KEYNAMES) {
+            if (definition[requiredKeyName] === undefined) {
+                throw new IncompleteCharacterRoleData(
+                    definition,
+                    requiredKeyName
+                );
+            }
+        }
+    }
+
+    protected setCharacterType(definition: Partial<RoleData>) {
+        const type = definition[RoleDataKeyName.TEAM];
 
         const characterType = CharacterType.unsafeFrom(type);
         if (characterType === undefined) {
@@ -142,30 +184,13 @@ export abstract class Character {
             this.characterType = characterType;
         }
     }
-
-    protected static checkForRequiredKeyNames(roleData: Partial<RoleData>) {
-        for (const requiredKeyName of this.REQUIRED_KEYNAMES) {
-            if (roleData[requiredKeyName] === undefined) {
-                throw new IncompleteCharacterRoleData(
-                    roleData,
-                    requiredKeyName
-                );
-            }
-        }
-    }
-
-    protected constructor() {
-        throw new Error(
-            'Cannot instantiate Character, meant to use as static class.'
-        );
-    }
 }
 
 /**
  * {@link `glossary["Character token"]`}
  * The large round token that each player gets at the start of the game that indicates their character. Players cannot look at each other's character tokens.
  */
-export type CharacterToken = typeof Character;
+export type CharacterToken = ICharacter;
 export type TownsfolkCharacterToken = CharacterToken & {
     characterType: Townsfolk;
 };

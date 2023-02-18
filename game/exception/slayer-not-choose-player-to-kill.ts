@@ -1,6 +1,5 @@
 import type { AbilityUseContext } from '../ability/ability';
 import type { IPlayer } from '../player';
-import type { SlayerPlayer } from '../types';
 import { RecoverableGameError } from './exception';
 
 export class SlayerNotChoosePlayerToKill extends RecoverableGameError {
@@ -9,7 +8,7 @@ export class SlayerNotChoosePlayerToKill extends RecoverableGameError {
     declare correctedPlayerToKill: IPlayer;
 
     constructor(
-        readonly slayerPlayer: SlayerPlayer,
+        readonly slayerPlayer: IPlayer,
         readonly context: AbilityUseContext
     ) {
         super(SlayerNotChoosePlayerToKill.description);

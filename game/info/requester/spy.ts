@@ -2,7 +2,7 @@ import type { SpyInformation } from '../provider/spy';
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, EachNight, IsAlive } from './common';
 import { type InformationRequestContext } from './requester';
-import { Spy } from '~/content/characters/output/spy';
+import { CharacterIds } from '~/game/character/character-id';
 
 class BaseSpyInformationRequester<
     TInformationRequestContext extends InformationRequestContext<SpyInformation>
@@ -11,7 +11,7 @@ class BaseSpyInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.SpyInformation;
-    readonly expectedCharacter = Spy;
+    readonly origin = CharacterIds.Spy;
 }
 
 export interface SpyInformationRequester<

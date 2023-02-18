@@ -10,7 +10,7 @@ import {
     EachNonfirstNight,
 } from './common';
 import { type InformationRequestContext } from './requester';
-import { Undertaker } from '~/content/characters/output/undertaker';
+import { CharacterIds } from '~/game/character/character-id';
 
 export interface UndertakerInformationRequestContext<TInformation>
     extends InformationRequestContext<TInformation>,
@@ -23,7 +23,7 @@ class BaseUndertakerInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.UndertakerInformation;
-    readonly expectedCharacter = Undertaker;
+    readonly origin = CharacterIds.Undertaker;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (

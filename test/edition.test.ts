@@ -1,5 +1,4 @@
-import { Imp } from '~/content/characters/output/imp';
-import { Virgin } from '~/content/characters/output/virgin';
+import { Imp, Virgin } from '~/__mocks__/character';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 
 describe('Trouble Brewing', () => {

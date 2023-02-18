@@ -8,9 +8,13 @@ import {
     type InformationRequestContext,
     InformationRequester,
 } from './requester';
-import type { Constructor, RequireInfoType } from '~/game/types';
+import type {
+    Constructor,
+    IBindToCharacter,
+    RequireInfoType,
+} from '~/game/types';
 import type { CharacterType } from '~/game/character/character-type';
-import type { CharacterToken } from '~/game/character/character';
+import type { CharacterId } from '~/game/character/character-id';
 
 type WithInfoType<T> = RequireInfoType & T;
 
@@ -220,23 +224,26 @@ export abstract class CharacterTypeInformationRequester<
 }
 
 export abstract class CharacterInformationRequester<
-    TInformation,
-    TInformationRequestContext extends InformationRequestContext<TInformation>
-> extends InformationRequester<TInformation, TInformationRequestContext> {
-    abstract readonly expectedCharacter: CharacterToken;
+        TInformation,
+        TInformationRequestContext extends InformationRequestContext<TInformation>
+    >
+    extends InformationRequester<TInformation, TInformationRequestContext>
+    implements IBindToCharacter
+{
+    abstract readonly origin: CharacterId;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {
         if (await super.isEligible(context)) {
             const character = await context.requestedPlayer.from(
                 context.requestedPlayer
             ).character;
-            return character === this.expectedCharacter;
+            return character.id === this.origin;
         }
 
         return false;
     }
 
     toString() {
-        return `RequestInfoAs${this.expectedCharacter}`;
+        return `RequestInfo(${this.origin})`;
     }
 }

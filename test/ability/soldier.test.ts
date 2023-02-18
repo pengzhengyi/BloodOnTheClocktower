@@ -6,19 +6,17 @@ import {
     setupDrunkAbility,
     setupPoisonerAbility,
 } from './common';
-import { Soldier } from '~/content/characters/output/soldier';
 import { SoldierAbility } from '~/game/ability/soldier';
-import { type ImpPlayer, type SoldierPlayer } from '~/game/types';
 import { mockAbilitySetupContext } from '~/__mocks__/ability';
 import { createBasicPlayer } from '~/__mocks__/player';
-import { Drunk } from '~/content/characters/output/drunk';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
-import { Poisoner } from '~/content/characters/output/poisoner';
+import { Poisoner, Drunk, Soldier } from '~/__mocks__/character';
+import type { IPlayer } from '~/game/player';
 
 describe('test SoldierAbility', () => {
     let _ability: SoldierAbility;
-    let soldierPlayer: SoldierPlayer;
-    let impPlayer: ImpPlayer;
+    let soldierPlayer: IPlayer;
+    let impPlayer: IPlayer;
 
     beforeEach(async () => {
         soldierPlayer = await createBasicPlayer(undefined, Soldier);

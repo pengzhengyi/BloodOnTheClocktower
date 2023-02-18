@@ -1,15 +1,14 @@
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from '../utils';
 import { expectAfterSlayerKill, mockRecluseRegisterAs } from './common';
-import { Imp } from '~/content/characters/output/imp';
-import { Slayer } from '~/content/characters/output/slayer';
 import { SlayerAbility } from '~/game/ability/slayer';
-import type { SlayerPlayer } from '~/game/types';
 import { createBasicPlayer } from '~/__mocks__/player';
+import type { IPlayer } from '~/game/player';
+import { Imp, Slayer } from '~/__mocks__/character';
 
 describe('test SlayerAbility', () => {
     let ability: SlayerAbility;
-    let slayerPlayer: SlayerPlayer;
+    let slayerPlayer: IPlayer;
 
     beforeEach(async () => {
         ability = new SlayerAbility();

@@ -1,6 +1,5 @@
 import type { AbilityUseContext } from '../ability/ability';
 import type { IPlayer } from '../player';
-import type { ImpPlayer } from '../types';
 import { RecoverableGameError } from './exception';
 
 export class ImpNotChoosePlayerToKill extends RecoverableGameError {
@@ -9,7 +8,7 @@ export class ImpNotChoosePlayerToKill extends RecoverableGameError {
     declare correctedPlayerToKill: IPlayer;
 
     constructor(
-        readonly impPlayer: ImpPlayer,
+        readonly impPlayer: IPlayer,
         readonly context: AbilityUseContext
     ) {
         super(ImpNotChoosePlayerToKill.description);

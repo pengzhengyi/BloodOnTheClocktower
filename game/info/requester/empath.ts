@@ -2,7 +2,7 @@ import type { EmpathInformation } from '../provider/empath';
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, EachNight } from './common';
 import { type InformationRequestContext } from './requester';
-import { Empath } from '~/content/characters/output/empath';
+import { CharacterIds } from '~/game/character/character-id';
 
 class BaseEmpathInformationRequester<
     TInformationRequestContext extends InformationRequestContext<EmpathInformation>
@@ -11,7 +11,7 @@ class BaseEmpathInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.EmpathInformation;
-    readonly expectedCharacter = Empath;
+    readonly origin = CharacterIds.Empath;
 }
 
 export interface EmpathInformationRequester<

@@ -1,5 +1,4 @@
 import { createInfoProvideContext } from '../info-provider.test';
-import { Monk } from '~/content/characters/output/monk';
 import type {
     AbilitySetupContext,
     AbilityUseContext,
@@ -34,19 +33,8 @@ import type { IPlayer } from '~/game/player';
 import type {
     AsyncFactory,
     DemonPlayer,
-    DrunkPlayer,
-    ImpPlayer,
     MinionPlayer,
-    MonkPlayer,
-    PoisonerPlayer,
-    ReclusePlayer,
-    SaintPlayer,
-    ScarletWomanPlayer,
-    SlayerPlayer,
-    SpyPlayer,
     Task,
-    UndertakerPlayer,
-    VirginPlayer,
 } from '~/game/types';
 import {
     mockAbilitySetupContext,
@@ -70,7 +58,6 @@ import {
     storytellerChooseOneMock,
     storytellerConfirmMock,
 } from '~/__mocks__/game-ui';
-import { Slayer } from '~/content/characters/output/slayer';
 import type {
     SlayerAbility,
     SlayerAbilityUseResult,
@@ -83,7 +70,6 @@ import {
     PoisonerAbility,
     type PoisonerAbilityUseResult,
 } from '~/game/ability/poisoner';
-import { Poisoner } from '~/content/characters/output/poisoner';
 import type { NightSheet } from '~/game/night-sheet';
 import { type GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import { mockClocktowerForUndertaker } from '~/__mocks__/information';
@@ -104,9 +90,10 @@ import { Demon } from '~/game/character/character-type';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';
 import { ImpAbility, type ImpAbilityUseResult } from '~/game/ability/imp';
-import { Imp } from '~/content/characters/output/imp';
 import type { ISetupContext } from '~/game/setup-sheet';
 import { createBasicStoryTeller } from '~/__mocks__/storyteller';
+import { Imp, Slayer, Poisoner, Monk } from '~/__mocks__/character';
+import { GameEnvironment } from '~/game/environment';
 
 export async function expectCharacterGetInformation<
     TInformation,
@@ -195,7 +182,7 @@ export async function expectAfterDemonAttack(
 
 export async function expectAfterImpKill(
     playerToKill: IPlayer,
-    impPlayer: ImpPlayer,
+    impPlayer: IPlayer,
     impAbility?: ImpAbility,
     setupContext?: AbilitySetupContext,
     useContext?: AbilityUseContext,
@@ -228,7 +215,7 @@ export async function expectAfterImpKill(
 }
 
 export async function expectAfterImpSelfKill(
-    impPlayer: ImpPlayer,
+    impPlayer: IPlayer,
     minionPlayerToBecomeDemon: MinionPlayer,
     impAbility?: ImpAbility,
     setupContext?: AbilitySetupContext,
@@ -258,7 +245,7 @@ export async function expectAfterImpSelfKill(
 }
 
 export async function mockRecluseRegisterAs<T>(
-    reclusePlayer: ReclusePlayer,
+    reclusePlayer: IPlayer,
     action: AsyncFactory<T>,
     registerAsCharacter: CharacterToken,
     registerAsAlignment?: Alignment,
@@ -301,7 +288,7 @@ export async function mockRecluseRegisterAs<T>(
 }
 
 export async function mockSpyRegisterAs<T>(
-    spyPlayer: SpyPlayer,
+    spyPlayer: IPlayer,
     action: AsyncFactory<T>,
     registerAsCharacter: CharacterToken,
     registerAsAlignment?: Alignment,
@@ -345,7 +332,7 @@ export async function mockSpyRegisterAs<T>(
 
 export async function expectAfterNominateVirgin(
     nominator: IPlayer,
-    virginPlayer: VirginPlayer,
+    virginPlayer: IPlayer,
     execution?: Execution,
     ability?: VirginAbility,
     context?: VirginAbilityUseContext,
@@ -416,7 +403,7 @@ export async function expectUndertakerToLearn(
     executedPlayer: IPlayer,
     shouldBeCharacter: CharacterToken,
     _context?: GetInfoAbilityUseContext,
-    undertakerPlayer?: UndertakerPlayer,
+    undertakerPlayer?: IPlayer,
     characterSheet?: ICharacterSheet
 ) {
     characterSheet ??= mockCharacterSheet();
@@ -449,7 +436,7 @@ export async function expectAfterSlayerKill(
     chosenPlayer: IPlayer,
     shouldBeDead: boolean,
     _context?: AbilityUseContext,
-    slayerPlayer?: SlayerPlayer
+    slayerPlayer?: IPlayer
 ) {
     const context = _context ?? mockAbilityUseContext(slayerPlayer);
 
@@ -482,7 +469,7 @@ export async function expectAfterPoisonerPoison(
     chosenPlayer: IPlayer,
     shouldGetPoisoned: boolean,
     _context?: AbilityUseContext,
-    poisonerPlayer?: PoisonerPlayer
+    poisonerPlayer?: IPlayer
 ) {
     const context = _context ?? mockAbilityUseContext(poisonerPlayer);
 
@@ -540,7 +527,7 @@ export async function expectAfterExecute(
 }
 
 export async function expectScarletWomanBecomeDemonAfterDemonDeath(
-    scarletWomanPlayer: ScarletWomanPlayer,
+    scarletWomanPlayer: IPlayer,
     demonPlayer: DemonPlayer,
     scarletWomanAbility?: ScarletWomanAbility,
     setupContext?: AbilitySetupContext,
@@ -581,7 +568,7 @@ export async function expectScarletWomanBecomeDemonAfterDemonDeath(
 
 export async function expectAfterExecuteSaint(
     execution: Execution,
-    saintPlayer: SaintPlayer,
+    saintPlayer: IPlayer,
     expectGameEnd = true,
     ability?: SaintAbility,
     players?: IPlayers,
@@ -640,7 +627,7 @@ export async function mockButlerChooseMaster(
 }
 
 export async function setupPoisonerAbility(
-    poisonerPlayer: PoisonerPlayer,
+    poisonerPlayer: IPlayer,
     poisonerAbility?: PoisonerAbility,
     nightsheet?: NightSheet,
     clocktower?: IClocktower
@@ -658,7 +645,7 @@ export async function setupPoisonerAbility(
 }
 
 export async function setupDrunkAbility(
-    drunkPlayer: DrunkPlayer,
+    drunkPlayer: IPlayer,
     thinkAsCharacter: CharacterToken,
     context?: AbilitySetupContext
 ): Promise<DrunkAbility> {
@@ -669,7 +656,7 @@ export async function setupDrunkAbility(
         undefined,
         undefined,
         undefined,
-        new AbilityLoader()
+        new AbilityLoader(GameEnvironment.current.characterLoader)
     );
     storytellerChooseOneMock.mockResolvedValue(thinkAsCharacter);
     await drunkAbility.setup(context);
@@ -678,7 +665,7 @@ export async function setupDrunkAbility(
 }
 
 export async function setupMonkProtectAbility(
-    monkPlayer: MonkPlayer,
+    monkPlayer: IPlayer,
     context?: AbilitySetupContext,
     nightSheet?: NightSheet
 ): Promise<MonkProtectAbility> {

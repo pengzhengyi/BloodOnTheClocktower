@@ -11,15 +11,11 @@ import {
     expectAfterExecuteSaint,
     setupPoisonerAbility,
 } from './common';
-import { Imp } from '~/content/characters/output/imp';
-import { Poisoner } from '~/content/characters/output/poisoner';
-import { Slayer } from '~/content/characters/output/slayer';
 import { PoisonerAbility } from '~/game/ability/poisoner';
 import { SlayerAbility } from '~/game/ability/slayer';
 import { mockPoisonerAbilitySetupContext } from '~/__mocks__/ability';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicPlayer } from '~/__mocks__/player';
-import { Empath } from '~/content/characters/output/empath';
 import { GetEmpathInformationAbility } from '~/game/ability/empath';
 import { Clocktower } from '~/game/clocktower';
 import { Phase } from '~/game/phase';
@@ -31,19 +27,25 @@ import {
 } from '~/__mocks__/game-ui';
 import type { Information } from '~/game/info/information';
 import type { EmpathInformation } from '~/game/info/provider/empath';
-import { Investigator } from '~/content/characters/output/investigator';
 import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
 import { mockClocktowerWithIsFirstNight } from '~/__mocks__/information';
-import { Baron } from '~/content/characters/output/baron';
 import { Minion } from '~/game/character/character-type';
 import type { InvestigatorInformation } from '~/game/info/provider/investigator';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
-import { Undertaker } from '~/content/characters/output/undertaker';
-import { Saint } from '~/content/characters/output/saint';
 import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
-import { Virgin } from '~/content/characters/output/virgin';
 import type { UndertakerInformation } from '~/game/info/provider/undertaker';
 import { Execution } from '~/game/execution';
+import {
+    Poisoner,
+    Slayer,
+    Imp,
+    Empath,
+    Investigator,
+    Baron,
+    Undertaker,
+    Saint,
+    Virgin,
+} from '~/__mocks__/character';
 
 describe('test PoisonerAbility', () => {
     /**

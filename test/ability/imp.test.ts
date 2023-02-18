@@ -1,11 +1,13 @@
 import { expectAfterImpKill, expectAfterImpSelfKill } from './common';
-import { Imp } from '~/content/characters/output/imp';
-import { Mayor } from '~/content/characters/output/mayor';
-import { Poisoner } from '~/content/characters/output/poisoner';
-import { Virgin } from '~/content/characters/output/virgin';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { mockPlayers } from '~/__mocks__/players';
+import {
+    Imp,
+    Poisoner,
+    Washerwoman,
+    Virgin,
+    Mayor,
+} from '~/__mocks__/character';
 
 describe('test ImpAbility', () => {
     /**

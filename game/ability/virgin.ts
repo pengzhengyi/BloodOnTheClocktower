@@ -4,7 +4,8 @@ import type { Execution } from '../execution';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { Nomination } from '../nomination';
-import type { VirginPlayer, RequireExecution } from '../types';
+import type { RequireExecution } from '../types';
+import type { IPlayer as VirginPlayer } from '../player';
 import {
     type AbilityUseContext,
     Ability,

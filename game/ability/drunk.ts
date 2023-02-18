@@ -104,8 +104,9 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         character: TownsfolkCharacterToken,
         context: AbilitySetupContext
     ) {
-        const CharacterAbility =
-            context.abilityLoader.loadCharacterAbility(character);
+        const CharacterAbility = context.abilityLoader.loadCharacterAbility(
+            character.id
+        );
         if (CharacterAbility !== undefined) {
             this.thinkAsAbility = new CharacterAbility() as Ability<
                 AbilityUseContext,

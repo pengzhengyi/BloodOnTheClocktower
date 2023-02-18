@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { mockPlayer, mockDeadPlayer } from '~/__mocks__/player';
 import { mockExecution } from '~/__mocks__/execution';
 import { Nomination } from '~/game/nomination';
+import { Washerwoman } from '~/__mocks__/character';
 
 describe('test Player serialization', () => {
     test.concurrent('convert to object', async () => {

@@ -1,14 +1,16 @@
-import type { CharacterToken } from '../character/character';
 import { DeadReason } from '../dead-reason';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, type InteractionContext } from '../effect/effect';
 import type { IPlayers } from '../players';
 import type { NextFunction } from '../proxy/middleware';
-import type { AnyFactory, ImpPlayer, MinionPlayer } from '../types';
-import type { IPlayer } from '../player';
+import type { AnyFactory, MinionPlayer } from '../types';
+import type { IPlayer, IPlayer as ImpPlayer } from '../player';
 import { ImpNotChoosePlayerToKill } from '../exception/imp-not-choose-player-to-kill';
 import type { Death } from '../death';
 import { BasicGamePhaseKind } from '../game-phase-kind';
+import type { CharacterId } from '../character/character-id';
+import { CharacterIds } from '../character/character-id';
+import { GameEnvironment } from '../environment';
 import {
     AbilitySuccessUseWhenMalfunction,
     AbilitySuccessUseWhenHasEffect,
@@ -20,14 +22,13 @@ import {
     type AbilityUseResult,
     RequireSetup,
 } from './ability';
-import { Imp } from '~/content/characters/output/imp';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
     static readonly description =
         'The Imp can make copies of itself... for a terrible price.';
 
-    static readonly origin: CharacterToken = Imp;
+    static readonly origin: CharacterId = CharacterIds.Imp;
 
     constructor(protected getPlayers: AnyFactory<IPlayers>) {
         super();
@@ -68,7 +69,8 @@ class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
             this.matchTarget(
                 context,
                 (demonPlayer) =>
-                    demonPlayer.storytellerGet('_character') === Imp
+                    demonPlayer.storytellerGet('_character').id ===
+                    CharacterIds.Imp
             ) && this.matchNotNullInitiatorSameAsTarget(context)
         );
     }
@@ -89,6 +91,9 @@ class BaseImpMakeCopyEffect extends Effect<ImpPlayer> {
 
     protected async minionBecomeDemon() {
         const minionPlayer = await this.chooseAliveMinionPlayer();
+        const Imp = await GameEnvironment.current.loadCharacterAsync(
+            CharacterIds.Imp
+        );
         const assignmentResult = await minionPlayer.assignCharacter(
             Imp,
             undefined,

@@ -5,7 +5,7 @@ import type {
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, EachNight } from './common';
 import { type InformationRequestContext } from './requester';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
+import { CharacterIds } from '~/game/character/character-id';
 
 export interface FortuneTellerInformationRequestContext<TInformation>
     extends InformationRequestContext<TInformation>,
@@ -18,7 +18,7 @@ class BaseFortuneTellerInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.FortuneTellerInformation;
-    readonly expectedCharacter = FortuneTeller;
+    readonly origin = CharacterIds.FortuneTeller;
 }
 
 export interface FortuneTellerInformationRequester<

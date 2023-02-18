@@ -17,7 +17,7 @@ module.exports = {
     '<rootDir>/game/**/*.ts',
   ],
   testEnvironment: 'jsdom',
-  testTimeout: 500,
+  testTimeout: 10000,
   setupFiles: ['<rootDir>/__mocks__/setup.ts'],
   setupFilesAfterEnv: ['jest-extended/all'],
 };

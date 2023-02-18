@@ -12,8 +12,8 @@ import type { TJSON } from '~/game/types';
 export interface ICharacterTokenJSONSerializable
     extends IJSONSerializable<CharacterToken> {}
 
-function isCharacterToken(input: any): input is CharacterToken {
-    return input.prototype instanceof Character;
+function isCharacterToken(input: unknown): input is CharacterToken {
+    return input instanceof Character;
 }
 
 export class CharacterTokenJSONSerializable

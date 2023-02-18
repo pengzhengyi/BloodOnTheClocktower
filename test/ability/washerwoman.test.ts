@@ -1,9 +1,6 @@
 import { createInfoProvideContext } from '../info-provider.test';
 import { playerFromDescription } from '../utils';
 import { expectCharacterGetInformation } from './common';
-import { Chef } from '~/content/characters/output/chef';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { AbilityUseStatus } from '~/game/ability/status';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
 import { Townsfolk } from '~/game/character/character-type';
@@ -18,6 +15,7 @@ import {
     mockClocktowerWithIsFirstNight,
 } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
+import { Washerwoman, Chef, Ravenkeeper } from '~/__mocks__/character';
 
 describe('test GetWasherwomanInformationAbility', () => {
     let ability: GetWasherwomanInformationAbility;

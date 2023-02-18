@@ -1,6 +1,5 @@
 import type { GetInfoAbilityUseContext } from '../ability/ability';
 import type { IPlayer } from '../player';
-import type { FortuneTellerPlayer } from '../types';
 import { RecoverableGameError } from './exception';
 
 export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
@@ -10,7 +9,7 @@ export class FortuneTellerChooseInvalidPlayers extends RecoverableGameError {
     declare corrected: [IPlayer, IPlayer];
 
     constructor(
-        readonly fortuneTellerPlayer: FortuneTellerPlayer,
+        readonly fortuneTellerPlayer: IPlayer,
         readonly chosen: Array<IPlayer> | undefined,
         readonly context: GetInfoAbilityUseContext
     ) {

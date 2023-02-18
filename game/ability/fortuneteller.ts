@@ -1,4 +1,3 @@
-import type { CharacterToken } from '../character/character';
 import { Effect, type InteractionContext } from '../effect/effect';
 import { FortuneTellerChooseInvalidPlayers } from '../exception/fortune-teller-choose-invalid-players';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
@@ -10,21 +9,21 @@ import {
 } from '../info/requester/fortuneteller';
 import type { NextFunction } from '../proxy/middleware';
 import type { NightSheet } from '../night-sheet';
-import type { IPlayer } from '../player';
-import type { FortuneTellerPlayer } from '../types';
+import type { IPlayer, IPlayer as FortuneTellerPlayer } from '../player';
 import { CharacterNightEffect } from '../effect/character';
+import type { CharacterId } from '../character/character-id';
+import { CharacterIds } from '../character/character-id';
 import {
     type AbilitySetupContext,
     GetCharacterInformationAbility,
     type GetInfoAbilityUseContext,
     RequireSetup,
 } from './ability';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
 class BaseRedHerringEffect extends Effect<FortuneTellerPlayer> {
     static readonly description =
         'A good player that registers as a Demon to Fortune Teller';
 
-    static readonly origin: CharacterToken = FortuneTeller;
+    static readonly origin: CharacterId = CharacterIds.FortuneTeller;
 
     constructor(protected readonly fortuneTellerPlayer: FortuneTellerPlayer) {
         super();

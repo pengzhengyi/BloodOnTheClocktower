@@ -10,7 +10,7 @@ import { CompositeGamePhaseKind } from '../game-phase-kind';
 import type { SpyInformation } from '../info/provider/spy';
 import type { InformationRequestContext } from '../info/requester/requester';
 import { SpyInformationRequester } from '../info/requester/spy';
-import type { SpyPlayer } from '../types';
+import type { IPlayer as SpyPlayer } from '../player';
 import {
     type Ability,
     type AbilitySetupContext,

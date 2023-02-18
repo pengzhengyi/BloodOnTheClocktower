@@ -8,10 +8,6 @@ import {
     expectAfterDemonAttack,
     expectCharacterGetInformation,
 } from './common';
-import { Drunk } from '~/content/characters/output/drunk';
-import { Empath } from '~/content/characters/output/empath';
-import { Imp } from '~/content/characters/output/imp';
-import { Soldier } from '~/content/characters/output/soldier';
 import type { GetEmpathInformationAbility } from '~/game/ability/empath';
 import type { EmpathInformation } from '~/game/info/provider/empath';
 import {
@@ -27,16 +23,22 @@ import {
 } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
 import type { Information } from '~/game/info/information';
-import { Saint } from '~/content/characters/output/saint';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
 import type { GetRavenkeeperInformationAbility } from '~/game/ability/ravenkeeper';
-import { Poisoner } from '~/content/characters/output/poisoner';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 import type { RavenkeeperInformation } from '~/game/info/provider/ravenkeeper';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import { Undertaker } from '~/content/characters/output/undertaker';
 import type { UndertakerInformation } from '~/game/info/provider/undertaker';
 import type { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
+import {
+    Imp,
+    Drunk,
+    Soldier,
+    Empath,
+    Saint,
+    Ravenkeeper,
+    Poisoner,
+    FortuneTeller,
+    Undertaker,
+} from '~/__mocks__/character';
 
 describe('test DrunkAbility', () => {
     /**

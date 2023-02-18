@@ -2,7 +2,7 @@ import type { ChefInformation } from '../provider/chef';
 import { InfoType } from '../info-type';
 import { AtFirstNight, CharacterInformationRequester, IsAlive } from './common';
 import { type InformationRequestContext } from './requester';
-import { Chef } from '~/content/characters/output/chef';
+import { CharacterIds } from '~/game/character/character-id';
 
 class BaseChefInformationRequester<
     TInformationRequestContext extends InformationRequestContext<ChefInformation>
@@ -11,7 +11,7 @@ class BaseChefInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.ChefInformation;
-    readonly expectedCharacter = Chef;
+    readonly origin = CharacterIds.Chef;
 }
 
 export interface ChefInformationRequester<

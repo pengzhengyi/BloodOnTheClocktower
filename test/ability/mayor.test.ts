@@ -1,15 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from '../utils';
 import { expectDieInsteadAfterDemonAttack } from './common';
-import { Mayor } from '~/content/characters/output/mayor';
 import { MayorAbility } from '~/game/ability/mayor';
-import type { MayorPlayer } from '~/game/types';
 import { mockMayorAbilitySetupContext } from '~/__mocks__/ability';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
+import type { IPlayer } from '~/game/player';
+import { Mayor } from '~/__mocks__/character';
 
 describe('test MayorAbility', () => {
-    let mayorPlayer: MayorPlayer;
+    let mayorPlayer: IPlayer;
 
     beforeEach(async () => {
         mayorPlayer = await createBasicPlayer(undefined, Mayor);

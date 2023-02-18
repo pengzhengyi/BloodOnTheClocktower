@@ -13,24 +13,7 @@ import type { Phase } from './phase';
 import type { InfoType } from './info/info-type';
 import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
-import type { Butler } from '~/content/characters/output/butler';
-import type { Drunk } from '~/content/characters/output/drunk';
-import type { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import type { Mayor } from '~/content/characters/output/mayor';
-import type { Monk } from '~/content/characters/output/monk';
-import type { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import type { Recluse } from '~/content/characters/output/recluse';
-import type { Saint } from '~/content/characters/output/saint';
-import type { Slayer } from '~/content/characters/output/slayer';
-import type { Soldier } from '~/content/characters/output/soldier';
-import type { Undertaker } from '~/content/characters/output/undertaker';
-import type { Virgin } from '~/content/characters/output/virgin';
-import type { Imp } from '~/content/characters/output/imp';
-import type { Poisoner } from '~/content/characters/output/poisoner';
-import type { Spy } from '~/content/characters/output/spy';
-import type { Chef } from '~/content/characters/output/chef';
-import type { Empath } from '~/content/characters/output/empath';
-import type { ScarletWoman } from '~/content/characters/output/scarletwoman';
+import type { CharacterId } from './character/character-id';
 
 export type NoParamConstructor<T> = { new (): T };
 export type Constructor<T> = { new (...args: any[]): T };
@@ -172,78 +155,6 @@ export type Neighbor = [IPlayer, IPlayer];
 
 export type AnyObject = Record<string, any>;
 
-export type FortuneTellerPlayer = IPlayer & {
-    character: Promise<FortuneTeller>;
-};
-
-export type EmpathPlayer = IPlayer & {
-    character: Promise<Empath>;
-};
-
-export type ChefPlayer = IPlayer & {
-    character: Promise<Chef>;
-};
-
-export type MonkPlayer = IPlayer & {
-    character: Promise<Monk>;
-};
-
-export type RavenkeeperPlayer = IPlayer & {
-    character: Promise<Ravenkeeper>;
-};
-
-export type VirginPlayer = IPlayer & {
-    character: Promise<Virgin>;
-};
-
-export type SlayerPlayer = IPlayer & {
-    character: Promise<Slayer>;
-};
-
-export type SoldierPlayer = IPlayer & {
-    character: Promise<Soldier>;
-};
-
-export type MayorPlayer = IPlayer & {
-    character: Promise<Mayor>;
-};
-
-export type ButlerPlayer = IPlayer & {
-    character: Promise<Butler>;
-};
-
-export type UndertakerPlayer = IPlayer & {
-    character: Promise<Undertaker>;
-};
-
-export type ReclusePlayer = IPlayer & {
-    character: Promise<Recluse>;
-};
-
-export type SaintPlayer = IPlayer & {
-    character: Promise<Saint>;
-};
-
-export type DrunkPlayer = IPlayer & {
-    character: Promise<Drunk>;
-};
-
-export type PoisonerPlayer = IPlayer & {
-    character: Promise<Poisoner>;
-};
-
-export type SpyPlayer = IPlayer & {
-    character: Promise<Spy>;
-};
-
-export type ScarletWomanPlayer = IPlayer & {
-    character: Promise<ScarletWoman>;
-};
-
-export type ImpPlayer = IPlayer & {
-    character: Promise<Imp>;
-};
-
 export interface RequirePhase {
     phase: Phase;
 }
@@ -278,7 +189,7 @@ export type TravellerPlayer = IPlayer & {
 };
 
 export interface IBindToCharacter {
-    origin: CharacterToken;
+    origin: CharacterId;
 }
 
 export interface IBindToCharacterType {

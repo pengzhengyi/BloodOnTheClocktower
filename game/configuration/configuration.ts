@@ -1,9 +1,11 @@
+import path from 'path';
 import { Singleton } from '../common';
 import { Edition, EditionName } from '../edition';
 import { createRecordProxy } from '../proxy/proxy';
 import type { NumberOfCharacters } from '../script-tool';
 
 export interface IGameConfiguration {
+    readonly characterDefinitionFolderPath: string;
     readonly maximumNumberOfPlayers: number;
     readonly supportedEditions: Array<string>;
     readonly recommendedCharacterTypeCompositions: Map<
@@ -22,6 +24,16 @@ export interface IGameConfiguration {
  * TODO This is an initial implementation for game configuration. Should substitute with more mature configuration like JSON file based.
  */
 class BaseDefaultStaticGameConfiguration implements IGameConfiguration {
+    get characterDefinitionFolderPath(): string {
+        const currentDirectory = path.resolve(__dirname);
+        const filepath = path.join(
+            currentDirectory,
+            '../..',
+            'content/characters/output'
+        );
+        return filepath;
+    }
+
     readonly maximumNumberOfPlayers: number = 20;
 
     readonly supportedEditions: Array<string> = [EditionName.TroubleBrewing];

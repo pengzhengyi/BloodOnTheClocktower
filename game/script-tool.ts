@@ -303,11 +303,11 @@ export class ScriptConstraintsHelper {
         ).throwWhen((error) => !Array.isArray(error.constraints.fabled));
 
         for (const character of constraints.fabled) {
-            await GameEnvironment.current.characterLoader.loadAsync(character);
+            await GameEnvironment.current.loadCharacterAsync(character);
         }
         this.fabled = await Promise.all(
             constraints.fabled.map((character) =>
-                GameEnvironment.current.characterLoader.loadAsync(character)
+                GameEnvironment.current.loadCharacterAsync(character)
             )
         );
     }
@@ -322,7 +322,7 @@ export class ScriptConstraintsHelper {
 
         this.excludes = await Promise.all(
             constraints.excludes.map((character) =>
-                GameEnvironment.current.characterLoader.loadAsync(character)
+                GameEnvironment.current.loadCharacterAsync(character)
             )
         );
     }
@@ -338,7 +338,7 @@ export class ScriptConstraintsHelper {
         await new TooManyMustIncludedCharacters(this).validateOrThrow();
         this.includes = await Promise.all(
             constraints.includes.map((character) =>
-                GameEnvironment.current.characterLoader.loadAsync(character)
+                GameEnvironment.current.loadCharacterAsync(character)
             )
         );
     }
@@ -346,8 +346,7 @@ export class ScriptConstraintsHelper {
     simplify() {
         this.characterTypeToIncludedCharacters = Generator.groupBy(
             Generator.map(
-                (include) =>
-                    GameEnvironment.current.characterLoader.tryLoad(include)!,
+                (include) => GameEnvironment.current.loadCharacter(include),
                 this.constraints.includes
             ),
             (character) => character.characterType

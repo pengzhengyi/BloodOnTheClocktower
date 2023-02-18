@@ -1,7 +1,6 @@
-import { Chef } from '~/content/characters/output/chef';
-import { Imp } from '~/content/characters/output/imp';
 import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 import { Demon, Townsfolk } from '~/game/character/character-type';
+import { Imp, Chef } from '~/__mocks__/character';
 
 describe('test CharacterSheet serialization', () => {
     const characterSheet =

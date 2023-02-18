@@ -1,6 +1,5 @@
 import type { AbilityUseContext } from '../ability/ability';
 import type { IPlayer } from '../player';
-import type { RavenkeeperPlayer } from '../types';
 import { RecoverableGameError } from './exception';
 
 export class RavenkeeperNotChoosePlayerToProtect extends RecoverableGameError {
@@ -10,7 +9,7 @@ export class RavenkeeperNotChoosePlayerToProtect extends RecoverableGameError {
     declare correctedPlayer: IPlayer;
 
     constructor(
-        readonly RavenkeeperPlayer: RavenkeeperPlayer,
+        readonly RavenkeeperPlayer: IPlayer,
         readonly context: AbilityUseContext
     ) {
         super(RavenkeeperNotChoosePlayerToProtect.description);

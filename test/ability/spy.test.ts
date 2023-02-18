@@ -9,9 +9,6 @@ import {
     expectCharacterGetInformation,
     mockSpyRegisterAs,
 } from './common';
-import { Monk } from '~/content/characters/output/monk';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
 import { GetWasherwomanInformationAbility } from '~/game/ability/washerwoman';
 import { Minion, Townsfolk } from '~/game/character/character-type';
 import {
@@ -19,15 +16,8 @@ import {
     mockClocktowerWithIsFirstNight,
 } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
-import { Chef } from '~/content/characters/output/chef';
-import type { ChefPlayer, EmpathPlayer, SpyPlayer } from '~/game/types';
-import { Spy } from '~/content/characters/output/spy';
 import { GetChefInformationAbility } from '~/game/ability/chef';
-import { Empath } from '~/content/characters/output/empath';
 import { GetEmpathInformationAbility } from '~/game/ability/empath';
-import { Virgin } from '~/content/characters/output/virgin';
-import { Undertaker } from '~/content/characters/output/undertaker';
-import { Drunk } from '~/content/characters/output/drunk';
 import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import {
     mockStorytellerChooseMatchingOne,
@@ -36,8 +26,20 @@ import {
 import type { ChefInformation } from '~/game/info/provider/chef';
 import type { InvestigatorInformation } from '~/game/info/provider/investigator';
 import type { Information } from '~/game/info/information';
-import { Investigator } from '~/content/characters/output/investigator';
 import { GetInvestigatorInformationAbility } from '~/game/ability/investigator';
+import {
+    Washerwoman,
+    Ravenkeeper,
+    Investigator,
+    Spy,
+    Monk,
+    Chef,
+    Empath,
+    Virgin,
+    Undertaker,
+    Drunk,
+} from '~/__mocks__/character';
+import type { IPlayer } from '~/game/player';
 
 describe('test SpyAbility', () => {
     /**
@@ -166,13 +168,13 @@ describe('test SpyAbility', () => {
 
         const chefPlayer = players.find(
             (player) => player.storytellerGet('_character') === Chef
-        ) as ChefPlayer;
+        ) as IPlayer;
         const spyPlayer = players.find(
             (player) => player.storytellerGet('_character') === Spy
-        ) as SpyPlayer;
+        ) as IPlayer;
         const empathPlayer = players.find(
             (player) => player.storytellerGet('_character') === Empath
-        ) as EmpathPlayer;
+        ) as IPlayer;
 
         mockStorytellerChooseMatchingOne(
             (information: Information<ChefInformation>) =>

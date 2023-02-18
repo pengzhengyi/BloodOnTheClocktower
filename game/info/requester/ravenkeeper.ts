@@ -6,7 +6,7 @@ import type {
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, OnceAtNight } from './common';
 import { type InformationRequestContext } from './requester';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
+import { CharacterIds } from '~/game/character/character-id';
 
 export interface RavenkeeperInformationRequestContext<TInformation>
     extends InformationRequestContext<TInformation>,
@@ -19,7 +19,7 @@ class BaseRavenkeeperInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.RavenkeeperInformation;
-    readonly expectedCharacter = Ravenkeeper;
+    readonly origin = CharacterIds.Ravenkeeper;
 
     async isEligible(context: InfoProvideContext): Promise<boolean> {
         return (

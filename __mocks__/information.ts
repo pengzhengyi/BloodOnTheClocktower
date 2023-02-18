@@ -5,6 +5,17 @@ import {
     mockWithPropertyValues,
 } from './common';
 import { mockGamePhaseForDay, mockGamePhaseForNight } from './game-phase';
+import {
+    Washerwoman,
+    Librarian,
+    Investigator,
+    Chef,
+    Empath,
+    FortuneTeller,
+    Undertaker,
+    Ravenkeeper,
+    Spy,
+} from './character';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
 import type { IPlayer } from '~/game/player';
 import type { IClocktower } from '~/game/clocktower';
@@ -12,15 +23,6 @@ import type { IPlayers } from '~/game/players';
 import type { ISeating } from '~/game/seating/seating';
 import type { IStoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
-import { Librarian } from '~/content/characters/output/librarian';
-import { Investigator } from '~/content/characters/output/investigator';
-import { Chef } from '~/content/characters/output/chef';
-import { Empath } from '~/content/characters/output/empath';
-import { FortuneTeller } from '~/content/characters/output/fortuneteller';
-import { Undertaker } from '~/content/characters/output/undertaker';
-import { Ravenkeeper } from '~/content/characters/output/ravenkeeper';
-import { Spy } from '~/content/characters/output/spy';
 import {
     type CharacterType,
     Demon,
@@ -260,7 +262,7 @@ export function mockContextForWasherwomanInformation(
     isFirstNight: boolean
 ): InformationRequestContext<WasherwomanInformation> {
     return mockContextForCharacterInformation<
-        Washerwoman,
+        typeof Washerwoman,
         WasherwomanInformation
     >(
         willGetTrueInformation,
@@ -275,12 +277,10 @@ export function mockContextForLibrarianInformation(
     requestedPlayerIsAlive: boolean,
     isFirstNight: boolean
 ): InformationRequestContext<LibrarianInformation> {
-    return mockContextForCharacterInformation<Librarian, LibrarianInformation>(
-        willGetTrueInformation,
-        requestedPlayerIsAlive,
-        isFirstNight,
-        Librarian
-    );
+    return mockContextForCharacterInformation<
+        typeof Librarian,
+        LibrarianInformation
+    >(willGetTrueInformation, requestedPlayerIsAlive, isFirstNight, Librarian);
 }
 
 export function mockContextForInvestigatorInformation(
@@ -289,7 +289,7 @@ export function mockContextForInvestigatorInformation(
     isFirstNight: boolean
 ): InformationRequestContext<InvestigatorInformation> {
     return mockContextForCharacterInformation<
-        Investigator,
+        typeof Investigator,
         InvestigatorInformation
     >(
         willGetTrueInformation,
@@ -304,7 +304,7 @@ export function mockContextForChefInformation(
     requestedPlayerIsAlive: boolean,
     isFirstNight: boolean
 ): InformationRequestContext<ChefInformation> {
-    return mockContextForCharacterInformation<Chef, ChefInformation>(
+    return mockContextForCharacterInformation<typeof Chef, ChefInformation>(
         willGetTrueInformation,
         requestedPlayerIsAlive,
         isFirstNight,
@@ -318,7 +318,7 @@ export function mockContextForEmpathInformation(
     isNight: boolean
 ): InformationRequestContext<EmpathInformation> {
     const context = mockContextForCharacterInformation<
-        Empath,
+        typeof Empath,
         EmpathInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Empath);
     context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
@@ -334,7 +334,7 @@ export function mockContextForFortuneTellerInformation(
     isNight: boolean
 ): InformationRequestContext<FortuneTellerInformation> {
     const context = mockContextForCharacterInformation<
-        FortuneTeller,
+        typeof FortuneTeller,
         FortuneTellerInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, FortuneTeller);
     context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
@@ -351,7 +351,7 @@ export function mockContextForUndertakerInformation(
     hasExecution: boolean
 ): InformationRequestContext<UndertakerInformation> {
     const context = mockContextForCharacterInformation<
-        Undertaker,
+        typeof Undertaker,
         UndertakerInformation
     >(
         willGetTrueInformation,
@@ -377,7 +377,7 @@ export function mockContextForRavenkeeperInformation(
     isNight: boolean
 ): InformationRequestContext<RavenkeeperInformation> {
     const context = mockContextForCharacterInformation<
-        Ravenkeeper,
+        typeof Ravenkeeper,
         RavenkeeperInformation
     >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Ravenkeeper);
     const today = mock<IDiary>();
@@ -397,12 +397,10 @@ export function mockContextForSpyInformation(
     requestedPlayerIsAlive: boolean,
     isNight: boolean
 ): InformationRequestContext<SpyInformation> {
-    const context = mockContextForCharacterInformation<Spy, SpyInformation>(
-        willGetTrueInformation,
-        requestedPlayerIsAlive,
-        isNight,
-        Spy
-    );
+    const context = mockContextForCharacterInformation<
+        typeof Spy,
+        SpyInformation
+    >(willGetTrueInformation, requestedPlayerIsAlive, isNight, Spy);
     context.clocktower = mockWithPropertyValue<IClocktower, IGamePhase>(
         'gamePhase',
         mockGamePhaseForNight(false, isNight)

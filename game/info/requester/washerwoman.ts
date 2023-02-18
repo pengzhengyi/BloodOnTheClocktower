@@ -2,7 +2,7 @@ import type { WasherwomanInformation } from '../provider/washerwoman';
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
 import { type InformationRequestContext } from './requester';
-import { Washerwoman } from '~/content/characters/output/washerwoman';
+import { CharacterIds } from '~/game/character/character-id';
 
 class BaseWasherwomanInformationRequester<
     TInformationRequestContext extends InformationRequestContext<WasherwomanInformation>
@@ -11,7 +11,7 @@ class BaseWasherwomanInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.WasherwomanInformation;
-    readonly expectedCharacter = Washerwoman;
+    readonly origin = CharacterIds.Washerwoman;
 }
 
 export interface WasherwomanInformationRequester<

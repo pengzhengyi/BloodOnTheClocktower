@@ -2,7 +2,7 @@ import type { InvestigatorInformation } from '../provider/investigator';
 import { InfoType } from '../info-type';
 import { CharacterInformationRequester, IsAlive, AtFirstNight } from './common';
 import { type InformationRequestContext } from './requester';
-import { Investigator } from '~/content/characters/output/investigator';
+import { CharacterIds } from '~/game/character/character-id';
 
 class BaseInvestigatorInformationRequester<
     TInformationRequestContext extends InformationRequestContext<InvestigatorInformation>
@@ -11,7 +11,7 @@ class BaseInvestigatorInformationRequester<
     TInformationRequestContext
 > {
     readonly infoType = InfoType.InvestigatorInformation;
-    readonly expectedCharacter = Investigator;
+    readonly origin = CharacterIds.Investigator;
 }
 
 export interface InvestigatorInformationRequester<

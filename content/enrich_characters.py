@@ -129,38 +129,46 @@ export abstract class {class_name} extends Character {{
     )
 
 
-def _write_typescript_export(filepath: str, imports: List[Tuple[str, str]]) -> None:
+def _write_typescript_export(filepath: str, enum_members: List[Tuple[str, str]]) -> None:
     with open(filepath, "w", encoding="utf-8") as file_writer:
-        import_statements, mapset_statements = zip(*imports)
+        file_writer.write("export enum CHARACTERS {")
         file_writer.writelines(
-            import_statement + os.linesep for import_statement in import_statements
+            f'\t{enum_name} = "{enum_id}",{os.linesep}' for enum_id, enum_name in enum_members
         )
-        file_writer.write(
-            'import type { CharacterToken } from "~/game/character";' + os.linesep + os.linesep
-        )
+        file_writer.write("}")
+        # import_statements, mapset_statements = zip(*enum_members)
+        # file_writer.writelines(
+        #     import_statement + os.linesep for import_statement in import_statements
+        # )
+        # file_writer.write(
+        #     'import type { CharacterToken } from "~/game/character";' + os.linesep + os.linesep
+        # )
 
-        file_writer.write(
-            "export const ID_TO_CHARACTER: Map<string, CharacterToken> = new Map();" + os.linesep
-        )
-        file_writer.writelines(
-            mapset_statement + os.linesep for mapset_statement in mapset_statements
-        )
+        # file_writer.write(
+        #     "export const ID_TO_CHARACTER: Map<string, CharacterToken> = new Map();" + os.linesep
+        # )
+        # file_writer.writelines(
+        #     mapset_statement + os.linesep for mapset_statement in mapset_statements
+        # )
 
-        file_writer.write("export const CHARACTERS = Array.from(ID_TO_CHARACTER.values());")
+        # file_writer.write("export const CHARACTERS = Array.from(ID_TO_CHARACTER.values());")
 
 
 def _write_enrichment(definitions: Iterable[CharacterDefinition], output_dirpath: str) -> None:
-    imports: List[Tuple[str, str]] = []
+    enum_members: List[Tuple[str, str]] = []
 
     for definition in tqdm(definitions):
         character_id = definition["id"]
         json_filepath = os.path.join(output_dirpath, f"{character_id}.json")
-        typescript_filepath = os.path.join(output_dirpath, f"{character_id}.ts")
+        # typescript_filepath = os.path.join(output_dirpath, f"{character_id}.ts")
         write_json(json_filepath, definition)
-        imports.append(_write_typescript(typescript_filepath, definition))
+        # imports.append(_write_typescript(typescript_filepath, definition))
+        character_name: str = definition["name"]
+        stripped_character_name = "".join(c for c in character_name if c.isalpha())
+        enum_members.append((character_id, stripped_character_name))
 
     typescript_export_filepath = os.path.join(output_dirpath, "characters.ts")
-    _write_typescript_export(typescript_export_filepath, imports)
+    _write_typescript_export(typescript_export_filepath, enum_members)
 
 
 def enrich() -> None:

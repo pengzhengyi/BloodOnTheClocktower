@@ -3,11 +3,11 @@ import { playerFromDescription } from '../utils';
 import { expectAfterNominateVirgin } from './common';
 import { DeadReason } from '~/game/dead-reason';
 import { DeadPlayerCannotNominate } from '~/game/exception/dead-player-cannot-nominate';
-import type { VirginPlayer } from '~/game/types';
 import { storytellerHandleMock } from '~/__mocks__/game-ui';
+import type { IPlayer } from '~/game/player';
 
 describe('test VirginAbility', () => {
-    let virginPlayer: VirginPlayer;
+    let virginPlayer: IPlayer;
 
     beforeEach(async () => {
         virginPlayer = await playerFromDescription(
