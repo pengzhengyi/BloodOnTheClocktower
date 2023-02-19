@@ -1,14 +1,20 @@
-import { Death } from '../death';
+import type { Death } from '../death';
 import { EventNotExistInDate } from '../exception/event-not-exist-in-date';
 import { PastMomentRewrite } from '../exception/past-moment-rewrite';
 import { RecordUnknownEventInDiary } from '../exception/record-unknown-event-in-diary';
-import { Execution } from '../execution';
-import { Exile } from '../exile';
+import type { Execution } from '../execution';
+import type { Exile } from '../exile';
 import { moment, type Moment } from '../../utils/moment';
-import { isPhase, Phase } from '../phase';
+import { Phase } from '../phase';
 import type { IPlayer } from '../player';
 import { type IToll, Toll } from './toll';
 import type { Event as ClocktowerEvent } from './event';
+import type { ITollRecorder } from './toll-recorder';
+import { TollRecorder } from './toll-recorder';
+import { RecordTollForDeath } from './record-toll-for-death';
+import { RecordTollForExecution } from './record-toll-for-execution';
+import { RecordTollForExile } from './record-toll-for-exile';
+import { RecordTollForPhase } from './record-toll-for-phase';
 
 type MomentQuery =
     | 'isSameOrBefore'
@@ -21,10 +27,13 @@ type MomentQuery =
  * A diary records important events within a date.
  */
 export interface IDiary {
-    execution: IToll<Execution> | undefined;
-    exiles: Array<IToll<Exile>>;
-    deaths: Map<IPlayer, IToll<Death>>;
-    phaseToMoment: Map<Phase, IToll<Phase>>;
+    // fundamental properties
+    readonly execution: IToll<Execution> | undefined;
+    readonly exiles: Array<IToll<Exile>>;
+    readonly deaths: Map<IPlayer, IToll<Death>>;
+    readonly phaseToMoment: Map<Phase, IToll<Phase>>;
+
+    // utility properties
     hasExecution: boolean;
     hasExile: boolean;
     executed: IPlayer | undefined;
@@ -45,15 +54,33 @@ export interface IDiary {
 }
 
 abstract class AbstractDiary implements IDiary {
-    execution: IToll<Execution> | undefined;
+    protected eventToMoment: Map<ClocktowerEvent, Moment>;
 
-    exiles: Array<IToll<Exile>> = [];
+    protected tollRecorder: ITollRecorder;
 
-    deaths: Map<IPlayer, IToll<Death>> = new Map();
+    protected declare recordTollForExecution: RecordTollForExecution;
 
-    phaseToMoment: Map<Phase, IToll<Phase>> = new Map();
+    protected declare recordTollForExile: RecordTollForExile;
 
-    protected eventToMoment: Map<ClocktowerEvent, Moment> = new Map();
+    protected declare recordTollForDeath: RecordTollForDeath;
+
+    protected declare recordTollForPhase: RecordTollForPhase;
+
+    get execution(): IToll<Execution> | undefined {
+        return this.recordTollForExecution.execution;
+    }
+
+    get exiles(): Array<IToll<Exile>> {
+        return this.recordTollForExile.exiles;
+    }
+
+    get deaths(): Map<IPlayer, IToll<Death>> {
+        return this.recordTollForDeath.deaths;
+    }
+
+    get phaseToMoment(): Map<Phase, IToll<Phase>> {
+        return this.recordTollForPhase.phaseToMoment;
+    }
 
     get hasExecution(): boolean {
         return this.execution !== undefined;
@@ -67,24 +94,20 @@ abstract class AbstractDiary implements IDiary {
         return this.execution?.forWhat.executed;
     }
 
+    constructor() {
+        this.eventToMoment = new Map();
+        this.tollRecorder = this.createTollRecorder();
+    }
+
     record(event: ClocktowerEvent): IToll<ClocktowerEvent> {
         const moment = this.tryRecord(event);
         const toll = new Toll(event, moment);
 
-        if (event instanceof Execution) {
-            return (this.execution = toll as IToll<Execution>);
-        } else if (event instanceof Exile) {
-            this.exiles.push(toll as IToll<Exile>);
-            return toll;
-        } else if (event instanceof Death) {
-            this.deaths.set(event.player, toll as IToll<Death>);
-            return toll;
-        } else if (isPhase(event)) {
-            this.phaseToMoment.set(event, toll as IToll<Phase>);
-            return toll;
+        if (!this.tollRecorder.record(toll)) {
+            throw new RecordUnknownEventInDiary(this, event, moment);
         }
 
-        throw new RecordUnknownEventInDiary(this, event, moment);
+        return toll;
     }
 
     getMoment(event: ClocktowerEvent): Moment | undefined {
@@ -195,6 +218,39 @@ abstract class AbstractDiary implements IDiary {
         this.eventToMoment.set(event, newMoment);
 
         return newMoment;
+    }
+
+    protected createTollRecorder(): ITollRecorder {
+        const recorder = new TollRecorder();
+        this.initializeTollRecorder(recorder);
+        return recorder;
+    }
+
+    protected initializeTollRecorder(recorder: ITollRecorder): void {
+        this.initializeRecordForExecution(recorder);
+        this.initializeRecordForExile(recorder);
+        this.initializeRecordForDeath(recorder);
+        this.initializeRecordForPhase(recorder);
+    }
+
+    protected initializeRecordForExecution(recorder: ITollRecorder): void {
+        this.recordTollForExecution = new RecordTollForExecution();
+        recorder.register(this.recordTollForExecution);
+    }
+
+    protected initializeRecordForExile(recorder: ITollRecorder): void {
+        this.recordTollForExile = new RecordTollForExile();
+        recorder.register(this.recordTollForExile);
+    }
+
+    protected initializeRecordForDeath(recorder: ITollRecorder): void {
+        this.recordTollForDeath = new RecordTollForDeath();
+        recorder.register(this.recordTollForDeath);
+    }
+
+    protected initializeRecordForPhase(recorder: ITollRecorder): void {
+        this.recordTollForPhase = new RecordTollForPhase();
+        recorder.register(this.recordTollForPhase);
     }
 }
 
