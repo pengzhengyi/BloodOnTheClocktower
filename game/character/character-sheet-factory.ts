@@ -1,6 +1,5 @@
 import { Generator, LazyMap } from '../collections';
 import { parsePromiseSettledResults, Singleton } from '../common';
-import type { Edition } from '../edition/edition';
 import { GameEnvironment } from '../environment';
 import { CharacterLoadFailures } from '../exception/character-load-failures';
 import type { GameError } from '../exception/exception';
@@ -8,13 +7,14 @@ import { NoCharacterMatchingId } from '../exception/no-character-matching-id';
 import { IncompleteEditionData } from '../exception/incomplete-edition-data';
 import type { ISingleton } from '../types';
 import { EditionKeyName } from '../types';
+import type { IEdition } from '../edition/edition';
 import type { CharacterToken } from './character';
 import type { ICharacterSheet } from './character-sheet';
 import { CharacterSheet } from './character-sheet';
 import type { CharacterType } from './character-type';
 
 export interface ICharacterSheetFactory {
-    getFromEdition(edition: typeof Edition): ICharacterSheet;
+    getFromEdition(edition: IEdition): ICharacterSheet;
 
     getFromCharacterIds(characterIds: Iterable<string>): ICharacterSheet;
 
@@ -35,12 +35,10 @@ export interface ICharacterSheetFactory {
 interface AbstractCharacterSheetFactory extends ICharacterSheetFactory {}
 
 abstract class AbstractCharacterSheetFactory {
-    protected editionToCharacterSheet: LazyMap<
-        typeof Edition,
-        ICharacterSheet
-    > = new LazyMap((edition) => this.getFromEditionImpl(edition));
+    protected editionToCharacterSheet: LazyMap<IEdition, ICharacterSheet> =
+        new LazyMap((edition) => this.getFromEditionImpl(edition));
 
-    getFromEdition(edition: typeof Edition): ICharacterSheet {
+    getFromEdition(edition: IEdition): ICharacterSheet {
         const characterSheet = this.editionToCharacterSheet.get(edition);
         return characterSheet;
     }
@@ -79,12 +77,12 @@ abstract class AbstractCharacterSheetFactory {
         return this._validateFoundCharacter(id, character);
     }
 
-    protected getFromEditionImpl(edition: typeof Edition): ICharacterSheet {
+    protected getFromEditionImpl(edition: IEdition): ICharacterSheet {
         const characterTypeToCharacters =
-            edition.editionData[EditionKeyName.CHARACTERS];
+            edition.definition[EditionKeyName.CHARACTERS];
         if (characterTypeToCharacters === undefined) {
             throw new IncompleteEditionData(
-                edition.editionData,
+                edition.definition,
                 EditionKeyName.CHARACTERS
             );
         }

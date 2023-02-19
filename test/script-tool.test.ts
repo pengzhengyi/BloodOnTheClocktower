@@ -1,7 +1,6 @@
 import script from './custom-script.json';
 import { ScriptConstraintsHelper, ScriptTool } from '~/game/script-tool';
 import { Generator } from '~/game/collections';
-import { EditionName } from '~/game/edition/edition';
 import { EditionKeyName } from '~/game/types';
 import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 import {
@@ -10,6 +9,7 @@ import {
     Judge,
     Virgin,
 } from '~/__mocks__/character';
+import { EditionIds } from '~/game/edition/edition-id';
 
 describe('Load Custom Script', () => {
     const characterSheet = ScriptTool.load(script);
@@ -82,7 +82,7 @@ describe('Random CharacterSheet Generation', () => {
         'Teensyville with must included characters and must excluded characters and a traveller',
         async () => {
             const constraints = {
-                editions: [EditionName.TroubleBrewing],
+                editions: [EditionIds.TroubleBrewing],
                 townsfolk: 6,
                 outsider: 2,
                 minion: 2,

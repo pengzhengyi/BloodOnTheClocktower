@@ -1,7 +1,8 @@
 import path from 'path';
-import fs, { promises as afs } from 'fs';
 import type { RoleData } from '../types';
 import type { CharacterId } from './character-id';
+import type { ILocalFileReader } from '~/utils/common';
+import { LocalJSONReader } from '~/utils/common';
 
 export interface ICharacterDefinitionProvider {
     getCharacterDefinition(id: CharacterId): Partial<RoleData>;
@@ -14,14 +15,15 @@ export interface IAsyncCharacterDefinitionProvider {
 export class FileReaderBasedProvider
     implements ICharacterDefinitionProvider, IAsyncCharacterDefinitionProvider
 {
-    // eslint-disable-next-line no-useless-constructor
-    constructor(protected readonly characterDefinitionFolderPath: string) {}
+    protected readonly fileReader: ILocalFileReader<Partial<RoleData>>;
+
+    constructor(protected readonly characterDefinitionFolderPath: string) {
+        this.fileReader = new LocalJSONReader<Partial<RoleData>>();
+    }
 
     getCharacterDefinition(id: CharacterId): Partial<RoleData> {
         const filepath = this.getFilePath(id);
-        const characterDefinitionString =
-            this.readCharacterDefinition(filepath);
-        const characterDefinition = JSON.parse(characterDefinitionString);
+        const characterDefinition = this.fileReader.read(filepath);
         return characterDefinition;
     }
 
@@ -29,9 +31,7 @@ export class FileReaderBasedProvider
         id: CharacterId
     ): Promise<Partial<RoleData>> {
         const filepath = this.getFilePath(id);
-        const characterDefinitionString =
-            await this.readCharacterDefinitionAsync(filepath);
-        const characterDefinition = JSON.parse(characterDefinitionString);
+        const characterDefinition = await this.fileReader.readAsync(filepath);
         return characterDefinition;
     }
 
@@ -41,13 +41,5 @@ export class FileReaderBasedProvider
             `${id}.json`
         );
         return filepath;
-    }
-
-    protected readCharacterDefinition(filepath: string) {
-        return fs.readFileSync(filepath, 'utf-8');
-    }
-
-    protected readCharacterDefinitionAsync(filepath: string): Promise<string> {
-        return afs.readFile(filepath, 'utf-8');
     }
 }

@@ -439,21 +439,26 @@ export class {name} extends Edition {{
     )
 
 
-def _write_editions_typescript(edition_folder: str, statements: list[tuple[str, str]]) -> None:
+def _write_editions_typescript(edition_folder: str, enum_members: list[tuple[str, str]]) -> None:
     filepath = os.path.join(edition_folder, "editions.ts")
     with open(filepath, "w", encoding="utf-8") as file_writer:
-        import_statements, mapset_statements = zip(*statements)
+        file_writer.write("export enum EDITIONS {\n")
         file_writer.writelines(
-            import_statement + os.linesep for import_statement in import_statements
+            f'\t{enum_name} = "{enum_id}",{os.linesep}' for enum_name, enum_id in enum_members
         )
-        file_writer.write('import { Edition } from "~/game/edition";' + os.linesep + os.linesep)
+        file_writer.write("}")
+        # import_statements, mapset_statements = zip(*statements)
+        # file_writer.writelines(
+        #     import_statement + os.linesep for import_statement in import_statements
+        # )
+        # file_writer.write('import { Edition } from "~/game/edition";' + os.linesep + os.linesep)
 
-        file_writer.write(
-            "export const NAME_TO_EDITION: Map<string, typeof Edition> = new Map();" + os.linesep
-        )
-        file_writer.writelines(
-            mapset_statement + os.linesep for mapset_statement in mapset_statements
-        )
+        # file_writer.write(
+        #     "export const NAME_TO_EDITION: Map<string, typeof Edition> = new Map();" + os.linesep
+        # )
+        # file_writer.writelines(
+        #     mapset_statement + os.linesep for mapset_statement in mapset_statements
+        # )
 
 
 def write_editions(edition_folder: str) -> None:
@@ -467,9 +472,11 @@ def write_editions(edition_folder: str) -> None:
             continue
         raw_name: str = data["name"]
         name = "".join(c for c in raw_name if c.isalpha())
-        filepath = os.path.join(edition_folder, f"{name}.json")
+        id = name.lower()
+        filepath = os.path.join(edition_folder, f"{id}.json")
         write_json(filepath, data)
-        statements.append(_write_edition_typescript(edition_folder, data))
+        # statements.append(_write_edition_typescript(edition_folder, data))
+        statements.append((name, id))
 
     _write_editions_typescript(edition_folder, statements)
 

@@ -1,4 +1,4 @@
-import type { EditionName } from '../edition/edition';
+import type { EditionId } from '../edition/edition-id';
 import { RecoverableGameError } from './exception';
 
 export class EditionNotSpecifiedMinimumNumberOfPlayers extends RecoverableGameError {
@@ -7,7 +7,7 @@ export class EditionNotSpecifiedMinimumNumberOfPlayers extends RecoverableGameEr
 
     declare correctedMinimumNumberOfPlayers: number;
 
-    constructor(readonly edition: EditionName | string) {
+    constructor(readonly edition: EditionId) {
         super(EditionNotSpecifiedMinimumNumberOfPlayers.description);
     }
 }

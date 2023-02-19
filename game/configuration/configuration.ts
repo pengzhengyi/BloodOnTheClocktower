@@ -1,21 +1,23 @@
 import path from 'path';
 import { Singleton } from '../common';
-import { Edition, EditionName } from '../edition/edition';
+import type { EditionId } from '../edition/edition-id';
+import { EditionIds } from '../edition/edition-id';
 import { createRecordProxy } from '../proxy/proxy';
 import type { NumberOfCharacters } from '../script-tool';
 
 export interface IGameConfiguration {
     readonly characterDefinitionFolderPath: string;
+    readonly editionDefinitionFolderPath: string;
     readonly maximumNumberOfPlayers: number;
-    readonly supportedEditions: Array<string>;
+    readonly supportedEditions: Array<EditionId>;
     readonly recommendedCharacterTypeCompositions: Map<
         number,
         NumberOfCharacters
     >;
 
-    readonly minimumNumberOfPlayers: Record<EditionName, number>;
+    readonly minimumNumberOfPlayers: Record<EditionId, number>;
     readonly maximumNumberOfPlayersBeforeNecessaryTraveller: Record<
-        EditionName,
+        EditionId,
         number
     >;
 }
@@ -24,31 +26,42 @@ export interface IGameConfiguration {
  * TODO This is an initial implementation for game configuration. Should substitute with more mature configuration like JSON file based.
  */
 class BaseDefaultStaticGameConfiguration implements IGameConfiguration {
+    protected static readonly CONFIGURATION_DIR = path.resolve(__dirname);
+    protected static readonly CONTENT_DIR = path.join(
+        this.CONFIGURATION_DIR,
+        '../..',
+        'content'
+    );
+
     get characterDefinitionFolderPath(): string {
-        const currentDirectory = path.resolve(__dirname);
         const filepath = path.join(
-            currentDirectory,
-            '../..',
-            'content/characters/output'
+            BaseDefaultStaticGameConfiguration.CONTENT_DIR,
+            'characters/output'
+        );
+        return filepath;
+    }
+
+    get editionDefinitionFolderPath(): string {
+        const filepath = path.join(
+            BaseDefaultStaticGameConfiguration.CONTENT_DIR,
+            'editions'
         );
         return filepath;
     }
 
     readonly maximumNumberOfPlayers: number = 20;
 
-    readonly supportedEditions: Array<string> = [EditionName.TroubleBrewing];
+    readonly supportedEditions: Array<EditionId> = [EditionIds.TroubleBrewing];
 
-    readonly minimumNumberOfPlayers: Record<EditionName, number> =
-        createRecordProxy<number>((editionName) =>
-            Edition.areSameNames(editionName, EditionName.TroubleBrewing)
-                ? 5
-                : 7
+    readonly minimumNumberOfPlayers: Record<EditionId, number> =
+        createRecordProxy<number>((editionId) =>
+            editionId === EditionIds.TroubleBrewing ? 5 : 7
         );
 
     readonly maximumNumberOfPlayersBeforeNecessaryTraveller: Record<
-        EditionName,
+        EditionId,
         number
-    > = createRecordProxy<number>((_editionName) => 15);
+    > = createRecordProxy<number>((_editionId) => 15);
 
     readonly recommendedCharacterTypeCompositions: Map<
         number,

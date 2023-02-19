@@ -2,7 +2,7 @@
 import { Alignment } from './alignment';
 import { type IPlayer } from './player';
 import type { IPlayers } from './players';
-import { type Edition } from './edition/edition';
+import type { IEdition } from './edition/edition';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
@@ -16,7 +16,7 @@ export interface IGame extends IEffectTarget<IGame> {
     readonly townSquare: ITownSquare;
     readonly storyTeller: IStoryTeller;
     readonly players: IPlayers;
-    readonly edition: Edition;
+    readonly edition: IEdition;
 
     // utility properties of IGame
     readonly today: IDiary;
@@ -51,7 +51,7 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     declare townSquare: ITownSquare;
 
-    declare edition: Edition;
+    declare edition: IEdition;
 
     declare storyTeller: IStoryTeller;
 

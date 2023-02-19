@@ -1,30 +1,30 @@
-import { EditionName } from '~/game/edition/edition';
 import { GameEnvironment } from '~/game/environment';
 import { GameHasTooManyPlayers } from '~/game/exception/game-has-too-many-players';
 import { GameHasTooFewPlayers } from '~/game/exception/game-has-too-few-players';
+import { EditionIds } from '~/game/edition/edition-id';
 
 describe('Test validateNumberOfPlayers', () => {
     const validator = GameEnvironment.current as any;
 
     test.concurrent('3 players', () => {
         expect(() =>
-            validator.validateNumberOfPlayers(3, EditionName.SectsViolets)
+            validator.validateNumberOfPlayers(3, EditionIds.SectsViolets)
         ).toThrowError(GameHasTooFewPlayers);
         expect(() =>
-            validator.validateNumberOfPlayers(3, EditionName.TroubleBrewing)
+            validator.validateNumberOfPlayers(3, EditionIds.TroubleBrewing)
         ).toThrowError(GameHasTooFewPlayers);
     });
 
     test.concurrent('5 players', () => {
-        validator.validateNumberOfPlayers(5, EditionName.TroubleBrewing);
+        validator.validateNumberOfPlayers(5, EditionIds.TroubleBrewing);
         expect(() =>
-            validator.validateNumberOfPlayers(5, EditionName.BadMoonRising)
+            validator.validateNumberOfPlayers(5, EditionIds.BadMoonRising)
         ).toThrowError(GameHasTooFewPlayers);
     });
 
     test.concurrent('7 players', () => {
-        validator.validateNumberOfPlayers(7, EditionName.SectsViolets);
-        validator.validateNumberOfPlayers(7, EditionName.TroubleBrewing);
+        validator.validateNumberOfPlayers(7, EditionIds.SectsViolets);
+        validator.validateNumberOfPlayers(7, EditionIds.TroubleBrewing);
     });
 
     test.concurrent('15 players', () => {
@@ -47,7 +47,7 @@ describe('test recommend', () => {
         const assignments = Array.from(
             await GameEnvironment.current.recommendCharacterTypeCompositionWithTravellerUpperbound(
                 13,
-                EditionName.BadMoonRising,
+                EditionIds.BadMoonRising,
                 3
             )
         );
@@ -60,7 +60,7 @@ describe('test recommend', () => {
             const expectedAssignment =
                 await GameEnvironment.current.recommendCharacterTypeComposition(
                     13 - numTraveller,
-                    EditionName.TroubleBrewing
+                    EditionIds.TroubleBrewing
                 );
             expectedAssignment.traveller = numTraveller;
 

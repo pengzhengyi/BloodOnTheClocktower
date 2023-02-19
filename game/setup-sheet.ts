@@ -1,5 +1,4 @@
-import type { EditionName } from './edition/edition';
-import { type Edition } from './edition/edition';
+import type { IEdition } from './edition/edition';
 import { Grimoire } from './grimoire';
 import { type IPlayers, Players } from './players';
 import type { NumberOfCharacters } from './script-tool';
@@ -28,6 +27,7 @@ import type {
 } from './types';
 import type { ICharacterSheet } from './character/character-sheet';
 import { CharacterSheetFactory } from './character/character-sheet-factory';
+import type { EditionId } from './edition/edition-id';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface ISetupContext {
@@ -39,7 +39,7 @@ export interface ISetupResult {
     players: IPlayers;
     townSquare: ITownSquare;
     storyTeller: IStoryTeller;
-    edition: typeof Edition;
+    edition: IEdition;
     editionCharacterSheet: ICharacterSheet;
     characterTypeComposition: NumberOfCharacters;
     initialInPlayCharacters: ICharacterTypeToCharacter;
@@ -59,15 +59,13 @@ export interface ISetupSheet {
 
     setupStoryTeller(players: IPlayers): Promise<IStoryTeller>;
 
-    setupEdition(): Promise<typeof Edition>;
+    setupEdition(): Promise<IEdition>;
 
-    setupEditionCharacterSheet(
-        edition: typeof Edition
-    ): Promise<ICharacterSheet>;
+    setupEditionCharacterSheet(edition: IEdition): Promise<ICharacterSheet>;
 
     recommendCharacterTypeComposition(
         numPlayers: number,
-        editionName: EditionName
+        editionId: EditionId
     ): Promise<NumberOfCharacters>;
 
     setupTraveller(
@@ -104,7 +102,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
                 this.setupStoryTeller(players),
                 this.recommendCharacterTypeComposition(
                     players.length,
-                    edition.name as EditionName
+                    edition.id
                 ),
                 this.setupEditionCharacterSheet(edition),
             ]);
@@ -133,8 +131,8 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         return Promise.resolve(new Players(initialPlayers ?? []));
     }
 
-    async setupEdition(): Promise<typeof Edition> {
-        const supportedEditions: Array<typeof Edition> =
+    async setupEdition(): Promise<IEdition> {
+        const supportedEditions: Array<IEdition> =
             await GameEnvironment.current.getSupportedEditions();
         const chosenEdition =
             await InteractionEnvironment.current.gameUI.storytellerChooseOne({
@@ -175,19 +173,17 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
 
     async recommendCharacterTypeComposition(
         numPlayers: number,
-        editionName: EditionName
+        editionId: EditionId
     ): Promise<NumberOfCharacters> {
         const assignment =
             await GameEnvironment.current.recommendCharacterTypeComposition(
                 numPlayers,
-                editionName
+                editionId
             );
         return assignment;
     }
 
-    setupEditionCharacterSheet(
-        edition: typeof Edition
-    ): Promise<ICharacterSheet> {
+    setupEditionCharacterSheet(edition: IEdition): Promise<ICharacterSheet> {
         const characterSheet =
             CharacterSheetFactory.getInstance().getFromEdition(edition);
         return Promise.resolve(characterSheet);

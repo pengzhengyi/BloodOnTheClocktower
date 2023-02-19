@@ -1,15 +1,15 @@
 import { RecoverableGameError } from './exception';
 
-export class NoEditionMatchingName extends RecoverableGameError {
-    static description = 'Cannot find a edition with matching name';
+export class NoEditionMatchingId extends RecoverableGameError {
+    static description = 'Cannot find a edition with matching id';
 
-    declare correctedEditionName: string;
+    declare correctedEditionId: string;
 
-    constructor(readonly editionName?: string) {
-        super(NoEditionMatchingName.description);
+    constructor(readonly editionId?: string) {
+        super(NoEditionMatchingId.description);
 
-        if (editionName !== undefined) {
-            this.correctedEditionName = editionName;
+        if (editionId !== undefined) {
+            this.correctedEditionId = editionId;
         }
     }
 }

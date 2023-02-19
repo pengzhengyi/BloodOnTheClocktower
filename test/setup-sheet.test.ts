@@ -1,6 +1,6 @@
-import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
-import { EditionName } from '~/game/edition/edition';
+import { EditionIds } from '~/game/edition/edition-id';
 import { SetupSheet } from '~/game/setup-sheet';
+import { TroubleBrewing } from '~/__mocks__/edition';
 import { storytellerChooseOneMock } from '~/__mocks__/game-ui';
 
 describe('test recommend assignments', () => {
@@ -8,7 +8,7 @@ describe('test recommend assignments', () => {
         const assignment =
             await SetupSheet.getInstance().recommendCharacterTypeComposition(
                 12,
-                EditionName.TroubleBrewing
+                EditionIds.TroubleBrewing
             );
         expect(assignment).toEqual({
             townsfolk: 7,

@@ -1,5 +1,5 @@
 import { mock } from 'jest-mock-extended';
-import { TroubleBrewing } from '~/content/editions/TroubleBrewing';
+import { TroubleBrewing } from './edition';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
 import { CharacterSheetFactory } from '~/game/character/character-sheet-factory';
 

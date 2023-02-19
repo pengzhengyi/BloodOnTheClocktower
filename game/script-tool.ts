@@ -6,13 +6,8 @@ import {
 } from './types';
 import type { ICharacterSheet } from './character/character-sheet';
 import { Character, type CharacterToken } from './character/character';
-import {
-    createCustomEdition,
-    type Edition,
-    EditionName,
-} from './edition/edition';
+import type { IEdition } from './edition/edition';
 import { Generator } from './collections';
-import { EditionLoader } from './edition/edition-loader';
 import {
     type CharacterType,
     Demon,
@@ -26,6 +21,7 @@ import { GameEnvironment } from './environment';
 import { CharacterSheetFactory } from './character/character-sheet-factory';
 import { InvalidScriptConstraints } from './exception/invalid-script-constraints';
 import { TooManyMustIncludedCharacters } from './exception/too-many-must-included-characters';
+import { EditionIds } from './edition/edition-id';
 
 export interface NumberOfCharacters {
     townsfolk: number;
@@ -50,9 +46,9 @@ export class ScriptConstraintsHelper {
     static defaultConstraints(): ScriptConstraints {
         return {
             editions: [
-                EditionName.TroubleBrewing,
-                EditionName.SectsViolets,
-                EditionName.BadMoonRising,
+                EditionIds.TroubleBrewing,
+                EditionIds.SectsViolets,
+                EditionIds.BadMoonRising,
             ],
             townsfolk: 13,
             outsider: 4,
@@ -113,7 +109,7 @@ export class ScriptConstraintsHelper {
         ]);
     }
 
-    protected declare editions: Array<typeof Edition>;
+    protected declare editions: Array<IEdition>;
 
     protected declare fabled: Array<CharacterToken>;
 
@@ -293,7 +289,7 @@ export class ScriptConstraintsHelper {
 
         this.editions = await Promise.all(
             constraints.editions.map((edition) =>
-                EditionLoader.loadAsync(edition)
+                GameEnvironment.current.loadEditionAsync(edition)
             )
         );
     }
@@ -437,7 +433,7 @@ export abstract class ScriptTool {
     static createCustomEdition(
         characterSheet: ICharacterSheet,
         otherEditionData: Partial<Omit<EditionData, EditionKeyName.CHARACTERS>>
-    ): typeof Edition {
+    ): IEdition {
         const characterEditionData: Pick<
             EditionData,
             EditionKeyName.CHARACTERS
@@ -447,6 +443,6 @@ export abstract class ScriptTool {
             otherEditionData,
             characterEditionData
         );
-        return createCustomEdition(editionData);
+        return GameEnvironment.current.loadCustomEdition(editionData);
     }
 }

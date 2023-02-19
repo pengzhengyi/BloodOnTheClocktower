@@ -2,32 +2,33 @@ import { Generator } from './collections';
 import { Singleton } from './common';
 import type { IGameConfiguration } from './configuration/configuration';
 import { DefaultStaticGameConfiguration } from './configuration/configuration';
-import type { Edition, EditionName } from './edition/edition';
+import type { IEdition } from './edition/edition';
 import { EditionLoader, type IEditionLoader } from './edition/edition-loader';
 import { RecoverableGameError } from './exception/exception';
 import type { IInfoProviderLoader } from './info/provider/loader';
 import { InfoProviderLoader } from './info/provider/loader';
 import type { NumberOfCharacters } from './script-tool';
-import type { IEnvironment, IEnvironmentProvider } from './types';
+import type { EditionData, IEnvironment, IEnvironmentProvider } from './types';
 import type { ICharacterLoader } from './character/character-loader';
 import { CharacterLoader } from './character/character-loader';
 import { GameHasTooFewPlayers } from './exception/game-has-too-few-players';
 import { GameHasTooManyPlayers } from './exception/game-has-too-many-players';
 import { EditionNotSpecifiedMinimumNumberOfPlayers } from './exception/edition-not-specified-minimum-number-of-players';
-import type {
-    ICharacterFromDefinition,
-    ICharacterFromId,
-} from './character/character-factory';
+
 import {
     CharacterFromDefinition,
     CharacterFromId,
 } from './character/character-factory';
-import type {
-    IAsyncCharacterDefinitionProvider,
-    ICharacterDefinitionProvider,
-} from './character/character-definition-provider';
-import { FileReaderBasedProvider } from './character/character-definition-provider';
+
+import { FileReaderBasedProvider as FileReaderBasedCharacterProvider } from './character/character-definition-provider';
+import { FileReaderBasedProvider as FileReaderBasedEditionProvider } from './edition/edition-definition-provider';
 import type { ICharacter } from './character/character';
+import type { IEditionFromDefinition } from './edition/edition-factory';
+import {
+    EditionFromDefinition,
+    EditionFromId,
+} from './edition/edition-factory';
+import type { EditionId } from './edition/edition-id';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGameEnvironment extends IEnvironment {
@@ -37,20 +38,26 @@ export interface IGameEnvironment extends IEnvironment {
     characterLoader: ICharacterLoader;
 
     // utility methods
-    getSupportedEditions(): Promise<Array<typeof Edition>>;
+    getSupportedEditions(): Promise<Array<IEdition>>;
 
     loadCharacter(characterId: string): ICharacter;
 
     loadCharacterAsync(characterId: string): Promise<ICharacter>;
 
+    loadEdition(editionId: string): IEdition;
+
+    loadEditionAsync(editionId: string): Promise<IEdition>;
+
+    loadCustomEdition(definition: Partial<EditionData>): IEdition;
+
     recommendCharacterTypeComposition(
         numPlayers: number,
-        editionName: EditionName
+        editionId: EditionId
     ): Promise<NumberOfCharacters>;
 
     recommendCharacterTypeCompositionWithTravellerUpperbound(
         numPlayers: number,
-        editionName: EditionName,
+        editionId: EditionId,
         maximumAcceptableNumTravellers?: number
     ): Promise<Array<NumberOfCharacters>>;
 }
@@ -59,24 +66,14 @@ export interface IGameEnvironmentProvider
     extends IEnvironmentProvider<IGameEnvironment> {}
 
 class BaseGameEnvironment implements IGameEnvironment {
-    editionLoader: IEditionLoader = EditionLoader;
-    characterLoader: ICharacterLoader;
+    readonly editionLoader: IEditionLoader;
+    readonly characterLoader: ICharacterLoader;
 
-    protected characterFromDefinition: ICharacterFromDefinition;
-    protected characterFromId: ICharacterFromId;
-    protected characterDefinitionProvider: ICharacterDefinitionProvider &
-        IAsyncCharacterDefinitionProvider;
+    protected declare editionFromDefinition: IEditionFromDefinition;
 
     constructor() {
-        this.characterFromDefinition = new CharacterFromDefinition();
-        this.characterDefinitionProvider = new FileReaderBasedProvider(
-            this.configuration.characterDefinitionFolderPath
-        );
-        this.characterFromId = new CharacterFromId(
-            this.characterFromDefinition,
-            this.characterDefinitionProvider
-        );
-        this.characterLoader = new CharacterLoader(this.characterFromId);
+        this.characterLoader = this.createCharacterLoader();
+        this.editionLoader = this.createEditionLoader();
     }
 
     get infoProviderLoader(): IInfoProviderLoader {
@@ -87,7 +84,7 @@ class BaseGameEnvironment implements IGameEnvironment {
         return DefaultStaticGameConfiguration.getInstance();
     }
 
-    protected supportedEditions?: Array<typeof Edition>;
+    protected supportedEditions?: Array<IEdition>;
 
     loadCharacter(characterId: string): ICharacter {
         return this.characterLoader.load(characterId);
@@ -97,14 +94,26 @@ class BaseGameEnvironment implements IGameEnvironment {
         return this.characterLoader.loadAsync(characterId);
     }
 
-    async getSupportedEditions(): Promise<Array<typeof Edition>> {
+    loadEdition(editionId: string): IEdition {
+        return this.editionLoader.load(editionId);
+    }
+
+    loadEditionAsync(editionId: string): Promise<IEdition> {
+        return this.editionLoader.loadAsync(editionId);
+    }
+
+    loadCustomEdition(definition: Partial<EditionData>): IEdition {
+        return this.editionFromDefinition.getEdition(definition);
+    }
+
+    async getSupportedEditions(): Promise<Array<IEdition>> {
         if (this.supportedEditions === undefined) {
-            const supportedEditionNames: Array<string> =
+            const supportedEditionIds: Array<EditionId> =
                 this.configuration.supportedEditions;
             const supportedEditions = await Generator.promiseAll(
                 Generator.toPromise(
-                    (editionName) => this.editionLoader.loadAsync(editionName),
-                    supportedEditionNames
+                    (editionId) => this.editionLoader.loadAsync(editionId),
+                    supportedEditionIds
                 )
             );
 
@@ -116,18 +125,18 @@ class BaseGameEnvironment implements IGameEnvironment {
 
     async recommendCharacterTypeComposition(
         numPlayers: number,
-        editionName: EditionName
+        editionId: EditionId
     ): Promise<NumberOfCharacters> {
         const assignment = await RecoverableGameError.catch(
             () =>
                 this.tryRecommendCharacterTypeComposition(
                     numPlayers,
-                    editionName
+                    editionId
                 ),
             (error) =>
                 this.manuallyDetermineCharacterTypeComposition(
                     numPlayers,
-                    editionName,
+                    editionId,
                     error
                 )
         );
@@ -137,14 +146,14 @@ class BaseGameEnvironment implements IGameEnvironment {
 
     async recommendCharacterTypeCompositionWithTravellerUpperbound(
         numPlayers: number,
-        editionName: EditionName,
+        editionId: EditionId,
         maximumAcceptableNumTravellers = 0
     ): Promise<Array<NumberOfCharacters>> {
         const assignmentPromises = Generator.toPromise(
             async (numTravellersToAssign) => {
                 const assignment = await this.recommendCharacterTypeComposition(
                     numPlayers - numTravellersToAssign,
-                    editionName
+                    editionId
                 );
                 assignment.traveller = numTravellersToAssign;
                 return assignment;
@@ -158,7 +167,7 @@ class BaseGameEnvironment implements IGameEnvironment {
                 const manualChosenAssignment =
                     await this.manuallyDetermineCharacterTypeComposition(
                         numPlayers,
-                        editionName,
+                        editionId,
                         error
                     );
                 return [manualChosenAssignment];
@@ -170,13 +179,13 @@ class BaseGameEnvironment implements IGameEnvironment {
 
     protected validateNumberOfPlayers(
         numPlayers: number,
-        editionName: EditionName
+        editionId: EditionId
     ): void {
         const recommendedMinimum =
-            this.configuration.minimumNumberOfPlayers[editionName];
+            this.configuration.minimumNumberOfPlayers[editionId];
 
         if (recommendedMinimum === undefined) {
-            throw new EditionNotSpecifiedMinimumNumberOfPlayers(editionName);
+            throw new EditionNotSpecifiedMinimumNumberOfPlayers(editionId);
         }
 
         if (numPlayers < recommendedMinimum) {
@@ -191,11 +200,11 @@ class BaseGameEnvironment implements IGameEnvironment {
 
     protected async manuallyDetermineCharacterTypeComposition(
         numPlayers: number,
-        editionName: EditionName,
+        editionId: EditionId,
         error: RecoverableGameError
     ): Promise<NumberOfCharacters> {
         // TODO properly get number of characters for each character type from storyteller
-        const reason = `choose number of characters for each character type for ${numPlayers} in ${editionName} as ${error}`;
+        const reason = `choose number of characters for each character type for ${numPlayers} in ${editionId} as ${error}`;
         const decision =
             await InteractionEnvironment.current.gameUI.storytellerDecide<NumberOfCharacters>(
                 {},
@@ -206,15 +215,15 @@ class BaseGameEnvironment implements IGameEnvironment {
 
     protected tryRecommendCharacterTypeComposition(
         numPlayers: number,
-        editionName: EditionName
+        editionId: EditionId
     ): Promise<NumberOfCharacters> {
-        this.validateNumberOfPlayers(numPlayers, editionName);
+        this.validateNumberOfPlayers(numPlayers, editionId);
 
         const numTraveller = Math.max(
             0,
             numPlayers -
                 this.configuration
-                    .maximumNumberOfPlayersBeforeNecessaryTraveller[editionName]
+                    .maximumNumberOfPlayersBeforeNecessaryTraveller[editionId]
         );
         const numPlayersWithoutTraveller = numPlayers - numTraveller;
 
@@ -224,6 +233,31 @@ class BaseGameEnvironment implements IGameEnvironment {
             ) as NumberOfCharacters;
         assignment.traveller = numTraveller;
         return Promise.resolve(assignment);
+    }
+
+    protected createCharacterLoader() {
+        const characterFromDefinition = new CharacterFromDefinition();
+        const characterDefinitionProvider =
+            new FileReaderBasedCharacterProvider(
+                this.configuration.characterDefinitionFolderPath
+            );
+        const characterFromId = new CharacterFromId(
+            characterFromDefinition,
+            characterDefinitionProvider
+        );
+        return new CharacterLoader(characterFromId);
+    }
+
+    protected createEditionLoader() {
+        this.editionFromDefinition = new EditionFromDefinition();
+        const editionDefinitionProvider = new FileReaderBasedEditionProvider(
+            this.configuration.editionDefinitionFolderPath
+        );
+        const editionFromId = new EditionFromId(
+            this.editionFromDefinition,
+            editionDefinitionProvider
+        );
+        return new EditionLoader(editionFromId);
     }
 }
 

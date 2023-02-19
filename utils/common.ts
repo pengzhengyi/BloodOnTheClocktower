@@ -1,3 +1,6 @@
+import fs, { promises as afs } from 'fs';
+import type { TJSON } from '~/game/types';
+
 export function isIterable<T>(obj: unknown): obj is Iterable<T> {
     if (obj == null || obj === undefined) {
         return false;
@@ -51,4 +54,43 @@ export function iterableToString<T>(
         .map((element) => `${branchNotation}${element}`)
         .join('\n');
     return header + elementsStr;
+}
+
+export interface ILocalFileReader<TOut> {
+    read(filepath: string): TOut;
+
+    readAsync(filepath: string): Promise<TOut>;
+}
+
+export class LocalFileReader implements ILocalFileReader<string> {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(protected readonly encoding: BufferEncoding = 'utf-8') {}
+
+    read(filepath: string) {
+        return fs.readFileSync(filepath, { encoding: this.encoding });
+    }
+
+    readAsync(filepath: string): Promise<string> {
+        return afs.readFile(filepath, { encoding: this.encoding });
+    }
+}
+
+export class LocalJSONReader<TOut = TJSON> implements ILocalFileReader<TOut> {
+    protected readonly fileReader: ILocalFileReader<string>;
+
+    constructor(fileReader?: ILocalFileReader<string>) {
+        this.fileReader = fileReader ?? new LocalFileReader();
+    }
+
+    read(filepath: string): TOut {
+        const jsonStr = this.fileReader.read(filepath);
+        const json = JSON.parse(jsonStr);
+        return json;
+    }
+
+    async readAsync(filepath: string): Promise<TOut> {
+        const jsonStr = await this.fileReader.readAsync(filepath);
+        const json = JSON.parse(jsonStr);
+        return json;
+    }
 }
