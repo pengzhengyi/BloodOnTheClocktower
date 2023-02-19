@@ -8,6 +8,7 @@ import { moment, type Moment } from '../../utils/moment';
 import { isPhase, Phase } from '../phase';
 import type { IPlayer } from '../player';
 import { type IToll, Toll } from './toll';
+import type { Event as ClocktowerEvent } from './event';
 
 type MomentQuery =
     | 'isSameOrBefore'
@@ -15,8 +16,6 @@ type MomentQuery =
     | 'isBefore'
     | 'isSame'
     | 'isAfter';
-
-export type Event = Execution | Exile | Phase | Death;
 
 /**
  * A diary records important events within a date.
@@ -30,13 +29,13 @@ export interface IDiary {
     hasExile: boolean;
     executed: IPlayer | undefined;
 
-    record(event: Event): IToll<Event>;
-    getMoment(event: Event): Moment | undefined;
+    record(event: ClocktowerEvent): IToll<ClocktowerEvent>;
+    getMoment(event: ClocktowerEvent): Moment | undefined;
     hasDead(player: IPlayer): boolean;
     hasDiedAtNight(player: IPlayer): boolean;
-    hasRecorded(event: Event): boolean;
-    isEventAtDay(event: Event): boolean;
-    isEventAtNight(event: Event): boolean;
+    hasRecorded(event: ClocktowerEvent): boolean;
+    isEventAtDay(event: ClocktowerEvent): boolean;
+    isEventAtNight(event: ClocktowerEvent): boolean;
     isMomentAtDay(moment: Moment): boolean;
     isMomentAtNight(moment: Moment): boolean;
     isMomentBeforePhase(moment: Moment, phase: Phase): boolean;
@@ -54,7 +53,7 @@ abstract class AbstractDiary implements IDiary {
 
     phaseToMoment: Map<Phase, IToll<Phase>> = new Map();
 
-    protected eventToMoment: Map<Event, Moment> = new Map();
+    protected eventToMoment: Map<ClocktowerEvent, Moment> = new Map();
 
     get hasExecution(): boolean {
         return this.execution !== undefined;
@@ -68,7 +67,7 @@ abstract class AbstractDiary implements IDiary {
         return this.execution?.forWhat.executed;
     }
 
-    record(event: Event): IToll<Event> {
+    record(event: ClocktowerEvent): IToll<ClocktowerEvent> {
         const moment = this.tryRecord(event);
         const toll = new Toll(event, moment);
 
@@ -88,7 +87,7 @@ abstract class AbstractDiary implements IDiary {
         throw new RecordUnknownEventInDiary(this, event, moment);
     }
 
-    getMoment(event: Event): Moment | undefined {
+    getMoment(event: ClocktowerEvent): Moment | undefined {
         return this.eventToMoment.get(event);
     }
 
@@ -106,11 +105,11 @@ abstract class AbstractDiary implements IDiary {
         return this.isMomentAtNight(death.when);
     }
 
-    hasRecorded(event: Event): boolean {
+    hasRecorded(event: ClocktowerEvent): boolean {
         return this.eventToMoment.has(event);
     }
 
-    isEventAtDay(event: Event): boolean {
+    isEventAtDay(event: ClocktowerEvent): boolean {
         const moment = this.getMoment(event);
 
         if (moment === undefined) {
@@ -120,7 +119,7 @@ abstract class AbstractDiary implements IDiary {
         return this.isMomentAtDay(moment);
     }
 
-    isEventAtNight(event: Event): boolean {
+    isEventAtNight(event: ClocktowerEvent): boolean {
         const moment = this.getMoment(event);
 
         if (moment === undefined) {
@@ -182,7 +181,7 @@ abstract class AbstractDiary implements IDiary {
         return moment[query](phaseMoment);
     }
 
-    protected tryRecord(event: Event): Moment {
+    protected tryRecord(event: ClocktowerEvent): Moment {
         if (this.hasRecorded(event)) {
             throw new PastMomentRewrite(
                 this,

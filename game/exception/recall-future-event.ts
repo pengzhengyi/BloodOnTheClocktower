@@ -1,4 +1,4 @@
-import type { Event as ClocktowerEvent } from '../clocktower/diary';
+import type { Event as ClocktowerEvent } from '../clocktower/event';
 import { RecoverableGameError } from './exception';
 
 export class RecallFutureEvent extends RecoverableGameError {

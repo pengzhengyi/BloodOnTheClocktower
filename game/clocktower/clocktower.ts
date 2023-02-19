@@ -1,9 +1,7 @@
 import { RecallFutureDate } from '../exception/recall-future-date';
 import { GamePhase, type IGamePhase } from '../game-phase';
 import { Phase, toString } from '../phase';
-import { Diary, type Event, type IDiary } from './diary';
 import { Chronology, type IChronology } from '../chronology';
-import type { IToll } from './toll';
 import { moment, type Moment } from '../../utils/moment';
 import {
     GamePhaseNotification,
@@ -11,13 +9,16 @@ import {
 } from '../event-notification/notification/game-phase';
 import { GamePhaseEvent } from '../event-notification/event/game-phase';
 import { RecallFutureEvent } from '../exception/recall-future-event';
+import type { IToll } from './toll';
+import { Diary, type IDiary } from './diary';
+import type { Event as ClocktowerEvent } from './event';
 
 export interface IClocktower {
     readonly gamePhase: IGamePhase;
     readonly today: IDiary;
     readonly notification: IGamePhaseNotification;
 
-    record(event: Event): IToll<Event>;
+    record(event: ClocktowerEvent): IToll<ClocktowerEvent>;
     recall(dateIndex: number): IDiary;
     getMoment(gamePhase: IGamePhase): Moment;
 
@@ -28,7 +29,7 @@ export interface IClocktower {
      * @param end The end of a time period. If undefined, it will be later than any potential events (like a timestamp of positive infinity).
      * @returns All captured events during the defined time period.
      */
-    rewind(start?: Moment, end?: Moment): Iterable<IToll<Event>>;
+    rewind(start?: Moment, end?: Moment): Iterable<IToll<ClocktowerEvent>>;
     advance(reason?: string): Promise<boolean>;
 
     toString(): string;
@@ -53,7 +54,8 @@ export class Clocktower implements IClocktower {
 
     protected readonly diaries: Array<IDiary> = [];
 
-    protected readonly chronology: IChronology<Event> = new Chronology();
+    protected readonly chronology: IChronology<ClocktowerEvent> =
+        new Chronology();
 
     constructor() {
         this.gamePhase = GamePhase.setup();
@@ -61,7 +63,7 @@ export class Clocktower implements IClocktower {
         this.prepareForFirstDate();
     }
 
-    record(event: Event): IToll<Event> {
+    record(event: ClocktowerEvent): IToll<ClocktowerEvent> {
         const toll = this.today.record(event);
         this.chronology.add(toll);
         return toll;
@@ -91,7 +93,7 @@ export class Clocktower implements IClocktower {
         return moment;
     }
 
-    rewind(start?: Moment, end?: Moment): Iterable<IToll<Event>> {
+    rewind(start?: Moment, end?: Moment): Iterable<IToll<ClocktowerEvent>> {
         return this.chronology.rewind(start, end);
     }
 
