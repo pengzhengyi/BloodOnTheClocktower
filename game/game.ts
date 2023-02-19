@@ -7,16 +7,18 @@ import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
-import type { ISetupContext, ISetupSheet } from './setup/setup-sheet';
+import type {
+    ISetupContext,
+    ISetupResult,
+    ISetupSheet,
+} from './setup/setup-sheet';
+import type { ICharacterSheet } from './character/character-sheet';
+import type { NumberOfCharacters } from './script-tool';
+import type { ICharacterTypeToCharacter } from './types';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
-export interface IGame extends IEffectTarget<IGame> {
-    // fundamental properties of IGame
-    readonly setupSheet: ISetupSheet;
-    readonly townSquare: ITownSquare;
-    readonly storyTeller: IStoryTeller;
-    readonly players: IPlayers;
-    readonly edition: IEdition;
+export interface IGame extends IEffectTarget<IGame>, Readonly<ISetupResult> {
+    // fundamental properties of IGame @see ISetupResult
 
     // utility properties of IGame
     readonly today: IDiary;
@@ -55,6 +57,14 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     declare storyTeller: IStoryTeller;
 
+    declare editionCharacterSheet: ICharacterSheet;
+
+    declare characterTypeComposition: NumberOfCharacters;
+
+    declare initialInPlayCharacters: ICharacterTypeToCharacter;
+
+    declare inPlayCharacters: ICharacterTypeToCharacter;
+
     get players(): IPlayers {
         return this._players.clone();
     }
@@ -83,6 +93,10 @@ export class Game extends EffectTarget<Game> implements IGame {
             townSquare: this.townSquare,
             players: this._players,
             storyTeller: this.storyTeller,
+            editionCharacterSheet: this.editionCharacterSheet,
+            characterTypeComposition: this.characterTypeComposition,
+            initialInPlayCharacters: this.initialInPlayCharacters,
+            inPlayCharacters: this.inPlayCharacters,
         } = setupResult);
     }
 

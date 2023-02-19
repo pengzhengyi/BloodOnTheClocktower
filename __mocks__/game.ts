@@ -13,6 +13,8 @@ import { type IGame, Game } from '~/game/game';
 import type { ISetupSheet, ISetupContext } from '~/game/setup/setup-sheet';
 import type { IEdition } from '~/game/edition/edition';
 import type { IDecideInPlayCharactersContext } from '~/game/types';
+import type { IModifyContext } from '~/game/setup/in-play-characters/modify-by-character';
+import { randomlyDecideForModification } from '~/test/setup/in-play-characters/common';
 
 export function mockGame(): IGame {
     return mockDeep<IGame>();
@@ -36,6 +38,10 @@ export async function createBasicGame(
             return randomChooseInPlayCharacters(
                 context as IDecideInPlayCharactersContext
             );
+        }
+
+        if ((context as IModifyContext).modification !== undefined) {
+            return randomlyDecideForModification(context as IModifyContext);
         }
 
         return await undefined;

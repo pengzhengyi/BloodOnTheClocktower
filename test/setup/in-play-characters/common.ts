@@ -1,4 +1,5 @@
 import type { CharacterToken } from '~/game/character/character';
+import { Generator } from '~/game/collections';
 import { adaptCharacterTypeToCharacter } from '~/game/common';
 import type { NumberOfCharacters } from '~/game/script-tool';
 import type {
@@ -9,6 +10,54 @@ import type { ICharacterTypeToCharacter } from '~/game/types';
 import { randomCharactersFrom } from '~/__mocks__/character';
 import type { AsyncStorytellerDecideImplementation } from '~/__mocks__/game-ui';
 import { mockStorytellerDecideImplementation } from '~/__mocks__/game-ui';
+
+export function randomlyDecideForModification(
+    context: IModifyContext
+): Promise<IInPlayCharactersModification> {
+    const actualModification = context.modification;
+    const added: Partial<ICharacterTypeToCharacter> = {};
+    const removed: Partial<ICharacterTypeToCharacter> = {};
+
+    for (const _characterType in actualModification) {
+        const characterType =
+            _characterType as keyof ICharacterTypeToCharacter &
+                keyof NumberOfCharacters;
+        const numCharacters = actualModification[characterType];
+
+        if (numCharacters === undefined) {
+            continue;
+        }
+
+        const charactersToChooseFrom =
+            numCharacters > 0
+                ? Generator.exclude(
+                      context.characterSheet[characterType],
+                      context.initialInPlayCharacters[characterType]
+                  )
+                : context.initialInPlayCharacters[characterType];
+
+        const selectedCharacters = randomCharactersFrom(
+            Math.abs(numCharacters),
+            charactersToChooseFrom
+        );
+        (numCharacters > 0 ? added : removed)[characterType] =
+            selectedCharacters;
+    }
+
+    const modification: IInPlayCharactersModification = {
+        add: adaptCharacterTypeToCharacter(added),
+        remove: adaptCharacterTypeToCharacter(removed),
+    };
+    return Promise.resolve(modification);
+}
+
+export function mockStorytellerRandomlyDecideForModification() {
+    const implementation: AsyncStorytellerDecideImplementation<
+        IModifyContext,
+        IInPlayCharactersModification
+    > = randomlyDecideForModification;
+    mockStorytellerDecideImplementation(implementation);
+}
 
 export function mockStorytellerDecideForModification(
     toModify: Record<

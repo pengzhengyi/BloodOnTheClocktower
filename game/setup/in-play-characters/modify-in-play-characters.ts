@@ -10,8 +10,6 @@ import { applyModifications } from './modify-by-character';
 import { ModifyByBaron } from './modify-by-baron';
 import type { ICharacter } from '~/game/character/character';
 import { chainCharacters } from '~/game/common';
-import { RemoveNotExistingInPlayCharacter } from '~/game/exception/remove-not-existing-in-play-character';
-import { AddAlreadyExistingInPlayCharacter } from '~/game/exception/add-already-existing-in-play-character';
 import { Generator } from '~/game/collections';
 
 export interface IModifyInPlayCharacters {
@@ -81,37 +79,18 @@ abstract class AbstractModifyInPlayCharacters
             modifications.push(modification);
 
             if (modification.add !== undefined) {
-                for (const character of chainCharacters(modification.add)) {
-                    if (inPlayCharactersNotExamined.has(character)) {
-                        // ! Error: character to add is already in play
-                        const currentInPlayCharacters = applyModifications(
-                            initialInPlayCharacters,
-                            modifications
-                        );
-                        throw new AddAlreadyExistingInPlayCharacter(
-                            character,
-                            currentInPlayCharacters
-                        );
-                    }
-
-                    inPlayCharactersNotExamined.add(character);
-                }
+                Generator.forEach(
+                    (character) => inPlayCharactersNotExamined.add(character),
+                    chainCharacters(modification.add)
+                );
             }
 
             if (modification.remove !== undefined) {
-                for (const character of chainCharacters(modification.remove)) {
-                    if (!inPlayCharactersNotExamined.delete(character)) {
-                        // ! Error: character to remove is not in play
-                        const currentInPlayCharacters = applyModifications(
-                            initialInPlayCharacters,
-                            modifications
-                        );
-                        throw new RemoveNotExistingInPlayCharacter(
-                            character,
-                            currentInPlayCharacters
-                        );
-                    }
-                }
+                Generator.forEach(
+                    (character) =>
+                        inPlayCharactersNotExamined.delete(character),
+                    chainCharacters(modification.remove)
+                );
             }
 
             // commit modification and repeat

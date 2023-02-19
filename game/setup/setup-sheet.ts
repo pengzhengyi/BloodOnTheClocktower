@@ -28,6 +28,8 @@ import type {
 import type { ICharacterSheet } from '../character/character-sheet';
 import { CharacterSheetFactory } from '../character/character-sheet-factory';
 import type { EditionId } from '../edition/edition-id';
+import type { IModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
+import { ModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface ISetupContext {
@@ -43,6 +45,7 @@ export interface ISetupResult {
     editionCharacterSheet: ICharacterSheet;
     characterTypeComposition: NumberOfCharacters;
     initialInPlayCharacters: ICharacterTypeToCharacter;
+    inPlayCharacters: ICharacterTypeToCharacter;
 }
 
 /**
@@ -73,9 +76,14 @@ export interface ISetupSheet {
         travellerCharacters: Array<TravellerCharacterToken>
     ): Promise<Array<TravellerPlayer>>;
 
-    setupInPlayCharacters(
+    setupInitialInPlayCharacters(
         editionCharacterSheet: ICharacterSheet,
         characterTypeComposition: NumberOfCharacters
+    ): Promise<ICharacterTypeToCharacter>;
+
+    modifyInitialInPlayCharacters(
+        characterSheet: ICharacterSheet,
+        initialInPlayCharacters: ICharacterTypeToCharacter
     ): Promise<ICharacterTypeToCharacter>;
 
     setup(context: ISetupContext): Promise<ISetupResult>;
@@ -107,9 +115,14 @@ abstract class AbstractSetupSheet implements ISetupSheet {
                 this.setupEditionCharacterSheet(edition),
             ]);
 
-        const initialInPlayCharacters = await this.setupInPlayCharacters(
+        const initialInPlayCharacters = await this.setupInitialInPlayCharacters(
             editionCharacterSheet,
             characterTypeComposition
+        );
+
+        const inPlayCharacters = await this.modifyInitialInPlayCharacters(
+            editionCharacterSheet,
+            initialInPlayCharacters
         );
 
         const setupResult: ISetupResult = {
@@ -120,6 +133,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             editionCharacterSheet,
             characterTypeComposition,
             initialInPlayCharacters,
+            inPlayCharacters,
         };
 
         return setupResult;
@@ -127,6 +141,14 @@ abstract class AbstractSetupSheet implements ISetupSheet {
 }
 
 class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
+    protected modifyInPlayCharacters: IModifyInPlayCharacters;
+
+    constructor(modifyInPlayCharacters?: IModifyInPlayCharacters) {
+        super();
+        this.modifyInPlayCharacters =
+            modifyInPlayCharacters ?? new ModifyInPlayCharacters();
+    }
+
     setupPlayers(initialPlayers?: IPlayer[]): Promise<IPlayers> {
         return Promise.resolve(new Players(initialPlayers ?? []));
     }
@@ -197,7 +219,7 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         throw new Error('method not implemented');
     }
 
-    async setupInPlayCharacters(
+    async setupInitialInPlayCharacters(
         editionCharacterSheet: ICharacterSheet,
         characterTypeComposition: NumberOfCharacters
     ): Promise<ICharacterTypeToCharacter> {
@@ -217,6 +239,18 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
                 { reason }
             );
         return decision.decided;
+    }
+
+    async modifyInitialInPlayCharacters(
+        characterSheet: ICharacterSheet,
+        initialInPlayCharacters: ICharacterTypeToCharacter
+    ): Promise<ICharacterTypeToCharacter> {
+        const modifiedInPlayCharacters =
+            await this.modifyInPlayCharacters.modifyInitialInPlayCharacters(
+                characterSheet,
+                initialInPlayCharacters
+            );
+        return modifiedInPlayCharacters;
     }
 
     protected getSeatAssignment(

@@ -19,6 +19,7 @@ import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 import { Generator } from '~/game/collections';
 import type { ICharacter } from '~/game/character/character';
 import type { IInPlayCharactersModification } from '~/game/setup/in-play-characters/modify-by-character';
+import { storytellerDecideMock } from '~/__mocks__/game-ui';
 
 function expectAfterBaronModify(
     modifiedInPlayCharacters: IInPlayCharactersModification,
@@ -75,7 +76,7 @@ describe('test modify in-play characters by Baron', () => {
                 characterSheet,
                 initialInPlayCharacters
             );
-
+        storytellerDecideMock.mockReset();
         expectAfterBaronModify(modifiedInPlayCharacters, [Saint, Butler]);
     });
 
@@ -116,6 +117,8 @@ describe('test modify in-play characters by Baron', () => {
                 characterSheet,
                 initialInPlayCharacters
             );
+
+        storytellerDecideMock.mockReset();
         expectAfterBaronModify(
             modifiedInPlayCharacters,
             addedOutsiders,

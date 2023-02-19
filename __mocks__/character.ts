@@ -32,10 +32,9 @@ export function randomCharactersFrom(
     numCharacters: number,
     characters: Iterable<CharacterToken>
 ): Array<CharacterToken> {
-    return Generator.take(
-        numCharacters,
-        Generator.shuffle(characters)
-    ) as Array<CharacterToken>;
+    return Array.from(
+        Generator.limit(numCharacters, Generator.shuffle(characters))
+    );
 }
 
 export const ScarletWoman = getCharacter(CharacterIds.ScarletWoman);

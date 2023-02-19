@@ -2,7 +2,7 @@ import type { CharacterToken } from '~/game/character/character';
 import type { CharacterId } from '~/game/character/character-id';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
 import { Generator } from '~/game/collections';
-import { chainCharacters } from '~/game/common';
+import { adaptCharacterTypeToCharacter, chainCharacters } from '~/game/common';
 import type { NumberOfCharacters } from '~/game/script-tool';
 import type { ICharacterTypeToCharacter } from '~/game/types';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
@@ -44,10 +44,12 @@ export function applyModifications(
 
     const finalInPlayCharacters = Generator.groupBy(
         finalInPlay,
-        (character) => character.characterType
+        (character) => character.characterType.id
     );
 
-    const characterTypeToCharacter = Object.fromEntries(finalInPlayCharacters);
+    const characterTypeToCharacter = adaptCharacterTypeToCharacter(
+        Object.fromEntries(finalInPlayCharacters)
+    );
 
     return characterTypeToCharacter;
 }

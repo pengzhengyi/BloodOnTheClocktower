@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
-import type { CharacterToken } from '~/game/character/character';
 import { Generator } from '~/game/collections';
+import { adaptCharacterTypeToCharacter } from '~/game/common';
 import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';
 import type { ISetupContext, ISetupSheet } from '~/game/setup/setup-sheet';
 import { SetupSheet } from '~/game/setup/setup-sheet';
@@ -46,13 +46,12 @@ export function randomChooseInPlayCharacters(
                 `Not specified number of characters to choose for character type ${characterType}`
             );
         }
-        const chosenCharacters = Generator.take(
-            numToChoose,
-            Generator.shuffle(characters)
-        ) as Array<CharacterToken>;
+        const chosenCharacters = Array.from(
+            Generator.limit(numToChoose, Generator.shuffle(characters))
+        );
 
         initialInPlayCharacters[characterTypeId] = chosenCharacters;
     }
 
-    return initialInPlayCharacters as ICharacterTypeToCharacter;
+    return adaptCharacterTypeToCharacter(initialInPlayCharacters);
 }
