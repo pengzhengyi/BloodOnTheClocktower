@@ -57,20 +57,6 @@ export interface IAbilityLoader {
               AbilitySetupContext
           >
         | undefined;
-
-    /**
-     * Load ability related to setup in play characters.
-     * @param character
-     */
-    loadSetupAbility(
-        characterId: CharacterId
-    ):
-        | ICharacterAbilityClass<
-              AbilityUseContext,
-              AbilityUseResult,
-              AbilitySetupContext
-          >
-        | undefined;
 }
 
 const CharacterAbilityClasses: Array<
@@ -136,14 +122,6 @@ const CharacterAbilityClasses: Array<
     },
 ];
 
-const CharacterSetupAbilityClasses: Array<
-    ICharacterAbilityClass<
-        AbilityUseContext,
-        AbilityUseResult,
-        AbilitySetupContext
-    >
-> = [];
-
 const CharacterTypeAbilityClasses: Array<
     ICharacterTypeAbilityClass<
         AbilityUseContext,
@@ -191,23 +169,6 @@ export class AbilityLoader implements IAbilityLoader {
                 CharacterTypeAbilityClass,
             ],
             CharacterTypeAbilityClasses
-        )
-    );
-
-    static characterToSetupAbility: Map<
-        CharacterId,
-        ICharacterAbilityClass<
-            AbilityUseContext,
-            AbilityUseResult,
-            AbilitySetupContext
-        >
-    > = new Map(
-        Generator.map(
-            (CharacterSetupAbilityClass) => [
-                CharacterSetupAbilityClass.origin,
-                CharacterSetupAbilityClass,
-            ],
-            CharacterSetupAbilityClasses
         )
     );
 
@@ -274,9 +235,5 @@ export class AbilityLoader implements IAbilityLoader {
         const character = this.characterLoader.load(characterId);
         const characterType = character.characterType;
         return AbilityLoader.characterTypeToAbility.get(characterType);
-    }
-
-    loadSetupAbility(characterId: CharacterId) {
-        return AbilityLoader.characterToSetupAbility.get(characterId);
     }
 }
