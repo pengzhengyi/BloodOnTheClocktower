@@ -22,7 +22,7 @@ import type { IClocktower } from '../clocktower';
 import type { ICharacterTypeInformationRequester } from '../info/requester/common';
 import { AbilityRequiresSetup } from '../exception/ability-requires-setup';
 import { AbilityCanOnlyUseOnce } from '../exception/ability-can-only-use-once';
-import type { IAbilityLoader } from './loader';
+import type { IAbilityLoader } from './ability-loader';
 import {
     AbilitySuccessCommunicatedInfo,
     AbilitySuccessUseWhenMalfunction,

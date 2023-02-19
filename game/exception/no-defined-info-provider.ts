@@ -1,5 +1,5 @@
 import type { InfoType } from '../info/info-type';
-import type { IInfoProviderLoader } from '../info/provider/loader';
+import type { IInfoProviderLoader } from '../info/provider/info-provider-loader';
 import { RecoverableGameError } from './exception';
 
 export class NoDefinedInfoProvider extends RecoverableGameError {

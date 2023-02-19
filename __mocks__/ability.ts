@@ -23,7 +23,7 @@ import type {
     SaintAbilityUseContext,
 } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
-import type { IAbilityLoader } from '~/game/ability/loader';
+import type { IAbilityLoader } from '~/game/ability/ability-loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
 import type { IClocktower } from '~/game/clocktower';
 

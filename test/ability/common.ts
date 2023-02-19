@@ -65,7 +65,7 @@ import type {
 import { Execution } from '~/game/execution';
 import type { ButlerAbility } from '~/game/ability/butler';
 import { DrunkAbility } from '~/game/ability/drunk';
-import { AbilityLoader } from '~/game/ability/loader';
+import { AbilityLoader } from '~/game/ability/ability-loader';
 import {
     PoisonerAbility,
     type PoisonerAbilityUseResult,
