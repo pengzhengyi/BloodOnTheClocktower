@@ -7,7 +7,7 @@ import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
 import type { IDiary } from './diary';
-import type { ISetupContext, ISetupSheet } from './setup-sheet';
+import type { ISetupContext, ISetupSheet } from './setup/setup-sheet';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGame extends IEffectTarget<IGame> {

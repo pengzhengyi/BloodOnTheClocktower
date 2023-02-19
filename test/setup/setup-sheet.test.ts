@@ -1,5 +1,5 @@
 import { EditionIds } from '~/game/edition/edition-id';
-import { SetupSheet } from '~/game/setup-sheet';
+import { SetupSheet } from '~/game/setup/setup-sheet';
 import { TroubleBrewing } from '~/__mocks__/edition';
 import { storytellerChooseOneMock } from '~/__mocks__/game-ui';
 

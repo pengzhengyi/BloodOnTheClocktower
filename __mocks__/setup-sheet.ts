@@ -2,8 +2,8 @@ import { mock } from 'jest-mock-extended';
 import type { CharacterToken } from '~/game/character/character';
 import { Generator } from '~/game/collections';
 import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';
-import type { ISetupContext, ISetupSheet } from '~/game/setup-sheet';
-import { SetupSheet } from '~/game/setup-sheet';
+import type { ISetupContext, ISetupSheet } from '~/game/setup/setup-sheet';
+import { SetupSheet } from '~/game/setup/setup-sheet';
 import type {
     ICharacterTypeToCharacter,
     IDecideInPlayCharactersContext,

@@ -1,33 +1,33 @@
-import type { IEdition } from './edition/edition';
-import { Grimoire } from './grimoire';
-import { type IPlayers, Players } from './players';
-import type { NumberOfCharacters } from './script-tool';
-import { Seating } from './seating/seating';
-import { TownSquare, type ITownSquare } from './town-square';
-import { Clocktower } from './clocktower';
-import type { IPlayer } from './player';
+import type { IEdition } from '../edition/edition';
+import { Grimoire } from '../grimoire';
+import { type IPlayers, Players } from '../players';
+import type { NumberOfCharacters } from '../script-tool';
+import { Seating } from '../seating/seating';
+import { TownSquare, type ITownSquare } from '../town-square';
+import { Clocktower } from '../clocktower';
+import type { IPlayer } from '../player';
 import {
     type ISeatAssignment,
     SeatAssignment,
-} from './seating/seat-assignment';
-import { SeatAssignmentFromMode } from './seating/seat-assignment-factory';
+} from '../seating/seat-assignment';
+import { SeatAssignmentFromMode } from '../seating/seat-assignment-factory';
 import {
     isSeatAssignmentMode,
     SeatAssignmentMode,
-} from './seating/seat-assignment-mode';
-import { GameEnvironment } from './environment';
-import { Singleton } from './common';
-import type { IStoryTeller } from './storyteller';
-import { StoryTeller } from './storyteller';
-import type { TravellerCharacterToken } from './character/character';
+} from '../seating/seat-assignment-mode';
+import { GameEnvironment } from '../environment';
+import { Singleton } from '../common';
+import type { IStoryTeller } from '../storyteller';
+import { StoryTeller } from '../storyteller';
+import type { TravellerCharacterToken } from '../character/character';
 import type {
     ICharacterTypeToCharacter,
     IDecideInPlayCharactersContext,
     TravellerPlayer,
-} from './types';
-import type { ICharacterSheet } from './character/character-sheet';
-import { CharacterSheetFactory } from './character/character-sheet-factory';
-import type { EditionId } from './edition/edition-id';
+} from '../types';
+import type { ICharacterSheet } from '../character/character-sheet';
+import { CharacterSheetFactory } from '../character/character-sheet-factory';
+import type { EditionId } from '../edition/edition-id';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface ISetupContext {

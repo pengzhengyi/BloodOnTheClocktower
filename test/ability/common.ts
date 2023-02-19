@@ -90,7 +90,7 @@ import { Demon } from '~/game/character/character-type';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';
 import { ImpAbility, type ImpAbilityUseResult } from '~/game/ability/imp';
-import type { ISetupContext } from '~/game/setup-sheet';
+import type { ISetupContext } from '~/game/setup/setup-sheet';
 import { createBasicStoryTeller } from '~/__mocks__/storyteller';
 import { Imp, Slayer, Poisoner, Monk } from '~/__mocks__/character';
 import { GameEnvironment } from '~/game/environment';
