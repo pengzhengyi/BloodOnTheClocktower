@@ -17,7 +17,7 @@ import { mockPoisonerAbilitySetupContext } from '~/__mocks__/ability';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { GetEmpathInformationAbility } from '~/game/ability/empath';
-import { Clocktower } from '~/game/clocktower';
+import { Clocktower } from '~/game/clocktower/clocktower';
 import { Phase } from '~/game/phase';
 import { clocktowerAdvanceToDateAndPhase } from '~/__mocks__/clocktower';
 import {

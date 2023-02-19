@@ -25,7 +25,7 @@ import type {
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
 import type { IAbilityLoader } from '~/game/ability/ability-loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
-import type { IClocktower } from '~/game/clocktower';
+import type { IClocktower } from '~/game/clocktower/clocktower';
 
 export function mockAbilityUseContext(
     player?: IPlayer,

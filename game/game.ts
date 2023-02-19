@@ -6,7 +6,7 @@ import type { IEdition } from './edition/edition';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import type { IStoryTeller } from './storyteller';
 import type { ITownSquare } from './town-square';
-import type { IDiary } from './diary';
+import type { IDiary } from './clocktower/diary';
 import type {
     ISetupContext,
     ISetupResult,

@@ -1,12 +1,12 @@
-import { Death } from './death';
-import { EventNotExistInDate } from './exception/event-not-exist-in-date';
-import { PastMomentRewrite } from './exception/past-moment-rewrite';
-import { RecordUnknownEventInDiary } from './exception/record-unknown-event-in-diary';
-import { Execution } from './execution';
-import { Exile } from './exile';
-import { moment, type Moment } from './moment';
-import { isPhase, Phase } from './phase';
-import type { IPlayer } from './player';
+import { Death } from '../death';
+import { EventNotExistInDate } from '../exception/event-not-exist-in-date';
+import { PastMomentRewrite } from '../exception/past-moment-rewrite';
+import { RecordUnknownEventInDiary } from '../exception/record-unknown-event-in-diary';
+import { Execution } from '../execution';
+import { Exile } from '../exile';
+import { moment, type Moment } from '../../utils/moment';
+import { isPhase, Phase } from '../phase';
+import type { IPlayer } from '../player';
 import { type IToll, Toll } from './toll';
 
 type MomentQuery =

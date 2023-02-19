@@ -1,4 +1,4 @@
-import type { IDiary, Event as ClocktowerEvent } from '../diary';
+import type { IDiary, Event as ClocktowerEvent } from '../clocktower/diary';
 import { RecoverableGameError } from './exception';
 
 export class EventNotExistInDate extends RecoverableGameError {

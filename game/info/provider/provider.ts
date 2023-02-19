@@ -5,7 +5,7 @@ import type {
 import type { StoryTellerInformationOptions } from '../storyteller-information';
 import type { InfoType } from '../info-type';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
-import type { IClocktower } from '~/game/clocktower';
+import type { IClocktower } from '~/game/clocktower/clocktower';
 import { LazyMap } from '~/game/collections';
 import type { IPlayer } from '~/game/player';
 import type { IPlayers } from '~/game/players';

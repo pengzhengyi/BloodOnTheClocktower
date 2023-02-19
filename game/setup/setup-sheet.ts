@@ -4,7 +4,7 @@ import { type IPlayers, Players } from '../players';
 import type { NumberOfCharacters } from '../script-tool';
 import { Seating } from '../seating/seating';
 import { TownSquare, type ITownSquare } from '../town-square';
-import { Clocktower } from '../clocktower';
+import { Clocktower } from '../clocktower/clocktower';
 import type { IPlayer } from '../player';
 import {
     type ISeatAssignment,

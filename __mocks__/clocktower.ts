@@ -1,6 +1,6 @@
 import { mockDeep } from 'jest-mock-extended';
 import { storytellerConfirmMock } from './game-ui';
-import type { IClocktower } from '~/game/clocktower';
+import type { IClocktower } from '~/game/clocktower/clocktower';
 import type { Phase } from '~/game/phase';
 
 export function mockClocktower(): IClocktower {

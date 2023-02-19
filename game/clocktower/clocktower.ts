@@ -1,16 +1,16 @@
-import { RecallFutureDate } from './exception/recall-future-date';
-import { GamePhase, type IGamePhase } from './game-phase';
-import { Phase, toString } from './phase';
+import { RecallFutureDate } from '../exception/recall-future-date';
+import { GamePhase, type IGamePhase } from '../game-phase';
+import { Phase, toString } from '../phase';
 import { Diary, type Event, type IDiary } from './diary';
-import { Chronology, type IChronology } from './chronology';
+import { Chronology, type IChronology } from '../chronology';
 import type { IToll } from './toll';
-import { moment, type Moment } from './moment';
+import { moment, type Moment } from '../../utils/moment';
 import {
     GamePhaseNotification,
     type IGamePhaseNotification,
-} from './event-notification/notification/game-phase';
-import { GamePhaseEvent } from './event-notification/event/game-phase';
-import { RecallFutureEvent } from './exception/recall-future-event';
+} from '../event-notification/notification/game-phase';
+import { GamePhaseEvent } from '../event-notification/event/game-phase';
+import { RecallFutureEvent } from '../exception/recall-future-event';
 
 export interface IClocktower {
     readonly gamePhase: IGamePhase;

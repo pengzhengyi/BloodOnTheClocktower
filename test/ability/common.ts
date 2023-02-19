@@ -85,7 +85,7 @@ import {
     type VirginAbilityUseContext,
 } from '~/game/ability/virgin';
 import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
-import type { IClocktower } from '~/game/clocktower';
+import type { IClocktower } from '~/game/clocktower/clocktower';
 import { Demon } from '~/game/character/character-type';
 import { ScarletWomanAbility } from '~/game/ability/scarlet-woman';
 import { createBasicGame } from '~/__mocks__/game';

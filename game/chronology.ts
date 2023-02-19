@@ -1,6 +1,6 @@
 import { binarySearch } from './common';
-import { type Moment } from './moment';
-import type { IToll } from './toll';
+import { type Moment } from '../utils/moment';
+import type { IToll } from './clocktower/toll';
 
 /**
  * A Chronology represents a series of tolls. It supports repeated iterations of tolls from earliest to latest or tolls within a given duration.

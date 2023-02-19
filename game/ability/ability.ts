@@ -18,7 +18,7 @@ import type {
     InformationRequestContext,
     IInformationRequester,
 } from '../info/requester/requester';
-import type { IClocktower } from '../clocktower';
+import type { IClocktower } from '../clocktower/clocktower';
 import type { ICharacterTypeInformationRequester } from '../info/requester/common';
 import { AbilityRequiresSetup } from '../exception/ability-requires-setup';
 import { AbilityCanOnlyUseOnce } from '../exception/ability-can-only-use-once';

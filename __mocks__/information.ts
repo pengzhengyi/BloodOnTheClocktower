@@ -18,7 +18,7 @@ import {
 } from './character';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
 import type { IPlayer } from '~/game/player';
-import type { IClocktower } from '~/game/clocktower';
+import type { IClocktower } from '~/game/clocktower/clocktower';
 import type { IPlayers } from '~/game/players';
 import type { ISeating } from '~/game/seating/seating';
 import type { IStoryTeller } from '~/game/storyteller';
@@ -48,7 +48,7 @@ import type {
     InformationRequestContext,
     IInfoRequester,
 } from '~/game/info/requester/requester';
-import type { IDiary } from '~/game/diary';
+import type { IDiary } from '~/game/clocktower/diary';
 import type { IGamePhase } from '~/game/game-phase';
 
 export function mockInfoProvideContext(): InfoProvideContext {

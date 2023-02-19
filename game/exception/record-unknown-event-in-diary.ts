@@ -1,5 +1,5 @@
 import { type Dayjs } from 'dayjs';
-import type { IDiary, Event as ClocktowerEvent } from '../diary';
+import type { IDiary, Event as ClocktowerEvent } from '../clocktower/diary';
 import { RecoverableGameError } from './exception';
 export class RecordUnknownEventInDiary extends RecoverableGameError {
     static description =
