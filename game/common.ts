@@ -1,4 +1,11 @@
-import type { ISingleton, Predicate, NoParamConstructor } from './types';
+import type { CharacterToken } from './character/character';
+import { Generator } from './collections';
+import type {
+    ISingleton,
+    Predicate,
+    NoParamConstructor,
+    ICharacterTypeToCharacter,
+} from './types';
 
 /**
  * Iterate from the element at specified index to last element and then from first element to the last element before specified index.
@@ -192,4 +199,37 @@ export function Singleton<
             super();
         }
     };
+}
+
+export function chainCharacters(
+    characterTypeToCharacter: ICharacterTypeToCharacter
+): Iterable<CharacterToken> {
+    return Generator.chain<CharacterToken>(
+        characterTypeToCharacter.townsfolk,
+        characterTypeToCharacter.outsider,
+        characterTypeToCharacter.minion,
+        characterTypeToCharacter.demon,
+        characterTypeToCharacter.traveller,
+        characterTypeToCharacter.fabled
+    );
+}
+
+export function createEmptyCharacterTypeToCharacter(): ICharacterTypeToCharacter {
+    return {
+        townsfolk: [],
+        outsider: [],
+        minion: [],
+        demon: [],
+        traveller: [],
+        fabled: [],
+    };
+}
+
+export function adaptCharacterTypeToCharacter(
+    characterTypeToCharacter: Partial<ICharacterTypeToCharacter>
+): ICharacterTypeToCharacter {
+    return Object.assign(
+        createEmptyCharacterTypeToCharacter(),
+        characterTypeToCharacter
+    );
 }

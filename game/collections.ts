@@ -702,6 +702,12 @@ export class Generator<T> implements Iterable<T> {
         }
     }
 
+    static *chain_from_object_values<T = unknown>(
+        object: Record<string, Iterable<T>> | any
+    ): Iterable<T> {
+        return this.chain_from_iterable<T>(Object.values<Iterable<T>>(object));
+    }
+
     static every<T>(predicate: Predicate<T>, iterable: Iterable<T>): boolean {
         for (const element of iterable) {
             if (!predicate(element)) {

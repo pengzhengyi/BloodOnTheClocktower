@@ -2,10 +2,17 @@ import type { CharacterToken } from '~/game/character/character';
 import { CharacterIds } from '~/game/character/character-id';
 
 import { Generator } from '~/game/collections';
+import { randomChoice } from '~/game/common';
 import { GameEnvironment } from '~/game/environment';
 
 export function randomCharacter(): CharacterToken {
     return GameEnvironment.current.characterLoader.randomLoad();
+}
+
+export function randomCharacterFrom(
+    characters: Array<CharacterToken>
+): CharacterToken {
+    return randomChoice(characters);
 }
 
 export function getCharacter(characterId: string): CharacterToken {
@@ -19,6 +26,16 @@ export function randomCharacters(
         (_) => randomCharacter(),
         Generator.range(0, numCharacters)
     );
+}
+
+export function randomCharactersFrom(
+    numCharacters: number,
+    characters: Array<CharacterToken>
+): Array<CharacterToken> {
+    return Generator.take(
+        numCharacters,
+        Generator.shuffle(characters)
+    ) as Array<CharacterToken>;
 }
 
 export const ScarletWoman = getCharacter(CharacterIds.ScarletWoman);
