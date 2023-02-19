@@ -1,19 +1,48 @@
-import { adaptCharacterTypeToCharacter as fillCharacterTypeToCharacter } from '~/game/common';
+import { mockStorytellerDecideForModification } from './common';
 import { ModifyByBaron } from '~/game/setup/in-play-characters/modify-by-baron';
-import type {
-    IInPlayCharactersModification,
-    IModifyContext,
-} from '~/game/setup/in-play-characters/modify-by-character';
+
 import type { ICharacterTypeToCharacter } from '~/game/types';
 import {
     Baron,
     Butler,
+    Drunk,
+    FortuneTeller,
+    Monk,
+    Poisoner,
     randomCharacterFrom,
     randomCharactersFrom,
+    Recluse,
     Saint,
+    Spy,
 } from '~/__mocks__/character';
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
-import { mockStorytellerDecideImplementation } from '~/__mocks__/game-ui';
+import { Generator } from '~/game/collections';
+import type { ICharacter } from '~/game/character/character';
+import type { IInPlayCharactersModification } from '~/game/setup/in-play-characters/modify-by-character';
+
+function expectAfterBaronModify(
+    modifiedInPlayCharacters: IInPlayCharactersModification,
+    addedOutsiders?: [ICharacter, ICharacter],
+    removedTownsfolks?: [ICharacter, ICharacter]
+) {
+    expect(modifiedInPlayCharacters.add).toBeDefined();
+    expect(modifiedInPlayCharacters.remove).toBeDefined();
+
+    expect(modifiedInPlayCharacters.add?.outsider).toHaveLength(2);
+
+    if (addedOutsiders !== undefined) {
+        expect(modifiedInPlayCharacters.add?.outsider).toIncludeSameMembers(
+            addedOutsiders
+        );
+    }
+
+    expect(modifiedInPlayCharacters.remove?.townsfolk).toHaveLength(2);
+    if (removedTownsfolks !== undefined) {
+        expect(modifiedInPlayCharacters.remove?.townsfolk).toIncludeSameMembers(
+            removedTownsfolks
+        );
+    }
+}
 
 describe('test modify in-play characters by Baron', () => {
     const characterSheet = getTroubleBrewingCharacterSheet();
@@ -32,28 +61,13 @@ describe('test modify in-play characters by Baron', () => {
             fabled: [],
         };
 
-        mockStorytellerDecideImplementation<
-            IModifyContext,
-            IInPlayCharactersModification
-        >((context) => {
-            const inPlayTownsfolks = context.initialInPlayCharacters.townsfolk;
-            expect(context.modification.outsider).toBe(2);
-            expect(context.modification.townsfolk).toBe(-2);
-            const townsfolksToRemove = randomCharactersFrom(
-                2,
-                inPlayTownsfolks
-            );
-
-            const modification: IInPlayCharactersModification = {
-                add: fillCharacterTypeToCharacter({
-                    outsider: [Saint, Butler],
-                }),
-                remove: fillCharacterTypeToCharacter({
-                    townsfolk: townsfolksToRemove,
-                }),
-            };
-
-            return Promise.resolve(modification);
+        mockStorytellerDecideForModification({
+            add: {
+                outsider: [Saint, Butler],
+            },
+            remove: {
+                townsfolk: -2,
+            },
         });
 
         const modifiedInPlayCharacters =
@@ -61,15 +75,51 @@ describe('test modify in-play characters by Baron', () => {
                 characterSheet,
                 initialInPlayCharacters
             );
-        expect(modifiedInPlayCharacters.add).toBeDefined();
-        expect(modifiedInPlayCharacters.remove).toBeDefined();
 
-        expect(modifiedInPlayCharacters.add?.outsider).toHaveLength(2);
-        expect(modifiedInPlayCharacters.add?.outsider).toIncludeSameMembers([
-            Saint,
-            Butler,
-        ]);
+        expectAfterBaronModify(modifiedInPlayCharacters, [Saint, Butler]);
+    });
 
-        expect(modifiedInPlayCharacters.remove?.townsfolk).toHaveLength(2);
+    /**
+     * {@link `baron["gameplay"][1]`}
+     */
+    test(`The game is being set up for 15 players, with nine Townsfolk, two Outsiders, three Minion, and one Demon tokens. Because the Baron is in play, the Storyteller must add a Drunk and a Recluse. So, they remove the Monk token and add a Recluse token. They then add a the Drunk's "Is the Drunk" reminder token… because this game, one player isn't a Townsfolk—they are an Outsider: the Drunk. All these character tokens then go into the bag for the players to draw from.`, async () => {
+        const inPlayTownsfolks = randomCharactersFrom(
+            7,
+            Generator.exclude(characterSheet.townsfolk, [Monk, FortuneTeller])
+        );
+        inPlayTownsfolks.push(Monk, FortuneTeller);
+        const initialInPlayCharacters: ICharacterTypeToCharacter = {
+            townsfolk: inPlayTownsfolks,
+            outsider: [Butler, Saint],
+            minion: [Baron, Spy, Poisoner],
+            demon: [randomCharacterFrom(characterSheet.demon)],
+            traveller: [],
+            fabled: [],
+        };
+
+        const addedOutsiders: [ICharacter, ICharacter] = [Drunk, Recluse];
+        const removedTownsfolks: [ICharacter, ICharacter] = [
+            Monk,
+            FortuneTeller,
+        ];
+        mockStorytellerDecideForModification({
+            add: {
+                outsider: addedOutsiders,
+            },
+            remove: {
+                townsfolk: removedTownsfolks,
+            },
+        });
+
+        const modifiedInPlayCharacters =
+            await modifyByBaron.modifyInitialInPlayCharacters(
+                characterSheet,
+                initialInPlayCharacters
+            );
+        expectAfterBaronModify(
+            modifiedInPlayCharacters,
+            addedOutsiders,
+            removedTownsfolks
+        );
     });
 });

@@ -30,7 +30,7 @@ export function randomCharacters(
 
 export function randomCharactersFrom(
     numCharacters: number,
-    characters: Array<CharacterToken>
+    characters: Iterable<CharacterToken>
 ): Array<CharacterToken> {
     return Generator.take(
         numCharacters,

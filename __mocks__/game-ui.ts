@@ -109,7 +109,7 @@ export function mockChooseImplementation<T>(
     chooseMock.mockImplementation(implementation);
 }
 
-type AsyncStorytellerDecideImplementation<TContext, T> = (
+export type AsyncStorytellerDecideImplementation<TContext, T> = (
     context: TContext
 ) => Promise<T>;
 export function mockStorytellerDecideImplementation<TContext, T>(
