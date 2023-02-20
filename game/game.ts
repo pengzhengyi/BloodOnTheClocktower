@@ -22,6 +22,7 @@ export interface IGame extends IEffectTarget<IGame>, Readonly<ISetupResult> {
     // fundamental properties of IGame @see ISetupResult
 
     // utility properties of IGame
+    readonly characterSheet: ICharacterSheet;
     readonly today: IDiary;
 
     // capabilities of IGame
@@ -76,6 +77,10 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     get today(): IDiary {
         return this.townSquare.clockTower.today;
+    }
+
+    get characterSheet(): ICharacterSheet {
+        return this.editionCharacterSheet;
     }
 
     protected winningTeam?: Alignment;

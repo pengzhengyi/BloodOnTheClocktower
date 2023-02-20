@@ -6,7 +6,7 @@ import type {
     StaticThis,
 } from '../types';
 import type { ICharacterSheet } from '../character/character-sheet';
-import type { NightSheet } from '../night-sheet';
+import type { INightSheet } from '../night-sheet';
 import type { IPlayer } from '../player';
 import type { IPlayers } from '../players';
 import type { Info } from '../info/info';
@@ -35,7 +35,7 @@ export interface AbilityUseContext {
 }
 
 export interface AbilitySetupContext extends AbilityUseContext, RequireGame {
-    nightSheet: NightSheet;
+    nightSheet: INightSheet;
     characterSheet: ICharacterSheet;
     abilityLoader: IAbilityLoader;
     clocktower: IClocktower;

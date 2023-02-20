@@ -10,7 +10,7 @@ import type { IPlayers } from '~/game/players';
 import type { Task } from '~/game/types';
 import type { Execution } from '~/game/execution';
 import type { IGame } from '~/game/game';
-import type { NightSheet } from '~/game/night-sheet';
+import type { INightSheet } from '~/game/night-sheet';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
 import type {
     AbilityUseContext,
@@ -37,7 +37,7 @@ export function mockAbilitySetupContext(
     player?: IPlayer,
     players?: IPlayers,
     context?: AbilityUseContext,
-    nightSheet?: NightSheet,
+    nightSheet?: INightSheet,
     characterSheet?: ICharacterSheet,
     abilityLoader?: IAbilityLoader,
     clocktower?: IClocktower
@@ -87,7 +87,7 @@ export function mockMayorAbilitySetupContext(
     player?: IPlayer,
     players?: IPlayers,
     game?: IGame,
-    nightSheet?: NightSheet,
+    nightSheet?: INightSheet,
     characterSheet?: ICharacterSheet
 ): AbilitySetupContext {
     return Object.assign(
@@ -109,7 +109,7 @@ export function mockSaintAbilitySetupContext(
     player?: IPlayer,
     players?: IPlayers,
     game?: IGame,
-    nightSheet?: NightSheet,
+    nightSheet?: INightSheet,
     characterSheet?: ICharacterSheet
 ): AbilitySetupContext {
     return Object.assign(
@@ -138,7 +138,7 @@ export function mockSaintAbilityUseContext(
 
 export function mockPoisonerAbilitySetupContext(
     poisonerPlayer: IPlayer,
-    nightSheet?: NightSheet,
+    nightSheet?: INightSheet,
     clocktower?: IClocktower
 ) {
     return mockAbilitySetupContext(

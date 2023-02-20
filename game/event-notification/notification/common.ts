@@ -14,7 +14,11 @@ export abstract class AbstractNotification<
     TEventCategory extends IEventCategory = IEventCategory
 > implements INotification<TEventCategory>
 {
-    abstract readonly defaultPriorityWhenNotProvided: number;
+    /**
+     * When a priority for a subscriber is not provided, this value will be used. Could be any arbitrary small value, chosen `Number.MIN_SAFE_INTEGER + 1` to allow `Number.MIN_SAFE_INTEGER` to be set for subscribers that need to have lower priority than default.
+     */
+    readonly defaultPriorityWhenNotProvided: number =
+        Number.MIN_SAFE_INTEGER + 1;
 
     abstract readonly eventCategories: Iterable<TEventCategory>;
 

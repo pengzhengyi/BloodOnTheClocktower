@@ -70,7 +70,7 @@ import {
     PoisonerAbility,
     type PoisonerAbilityUseResult,
 } from '~/game/ability/poisoner';
-import type { NightSheet } from '~/game/night-sheet';
+import type { INightSheet } from '~/game/night-sheet';
 import { type GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import { mockClocktowerForUndertaker } from '~/__mocks__/information';
 import {
@@ -628,14 +628,14 @@ export async function mockButlerChooseMaster(
 export async function setupPoisonerAbility(
     poisonerPlayer: IPlayer,
     poisonerAbility?: PoisonerAbility,
-    nightsheet?: NightSheet,
+    nightSheet?: INightSheet,
     clocktower?: IClocktower
 ): Promise<PoisonerAbility> {
     poisonerAbility ??= new PoisonerAbility();
 
     const setupContext = mockPoisonerAbilitySetupContext(
         poisonerPlayer,
-        nightsheet,
+        nightSheet,
         clocktower
     );
     await poisonerAbility.setup(setupContext);
@@ -666,7 +666,7 @@ export async function setupDrunkAbility(
 export async function setupMonkProtectAbility(
     monkPlayer: IPlayer,
     context?: AbilitySetupContext,
-    nightSheet?: NightSheet
+    nightSheet?: INightSheet
 ): Promise<MonkProtectAbility> {
     const ability = new MonkProtectAbility();
 

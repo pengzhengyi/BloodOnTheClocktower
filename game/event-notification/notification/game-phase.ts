@@ -11,7 +11,6 @@ import type { IGamePhaseEvent } from '../event/game-phase';
 import type { IEvent, INotification, ISubscriber } from '../types';
 import { AbstractNotification } from './common';
 import { isPhase, type Phase } from '~/game/phase';
-import { NightSheet } from '~/game/night-sheet';
 import { Generator } from '~/game/collections';
 
 const CATEGORY_CLASSES = [
@@ -44,9 +43,6 @@ export class GamePhaseNotification
     extends AbstractNotification
     implements IGamePhaseNotification
 {
-    defaultPriorityWhenNotProvided: number =
-        NightSheet.DEFAULT_NOT_ACTING_PRIORITY + 1;
-
     protected static phaseToCategory: Map<Phase, IGamePhaseCategory> = new Map(
         Generator.map(
             ([category, phase]) => [phase, category],

@@ -16,17 +16,19 @@ import {
 
 describe('Test basic functionalities', () => {
     test.concurrent('determine will or will not act', async () => {
-        expect(await NightSheet.willActDuringFirstNight(Mayor)).toBeFalse();
-        expect(await NightSheet.willActDuringAllOtherNights(Mayor)).toBeFalse();
+        const nightSheet = new NightSheet();
+        await nightSheet.init([Mayor, Imp, Monk]);
+        expect(nightSheet.willActDuringFirstNight(Mayor)).toBeFalse();
+        expect(nightSheet.willActDuringOtherNights(Mayor)).toBeFalse();
 
-        expect(await NightSheet.willActDuringFirstNight(Imp)).toBeFalse();
-        expect(await NightSheet.willActDuringAllOtherNights(Imp)).toBeTrue();
+        expect(nightSheet.willActDuringFirstNight(Imp)).toBeFalse();
+        expect(nightSheet.willActDuringOtherNights(Imp)).toBeTrue();
 
-        expect(await NightSheet.willActDuringFirstNight(Monk)).toBeFalse();
-        expect(await NightSheet.willActDuringAllOtherNights(Monk)).toBeTrue();
+        expect(nightSheet.willActDuringFirstNight(Monk)).toBeFalse();
+        expect(nightSheet.willActDuringOtherNights(Monk)).toBeTrue();
 
-        expect(await NightSheet.willActDuringFirstNight(Monk)).toBeFalse();
-        expect(await NightSheet.willActDuringAllOtherNights(Monk)).toBeTrue();
+        expect(nightSheet.willActDuringFirstNight(Monk)).toBeFalse();
+        expect(nightSheet.willActDuringOtherNights(Monk)).toBeTrue();
     });
 
     test.concurrent('determine night acting order', async () => {
@@ -46,7 +48,7 @@ describe('Test basic functionalities', () => {
 
         const firstNightOrdering: NightActOrdering =
             await NightSheet.getNightActOrdering(characters, true);
-        expect(firstNightOrdering.acting).toEqual([
+        expect(firstNightOrdering.order).toEqual([
             Poisoner, // 17
             Washerwoman, // 32
             Librarian, // 33
@@ -61,7 +63,7 @@ describe('Test basic functionalities', () => {
 
         const otherNightsOrdering: NightActOrdering =
             await NightSheet.getNightActOrdering(characters, false);
-        expect(otherNightsOrdering.acting).toEqual([
+        expect(otherNightsOrdering.order).toEqual([
             Poisoner, // 8
             Monk, // 13
             Imp, // 24

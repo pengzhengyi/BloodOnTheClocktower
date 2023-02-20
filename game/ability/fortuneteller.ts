@@ -8,7 +8,7 @@ import {
     FortuneTellerInformationRequester,
 } from '../info/requester/fortuneteller';
 import type { NextFunction } from '../proxy/middleware';
-import type { NightSheet } from '../night-sheet';
+import type { INightSheet } from '../night-sheet';
 import type { IPlayer, IPlayer as FortuneTellerPlayer } from '../player';
 import { CharacterNightEffect } from '../effect/character';
 import type { CharacterId } from '../character/character-id';
@@ -132,7 +132,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     protected async setupRedHerring(
         fortuneTellerPlayer: FortuneTellerPlayer,
         players: Iterable<IPlayer>,
-        nightSheet: NightSheet
+        nightSheet: INightSheet
     ): Promise<void> {
         const redHerringPlayer = await this.chooseRedHerring(players);
         this.setRedHerring(fortuneTellerPlayer, redHerringPlayer, nightSheet);
@@ -150,7 +150,7 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
     protected setRedHerring(
         fortuneTellerPlayer: FortuneTellerPlayer,
         redHerringPlayer: IPlayer,
-        nightSheet: NightSheet
+        nightSheet: INightSheet
     ) {
         this.redHerringPlayer = redHerringPlayer;
         const effect = new RedHerringEffect(fortuneTellerPlayer);
