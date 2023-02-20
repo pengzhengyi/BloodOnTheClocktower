@@ -20,8 +20,7 @@ import type {
     TRandomRange,
     Transform,
 } from './types';
-import { getRandomCryptoIntInclusive } from './common';
-import { isIterable } from '~/utils/common';
+import { isIterable, getRandomCryptoIntInclusive } from '~/utils/common';
 
 export class LazyMap<K, V> extends Map<K, V> {
     constructor(readonly loader: Loader<K, V>) {
