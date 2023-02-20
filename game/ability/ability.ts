@@ -2,8 +2,6 @@ import { RecoverableGameError } from '../exception/exception';
 import type {
     AsyncFactory,
     Constructor,
-    IBindToCharacter,
-    IBindToCharacterType,
     RequireGame,
     StaticThis,
 } from '../types';
@@ -88,18 +86,6 @@ export interface IAbility<
      */
     createContext(...args: any[]): Promise<TAbilityUseContext>;
 }
-
-export type ICharacterAbilityClass<
-    TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult
-> = Constructor<IAbility<TAbilityUseContext, TAbilityUseResult>> &
-    IBindToCharacter;
-
-export type ICharacterTypeAbilityClass<
-    TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult
-> = Constructor<IAbility<TAbilityUseContext, TAbilityUseResult>> &
-    IBindToCharacterType;
 
 /**
  * {@link `glossary["Ability"]`}

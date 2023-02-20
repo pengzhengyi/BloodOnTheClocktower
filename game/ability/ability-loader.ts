@@ -1,7 +1,9 @@
-/* eslint-disable lines-between-class-members */
-/* eslint-disable no-dupe-class-members */
 import { Generator } from '../collections';
-import type { Constructor } from '../types';
+import type {
+    IBindToCharacter,
+    IBindToCharacterType,
+    NoParamConstructor,
+} from '../types';
 import { type CharacterType, Demon, Minion } from '../character/character-type';
 import type { CharacterId } from '../character/character-id';
 import { CharacterIds } from '../character/character-id';
@@ -22,30 +24,39 @@ import { SoldierAbility } from './soldier';
 import { GetUndertakerInformationAbility } from './undertaker';
 import { VirginAbility } from './virgin';
 import { GetWasherwomanInformationAbility } from './washerwoman';
-import type {
-    AbilityUseContext,
-    AbilityUseResult,
-    IAbility,
-    ICharacterAbilityClass,
-    ICharacterTypeAbilityClass,
-} from './ability';
+import type { AbilityUseContext, AbilityUseResult, IAbility } from './ability';
 import { DrunkAbility } from './drunk';
 import { PoisonerAbility } from './poisoner';
 import { GetMinionInformationAbility } from './minion';
 import { GetDemonInformationAbility } from './demon';
-import type { CHARACTERS } from '~/content/characters/output/characters';
+import type { IAbilities } from './abilities';
+import { Abilities } from './abilities';
+
+export type ICharacterAbilityClass<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult
+> = NoParamConstructor<IAbility<TAbilityUseContext, TAbilityUseResult>> &
+    IBindToCharacter;
+
+export type ICharacterTypeAbilityClass<
+    TAbilityUseContext extends AbilityUseContext,
+    TAbilityUseResult extends AbilityUseResult
+> = NoParamConstructor<IAbility<TAbilityUseContext, TAbilityUseResult>> &
+    IBindToCharacterType;
 
 export interface IAbilityLoader {
-    load(
-        characterId: CharacterId
-    ): Array<Constructor<IAbility<AbilityUseContext, AbilityUseResult>>>;
+    load(characterId: CharacterId): IAbilities;
 
     /**
      * Load ability related to character.
      */
     loadCharacterAbility(
         characterId: CharacterId
-    ): ICharacterAbilityClass<AbilityUseContext, AbilityUseResult> | undefined;
+    ): IAbility<AbilityUseContext, AbilityUseResult> | undefined;
+
+    loadCharacterTypeAbility(
+        characterType: CharacterType
+    ): IAbility<AbilityUseContext, AbilityUseResult> | undefined;
 }
 
 const CharacterAbilityClasses: Array<
@@ -148,61 +159,37 @@ export class AbilityLoader implements IAbilityLoader {
     // eslint-disable-next-line no-useless-constructor
     constructor(protected readonly characterLoader: ICharacterLoader) {}
 
-    load(
-        characterId: CHARACTERS.Washerwoman
-    ): [typeof GetWasherwomanInformationAbility];
-
-    load(
-        characterId: CHARACTERS.Librarian
-    ): [typeof GetLibrarianInformationAbility];
-    load(
-        characterId: CHARACTERS.Investigator
-    ): [typeof GetInvestigatorInformationAbility];
-    load(characterId: CHARACTERS.Chef): [typeof GetChefInformationAbility];
-    load(characterId: CHARACTERS.Empath): [typeof GetEmpathInformationAbility];
-    load(
-        characterId: CHARACTERS.FortuneTeller
-    ): [typeof GetFortuneTellerInformationAbility];
-    load(
-        characterId: CHARACTERS.Undertaker
-    ): [typeof GetUndertakerInformationAbility];
-    load(characterId: CHARACTERS.Monk): [typeof MonkProtectAbility];
-    load(
-        characterId: CHARACTERS.Ravenkeeper
-    ): [typeof GetRavenkeeperInformationAbility];
-    load(characterId: CHARACTERS.Virgin): [typeof VirginAbility];
-    load(characterId: CHARACTERS.Slayer): [typeof SlayerAbility];
-    load(characterId: CHARACTERS.Soldier): [typeof SoldierAbility];
-    load(characterId: CHARACTERS.Mayor): [typeof MayorAbility];
-    load(characterId: CHARACTERS.Butler): [typeof ButlerAbility];
-    load(characterId: CHARACTERS.Drunk): [typeof DrunkAbility];
-    load(characterId: CHARACTERS.Recluse): [typeof RecluseAbility];
-    load(characterId: CHARACTERS.Saint): [typeof SaintAbility];
-    load(characterId: CHARACTERS.Poisoner): [typeof PoisonerAbility];
-    load(
-        characterId: CharacterId
-    ): Array<Constructor<IAbility<AbilityUseContext, AbilityUseResult>>> {
-        const abilities = [];
-
+    load(characterId: CharacterId): IAbilities {
+        let characterAbilities:
+            | Array<IAbility<AbilityUseContext, AbilityUseResult>>
+            | undefined;
         const characterAbility = this.loadCharacterAbility(characterId);
         if (characterAbility !== undefined) {
-            abilities.push(characterAbility);
+            characterAbilities = [characterAbility];
         }
         const characterTypeAbility = this.loadCharacterTypeAbility(characterId);
-        if (characterTypeAbility !== undefined) {
-            abilities.push(characterTypeAbility);
-        }
 
+        const abilities = Abilities.from(
+            characterAbilities,
+            characterTypeAbility
+        );
         return abilities;
     }
 
     loadCharacterAbility(characterId: CharacterId) {
-        return AbilityLoader.characterToAbility.get(characterId);
+        const AbilityClass = AbilityLoader.characterToAbility.get(characterId);
+        const ability =
+            AbilityClass !== undefined ? new AbilityClass() : undefined;
+        return ability;
     }
 
     loadCharacterTypeAbility(characterId: CharacterId) {
         const character = this.characterLoader.load(characterId);
         const characterType = character.characterType;
-        return AbilityLoader.characterTypeToAbility.get(characterType);
+        const AbilityClass =
+            AbilityLoader.characterTypeToAbility.get(characterType);
+        const ability =
+            AbilityClass !== undefined ? new AbilityClass() : undefined;
+        return ability;
     }
 }
