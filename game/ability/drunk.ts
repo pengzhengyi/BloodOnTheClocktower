@@ -27,11 +27,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
 
     protected declare thinkAsTownsfolk: TownsfolkCharacterToken;
 
-    protected thinkAsAbility?: Ability<
-        AbilityUseContext,
-        AbilityUseResult,
-        AbilitySetupContext
-    >;
+    protected thinkAsAbility?: Ability<AbilityUseContext, AbilityUseResult>;
 
     async useWhenNormal(context: AbilityUseContext) {
         let result: AbilityUseResult | AbilityUseResult;
@@ -110,8 +106,7 @@ class BaseDrunkAbility extends Ability<AbilityUseContext, AbilityUseResult> {
         if (CharacterAbility !== undefined) {
             this.thinkAsAbility = new CharacterAbility() as Ability<
                 AbilityUseContext,
-                AbilityUseResult,
-                AbilitySetupContext
+                AbilityUseResult
             >;
             await this.thinkAsAbility.setup(context);
         }

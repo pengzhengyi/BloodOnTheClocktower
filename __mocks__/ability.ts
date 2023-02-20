@@ -17,11 +17,7 @@ import type {
     AbilitySetupContext,
     GetInfoAbilityUseContext,
 } from '~/game/ability/ability';
-import type { MayorAbilitySetupContext } from '~/game/ability/mayor';
-import type {
-    SaintAbilitySetupContext,
-    SaintAbilityUseContext,
-} from '~/game/ability/saint';
+import type { SaintAbilityUseContext } from '~/game/ability/saint';
 import type { VirginAbilityUseContext } from '~/game/ability/virgin';
 import type { IAbilityLoader } from '~/game/ability/ability-loader';
 import type { InfoProvideContext } from '~/game/info/provider/provider';
@@ -93,7 +89,7 @@ export function mockMayorAbilitySetupContext(
     game?: IGame,
     nightSheet?: NightSheet,
     characterSheet?: ICharacterSheet
-): MayorAbilitySetupContext {
+): AbilitySetupContext {
     return Object.assign(
         {},
         mockAbilitySetupContext(
@@ -115,7 +111,7 @@ export function mockSaintAbilitySetupContext(
     game?: IGame,
     nightSheet?: NightSheet,
     characterSheet?: ICharacterSheet
-): SaintAbilitySetupContext {
+): AbilitySetupContext {
     return Object.assign(
         {},
         mockAbilitySetupContext(

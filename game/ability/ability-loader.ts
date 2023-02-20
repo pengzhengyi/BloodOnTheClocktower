@@ -23,7 +23,6 @@ import { GetUndertakerInformationAbility } from './undertaker';
 import { VirginAbility } from './virgin';
 import { GetWasherwomanInformationAbility } from './washerwoman';
 import type {
-    AbilitySetupContext,
     AbilityUseContext,
     AbilityUseResult,
     IAbility,
@@ -39,32 +38,18 @@ import type { CHARACTERS } from '~/content/characters/output/characters';
 export interface IAbilityLoader {
     load(
         characterId: CharacterId
-    ): Array<
-        Constructor<
-            IAbility<AbilityUseContext, AbilityUseResult, AbilitySetupContext>
-        >
-    >;
+    ): Array<Constructor<IAbility<AbilityUseContext, AbilityUseResult>>>;
 
     /**
      * Load ability related to character.
      */
     loadCharacterAbility(
         characterId: CharacterId
-    ):
-        | ICharacterAbilityClass<
-              AbilityUseContext,
-              AbilityUseResult,
-              AbilitySetupContext
-          >
-        | undefined;
+    ): ICharacterAbilityClass<AbilityUseContext, AbilityUseResult> | undefined;
 }
 
 const CharacterAbilityClasses: Array<
-    ICharacterAbilityClass<
-        AbilityUseContext,
-        AbilityUseResult,
-        AbilitySetupContext
-    >
+    ICharacterAbilityClass<AbilityUseContext, AbilityUseResult>
 > = [
     class extends GetWasherwomanInformationAbility {
         static origin: CharacterId = CharacterIds.Washerwoman;
@@ -123,11 +108,7 @@ const CharacterAbilityClasses: Array<
 ];
 
 const CharacterTypeAbilityClasses: Array<
-    ICharacterTypeAbilityClass<
-        AbilityUseContext,
-        AbilityUseResult,
-        AbilitySetupContext
-    >
+    ICharacterTypeAbilityClass<AbilityUseContext, AbilityUseResult>
 > = [
     class extends GetMinionInformationAbility {
         static origin: typeof CharacterType = Minion;
@@ -140,11 +121,7 @@ const CharacterTypeAbilityClasses: Array<
 export class AbilityLoader implements IAbilityLoader {
     static characterToAbility: Map<
         CharacterId,
-        ICharacterAbilityClass<
-            AbilityUseContext,
-            AbilityUseResult,
-            AbilitySetupContext
-        >
+        ICharacterAbilityClass<AbilityUseContext, AbilityUseResult>
     > = new Map(
         Generator.map(
             (CharacterAbilityClass) => [
@@ -157,11 +134,7 @@ export class AbilityLoader implements IAbilityLoader {
 
     static characterTypeToAbility: Map<
         typeof CharacterType,
-        ICharacterTypeAbilityClass<
-            AbilityUseContext,
-            AbilityUseResult,
-            AbilitySetupContext
-        >
+        ICharacterTypeAbilityClass<AbilityUseContext, AbilityUseResult>
     > = new Map(
         Generator.map(
             (CharacterTypeAbilityClass) => [
@@ -208,11 +181,7 @@ export class AbilityLoader implements IAbilityLoader {
     load(characterId: CHARACTERS.Poisoner): [typeof PoisonerAbility];
     load(
         characterId: CharacterId
-    ): Array<
-        Constructor<
-            IAbility<AbilityUseContext, AbilityUseResult, AbilitySetupContext>
-        >
-    > {
+    ): Array<Constructor<IAbility<AbilityUseContext, AbilityUseResult>>> {
         const abilities = [];
 
         const characterAbility = this.loadCharacterAbility(characterId);

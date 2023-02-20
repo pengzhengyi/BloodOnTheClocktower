@@ -1,24 +1,18 @@
 import type {
     AbilityUseContext,
     AbilityUseResult,
-    AbilitySetupContext,
     IAbility,
 } from '../ability/ability';
 import { RecoverableGameError } from './exception';
 
 export class AbilityRequiresSetup<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext
+    TAbilityUseResult extends AbilityUseResult
 > extends RecoverableGameError {
     static description = 'Ability requires setup before use';
 
     constructor(
-        readonly ability: IAbility<
-            TAbilityUseContext,
-            TAbilityUseResult,
-            TAbilitySetupContext
-        >,
+        readonly ability: IAbility<TAbilityUseContext, TAbilityUseResult>,
         readonly context: TAbilityUseContext
     ) {
         super(AbilityRequiresSetup.description);

@@ -6,7 +6,6 @@ import type { IGame } from '../game';
 import type { NextFunction } from '../proxy/middleware';
 import type { IPlayer, IPlayer as MayorPlayer } from '../player';
 import type { IPlayers } from '../players';
-import type { RequireGame } from '../types';
 import { Generator } from '../collections';
 import {
     Ability,
@@ -118,15 +117,7 @@ export class MayorDieInsteadEffect extends Effect<MayorPlayer> {
     }
 }
 
-export interface MayorAbilitySetupContext
-    extends AbilitySetupContext,
-        RequireGame {}
-
-class BaseMayorAbility extends Ability<
-    AbilityUseContext,
-    AbilityUseResult,
-    MayorAbilitySetupContext
-> {
+class BaseMayorAbility extends Ability<AbilityUseContext, AbilityUseResult> {
     /**
      * {@link `mayor["ability"]`}
      */
@@ -151,7 +142,7 @@ class BaseMayorAbility extends Ability<
         });
     }
 
-    async setup(context: MayorAbilitySetupContext): Promise<void> {
+    async setup(context: AbilitySetupContext): Promise<void> {
         await super.setup(context);
 
         this.mayorDieInsteadEffect = new MayorDieInsteadEffect(context.players);

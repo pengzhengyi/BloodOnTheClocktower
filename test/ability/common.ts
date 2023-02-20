@@ -75,7 +75,6 @@ import { type GetUndertakerInformationAbility } from '~/game/ability/undertaker'
 import { mockClocktowerForUndertaker } from '~/__mocks__/information';
 import {
     SaintAbility,
-    type SaintAbilitySetupContext,
     type SaintAbilityUseContext,
 } from '~/game/ability/saint';
 import { type IPlayers, Players } from '~/game/players';
@@ -573,7 +572,7 @@ export async function expectAfterExecuteSaint(
     ability?: SaintAbility,
     players?: IPlayers,
     numAlivePlayer?: number,
-    setupContext?: SaintAbilitySetupContext,
+    setupContext?: AbilitySetupContext,
     useContext?: SaintAbilityUseContext,
     forceExecution = false
 ) {

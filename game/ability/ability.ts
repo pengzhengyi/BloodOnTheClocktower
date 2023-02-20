@@ -4,6 +4,7 @@ import type {
     Constructor,
     IBindToCharacter,
     IBindToCharacterType,
+    RequireGame,
     StaticThis,
 } from '../types';
 import type { ICharacterSheet } from '../character/character-sheet';
@@ -35,7 +36,7 @@ export interface AbilityUseContext {
     players: IPlayers;
 }
 
-export interface AbilitySetupContext extends AbilityUseContext {
+export interface AbilitySetupContext extends AbilityUseContext, RequireGame {
     nightSheet: NightSheet;
     characterSheet: ICharacterSheet;
     abilityLoader: IAbilityLoader;
@@ -52,8 +53,7 @@ export interface AbilityUseResult {
 
 export interface IAbility<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
+    TAbilityUseResult extends AbilityUseResult
 > {
     hasSetup: boolean;
 
@@ -73,7 +73,7 @@ export interface IAbility<
      */
     willMalfunction(context: TAbilityUseContext): Promise<boolean>;
 
-    setup(context: TAbilitySetupContext): Promise<void>;
+    setup(context: AbilitySetupContext): Promise<void>;
 
     use(
         context: TAbilityUseContext
@@ -91,20 +91,14 @@ export interface IAbility<
 
 export type ICharacterAbilityClass<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
-> = Constructor<
-    IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
-> &
+    TAbilityUseResult extends AbilityUseResult
+> = Constructor<IAbility<TAbilityUseContext, TAbilityUseResult>> &
     IBindToCharacter;
 
 export type ICharacterTypeAbilityClass<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
-> = Constructor<
-    IAbility<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
-> &
+    TAbilityUseResult extends AbilityUseResult
+> = Constructor<IAbility<TAbilityUseContext, TAbilityUseResult>> &
     IBindToCharacterType;
 
 /**
@@ -113,8 +107,7 @@ export type ICharacterTypeAbilityClass<
  */
 export abstract class Ability<
     TAbilityUseContext extends AbilityUseContext,
-    TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext = AbilitySetupContext
+    TAbilityUseResult extends AbilityUseResult
 > implements IAbility<TAbilityUseContext, TAbilityUseResult>
 {
     static readonly REASON_FOR_UNEXPECTED_ERROR =
@@ -126,15 +119,10 @@ export abstract class Ability<
     static async init<
         TAbilityUseContext extends AbilityUseContext,
         TAbilityUseResult extends AbilityUseResult,
-        TAbilitySetupContext extends AbilitySetupContext,
-        TAbility extends Ability<
-            TAbilityUseContext,
-            TAbilityUseResult,
-            TAbilitySetupContext
-        >
+        TAbility extends Ability<TAbilityUseContext, TAbilityUseResult>
     >(
         this: StaticThis<TAbility>,
-        context: TAbilitySetupContext
+        context: AbilitySetupContext
     ): Promise<TAbility> {
         const instance = new this();
         await instance.setup(context);
@@ -171,7 +159,7 @@ export abstract class Ability<
         return context.requestedPlayer.alive;
     }
 
-    setup(_context: TAbilitySetupContext): Promise<void> {
+    setup(_context: AbilitySetupContext): Promise<void> {
         this._hasSetup = true;
         return Promise.resolve(undefined);
     }
@@ -311,10 +299,7 @@ export abstract class Ability<
 export function RequireSetup<
     TAbilityUseContext extends AbilityUseContext,
     TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext,
-    TAbility extends Constructor<
-        Ability<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
-    >
+    TAbility extends Constructor<Ability<TAbilityUseContext, TAbilityUseResult>>
 >(AbilityClass: TAbility) {
     return class RequireSetup extends AbilityClass {
         declare createContext;
@@ -338,10 +323,7 @@ export function RequireSetup<
 export function Once<
     TAbilityUseContext extends AbilityUseContext,
     TAbilityUseResult extends AbilityUseResult,
-    TAbilitySetupContext extends AbilitySetupContext,
-    TAbility extends Constructor<
-        Ability<TAbilityUseContext, TAbilityUseResult, TAbilitySetupContext>
-    >
+    TAbility extends Constructor<Ability<TAbilityUseContext, TAbilityUseResult>>
 >(AbilityClass: TAbility) {
     return class Once extends AbilityClass {
         protected hasUsedAbility = false;

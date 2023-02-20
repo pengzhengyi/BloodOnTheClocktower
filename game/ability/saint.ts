@@ -3,10 +3,10 @@ import type { Execution } from '../execution';
 import type { IGame } from '../game';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
-import type { RequireGame, RequireExecution } from '../types';
+import type { RequireExecution } from '../types';
 import type { IPlayer as SaintPlayer } from '../player';
+import type { AbilitySetupContext } from './ability';
 import {
-    type AbilitySetupContext,
     type AbilityUseContext,
     Ability,
     type AbilityUseResult,
@@ -63,18 +63,13 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
     }
 }
 
-export interface SaintAbilitySetupContext
-    extends AbilitySetupContext,
-        RequireGame {}
-
 export interface SaintAbilityUseContext
     extends AbilityUseContext,
         RequireExecution {}
 
 class BaseSaintAbility extends Ability<
     SaintAbilityUseContext,
-    AbilityUseResult,
-    SaintAbilitySetupContext
+    AbilityUseResult
 > {
     /**
      * {@link `saint["ability"]`}
@@ -101,7 +96,7 @@ class BaseSaintAbility extends Ability<
         });
     }
 
-    async setup(context: SaintAbilitySetupContext): Promise<void> {
+    async setup(context: AbilitySetupContext): Promise<void> {
         await super.setup(context);
 
         this.penalty = new SaintEndsGamePenalty(
@@ -133,11 +128,7 @@ class BaseSaintAbility extends Ability<
 }
 
 export interface SaintAbility
-    extends Ability<
-        SaintAbilityUseContext,
-        AbilityUseResult,
-        SaintAbilitySetupContext
-    > {}
+    extends Ability<SaintAbilityUseContext, AbilityUseResult> {}
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SaintAbility = RequireSetup(BaseSaintAbility);
