@@ -5,7 +5,7 @@ import type { NumberOfCharacters } from '../script-tool';
 import { Seating } from '../seating/seating';
 import { TownSquare, type ITownSquare } from '../town-square';
 import { Clocktower } from '../clocktower/clocktower';
-import type { IPlayer } from '../player';
+import type { CharacterAssignmentResult, IPlayer } from '../player';
 import {
     type ISeatAssignment,
     SeatAssignment,
@@ -16,18 +16,27 @@ import {
     SeatAssignmentMode,
 } from '../seating/seat-assignment-mode';
 import { GameEnvironment } from '../environment';
-import { Singleton } from '../common';
+import {
+    chainCharacters,
+    characterTypeToCharacterToString,
+    Singleton,
+} from '../common';
 import type { IStoryTeller } from '../storyteller';
 import { StoryTeller } from '../storyteller';
-import type { TravellerCharacterToken } from '../character/character';
+import type {
+    CharacterToken,
+    TravellerCharacterToken,
+} from '../character/character';
 import type {
     ICharacterTypeToCharacter,
+    IDecideCharacterAssignmentsContext,
     IDecideInPlayCharactersContext,
     TravellerPlayer,
 } from '../types';
 import type { ICharacterSheet } from '../character/character-sheet';
 import { CharacterSheetFactory } from '../character/character-sheet-factory';
 import type { EditionId } from '../edition/edition-id';
+import { Generator } from '../collections';
 import type { IModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { ModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
@@ -46,6 +55,7 @@ export interface ISetupResult {
     characterTypeComposition: NumberOfCharacters;
     initialInPlayCharacters: ICharacterTypeToCharacter;
     inPlayCharacters: ICharacterTypeToCharacter;
+    characterAssignments: Array<CharacterAssignmentResult>;
 }
 
 /**
@@ -86,6 +96,11 @@ export interface ISetupSheet {
         initialInPlayCharacters: ICharacterTypeToCharacter
     ): Promise<ICharacterTypeToCharacter>;
 
+    setupCharacterAssignments(
+        players: IPlayers,
+        inPlayCharacters: ICharacterTypeToCharacter
+    ): Promise<Array<CharacterAssignmentResult>>;
+
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
 
@@ -125,6 +140,11 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             initialInPlayCharacters
         );
 
+        const characterAssignments = await this.setupCharacterAssignments(
+            players,
+            inPlayCharacters
+        );
+
         const setupResult: ISetupResult = {
             players,
             townSquare,
@@ -134,6 +154,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             characterTypeComposition,
             initialInPlayCharacters,
             inPlayCharacters,
+            characterAssignments,
         };
 
         return setupResult;
@@ -253,6 +274,21 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         return modifiedInPlayCharacters;
     }
 
+    async setupCharacterAssignments(
+        players: IPlayers,
+        inPlayCharacters: ICharacterTypeToCharacter
+    ): Promise<Array<CharacterAssignmentResult>> {
+        const characters = await this.storytellerDecideCharacterAssignments(
+            players,
+            inPlayCharacters
+        );
+        const assignmentResults = await this.assignCharactersToPlayers(
+            players,
+            characters
+        );
+        return assignmentResults;
+    }
+
     protected getSeatAssignment(
         seatAssignment: ISeatAssignment | SeatAssignmentMode
     ): ISeatAssignment {
@@ -279,6 +315,52 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         return Promise.resolve(new Seating(initialNumPlayers));
     }
 
+    protected recommendCharacterAssignments(
+        inPlayCharacters: ICharacterTypeToCharacter
+    ): Array<CharacterToken> {
+        const shuffledCharacters = Array.from(
+            Generator.shuffle(chainCharacters(inPlayCharacters))
+        );
+        return shuffledCharacters;
+    }
+
+    protected async assignCharactersToPlayers(
+        players: IPlayers,
+        characters: Array<CharacterToken>
+    ): Promise<Array<CharacterAssignmentResult>> {
+        // TODO determine travellerToAlignment when there are travellers
+        const result = await players.assignCharacters(characters);
+        return result;
+    }
+
+    protected async storytellerDecideCharacterAssignments(
+        players: IPlayers,
+        inPlayCharacters: ICharacterTypeToCharacter
+    ): Promise<Array<CharacterToken>> {
+        const recommendation =
+            this.recommendCharacterAssignments(inPlayCharacters);
+        const reason = this.formatPromptForSetupCharacterAssignments(
+            players,
+            inPlayCharacters
+        );
+        const context: IDecideCharacterAssignmentsContext = {
+            players,
+            inPlayCharacters,
+        };
+
+        const decision =
+            await InteractionEnvironment.current.gameUI.storytellerDecide<
+                Array<CharacterToken>
+            >(
+                {
+                    context,
+                    recommendation,
+                },
+                { reason }
+            );
+        return decision.decided;
+    }
+
     protected formatPromptForSetupInPlayCharacters(
         numberOfCharacters: NumberOfCharacters
     ): string {
@@ -291,6 +373,21 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         }
 
         return reason + ' from character sheet';
+    }
+
+    protected formatPromptForSetupCharacterAssignments(
+        players: IPlayers,
+        inPlayCharacters: ICharacterTypeToCharacter
+    ): string {
+        const playersDescription = players.toString();
+
+        const charactersDescription = characterTypeToCharacterToString(
+            inPlayCharacters,
+            'In-play characters'
+        );
+
+        const prompt = `Assign characters to players:\n${charactersDescription}\n${playersDescription}`;
+        return prompt;
     }
 }
 

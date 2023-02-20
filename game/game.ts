@@ -1,5 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
+import type { CharacterAssignmentResult } from './player';
 import { type IPlayer } from './player';
 import type { IPlayers } from './players';
 import type { IEdition } from './edition/edition';
@@ -65,6 +66,8 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     declare inPlayCharacters: ICharacterTypeToCharacter;
 
+    declare characterAssignments: Array<CharacterAssignmentResult>;
+
     get players(): IPlayers {
         return this._players.clone();
     }
@@ -97,6 +100,7 @@ export class Game extends EffectTarget<Game> implements IGame {
             characterTypeComposition: this.characterTypeComposition,
             initialInPlayCharacters: this.initialInPlayCharacters,
             inPlayCharacters: this.inPlayCharacters,
+            characterAssignments: this.characterAssignments,
         } = setupResult);
     }
 

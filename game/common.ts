@@ -6,6 +6,7 @@ import type {
     NoParamConstructor,
     ICharacterTypeToCharacter,
 } from './types';
+import { iterableToString } from '~/utils/common';
 
 /**
  * Iterate from the element at specified index to last element and then from first element to the last element before specified index.
@@ -232,4 +233,36 @@ export function adaptCharacterTypeToCharacter(
         createEmptyCharacterTypeToCharacter(),
         characterTypeToCharacter
     );
+}
+
+/**
+ * A small utility class intended to improve `toString` on a set of characters.
+ */
+class CharacterGroup {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        readonly characters: Array<CharacterToken>,
+        readonly groupName?: string
+    ) {}
+
+    toString() {
+        const groupName = this.groupName ? this.groupName + ':' : '';
+        return `${groupName}${this.characters}`;
+    }
+}
+
+export function characterTypeToCharacterToString(
+    characterTypeToCharacter: ICharacterTypeToCharacter,
+    name?: string
+): string {
+    const characterGroups = [
+        new CharacterGroup(characterTypeToCharacter.minion, 'minion'),
+        new CharacterGroup(characterTypeToCharacter.demon, 'demon'),
+        new CharacterGroup(characterTypeToCharacter.townsfolk, 'townsfolk'),
+        new CharacterGroup(characterTypeToCharacter.outsider, 'outsider'),
+        new CharacterGroup(characterTypeToCharacter.traveller, 'traveller'),
+        new CharacterGroup(characterTypeToCharacter.fabled, 'fabled'),
+    ];
+
+    return iterableToString(characterGroups, name);
 }

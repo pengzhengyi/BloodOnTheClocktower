@@ -14,6 +14,7 @@ import type { InfoType } from './info/info-type';
 import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
 import type { CharacterId } from './character/character-id';
+import type { IPlayers } from './players';
 
 export type NoParamConstructor<T> = { new (): T };
 export type Constructor<T> = { new (...args: any[]): T };
@@ -219,4 +220,9 @@ export interface ICharacterTypeToCharacter {
 export interface IDecideInPlayCharactersContext {
     characterSheet: ICharacterSheet;
     numToChooseForEachCharacterType: NumberOfCharacters;
+}
+
+export interface IDecideCharacterAssignmentsContext {
+    players: IPlayers;
+    inPlayCharacters: ICharacterTypeToCharacter;
 }

@@ -1,11 +1,13 @@
 import { mock } from 'jest-mock-extended';
+import type { CharacterToken } from '~/game/character/character';
 import { Generator } from '~/game/collections';
-import { adaptCharacterTypeToCharacter } from '~/game/common';
+import { adaptCharacterTypeToCharacter, chainCharacters } from '~/game/common';
 import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';
 import type { ISetupContext, ISetupSheet } from '~/game/setup/setup-sheet';
 import { SetupSheet } from '~/game/setup/setup-sheet';
 import type {
     ICharacterTypeToCharacter,
+    IDecideCharacterAssignmentsContext,
     IDecideInPlayCharactersContext,
 } from '~/game/types';
 
@@ -54,4 +56,12 @@ export function randomChooseInPlayCharacters(
     }
 
     return adaptCharacterTypeToCharacter(initialInPlayCharacters);
+}
+
+export function randomAssignInPlayCharacters(
+    context: IDecideCharacterAssignmentsContext
+): Array<CharacterToken> {
+    const characters = chainCharacters(context.inPlayCharacters);
+    const randomAssignments = Array.from(Generator.shuffle(characters));
+    return randomAssignments;
 }

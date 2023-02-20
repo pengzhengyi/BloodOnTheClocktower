@@ -10,6 +10,7 @@ import { Generator } from '../collections';
 import { GameError } from '../exception/exception';
 import { CharacterSheetCreationFailure } from '../exception/character-sheet-creation-failure';
 import type { ICharacterTypeToCharacter } from '../types';
+import { characterTypeToCharacterToString } from '../common';
 import { CharactersToIDs, type CharacterToken } from './character';
 import {
     type CharacterType,
@@ -20,7 +21,6 @@ import {
     Townsfolk,
     Traveller,
 } from './character-type';
-import { iterableToString } from '~/utils/common';
 
 export interface ICharacterSheet extends ICharacterTypeToCharacter {
     readonly characters: Array<CharacterToken>;
@@ -40,36 +40,11 @@ export interface ICharacterSheet extends ICharacterTypeToCharacter {
     ): Iterable<CharacterToken>;
 }
 
-/**
- * A small utility class intended to improve `toString` on a set of characters.
- */
-class CharacterGroup {
-    // eslint-disable-next-line no-useless-constructor
-    constructor(
-        readonly characters: Array<CharacterToken>,
-        readonly groupName?: string
-    ) {}
-
-    toString() {
-        const groupName = this.groupName ? this.groupName + ':' : '';
-        return `${groupName}${this.characters}`;
-    }
-}
-
 interface AbstractCharacterSheet extends ICharacterSheet {}
 
 abstract class AbstractCharacterSheet {
     toString(): string {
-        const characterGroups = [
-            new CharacterGroup(this.minion, 'minion'),
-            new CharacterGroup(this.demon, 'demon'),
-            new CharacterGroup(this.townsfolk, 'townsfolk'),
-            new CharacterGroup(this.outsider, 'outsider'),
-            new CharacterGroup(this.traveller, 'traveller'),
-            new CharacterGroup(this.fabled, 'fabled'),
-        ];
-
-        return iterableToString(characterGroups, 'CharacterSheet');
+        return characterTypeToCharacterToString(this, 'CharacterSheet');
     }
 }
 

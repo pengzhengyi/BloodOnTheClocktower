@@ -3,6 +3,7 @@ import {
     mockSetupContext,
     createBasicSetupSheet,
     randomChooseInPlayCharacters,
+    randomAssignInPlayCharacters,
 } from './setup-sheet';
 import {
     mockStorytellerDecideImplementation,
@@ -12,7 +13,10 @@ import { TroubleBrewing } from './edition';
 import { type IGame, Game } from '~/game/game';
 import type { ISetupSheet, ISetupContext } from '~/game/setup/setup-sheet';
 import type { IEdition } from '~/game/edition/edition';
-import type { IDecideInPlayCharactersContext } from '~/game/types';
+import type {
+    IDecideCharacterAssignmentsContext,
+    IDecideInPlayCharactersContext,
+} from '~/game/types';
 import type { IModifyContext } from '~/game/setup/in-play-characters/modify-by-character';
 import { randomlyDecideForModification } from '~/test/setup/in-play-characters/common';
 
@@ -42,6 +46,15 @@ export async function createBasicGame(
 
         if ((context as IModifyContext).modification !== undefined) {
             return randomlyDecideForModification(context as IModifyContext);
+        }
+
+        if (
+            (context as IDecideCharacterAssignmentsContext).inPlayCharacters !==
+            undefined
+        ) {
+            return randomAssignInPlayCharacters(
+                context as IDecideCharacterAssignmentsContext
+            );
         }
 
         return await undefined;

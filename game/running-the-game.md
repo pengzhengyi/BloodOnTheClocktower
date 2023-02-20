@@ -31,3 +31,8 @@ To make it easier to cross reference online / in-player play, the in-player game
 `SetupSheet` asks storyteller to choose initial characters from `setupInPlayCharacters`.
 
 > 7. Add and remove characters. If any chosen character tokens show an orange leaf, you will need to add or remove some character tokens, as described by its almanac entry. On the character token, the text in square brackets like [this] briefly describes how to alter the characters in play this game. This happens once, during the setup phase, and does not happen again once the game is underway. After adding and removing character tokens, the number of character tokens will always equal the number of players.
+
+`SetupSheet` modifies initial in-play characters through `modifyInitialInPlayCharacters`.
+
+> 8. Add reminder tokens to the Grimoire. If any chosen character tokens show green leaves at the top of its character token, add the reminder tokens for that character next to the character token in the Grimoire. Return all remaining reminder tokens to the edition box. The reminder tokens for a character show the same symbol as its character token. The number of green leaves equals the number of reminder tokens that character has: If there’s one leaf, add one reminder. If there are three, add three.
+> 9. Pass out character tokens. Shuffle the character tokens and put them in the bag. Then, each player takes 1 character token out of the bag, and then passes the bag to the next player. Continue this until each player has one token. Each player looks at their character token in secret, revealing it to no one else.

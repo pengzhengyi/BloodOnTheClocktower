@@ -15,6 +15,7 @@ import { Generator } from './collections';
 import type { InteractionInitiator } from './effect/effect';
 import { IncorrectNumberOfCharactersToAssign } from './exception/incorrect-number-of-characters-to-assign';
 import type { CharacterAssignmentResult, IPlayer } from './player';
+import { iterableToString } from '~/utils/common';
 
 /**
  * A collection of players. This collection supports operations on multiple players at once.
@@ -107,6 +108,8 @@ export interface IPlayers extends Generator<IPlayer> {
         characters: Array<CharacterToken>,
         travellerToAlignment?: Map<TravellerCharacterToken, Alignment>
     ): Promise<Array<CharacterAssignmentResult>>;
+
+    toString(): string;
 }
 
 export class Players extends Generator<IPlayer> implements IPlayers {
@@ -264,5 +267,9 @@ export class Players extends Generator<IPlayer> implements IPlayers {
                 Generator.pair(this, characters)
             )
         );
+    }
+
+    toString(): string {
+        return iterableToString(this.players, 'Players');
     }
 }
