@@ -28,7 +28,9 @@ export interface NightActOrdering {
      * A set of characters that do not act at night. Can be used to quickly check if a character is not acting at night.
      */
     notActing: Set<CharacterToken>;
+}
 
+interface NightActOrderingExtended extends NightActOrdering {
     /**
      * A mapping from characters to their night act order in definition or resolved by storyteller. This is the original data used to compute the night act ordering and usually should not be used directly.
      */
@@ -41,14 +43,14 @@ export function nightActOrderingToString(ordering: NightActOrdering): string {
             ([i, character]) => `${i} => ${character}`,
             Generator.enumerate(ordering.order, 1)
         ),
-        'Characters act tonight'
+        'Characters act'
     );
     const notActing =
         'Characters not act: ' + Array.from(ordering.notActing).join(', ');
     const header = `Night Act Order (${
         ordering.isFirstNight ? 'First Night' : 'Other Nights'
     })`;
-    return `${header}\n${acting}\n${notActing}`;
+    return `${header}\n${acting}\n\n${notActing}`;
 }
 
 /**
@@ -73,6 +75,16 @@ export interface INightSheet {
 
     // query methods
     /**
+     * Get the night act ordering for the given characters and night.
+     * @param inPlayCharacters In-play characters to get night act ordering for. Should be a subset of the characters for which NightSheet is currently initialized. If not provided, all characters when NightSheet is initialized will be considered in-play.
+     * @param isFirstNight Whether to get the night act ordering for the first night or for other nights.
+     * @returns The night act ordering for the given characters and night.
+     */
+    getNightActOrdering(
+        inPlayCharacters?: Iterable<CharacterToken>,
+        isFirstNight?: boolean
+    ): NightActOrdering;
+    /**
      * Night act sequence number of a character tells how earlier a character acts among provided characters. The first character to act has a sequence number of 0. If the character does not act at night, it will have a sequence number of undefined.
      *
      * @param character The character to get night act sequence number of.
@@ -91,6 +103,8 @@ export interface INightSheet {
      *
      * - if player does not act at night, it will have `NightSheet.DEFAULT_NOT_ACTING_PRIORITY`
      * - if player act at night, it will have `NightSheet.DEFAULT_ACTING_ADJUSTMENT` - act order of character
+     *
+     * Since each character has a priority, it allows characters, no matter whether act at night, to be sorted.
      *
      * Usually this method should not be used directly. Use {@link getNightActSequenceNumber} instead.
      *
@@ -128,8 +142,8 @@ export class NightSheet implements INightSheet {
         characters: Iterable<CharacterToken>,
         isFirstNight: boolean,
         strategy: NightActOrderNotDefinedHandleStrategy = NightActOrderNotDefinedHandleStrategy.StoryTellerDecide
-    ): Promise<NightActOrdering> {
-        const ordering: NightActOrdering = {
+    ): Promise<NightActOrderingExtended> {
+        const ordering: NightActOrderingExtended = {
             isFirstNight,
             order: [],
             acting: new Map(),
@@ -137,14 +151,7 @@ export class NightSheet implements INightSheet {
             __characterToActOrder: new Map(),
         };
 
-        const priorityQueue = new PriorityQueue<{
-            character: CharacterToken;
-            order: number;
-        }>(
-            [],
-            (characterWithOrder, otherCharacterWithOrder) =>
-                characterWithOrder.order - otherCharacterWithOrder.order
-        );
+        const priorityQueue = this.createPriorityQueueForCharacterOrder();
 
         for (const character of characters) {
             const order = await this.getNightActOrder(
@@ -166,13 +173,75 @@ export class NightSheet implements INightSheet {
             });
         }
 
-        while (!priorityQueue.empty()) {
-            const { character } = priorityQueue.pop()!;
-            ordering.acting.set(character, ordering.order.length);
-            ordering.order.push(character);
-        }
+        [ordering.order, ordering.acting] =
+            this.getActingOrderFromPriorityQueue(priorityQueue);
 
         return ordering;
+    }
+
+    static getNightActOrderingForSubset(
+        subsetOfCharacters: Iterable<CharacterToken>,
+        ordering: Readonly<NightActOrdering>
+    ): NightActOrdering {
+        const subsetOrdering: NightActOrdering = {
+            isFirstNight: ordering.isFirstNight,
+            order: [],
+            acting: new Map(),
+            notActing: new Set(),
+        };
+
+        const priorityQueue = this.createPriorityQueueForCharacterOrder();
+
+        for (const character of subsetOfCharacters) {
+            if (ordering.notActing.has(character)) {
+                subsetOrdering.notActing.add(character);
+                continue;
+            }
+
+            const order = ordering.acting.get(character);
+            if (order === undefined) {
+                throw new CharacterNotInNightActOrdering(character, ordering);
+            }
+
+            priorityQueue.push({
+                character,
+                order,
+            });
+        }
+
+        [subsetOrdering.order, subsetOrdering.acting] =
+            this.getActingOrderFromPriorityQueue(priorityQueue);
+
+        return subsetOrdering;
+    }
+
+    protected static createPriorityQueueForCharacterOrder() {
+        return new PriorityQueue<{
+            character: CharacterToken;
+            order: number;
+        }>(
+            [],
+            (characterWithOrder, otherCharacterWithOrder) =>
+                characterWithOrder.order - otherCharacterWithOrder.order
+        );
+    }
+
+    protected static getActingOrderFromPriorityQueue(
+        priorityQueue: PriorityQueue<{
+            character: CharacterToken;
+            order: number;
+        }>
+    ) {
+        const order: NightActOrdering['order'] = [];
+        const acting: NightActOrdering['acting'] = new Map();
+
+        while (!priorityQueue.empty()) {
+            const { character } = priorityQueue.pop()!;
+            acting.set(character, order.length);
+            order.push(character);
+        }
+
+        return [order, acting] as const;
     }
 
     /**
@@ -189,7 +258,7 @@ export class NightSheet implements INightSheet {
      */
     protected static getNightPriority(
         character: CharacterToken,
-        ordering: NightActOrdering,
+        ordering: NightActOrderingExtended,
         ACTING_ADJUSTMENT = this.DEFAULT_ACTING_ADJUSTMENT,
         NOT_ACTING_PRIORITY = this.DEFAULT_NOT_ACTING_PRIORITY
     ): number {
@@ -256,9 +325,9 @@ export class NightSheet implements INightSheet {
         } (0 means not acting)`;
     }
 
-    declare firstNightActOrdering: NightActOrdering;
+    declare firstNightActOrdering: NightActOrderingExtended;
 
-    declare otherNightActOrdering: NightActOrdering;
+    declare otherNightActOrdering: NightActOrderingExtended;
 
     get characters(): Array<CharacterToken> {
         if (this._characters === undefined) {
@@ -276,6 +345,24 @@ export class NightSheet implements INightSheet {
     ) {
         this._characters = characters;
         await this.initNightActOrdering(strategy);
+    }
+
+    getNightActOrdering(
+        inPlayCharacters?: Iterable<ICharacter> | undefined,
+        isFirstNight?: boolean | undefined
+    ): NightActOrdering {
+        const existing = isFirstNight
+            ? this.firstNightActOrdering
+            : this.otherNightActOrdering;
+
+        if (inPlayCharacters === undefined) {
+            return existing;
+        }
+
+        return NightSheet.getNightActOrderingForSubset(
+            inPlayCharacters,
+            existing
+        );
     }
 
     getNightActSequenceNumber(

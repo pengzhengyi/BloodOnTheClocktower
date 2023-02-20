@@ -16,6 +16,7 @@ import type {
 import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
 import type { ICharacterTypeToCharacter } from './types';
+import type { INightSheet } from './night-sheet';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGame extends IEffectTarget<IGame>, Readonly<ISetupResult> {
@@ -58,6 +59,8 @@ export class Game extends EffectTarget<Game> implements IGame {
     declare edition: IEdition;
 
     declare storyTeller: IStoryTeller;
+
+    declare nightSheet: INightSheet;
 
     declare editionCharacterSheet: ICharacterSheet;
 
@@ -106,6 +109,7 @@ export class Game extends EffectTarget<Game> implements IGame {
             initialInPlayCharacters: this.initialInPlayCharacters,
             inPlayCharacters: this.inPlayCharacters,
             characterAssignments: this.characterAssignments,
+            nightSheet: this.nightSheet,
         } = setupResult);
     }
 

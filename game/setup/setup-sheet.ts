@@ -25,6 +25,7 @@ import type { IStoryTeller } from '../storyteller';
 import { StoryTeller } from '../storyteller';
 import type {
     CharacterToken,
+    ICharacter,
     TravellerCharacterToken,
 } from '../character/character';
 import type {
@@ -37,6 +38,8 @@ import type { ICharacterSheet } from '../character/character-sheet';
 import { CharacterSheetFactory } from '../character/character-sheet-factory';
 import type { EditionId } from '../edition/edition-id';
 import { Generator } from '../collections';
+import type { INightSheet } from '../night-sheet';
+import { NightSheet } from '../night-sheet';
 import type { IModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { ModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
@@ -56,6 +59,7 @@ export interface ISetupResult {
     initialInPlayCharacters: ICharacterTypeToCharacter;
     inPlayCharacters: ICharacterTypeToCharacter;
     characterAssignments: Array<CharacterAssignmentResult>;
+    nightSheet: INightSheet;
 }
 
 /**
@@ -101,6 +105,8 @@ export interface ISetupSheet {
         inPlayCharacters: ICharacterTypeToCharacter
     ): Promise<Array<CharacterAssignmentResult>>;
 
+    setupNightSheet(characters: Array<CharacterToken>): Promise<INightSheet>;
+
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
 
@@ -130,10 +136,13 @@ abstract class AbstractSetupSheet implements ISetupSheet {
                 this.setupEditionCharacterSheet(edition),
             ]);
 
-        const initialInPlayCharacters = await this.setupInitialInPlayCharacters(
-            editionCharacterSheet,
-            characterTypeComposition
-        );
+        const [initialInPlayCharacters, nightSheet] = await Promise.all([
+            this.setupInitialInPlayCharacters(
+                editionCharacterSheet,
+                characterTypeComposition
+            ),
+            this.setupNightSheet(editionCharacterSheet.characters),
+        ]);
 
         const inPlayCharacters = await this.modifyInitialInPlayCharacters(
             editionCharacterSheet,
@@ -155,6 +164,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             initialInPlayCharacters,
             inPlayCharacters,
             characterAssignments,
+            nightSheet,
         };
 
         return setupResult;
@@ -238,6 +248,12 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
     ): Promise<Array<TravellerPlayer>> {
         // TODO implement traveller selection
         throw new Error('method not implemented');
+    }
+
+    async setupNightSheet(characters: ICharacter[]): Promise<INightSheet> {
+        const nightSheet = new NightSheet();
+        await nightSheet.init(characters);
+        return nightSheet;
     }
 
     async setupInitialInPlayCharacters(
