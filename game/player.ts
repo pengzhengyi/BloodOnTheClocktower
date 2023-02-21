@@ -26,6 +26,8 @@ import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';
 import { PlayerHasUnclearAlignment } from './exception/player-has-unclear-alignment';
 import { ReassignCharacterToPlayer } from './exception/reassign-character-to-player';
+import type { IAbilities } from './ability/abilities';
+import { Abilities } from './ability/abilities';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface CharacterAssignmentResult {
@@ -42,6 +44,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     readonly username: string;
 
     seatNumber: number | undefined;
+    abilities: IAbilities;
     readonly alignment: Promise<Alignment>;
     readonly character: Promise<CharacterToken>;
 
@@ -254,6 +257,8 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     readonly username;
 
     seatNumber: number | undefined;
+
+    abilities: IAbilities;
 
     get alignment() {
         return Promise.resolve(this._alignment);
@@ -481,6 +486,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         super(enabledProxyHandlerPropertyNames);
         this.id = id;
         this.username = username;
+        this.abilities = new Abilities();
 
         // alignment and character can be lazy initialized
         alignment = this.tryInferAlignment(alignment, character);

@@ -29,8 +29,7 @@ import { DrunkAbility } from './drunk';
 import { PoisonerAbility } from './poisoner';
 import { GetMinionInformationAbility } from './minion';
 import { GetDemonInformationAbility } from './demon';
-import type { IAbilities } from './abilities';
-import { Abilities } from './abilities';
+import type { IAbilityGroup } from './ability-group';
 
 export type ICharacterAbilityClass<
     TAbilityUseContext extends AbilityUseContext,
@@ -45,7 +44,7 @@ export type ICharacterTypeAbilityClass<
     IBindToCharacterType;
 
 export interface IAbilityLoader {
-    load(characterId: CharacterId): IAbilities;
+    load(characterId: CharacterId): IAbilityGroup;
 
     /**
      * Load ability related to character.
@@ -159,20 +158,20 @@ export class AbilityLoader implements IAbilityLoader {
     // eslint-disable-next-line no-useless-constructor
     constructor(protected readonly characterLoader: ICharacterLoader) {}
 
-    load(characterId: CharacterId): IAbilities {
-        let characterAbilities:
-            | Array<IAbility<AbilityUseContext, AbilityUseResult>>
-            | undefined;
+    load(characterId: CharacterId): IAbilityGroup {
+        let characterAbilities: Array<
+            IAbility<AbilityUseContext, AbilityUseResult>
+        > = [];
         const characterAbility = this.loadCharacterAbility(characterId);
         if (characterAbility !== undefined) {
             characterAbilities = [characterAbility];
         }
         const characterTypeAbility = this.loadCharacterTypeAbility(characterId);
 
-        const abilities = Abilities.from(
+        const abilities: IAbilityGroup = {
             characterAbilities,
-            characterTypeAbility
-        );
+            characterTypeAbility,
+        };
         return abilities;
     }
 

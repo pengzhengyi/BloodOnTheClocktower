@@ -29,11 +29,14 @@ import {
     EditionFromId,
 } from './edition/edition-factory';
 import type { EditionId } from './edition/edition-id';
+import type { IAbilityLoader } from './ability/ability-loader';
+import { AbilityLoader } from './ability/ability-loader';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGameEnvironment extends IEnvironment {
     editionLoader: IEditionLoader;
     infoProviderLoader: IInfoProviderLoader;
+    abilityLoader: IAbilityLoader;
     configuration: IGameConfiguration;
     characterLoader: ICharacterLoader;
 
@@ -68,12 +71,14 @@ export interface IGameEnvironmentProvider
 class BaseGameEnvironment implements IGameEnvironment {
     readonly editionLoader: IEditionLoader;
     readonly characterLoader: ICharacterLoader;
+    readonly abilityLoader: IAbilityLoader;
 
     protected declare editionFromDefinition: IEditionFromDefinition;
 
     constructor() {
         this.characterLoader = this.createCharacterLoader();
         this.editionLoader = this.createEditionLoader();
+        this.abilityLoader = this.createAbilityLoader();
     }
 
     get infoProviderLoader(): IInfoProviderLoader {
@@ -258,6 +263,11 @@ class BaseGameEnvironment implements IGameEnvironment {
             editionDefinitionProvider
         );
         return new EditionLoader(editionFromId);
+    }
+
+    protected createAbilityLoader() {
+        const abilityLoader = new AbilityLoader(this.characterLoader);
+        return abilityLoader;
     }
 }
 

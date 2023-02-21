@@ -17,6 +17,7 @@ import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
 import type { ICharacterTypeToCharacter } from './types';
 import type { INightSheet } from './night-sheet';
+import type { IClocktower } from './clocktower/clocktower';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IGame extends IEffectTarget<IGame>, Readonly<ISetupResult> {
@@ -24,6 +25,7 @@ export interface IGame extends IEffectTarget<IGame>, Readonly<ISetupResult> {
 
     // utility properties of IGame
     readonly characterSheet: ICharacterSheet;
+    readonly clocktower: IClocktower;
     readonly today: IDiary;
 
     // capabilities of IGame
@@ -79,7 +81,11 @@ export class Game extends EffectTarget<Game> implements IGame {
     protected declare _players: IPlayers;
 
     get today(): IDiary {
-        return this.townSquare.clockTower.today;
+        return this.clocktower.today;
+    }
+
+    get clocktower(): IClocktower {
+        return this.townSquare.clockTower;
     }
 
     get characterSheet(): ICharacterSheet {

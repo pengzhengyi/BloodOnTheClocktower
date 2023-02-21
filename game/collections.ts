@@ -25,7 +25,6 @@ import { isIterable, getRandomCryptoIntInclusive } from '~/utils/common';
 export class LazyMap<K, V> extends Map<K, V> {
     constructor(readonly loader: Loader<K, V>) {
         super();
-        this.loader = loader;
     }
 
     get(key: K): V {

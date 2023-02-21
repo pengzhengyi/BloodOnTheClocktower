@@ -5,17 +5,12 @@ import type {
     AbilityUseResult,
     IAbility,
 } from './ability';
+import type { IAbilityGroup } from './ability-group';
 
 /**
  * IAbilities is a utility structure holding all abilities for a player. It allows convenient operations like `setup`.
  */
-export interface IAbilities {
-    characterAbilities: IAbility<AbilityUseContext, AbilityUseResult>[];
-
-    characterTypeAbility:
-        | IAbility<AbilityUseContext, AbilityUseResult>
-        | undefined;
-
+export interface IAbilities extends IAbilityGroup {
     // utility properties
     readonly hasCharacterAbility: boolean;
     readonly hasCharacterTypeAbility: boolean;
@@ -26,26 +21,11 @@ export interface IAbilities {
     >;
 
     setup(context: AbilitySetupContext): Promise<void>;
+
+    assign(abilities: IAbilityGroup): void;
 }
 
 export class Abilities implements IAbilities {
-    static from(
-        characterAbilities?: IAbility<AbilityUseContext, AbilityUseResult>[],
-        characterTypeAbility?: IAbility<AbilityUseContext, AbilityUseResult>
-    ): IAbilities {
-        const abilities = new Abilities();
-
-        if (characterAbilities !== undefined) {
-            abilities.characterAbilities = characterAbilities;
-        }
-
-        if (characterTypeAbility !== undefined) {
-            abilities.characterTypeAbility = characterTypeAbility;
-        }
-
-        return abilities;
-    }
-
     characterAbilities: Array<IAbility<AbilityUseContext, AbilityUseResult>> =
         [];
 
@@ -80,5 +60,15 @@ export class Abilities implements IAbilities {
             this
         );
         const _result = await Generator.promiseAllSettled(promises);
+    }
+
+    assign(abilities: IAbilityGroup): void {
+        if (abilities.characterAbilities !== undefined) {
+            this.characterAbilities = abilities.characterAbilities;
+        }
+
+        if (abilities.characterTypeAbility !== undefined) {
+            this.characterTypeAbility = abilities.characterTypeAbility;
+        }
     }
 }

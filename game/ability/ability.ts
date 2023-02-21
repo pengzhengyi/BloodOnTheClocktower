@@ -21,6 +21,8 @@ import type { IClocktower } from '../clocktower/clocktower';
 import type { ICharacterTypeInformationRequester } from '../info/requester/common';
 import { AbilityRequiresSetup } from '../exception/ability-requires-setup';
 import { AbilityCanOnlyUseOnce } from '../exception/ability-can-only-use-once';
+import type { IGame } from '../game';
+import type { IGameEnvironment } from '../environment';
 import type { IAbilityLoader } from './ability-loader';
 import {
     AbilitySuccessCommunicatedInfo,
@@ -85,6 +87,12 @@ export interface IAbility<
      * @returns A promise that resolves to the constructed context.
      */
     createContext(...args: any[]): Promise<TAbilityUseContext>;
+
+    createSetupContext(
+        abilityOwner: IPlayer,
+        game: IGame,
+        gameEnvironment: IGameEnvironment
+    ): Promise<AbilitySetupContext>;
 }
 
 /**
@@ -140,6 +148,24 @@ export abstract class Ability<
     ): Promise<TAbilityUseResult | AbilityUseResult>;
 
     abstract createContext(...args: any[]): Promise<TAbilityUseContext>;
+
+    createSetupContext(
+        abilityOwner: IPlayer,
+        game: IGame,
+        gameEnvironment: IGameEnvironment
+    ): Promise<AbilitySetupContext> {
+        const context: AbilitySetupContext = {
+            requestedPlayer: abilityOwner,
+            players: game.players,
+            game,
+            nightSheet: game.nightSheet,
+            characterSheet: game.characterSheet,
+            abilityLoader: gameEnvironment.abilityLoader,
+            clocktower: game.clocktower,
+        };
+
+        return Promise.resolve(context);
+    }
 
     isEligible(context: TAbilityUseContext): Promise<boolean> {
         return context.requestedPlayer.alive;
