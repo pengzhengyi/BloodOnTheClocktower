@@ -5,7 +5,7 @@ import type { NumberOfCharacters } from '../script-tool';
 import { Seating } from '../seating/seating';
 import { TownSquare, type ITownSquare } from '../town-square';
 import { Clocktower } from '../clocktower/clocktower';
-import type { CharacterAssignmentResult, IPlayer } from '../player';
+import type { IPlayer } from '../player';
 import {
     type ISeatAssignment,
     SeatAssignment,
@@ -29,6 +29,8 @@ import type {
     TravellerCharacterToken,
 } from '../character/character';
 import type {
+    CharacterAssignment,
+    CharacterAssignmentResult,
     ICharacterTypeToCharacter,
     IDecideCharacterAssignmentsContext,
     IDecideInPlayCharactersContext,
@@ -40,6 +42,8 @@ import type { EditionId } from '../edition/edition-id';
 import { Generator } from '../collections';
 import type { INightSheet } from '../night-sheet';
 import { NightSheet } from '../night-sheet';
+import type { IAbilityGroup } from '../ability/ability-group';
+import type { IAbilityLoader } from '../ability/ability-loader';
 import type { IModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { ModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
@@ -107,6 +111,11 @@ export interface ISetupSheet {
 
     setupNightSheet(characters: Array<CharacterToken>): Promise<INightSheet>;
 
+    assignAbilities(
+        characterAssignments: Iterable<CharacterAssignment>,
+        abilityLoader: IAbilityLoader
+    ): Promise<Array<IAbilityGroup>>;
+
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
 
@@ -152,6 +161,11 @@ abstract class AbstractSetupSheet implements ISetupSheet {
         const characterAssignments = await this.setupCharacterAssignments(
             players,
             inPlayCharacters
+        );
+
+        const _abilityGroups = await this.assignAbilities(
+            characterAssignments,
+            GameEnvironment.current.abilityLoader
         );
 
         const setupResult: ISetupResult = {
@@ -254,6 +268,21 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
         const nightSheet = new NightSheet();
         await nightSheet.init(characters);
         return nightSheet;
+    }
+
+    async assignAbilities(
+        characterAssignments: Iterable<CharacterAssignment>,
+        abilityLoader: IAbilityLoader
+    ): Promise<Array<IAbilityGroup>> {
+        const promises = Generator.toPromise(async ({ character, player }) => {
+            const abilityGroup = abilityLoader.load(character.id);
+            const abilities = player.abilities;
+            await abilities.assign(abilityGroup);
+            return abilities;
+        }, characterAssignments);
+
+        const result = await Promise.all(promises);
+        return result;
     }
 
     async setupInitialInPlayCharacters(

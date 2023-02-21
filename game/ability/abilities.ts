@@ -22,7 +22,7 @@ export interface IAbilities extends IAbilityGroup {
 
     setup(context: AbilitySetupContext): Promise<void>;
 
-    assign(abilities: IAbilityGroup): void;
+    assign(abilities: IAbilityGroup): this;
 }
 
 export class Abilities implements IAbilities {
@@ -62,7 +62,7 @@ export class Abilities implements IAbilities {
         const _result = await Generator.promiseAllSettled(promises);
     }
 
-    assign(abilities: IAbilityGroup): void {
+    assign(abilities: IAbilityGroup) {
         if (abilities.characterAbilities !== undefined) {
             this.characterAbilities = abilities.characterAbilities;
         }
@@ -70,5 +70,7 @@ export class Abilities implements IAbilities {
         if (abilities.characterTypeAbility !== undefined) {
             this.characterTypeAbility = abilities.characterTypeAbility;
         }
+
+        return this;
     }
 }

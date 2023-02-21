@@ -1,6 +1,5 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
-import type { CharacterAssignmentResult } from './player';
 import { type IPlayer } from './player';
 import type { IPlayers } from './players';
 import type { IEdition } from './edition/edition';
@@ -15,7 +14,10 @@ import type {
 } from './setup/setup-sheet';
 import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
-import type { ICharacterTypeToCharacter } from './types';
+import type {
+    CharacterAssignmentResult,
+    ICharacterTypeToCharacter,
+} from './types';
 import type { INightSheet } from './night-sheet';
 import type { IClocktower } from './clocktower/clocktower';
 import { InteractionEnvironment } from '~/interaction/environment/environment';

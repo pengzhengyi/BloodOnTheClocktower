@@ -14,7 +14,8 @@ import {
 import { Generator } from './collections';
 import type { InteractionInitiator } from './effect/effect';
 import { IncorrectNumberOfCharactersToAssign } from './exception/incorrect-number-of-characters-to-assign';
-import type { CharacterAssignmentResult, IPlayer } from './player';
+import type { IPlayer } from './player';
+import type { CharacterAssignmentResult } from './types';
 import { iterableToString } from '~/utils/common';
 
 /**

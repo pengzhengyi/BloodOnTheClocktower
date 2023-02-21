@@ -226,3 +226,13 @@ export interface IDecideCharacterAssignmentsContext {
     players: IPlayers;
     inPlayCharacters: ICharacterTypeToCharacter;
 }
+
+export interface CharacterAssignment {
+    player: IPlayer;
+
+    character: CharacterToken;
+}
+
+export interface CharacterAssignmentResult extends CharacterAssignment {
+    result: boolean;
+}
