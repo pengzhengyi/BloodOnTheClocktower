@@ -1,5 +1,4 @@
 import type { CharacterId } from '../character/character-id';
-import { GameEnvironment } from '../environment';
 import { CharacterEffectOriginNotSetup } from '../exception/character-effect-origin-not-setup';
 import type { INightSheet } from '../night-sheet';
 import type { Constructor, IBindToCharacter } from '../types';
@@ -52,15 +51,12 @@ export function CharacterNightEffect<
         protected setupNightPriority(
             nightSheet: INightSheet
         ): [number, number] {
-            const character = GameEnvironment.current.loadCharacter(
-                this.origin
-            );
             this.firstNightPriority = nightSheet.getNightPriority(
-                character,
+                this.origin,
                 true
             );
             this.otherNightPriority = nightSheet.getNightPriority(
-                character,
+                this.origin,
                 false
             );
 

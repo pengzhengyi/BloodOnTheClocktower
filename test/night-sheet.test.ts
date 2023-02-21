@@ -1,3 +1,4 @@
+import { CharacterIds } from '~/game/character/character-id';
 import { type NightActOrdering, NightSheet } from '~/game/night-sheet';
 import {
     Mayor,
@@ -18,17 +19,33 @@ describe('Test basic functionalities', () => {
     test.concurrent('determine will or will not act', async () => {
         const nightSheet = new NightSheet();
         await nightSheet.init([Mayor, Imp, Monk]);
-        expect(nightSheet.willActDuringFirstNight(Mayor)).toBeFalse();
-        expect(nightSheet.willActDuringOtherNights(Mayor)).toBeFalse();
+        expect(
+            nightSheet.willActDuringFirstNight(CharacterIds.Mayor)
+        ).toBeFalse();
+        expect(
+            nightSheet.willActDuringOtherNights(CharacterIds.Mayor)
+        ).toBeFalse();
 
-        expect(nightSheet.willActDuringFirstNight(Imp)).toBeFalse();
-        expect(nightSheet.willActDuringOtherNights(Imp)).toBeTrue();
+        expect(
+            nightSheet.willActDuringFirstNight(CharacterIds.Imp)
+        ).toBeFalse();
+        expect(
+            nightSheet.willActDuringOtherNights(CharacterIds.Imp)
+        ).toBeTrue();
 
-        expect(nightSheet.willActDuringFirstNight(Monk)).toBeFalse();
-        expect(nightSheet.willActDuringOtherNights(Monk)).toBeTrue();
+        expect(
+            nightSheet.willActDuringFirstNight(CharacterIds.Monk)
+        ).toBeFalse();
+        expect(
+            nightSheet.willActDuringOtherNights(CharacterIds.Monk)
+        ).toBeTrue();
 
-        expect(nightSheet.willActDuringFirstNight(Monk)).toBeFalse();
-        expect(nightSheet.willActDuringOtherNights(Monk)).toBeTrue();
+        expect(
+            nightSheet.willActDuringFirstNight(CharacterIds.Monk)
+        ).toBeFalse();
+        expect(
+            nightSheet.willActDuringOtherNights(CharacterIds.Monk)
+        ).toBeTrue();
     });
 
     test.concurrent('determine night acting order', async () => {
@@ -49,30 +66,36 @@ describe('Test basic functionalities', () => {
         const firstNightOrdering: NightActOrdering =
             await NightSheet.getNightActOrdering(characters, true);
         expect(firstNightOrdering.order).toEqual([
-            Poisoner, // 17
-            Washerwoman, // 32
-            Librarian, // 33
-            Investigator, // 34
-            FortuneTeller, // 37
-            Butler, // 38
-            Spy, // 48
+            Poisoner.id, // 17
+            Washerwoman.id, // 32
+            Librarian.id, // 33
+            Investigator.id, // 34
+            FortuneTeller.id, // 37
+            Butler.id, // 38
+            Spy.id, // 48
         ]);
         expect(firstNightOrdering.notActing).toEqual(
-            new Set([Monk, Virgin, Saint, Imp])
+            new Set([Monk.id, Virgin.id, Saint.id, Imp.id])
         );
 
         const otherNightsOrdering: NightActOrdering =
             await NightSheet.getNightActOrdering(characters, false);
         expect(otherNightsOrdering.order).toEqual([
-            Poisoner, // 8
-            Monk, // 13
-            Imp, // 24
-            FortuneTeller, // 54
-            Butler, // 55
-            Spy, // 68
+            Poisoner.id, // 8
+            Monk.id, // 13
+            Imp.id, // 24
+            FortuneTeller.id, // 54
+            Butler.id, // 55
+            Spy.id, // 68
         ]);
         expect(otherNightsOrdering.notActing).toEqual(
-            new Set([Librarian, Washerwoman, Investigator, Virgin, Saint])
+            new Set([
+                Librarian.id,
+                Washerwoman.id,
+                Investigator.id,
+                Virgin.id,
+                Saint.id,
+            ])
         );
     });
 });
