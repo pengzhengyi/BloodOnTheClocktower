@@ -1,4 +1,7 @@
 import { Generator } from '../collections';
+import type { IGameEnvironment } from '../environment';
+import type { IGame } from '../game';
+import type { IPlayer } from '../player';
 import type {
     AbilitySetupContext,
     AbilityUseContext,
@@ -20,7 +23,11 @@ export interface IAbilities extends IAbilityGroup {
         IAbility<AbilityUseContext, AbilityUseResult>
     >;
 
-    setup(context: AbilitySetupContext): Promise<void>;
+    setup(
+        abilityOwner: IPlayer,
+        game: IGame,
+        gameEnvironment: IGameEnvironment
+    ): Promise<void>;
 
     assign(abilities: IAbilityGroup): this;
 }
@@ -54,11 +61,20 @@ export class Abilities implements IAbilities {
         }
     }
 
-    async setup(context: AbilitySetupContext): Promise<void> {
-        const promises = Generator.toPromise(
-            (ability) => ability.setup(context),
-            this
-        );
+    async setup(
+        abilityOwner: IPlayer,
+        game: IGame,
+        gameEnvironment: IGameEnvironment
+    ): Promise<void> {
+        const promises = Generator.toPromise(async (ability) => {
+            const context: AbilitySetupContext =
+                await ability.createSetupContext(
+                    abilityOwner,
+                    game,
+                    gameEnvironment
+                );
+            const _setupResult = await ability.setup(context);
+        }, this);
         const _result = await Generator.promiseAllSettled(promises);
     }
 

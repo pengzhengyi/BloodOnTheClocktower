@@ -15,7 +15,7 @@ import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
 import type { CharacterId } from './character/character-id';
 import type { IPlayers } from './players';
-import type { IAbilityGroup } from './ability/ability-group';
+import type { IAbilities } from './ability/abilities';
 
 export type NoParamConstructor<T> = { new (): T };
 export type Constructor<T> = { new (...args: any[]): T };
@@ -237,7 +237,7 @@ export interface CharacterAssignment {
 export interface AbilityAssignment {
     player: IPlayer;
 
-    abilities: IAbilityGroup;
+    abilities: IAbilities;
 }
 
 export interface CharacterAssignmentResult extends CharacterAssignment {

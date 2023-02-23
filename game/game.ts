@@ -43,7 +43,7 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     static async init(
         setupSheet: ISetupSheet,
-        setupContext: ISetupContext,
+        setupContext: Omit<ISetupContext, 'game'>,
         enabledProxyHandlerPropertyNames?: Array<keyof ProxyHandler<Game>>
     ) {
         if (enabledProxyHandlerPropertyNames === undefined) {
@@ -52,7 +52,9 @@ export class Game extends EffectTarget<Game> implements IGame {
         }
 
         const game = new this(setupSheet, enabledProxyHandlerPropertyNames);
-        await game.setup(setupContext);
+
+        const context = { ...setupContext, game };
+        await game.setup(context);
 
         return game.getProxy();
     }

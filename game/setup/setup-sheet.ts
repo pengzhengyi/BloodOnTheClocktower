@@ -44,11 +44,13 @@ import { Generator } from '../collections';
 import type { INightSheet } from '../night-sheet';
 import { NightSheet } from '../night-sheet';
 import type { IAbilityLoader } from '../ability/ability-loader';
+import type { IGame } from '../game';
 import type { IModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { ModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface ISetupContext {
+    game: IGame;
     initialPlayers?: Array<IPlayer>;
     seatAssignment?: ISeatAssignment | SeatAssignmentMode;
 }
@@ -117,6 +119,17 @@ export interface ISetupSheet {
         abilityLoader: IAbilityLoader
     ): Promise<Array<AbilityAssignment>>;
 
+    setupAbilities(
+        game: IGame,
+        abilityAssignments: Array<AbilityAssignment>
+    ): Promise<void>;
+
+    /**
+     * Responsible for setting up the game. Should be preferred than the individual `setup*` methods.
+     *
+     * @param context The context for setting up the game.
+     * @returns The result of the setup process.
+     */
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
 
@@ -167,6 +180,11 @@ abstract class AbstractSetupSheet implements ISetupSheet {
         const abilityAssignments = await this.assignAbilities(
             characterAssignments,
             GameEnvironment.current.abilityLoader
+        );
+
+        const _abilitySetupResults = await this.setupAbilities(
+            context.game,
+            abilityAssignments
         );
 
         const setupResult: ISetupResult = {
@@ -285,6 +303,16 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
 
         const result = await Promise.all(promises);
         return result;
+    }
+
+    async setupAbilities(
+        game: IGame,
+        abilityAssignments: AbilityAssignment[]
+    ): Promise<void> {
+        const promises = Generator.toPromise(async ({ abilities, player }) => {
+            await abilities.setup(player, game, GameEnvironment.current);
+        }, abilityAssignments);
+        await Promise.all(promises);
     }
 
     async setupInitialInPlayCharacters(
