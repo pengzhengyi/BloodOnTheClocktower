@@ -29,6 +29,7 @@ import type {
     TravellerCharacterToken,
 } from '../character/character';
 import type {
+    AbilityAssignment,
     CharacterAssignment,
     CharacterAssignmentResult,
     ICharacterTypeToCharacter,
@@ -42,7 +43,6 @@ import type { EditionId } from '../edition/edition-id';
 import { Generator } from '../collections';
 import type { INightSheet } from '../night-sheet';
 import { NightSheet } from '../night-sheet';
-import type { IAbilityGroup } from '../ability/ability-group';
 import type { IAbilityLoader } from '../ability/ability-loader';
 import type { IModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
 import { ModifyInPlayCharacters } from './in-play-characters/modify-in-play-characters';
@@ -63,6 +63,7 @@ export interface ISetupResult {
     initialInPlayCharacters: ICharacterTypeToCharacter;
     inPlayCharacters: ICharacterTypeToCharacter;
     characterAssignments: Array<CharacterAssignmentResult>;
+    abilityAssignments: Array<AbilityAssignment>;
     nightSheet: INightSheet;
 }
 
@@ -114,7 +115,7 @@ export interface ISetupSheet {
     assignAbilities(
         characterAssignments: Iterable<CharacterAssignment>,
         abilityLoader: IAbilityLoader
-    ): Promise<Array<IAbilityGroup>>;
+    ): Promise<Array<AbilityAssignment>>;
 
     setup(context: ISetupContext): Promise<ISetupResult>;
 }
@@ -163,7 +164,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             inPlayCharacters
         );
 
-        const _abilityGroups = await this.assignAbilities(
+        const abilityAssignments = await this.assignAbilities(
             characterAssignments,
             GameEnvironment.current.abilityLoader
         );
@@ -178,6 +179,7 @@ abstract class AbstractSetupSheet implements ISetupSheet {
             initialInPlayCharacters,
             inPlayCharacters,
             characterAssignments,
+            abilityAssignments,
             nightSheet,
         };
 
@@ -273,12 +275,12 @@ class BaseSetupSheet extends AbstractSetupSheet implements ISetupSheet {
     async assignAbilities(
         characterAssignments: Iterable<CharacterAssignment>,
         abilityLoader: IAbilityLoader
-    ): Promise<Array<IAbilityGroup>> {
+    ): Promise<Array<AbilityAssignment>> {
         const promises = Generator.toPromise(async ({ character, player }) => {
             const abilityGroup = abilityLoader.load(character.id);
             const abilities = player.abilities;
             await abilities.assign(abilityGroup);
-            return abilities;
+            return { abilities, player };
         }, characterAssignments);
 
         const result = await Promise.all(promises);

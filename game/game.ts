@@ -15,6 +15,7 @@ import type {
 import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
 import type {
+    AbilityAssignment,
     CharacterAssignmentResult,
     ICharacterTypeToCharacter,
 } from './types';
@@ -76,6 +77,8 @@ export class Game extends EffectTarget<Game> implements IGame {
 
     declare characterAssignments: Array<CharacterAssignmentResult>;
 
+    declare abilityAssignments: Array<AbilityAssignment>;
+
     get players(): IPlayers {
         return this._players.clone();
     }
@@ -118,6 +121,7 @@ export class Game extends EffectTarget<Game> implements IGame {
             inPlayCharacters: this.inPlayCharacters,
             characterAssignments: this.characterAssignments,
             nightSheet: this.nightSheet,
+            abilityAssignments: this.abilityAssignments,
         } = setupResult);
     }
 
