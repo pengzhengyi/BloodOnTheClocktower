@@ -6,7 +6,6 @@ import type {
     InformationRequestContext,
 } from './info/requester/requester';
 import type { IPlayer } from './player';
-import { type AsyncTask } from './types';
 import { GameEnvironment } from './environment';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
@@ -35,9 +34,6 @@ export interface IStoryTeller {
  * The person who runs the game. The Storyteller keeps the Grimoire, follows the rules of the game, and makes the final decision on what happens when a situation needs adjudication.
  */
 export class StoryTeller implements IStoryTeller {
-    static DEFAULT_WAKE_REASON =
-        'Player is awaken to act or receive information';
-
     protected grimoire?: IGrimoire;
 
     getGrimoire(_requestedPlayer?: IPlayer): Promise<IGrimoire> {
@@ -49,32 +45,8 @@ export class StoryTeller implements IStoryTeller {
         return Promise.resolve(this.grimoire!);
     }
 
-    async interact(
-        player: IPlayer,
-        action: AsyncTask<IPlayer>,
-        reason?: string
-    ) {
-        if (reason === undefined) {
-            reason = action.toString();
-        }
-
-        await action(player);
-    }
-
     constructor(grimoire: IGrimoire) {
         this.grimoire = grimoire;
-    }
-
-    /**
-     * {@link `glossary["Wake"]`}
-     * A player opening their eyes at night. The Storyteller wakes a player by tapping twice on the knee or shoulder, and wakes all players by saying “eyes open, everybody” at dawn.
-     */
-    async wake(
-        player: IPlayer,
-        action: AsyncTask<IPlayer>,
-        reason: string = StoryTeller.DEFAULT_WAKE_REASON
-    ) {
-        await this.interact(player, action, reason);
     }
 
     async giveInfo<TInformation, TInfoType extends Info<TInformation>>(
