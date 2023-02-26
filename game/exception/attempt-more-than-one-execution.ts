@@ -1,4 +1,4 @@
-import type { Execution } from '../execution';
+import type { Execution } from '../voting/execution';
 import type { IPlayer } from '../player';
 import { RecoverableGameError } from './exception';
 

@@ -1,4 +1,4 @@
-import { Exile } from '../exile';
+import { Exile } from '../voting/exile';
 import type { IToll } from './toll';
 import type { IRecordTollCommand } from './toll-recorder';
 

@@ -1,6 +1,6 @@
 import { DeadReason } from '../dead-reason';
 import { Effect, type InteractionContext } from '../effect/effect';
-import type { Execution } from '../execution';
+import type { Execution } from '../voting/execution';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { Nomination } from '../nomination';

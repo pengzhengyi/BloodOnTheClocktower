@@ -1,4 +1,4 @@
-import { Execution } from '../execution';
+import { Execution } from '../voting/execution';
 import type { IToll } from './toll';
 import type { IRecordTollCommand } from './toll-recorder';
 

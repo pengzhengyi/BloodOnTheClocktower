@@ -1,4 +1,4 @@
-import { createExecutionAndAddVotedNominations } from '../execution.test';
+import { createExecutionAndAddVotedNominations } from '../voting/execution.test';
 import { expectAfterExecuteSaint } from './common';
 import type { GamePhase } from '~/game/game-phase';
 import type { Action } from '~/game/types';

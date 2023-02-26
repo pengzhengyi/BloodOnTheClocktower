@@ -2,7 +2,7 @@ import {
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
 } from '~/__mocks__/game-ui';
-import { Execution } from '~/game/execution';
+import { Execution } from '~/game/voting/execution';
 import { Nomination } from '~/game/nomination';
 import {
     createBasicPlayers,

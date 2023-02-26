@@ -1,4 +1,4 @@
-import { playerFromDescription } from './utils';
+import { playerFromDescription } from '../utils';
 import {
     hasRaisedHandForVoteMock,
     storytellerConfirmMock,
@@ -10,7 +10,7 @@ import {
 } from '~/__mocks__/player';
 
 import type { IPlayer } from '~/game/player';
-import { Vote } from '~/game/vote';
+import { Vote } from '~/game/voting/vote';
 
 afterAll(() => {
     hasRaisedHandForVoteMock.mockReset();

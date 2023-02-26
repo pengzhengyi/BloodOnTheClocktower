@@ -1,6 +1,6 @@
 import { collectVotesForNomination as collectVotesForExile } from './execution.test';
 import { storytellerHandleMock } from '~/__mocks__/game-ui';
-import { Exile } from '~/game/exile';
+import { Exile } from '~/game/voting/exile';
 import { ExileNonTraveller } from '~/game/exception/exile-non-traveller';
 import type { IPlayer } from '~/game/player';
 import { createBasicPlayer, setPlayerDead } from '~/__mocks__/player';

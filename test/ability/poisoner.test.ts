@@ -34,7 +34,7 @@ import type { InvestigatorInformation } from '~/game/info/provider/investigator'
 import { getTroubleBrewingCharacterSheet } from '~/__mocks__/character-sheet';
 import { GetUndertakerInformationAbility } from '~/game/ability/undertaker';
 import type { UndertakerInformation } from '~/game/info/provider/undertaker';
-import { Execution } from '~/game/execution';
+import { Execution } from '~/game/voting/execution';
 import {
     Poisoner,
     Slayer,

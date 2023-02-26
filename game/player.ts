@@ -20,7 +20,7 @@ import {
     Traveller,
 } from './character/character-type';
 import { DeadPlayerCannotNominate } from './exception/dead-player-cannot-nominate';
-import type { Execution } from './execution';
+import type { Execution } from './voting/execution';
 import { DrunkReason } from './drunk-reason';
 import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';

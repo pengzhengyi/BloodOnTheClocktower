@@ -1,5 +1,5 @@
 import type { Nomination } from '../nomination';
-import type { Vote } from '../vote';
+import type { Vote } from '../voting/vote';
 import { RecoverableGameError } from './exception';
 
 export class NoVotesWhenCountingVote extends RecoverableGameError {

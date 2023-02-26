@@ -1,4 +1,4 @@
-import type { Exile } from '../exile';
+import type { Exile } from '../voting/exile';
 import { RecoverableGameError } from './exception';
 
 export class NoVoteInExile extends RecoverableGameError {

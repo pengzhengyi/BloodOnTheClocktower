@@ -8,7 +8,7 @@ import { mockClocktower } from './clocktower';
 import type { IPlayer } from '~/game/player';
 import type { IPlayers } from '~/game/players';
 import type { Task } from '~/game/types';
-import type { Execution } from '~/game/execution';
+import type { Execution } from '~/game/voting/execution';
 import type { IGame } from '~/game/game';
 import type { INightSheet } from '~/game/night-sheet';
 import type { ICharacterSheet } from '~/game/character/character-sheet';

@@ -62,7 +62,7 @@ import type {
     SlayerAbility,
     SlayerAbilityUseResult,
 } from '~/game/ability/slayer';
-import { Execution } from '~/game/execution';
+import { Execution } from '~/game/voting/execution';
 import type { ButlerAbility } from '~/game/ability/butler';
 import { DrunkAbility } from '~/game/ability/drunk';
 import { AbilityLoader } from '~/game/ability/ability-loader';
