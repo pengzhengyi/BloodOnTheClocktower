@@ -45,6 +45,22 @@ export interface IGamePhase {
 
 @Exclude()
 export class GamePhase implements IGamePhase {
+    static format(phase: Phase, cycleIndex: number): string {
+        return `${toString(phase)} ${cycleIndex}`;
+    }
+
+    static setup() {
+        return this.of(0);
+    }
+
+    static firstNight() {
+        return this.of(1);
+    }
+
+    static of(phaseCounter: number): GamePhase {
+        return new this(undefined, phaseCounter);
+    }
+
     protected _phase: Phase;
 
     /**
@@ -91,22 +107,6 @@ export class GamePhase implements IGamePhase {
         }
 
         return BasicGamePhaseKind.Other;
-    }
-
-    static format(phase: Phase, cycleIndex: number): string {
-        return `${toString(phase)} ${cycleIndex}`;
-    }
-
-    static setup() {
-        return this.of(0);
-    }
-
-    static firstNight() {
-        return this.of(1);
-    }
-
-    static of(phaseCounter: number): GamePhase {
-        return new this(undefined, phaseCounter);
     }
 
     protected constructor(phase?: Phase, phaseCounter?: number) {
