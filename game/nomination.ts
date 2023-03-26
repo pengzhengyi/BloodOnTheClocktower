@@ -1,5 +1,6 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain, Type } from 'class-transformer';
+import type { IVote } from './voting/vote';
 import { Vote } from './voting/vote';
 import type { IPlayer } from './player';
 
@@ -18,7 +19,7 @@ export class Nomination {
 
     @Expose({ toPlainOnly: true })
     @Type(() => Vote)
-    vote?: Vote;
+    vote?: IVote;
 
     @Expose({ toPlainOnly: true })
     nominator: IPlayer;
@@ -31,7 +32,7 @@ export class Nomination {
             return NominationState.NotStarted;
         }
 
-        if (this.vote.voted) {
+        if (this.vote.hasVoted) {
             return NominationState.Voted;
         } else {
             return NominationState.Ready;
@@ -52,7 +53,7 @@ export class Nomination {
     }
 
     startVote(players: Iterable<IPlayer>) {
-        const vote: Vote = this.isVoteStarted()
+        const vote: IVote = this.isVoteStarted()
             ? this.vote
             : (this.vote = this.createVote());
         return vote.collectVotes(players);
@@ -62,7 +63,7 @@ export class Nomination {
         return instanceToPlain(this);
     }
 
-    protected createVote(): Vote {
+    protected createVote(): IVote {
         return new Vote(this.nominated);
     }
 }

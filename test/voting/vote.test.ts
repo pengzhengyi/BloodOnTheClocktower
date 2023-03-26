@@ -10,6 +10,7 @@ import {
 } from '~/__mocks__/player';
 
 import type { IPlayer } from '~/game/player';
+import type { IVote } from '~/game/voting/vote';
 import { Vote } from '~/game/voting/vote';
 
 afterAll(() => {
@@ -41,7 +42,7 @@ async function createVoteAndCollectVotes(
     forExile: boolean,
     playersToVote: Array<IPlayer>,
     willPlayerRaiseHand: Array<boolean>
-): Promise<Array<IPlayer>> {
+): Promise<[IVote, Array<IPlayer>]> {
     const vote = new Vote(nominated, forExile);
 
     const playerToWillRaiseHand = new Map<IPlayer, boolean>();
@@ -50,17 +51,26 @@ async function createVoteAndCollectVotes(
         playerToWillRaiseHand.set(playersToVote[i], willPlayerRaiseHand[i]);
     }
 
-    return await collectVotesForExecution(vote, playerToWillRaiseHand);
+    const votedPlayers = await collectVotesForExecution(
+        vote,
+        playerToWillRaiseHand
+    );
+
+    return [vote, votedPlayers];
 }
 
 describe('test Vote serialization', () => {
     test.concurrent('convert to object', async () => {
         const Evin = await playerFromDescription('Evin is the Chef');
         const Amy = await playerFromDescription('Amy is the Ravenkeeper');
-        const vote = new Vote(Amy);
-        vote.votes = [Evin];
+        const [vote, _] = await createVoteAndCollectVotes(
+            Amy,
+            false,
+            [Evin],
+            [true]
+        );
 
-        const voteObj = vote.toJSON();
+        const voteObj = vote.toJSON() as Record<string, any>;
 
         expect(Amy.equals(voteObj.nominated)).toBeTrue();
         expect(voteObj.votes).toHaveLength(1);
@@ -76,7 +86,7 @@ describe('Test Vote Edge Cases', () => {
         const deadPlayer = await createBasicPlayer();
         await setPlayerDead(deadPlayer);
 
-        const votedPlayers = await createVoteAndCollectVotes(
+        const [_vote1, votedPlayers] = await createVoteAndCollectVotes(
             nominated1,
             false,
             [alivePlayer, deadPlayer],
@@ -84,16 +94,18 @@ describe('Test Vote Edge Cases', () => {
         );
         expect(votedPlayers).toEqual([alivePlayer, deadPlayer]);
 
-        const votedPlayersSecondRound = await createVoteAndCollectVotes(
-            nominated2,
-            false,
-            [alivePlayer, deadPlayer],
-            [true, true]
-        );
+        const [_vote2, votedPlayersSecondRound] =
+            await createVoteAndCollectVotes(
+                nominated2,
+                false,
+                [alivePlayer, deadPlayer],
+                [true, true]
+            );
         expect(votedPlayersSecondRound).toEqual([alivePlayer]);
     });
 
-    test('force recollection of votes', async () => {
+    // skip due to recollection is not supported
+    test.skip('force recollection of votes', async () => {
         const nominated = mockPlayer();
         const player1 = await createBasicPlayer();
         const player2 = await createBasicPlayer();

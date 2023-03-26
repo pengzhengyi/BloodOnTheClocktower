@@ -2,6 +2,7 @@ import { ExileNonTraveller } from '../exception/exile-non-traveller';
 import { NoVoteInExile } from '../exception/no-vote-in-exile';
 import { Nomination, type NominationState } from '../nomination';
 import type { IPlayer } from '../player';
+import type { IVote } from './vote';
 import { Vote } from './vote';
 
 export type ExileState = NominationState;
@@ -22,9 +23,7 @@ export class Exile extends Nomination {
     async getPlayerAboutToExile(
         numPlayer: number
     ): Promise<IPlayer | undefined> {
-        let hasEnoughVoteToExile = await this.vote?.hasEnoughVoteToExile(
-            numPlayer
-        );
+        let hasEnoughVoteToExile = this.vote?.hasEnoughVote(numPlayer);
 
         if (hasEnoughVoteToExile === undefined) {
             const error = new NoVoteInExile(this);
@@ -35,7 +34,7 @@ export class Exile extends Nomination {
         return hasEnoughVoteToExile ? this.nominated : undefined;
     }
 
-    protected createVote(): Vote {
+    protected createVote(): IVote {
         return new Vote(this.nominated, true);
     }
 }

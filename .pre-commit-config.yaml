@@ -33,7 +33,7 @@ repos:
 
   # Remove unused imports
   - repo: https://github.com/myint/autoflake
-    rev: v2.0.1
+    rev: v2.0.2
     hooks:
       - id: autoflake
         stages: [commit]
@@ -80,14 +80,14 @@ repos:
   # Push hooks (runs on push because developers may commit incomplete changes)
   # Python files linter, see .pylintrc for configuration
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.16.1
+    rev: v2.17.1
     hooks:
       - id: pylint
         stages: [push]
 
   # Python security linter
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.4
+    rev: 1.7.5
     hooks:
       - id: bandit
         stages: [push]

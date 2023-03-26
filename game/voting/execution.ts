@@ -122,11 +122,11 @@ export class Execution extends EffectTarget<Execution> {
                     error.nomination.isVoteNotStarted()
                 );
 
-                await new NoVotesWhenCountingVote(vote!).throwWhen((error) =>
-                    error.vote.hasNotVoted()
+                await new NoVotesWhenCountingVote(vote!).throwWhen(
+                    (error) => !error.vote.hasVoted
                 );
 
-                if (!(await vote!.hasEnoughVoteToExecute(numAlivePlayer))) {
+                if (!vote!.hasEnoughVote(numAlivePlayer)) {
                     continue;
                 }
 
