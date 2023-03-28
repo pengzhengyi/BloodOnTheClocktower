@@ -3,7 +3,7 @@ import { Effect, type InteractionContext } from '../effect/effect';
 import type { Execution } from '../voting/execution';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
-import type { Nomination } from '../nomination';
+import type { INomination } from '../nomination';
 import type { RequireExecution } from '../types';
 import type { IPlayer as VirginPlayer } from '../player';
 import {
@@ -46,7 +46,7 @@ export class NominateVirginPenalty extends Effect<Execution> {
         const originalAddNomination = execution.addNomination.bind(execution);
 
         const newAddNomination = async (
-            nomination: Nomination
+            nomination: INomination
         ): Promise<boolean> => {
             const result = await originalAddNomination(nomination);
 

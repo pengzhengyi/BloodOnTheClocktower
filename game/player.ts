@@ -7,6 +7,7 @@ import type { CharacterToken } from './character/character';
 import { DeadReason } from './dead-reason';
 import { Death } from './death';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
+import type { INomination } from './nomination';
 import { Nomination } from './nomination';
 import { type IPlayerState, PlayerState, State } from './player-state';
 
@@ -113,7 +114,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     nominate(
         nominated: IPlayer,
         execution: Execution
-    ): Promise<Nomination | undefined>;
+    ): Promise<INomination | undefined>;
     collectVote(forExile: boolean): Promise<boolean>;
     revokeVoteToken(reason?: string): Promise<boolean>;
 
@@ -540,7 +541,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     async nominate(
         nominated: IPlayer,
         execution: Execution
-    ): Promise<Nomination | undefined> {
+    ): Promise<INomination | undefined> {
         if (!(await this.canNominate)) {
             const error = new DeadPlayerCannotNominate(this);
             await error.resolve();
@@ -549,7 +550,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
             }
         }
 
-        const nomination = await Nomination.init(this, nominated);
+        const nomination = new Nomination(this, nominated);
         if (await execution.addNomination(nomination)) {
             return nomination;
         }

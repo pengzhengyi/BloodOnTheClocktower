@@ -1,4 +1,4 @@
-import type { Nomination } from '../nomination';
+import type { INomination } from '../nomination';
 import type { IPlayer } from '../player';
 import { RecoverableGameError } from './exception';
 
@@ -9,8 +9,8 @@ export class NominatorNominatedBefore extends RecoverableGameError {
     forceAllowNomination = false;
 
     constructor(
-        readonly failedNomination: Nomination,
-        readonly pastNomination: Nomination,
+        readonly failedNomination: INomination,
+        readonly pastNomination: INomination,
         readonly nominator: IPlayer
     ) {
         super(NominatorNominatedBefore.description);

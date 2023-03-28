@@ -1,40 +1,25 @@
 import { ExileNonTraveller } from '../exception/exile-non-traveller';
-import { NoVoteInExile } from '../exception/no-vote-in-exile';
-import { Nomination, type NominationState } from '../nomination';
-import type { IPlayer } from '../player';
+import type { INomination } from '../nomination';
+import { Nomination } from '../nomination';
 import type { IVote } from './vote';
 import { Vote } from './vote';
 
-export type ExileState = NominationState;
+export interface IExile extends INomination {
+    validate(): Promise<void>;
+}
 
-export class Exile extends Nomination {
-    static async init(nominator: IPlayer, nominated: IPlayer) {
-        const exile = new this(nominator, nominated);
-        await exile.validate();
-        return exile;
-    }
-
+export class Exile extends Nomination implements IExile {
     async validate() {
-        await new ExileNonTraveller(this).throwWhenAsync(
-            async (error) => !(await error.exile.nominated.isTraveller)
-        );
-    }
-
-    async getPlayerAboutToExile(
-        numPlayer: number
-    ): Promise<IPlayer | undefined> {
-        let hasEnoughVoteToExile = this.vote?.hasEnoughVote(numPlayer);
-
-        if (hasEnoughVoteToExile === undefined) {
-            const error = new NoVoteInExile(this);
-            await error.resolve();
-            hasEnoughVoteToExile = error.forceAllowExile;
+        if (!(await this.nominated.isTraveller)) {
+            throw new ExileNonTraveller(this);
         }
-
-        return hasEnoughVoteToExile ? this.nominated : undefined;
     }
 
     protected createVote(): IVote {
         return new Vote(this.nominated, true);
     }
+}
+
+export function isExile(value: unknown): value is IExile {
+    return value instanceof Exile;
 }

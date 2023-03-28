@@ -9,7 +9,7 @@ import { UnsupportedOperationForVote } from '../exception/unsupported-operation-
  * Whenever the vote is invalidated, the Vote is at the Invalid state.
  * A vote can be invalidated for various reasons, for example, when players fail to vote due to network delay and the storyteller decide to abort the vote. A invalid vote will be ignored.
  */
-export enum VoteStateName {
+enum VoteStateName {
     Invalid = 'Invalid',
     NotVoted = 'Not Voted',
     Voting = 'Vote in Progress',

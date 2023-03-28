@@ -3,11 +3,11 @@ import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from '../dead-reason';
 import { EffectTarget } from '../effect/effect-target';
+import type { INomination } from '../nomination';
 import { Nomination } from '../nomination';
 import { type IPlayer, Player } from '../player';
 import { type Predicate } from '../types';
 import type { Death } from '../death';
-import { NoVoteInNomination } from '../exception/no-vote-in-nomination';
 import { AttemptMoreThanOneExecution } from '../exception/attempt-more-than-one-execution';
 import { NoVotesWhenCountingVote } from '../exception/no-votes-when-counting-vote';
 import { NominatedNominatedBefore } from '../exception/nominated-nominated-before';
@@ -39,7 +39,7 @@ export class Execution extends EffectTarget<Execution> {
 
     @Expose({ toPlainOnly: true })
     @Type(() => Nomination)
-    readonly nominations: Array<Nomination> = [];
+    readonly nominations: Array<INomination> = [];
 
     @Expose({ toPlainOnly: true })
     @Type(() => Player)
@@ -118,19 +118,16 @@ export class Execution extends EffectTarget<Execution> {
         for (const nomination of this.nominations) {
             try {
                 const vote = nomination.vote;
-                await new NoVoteInNomination(nomination).throwWhen((error) =>
-                    error.nomination.isVoteNotStarted()
-                );
 
-                await new NoVotesWhenCountingVote(vote!).throwWhen(
+                await new NoVotesWhenCountingVote(vote).throwWhen(
                     (error) => !error.vote.hasVoted
                 );
 
-                if (!vote!.hasEnoughVote(numAlivePlayer)) {
+                if (!vote.hasEnoughVote(numAlivePlayer)) {
                     continue;
                 }
 
-                const numVotes = vote!.votes!.length;
+                const numVotes = vote.votes.length;
 
                 if (numVotes > highestNumVotes) {
                     highestNumVotes = numVotes;
@@ -151,8 +148,8 @@ export class Execution extends EffectTarget<Execution> {
     }
 
     getPastNomination(
-        predicate: Predicate<Nomination>
-    ): Nomination | undefined {
+        predicate: Predicate<INomination>
+    ): INomination | undefined {
         return this.nominations.find(predicate);
     }
 
@@ -160,7 +157,7 @@ export class Execution extends EffectTarget<Execution> {
         return instanceToPlain(this);
     }
 
-    async addNomination(nomination: Nomination): Promise<boolean> {
+    async addNomination(nomination: INomination): Promise<boolean> {
         const checks = await Promise.all([
             this.checkNominatorNotNominatedBefore(nomination),
             this.checkNominatedNotNominatedBefore(nomination),
@@ -220,7 +217,7 @@ export class Execution extends EffectTarget<Execution> {
     }
 
     private async checkNominatorNotNominatedBefore(
-        nomination: Nomination
+        nomination: INomination
     ): Promise<boolean> {
         if (this.pastNominators.has(nomination.nominator)) {
             const pastNomination = this.getPastNomination((pastNomination) =>
@@ -239,7 +236,7 @@ export class Execution extends EffectTarget<Execution> {
     }
 
     private async checkNominatedNotNominatedBefore(
-        nomination: Nomination
+        nomination: INomination
     ): Promise<boolean> {
         if (this.pastNominateds.has(nomination.nominated)) {
             const pastNomination = this.getPastNomination((pastNomination) =>

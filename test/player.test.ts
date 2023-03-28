@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
 import { mockPlayer, mockDeadPlayer } from '~/__mocks__/player';
 import { mockExecution } from '~/__mocks__/execution';
-import { Nomination } from '~/game/nomination';
 import { Washerwoman } from '~/__mocks__/character';
 
 describe('test Player serialization', () => {
@@ -26,8 +25,8 @@ describe('test Player Edge Cases', () => {
         const nominated = mockPlayer();
         const execution = mockExecution();
 
-        expect(nominator.nominate(nominated, execution)).not.toBeInstanceOf(
-            Nomination
-        );
+        const nomination = nominator.nominate(nominated, execution);
+
+        expect(nomination).toBeUndefined();
     });
 });

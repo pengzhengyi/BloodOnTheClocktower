@@ -3,6 +3,7 @@ import {
     storytellerConfirmMock,
 } from '~/__mocks__/game-ui';
 import { Execution } from '~/game/voting/execution';
+import type { INomination } from '~/game/nomination';
 import { Nomination } from '~/game/nomination';
 import {
     createBasicPlayers,
@@ -22,7 +23,7 @@ afterAll(() => {
 });
 
 export async function collectVotesForNomination(
-    nomination: Nomination,
+    nomination: INomination,
     playerToWillRaiseHand: Map<IPlayer, boolean>
 ): Promise<Array<IPlayer>> {
     const votedPlayers: Array<IPlayer> = [];
@@ -31,7 +32,7 @@ export async function collectVotesForNomination(
         return (await playerToWillRaiseHand.get(player)) === true;
     });
 
-    for await (const votedPlayer of nomination.startVote(
+    for await (const votedPlayer of nomination.collectVotes(
         playerToWillRaiseHand.keys()
     )) {
         votedPlayers.push(votedPlayer);
@@ -47,7 +48,7 @@ async function* addNominations(
     nominationPlayers: Array<[IPlayer, IPlayer]>
 ): AsyncIterable<boolean> {
     for (const [nominator, nominated] of nominationPlayers) {
-        const nomination = await Nomination.init(nominator, nominated);
+        const nomination = new Nomination(nominator, nominated);
         yield await execution.addNomination(nomination);
     }
 }
