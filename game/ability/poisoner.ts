@@ -185,14 +185,12 @@ class BasePoisonerAbility extends Ability<
             BasePoisonerAbility.description
         );
 
-        if (chosen === undefined) {
-            const error = new PoisonerNotChoosePlayerToPoison(
-                poisonerPlayer,
-                context
-            );
-            await error.resolve();
-            chosen = error.correctedPlayerToPoison;
-        }
+        chosen = await PoisonerNotChoosePlayerToPoison.ternary(
+            () => chosen !== undefined,
+            () => chosen,
+            () => new PoisonerNotChoosePlayerToPoison(poisonerPlayer, context),
+            (error) => error.correctedPlayerToPoison
+        );
 
         return chosen as IPlayer;
     }

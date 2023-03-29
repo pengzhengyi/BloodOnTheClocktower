@@ -126,11 +126,12 @@ class BaseMonkProtectAbility extends Ability<
             BaseMonkProtectAbility.description
         );
 
-        if (chosen === undefined) {
-            const error = new MonkNotChoosePlayerToProtect(monkPlayer, context);
-            await error.resolve();
-            chosen = error.correctedPlayerToProtect;
-        }
+        chosen = await MonkNotChoosePlayerToProtect.ternary(
+            () => chosen !== undefined,
+            () => chosen,
+            () => new MonkNotChoosePlayerToProtect(monkPlayer, context),
+            (error) => error.correctedPlayerToProtect
+        );
 
         return chosen as IPlayer;
     }

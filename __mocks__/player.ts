@@ -48,7 +48,11 @@ export async function createBasicPlayers(
 }
 
 export function mockPlayer() {
-    return mock<IPlayer>();
+    const player = mock<IPlayer>();
+    (player as any).equals = jest.fn((otherPlayer: IPlayer) =>
+        Object.is(player, otherPlayer)
+    );
+    return player;
 }
 
 export function mockAlivePlayer(): IPlayer {
@@ -116,7 +120,10 @@ export function mockPlayerWithState(
 
 export async function setPlayerDead(player: IPlayer): Promise<void> {
     storytellerConfirmMock.mockImplementationOnce((reason: string) => {
-        expect(reason).toContain((Player as any).revokeVoteTokenDefaultPrompt);
+        expect(reason).toContain(
+            (Player as unknown as Record<string, unknown>)
+                .revokeVoteTokenDefaultPrompt
+        );
         return Promise.resolve(true);
     });
     await player.setDead();

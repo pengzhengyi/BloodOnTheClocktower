@@ -96,14 +96,12 @@ class BaseSlayerAbility extends Ability<
             BaseSlayerAbility.description
         );
 
-        if (chosen === undefined) {
-            const error = new SlayerNotChoosePlayerToKill(
-                slayerPlayer,
-                context
-            );
-            await error.resolve();
-            chosen = error.correctedPlayerToKill;
-        }
+        chosen = await SlayerNotChoosePlayerToKill.ternary(
+            () => chosen !== undefined,
+            () => chosen,
+            () => new SlayerNotChoosePlayerToKill(slayerPlayer, context),
+            (error) => error.correctedPlayerToKill
+        );
 
         return chosen;
     }

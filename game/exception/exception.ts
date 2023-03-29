@@ -4,6 +4,8 @@ import type {
     Predicate,
     StaticThis,
     AsyncPredicate,
+    AnyFactory,
+    AnyTransform,
 } from '../types';
 
 import { InteractionEnvironment } from '~/interaction/environment/environment';
@@ -77,6 +79,26 @@ export class RecoverableGameError extends GameError {
             }
 
             throw error;
+        }
+    }
+
+    static async ternary<TError extends RecoverableGameError, TResult>(
+        this: StaticThis<TError>,
+        successWhen: AnyFactory<boolean>,
+        successCallback: AnyFactory<TResult>,
+        errorFactory: AnyFactory<TError>,
+        onErrorResolvedCallback: AnyTransform<TError, TResult>
+    ): Promise<TResult> {
+        if (await successWhen()) {
+            const result = await successCallback();
+            return result;
+        } else {
+            const error = await errorFactory();
+            await error.resolve();
+            const resultAfterErrorResolved = await onErrorResolvedCallback(
+                error
+            );
+            return resultAfterErrorResolved;
         }
     }
 

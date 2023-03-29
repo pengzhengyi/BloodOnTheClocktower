@@ -34,7 +34,7 @@ export function mockObject<O, T extends any[]>(
     propertyNames: (string & keyof O)[],
     propertyValues: T,
     functions: { [key: string]: ModifyMockFunction }
-) {
+): O {
     const mockObject = mockWithPropertyValues<O, T>(
         propertyNames,
         propertyValues

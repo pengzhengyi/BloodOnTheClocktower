@@ -136,14 +136,12 @@ export class ButlerAbility extends Ability<
             ButlerAbility.description
         );
 
-        if (chosenPlayer === undefined) {
-            const error = new ButlerNotChooseMasterToFollow(
-                butlerPlayer,
-                context
-            );
-            await error.resolve();
-            chosenPlayer = error.correctedMaster;
-        }
+        chosenPlayer = await ButlerNotChooseMasterToFollow.ternary(
+            () => chosenPlayer !== undefined,
+            () => chosenPlayer,
+            () => new ButlerNotChooseMasterToFollow(butlerPlayer, context),
+            (error) => error.correctedMaster
+        );
 
         return chosenPlayer;
     }

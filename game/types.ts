@@ -37,6 +37,10 @@ export type Action = () => void;
 export type Task<T = undefined> = (value: T) => void;
 export type AsyncTask<T = undefined> = (value: T) => Promise<void>;
 export type Transform<T1, T2 = T1> = (value: T1) => T2;
+export type AsyncTransform<T1, T2 = T1> = (value: T1) => Promise<T2>;
+export type AnyTransform<T1, T2 = T1> =
+    | Transform<T1, T2>
+    | AsyncTransform<T1, T2>;
 export type Reducer<T1, T2> = (previousValue: T1, currentValue: T2) => T1;
 export type AsyncReducer<T1, T2> = (
     previousValue: Promise<T1>,

@@ -116,15 +116,18 @@ class BaseGetFortuneTellerInformationAbility extends GetCharacterInformationAbil
             BaseGetFortuneTellerInformationAbility.description
         );
 
-        if (!BaseGetFortuneTellerInformationAbility.canChoose(chosenPlayers)) {
-            const error = new FortuneTellerChooseInvalidPlayers(
-                fortuneTellerPlayer,
-                chosenPlayers,
-                context
-            );
-            await error.resolve();
-            chosenPlayers = error.corrected;
-        }
+        chosenPlayers = await FortuneTellerChooseInvalidPlayers.ternary(
+            () =>
+                BaseGetFortuneTellerInformationAbility.canChoose(chosenPlayers),
+            () => chosenPlayers,
+            () =>
+                new FortuneTellerChooseInvalidPlayers(
+                    fortuneTellerPlayer,
+                    chosenPlayers,
+                    context
+                ),
+            (error) => error.corrected
+        );
 
         return chosenPlayers;
     }

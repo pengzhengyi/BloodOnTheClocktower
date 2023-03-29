@@ -57,14 +57,16 @@ export class GetRavenkeeperInformationAbility extends GetCharacterInformationAbi
             GetRavenkeeperInformationAbility.description
         );
 
-        if (chosen === undefined) {
-            const error = new RavenkeeperNotChoosePlayerToProtect(
-                ravenkeeperPlayer,
-                context
-            );
-            await error.resolve();
-            chosen = error.correctedPlayer;
-        }
+        chosen = await RavenkeeperNotChoosePlayerToProtect.ternary(
+            () => chosen !== undefined,
+            () => chosen,
+            () =>
+                new RavenkeeperNotChoosePlayerToProtect(
+                    ravenkeeperPlayer,
+                    context
+                ),
+            (error) => error.correctedPlayer
+        );
 
         return chosen;
     }

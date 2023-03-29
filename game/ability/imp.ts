@@ -182,12 +182,12 @@ class BaseImpAbility extends Ability<AbilityUseContext, ImpAbilityUseResult> {
             players,
             BaseImpAbility.description
         );
-
-        if (chosenPlayer === undefined) {
-            const error = new ImpNotChoosePlayerToKill(impPlayer, context);
-            await error.resolve();
-            chosenPlayer = error.correctedPlayerToKill;
-        }
+        chosenPlayer = await ImpNotChoosePlayerToKill.ternary(
+            () => chosenPlayer !== undefined,
+            () => chosenPlayer,
+            () => new ImpNotChoosePlayerToKill(impPlayer, context),
+            (error) => error.correctedPlayerToKill
+        );
 
         return chosenPlayer;
     }

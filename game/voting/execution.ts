@@ -6,12 +6,13 @@ import { EffectTarget } from '../effect/effect-target';
 import type { INomination } from '../nomination';
 import { type IPlayer } from '../player';
 import type { TJSON } from '../types';
-import { type Predicate } from '../types';
+import { TAUTOLOGY, type Predicate } from '../types';
 import type { Death } from '../death';
 import { AttemptMoreThanOneExecution } from '../exception/attempt-more-than-one-execution';
 import { NoVotesWhenCountingVote } from '../exception/no-votes-when-counting-vote';
 import { NominatedNominatedBefore } from '../exception/nominated-nominated-before';
 import { NominatorNominatedBefore } from '../exception/nominator-nominated-before';
+import { CannotFindExistingNomination } from '../exception/cannot-find-existing-nomination';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IExecution extends IEffectTarget<IExecution> {
@@ -251,46 +252,59 @@ export class Execution extends EffectTarget<IExecution> implements IExecution {
 
     protected findPastNomination(
         predicate: Predicate<INomination>
-    ): INomination | undefined {
-        return this.nominations.find(predicate);
+    ): INomination {
+        const found = this.nominations.find(predicate);
+        if (found === undefined) {
+            throw new CannotFindExistingNomination(predicate, this.nominations);
+        } else {
+            return found;
+        }
     }
 
     private async checkNominatorNotNominatedBefore(
         nomination: INomination
     ): Promise<boolean> {
-        if (this.pastNominators.has(nomination.nominator)) {
-            const pastNomination = this.findPastNomination((pastNomination) =>
-                pastNomination.nominator.equals(nomination.nominator)
-            )!;
-            const error = new NominatorNominatedBefore(
-                nomination,
-                pastNomination,
-                nomination.nominator
-            );
-            await error.resolve();
-            return error.forceAllowNomination;
-        }
+        const validationSucceed = await NominatorNominatedBefore.ternary(
+            () => !this.pastNominators.has(nomination.nominator),
+            TAUTOLOGY,
+            () => {
+                const pastNomination = this.findPastNomination(
+                    (pastNomination) =>
+                        pastNomination.nominator.equals(nomination.nominator)
+                );
+                return new NominatorNominatedBefore(
+                    nomination,
+                    pastNomination,
+                    nomination.nominator
+                );
+            },
+            (error) => error.forceAllowNomination
+        );
 
-        return true;
+        return validationSucceed;
     }
 
     private async checkNominatedNotNominatedBefore(
         nomination: INomination
     ): Promise<boolean> {
-        if (this.pastNominateds.has(nomination.nominated)) {
-            const pastNomination = this.findPastNomination((pastNomination) =>
-                pastNomination.nominated.equals(nomination.nominated)
-            )!;
-            const error = new NominatedNominatedBefore(
-                nomination,
-                pastNomination,
-                nomination.nominated
-            );
-            await error.resolve();
-            return error.forceAllowNomination;
-        }
+        const validationSucceed = await NominatedNominatedBefore.ternary(
+            () => !this.pastNominateds.has(nomination.nominated),
+            TAUTOLOGY,
+            () => {
+                const pastNomination = this.findPastNomination(
+                    (pastNomination) =>
+                        pastNomination.nominated.equals(nomination.nominated)
+                );
+                return new NominatedNominatedBefore(
+                    nomination,
+                    pastNomination,
+                    nomination.nominated
+                );
+            },
+            (error) => error.forceAllowNomination
+        );
 
-        return true;
+        return validationSucceed;
     }
 }
 

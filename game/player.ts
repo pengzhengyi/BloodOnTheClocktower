@@ -535,15 +535,15 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     async nominate(nominated: IPlayer): Promise<INomination | undefined> {
-        if (!(await this.canNominate)) {
-            const error = new DeadPlayerCannotNominate(this);
-            await error.resolve();
-            if (!error.forceAllowNomination) {
-                return;
-            }
-        }
-
-        const nomination = new Nomination(this, nominated);
+        const nomination = await DeadPlayerCannotNominate.ternary(
+            () => this.canNominate,
+            () => new Nomination(this, nominated),
+            () => new DeadPlayerCannotNominate(this),
+            (error) =>
+                error.forceAllowNomination
+                    ? new Nomination(this, nominated)
+                    : undefined
+        );
         return nomination;
     }
 
