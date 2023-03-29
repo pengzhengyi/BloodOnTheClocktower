@@ -20,12 +20,18 @@ describe('test Player serialization', () => {
 });
 
 describe('test Player Edge Cases', () => {
-    test('Only alive players may nominate.', () => {
+    test('Only alive players may nominate.', async () => {
         const nominator = mockDeadPlayer();
         const nominated = mockPlayer();
         const execution = mockExecution();
 
-        const nomination = nominator.nominate(nominated, execution);
+        const nomination = await nominator.nominate(nominated);
+
+        if (nomination !== undefined) {
+            expect(await execution.addNomination(nomination)).toBeTrue();
+        } else {
+            expect.fail('Unable to add nomination to execution');
+        }
 
         expect(nomination).toBeUndefined();
     });

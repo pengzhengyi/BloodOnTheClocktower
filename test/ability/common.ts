@@ -355,7 +355,12 @@ export async function expectAfterNominateVirgin(
     }
 
     const [_gamePhase, recover] = mockGamePhaseTemporarily(3);
-    const nomination = await nominator.nominate(virginPlayer, execution);
+    const nomination = await nominator.nominate(virginPlayer);
+    if (nomination !== undefined) {
+        expect(await execution.addNomination(nomination)).toBeTrue();
+    } else {
+        expect.fail('Unable to add nomination to execution');
+    }
 
     recover();
 
