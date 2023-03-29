@@ -1,6 +1,6 @@
 import { DeadReason } from '../dead-reason';
 import { Effect, type InteractionContext } from '../effect/effect';
-import type { Execution } from '../voting/execution';
+import type { IExecution } from '../voting/execution';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { INomination } from '../nomination';
@@ -16,7 +16,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
 } from './status';
 
-export class NominateVirginPenalty extends Effect<Execution> {
+export class NominateVirginPenalty extends Effect<IExecution> {
     static readonly description =
         'The Virgin may inadvertently execute their accuser.';
 
@@ -30,7 +30,7 @@ export class NominateVirginPenalty extends Effect<Execution> {
         super();
     }
 
-    isApplicable(context: InteractionContext<Execution>): boolean {
+    isApplicable(context: InteractionContext<IExecution>): boolean {
         return (
             super.isApplicable(context) &&
             this.isGetProperty(context, 'addNomination') &&
@@ -39,10 +39,10 @@ export class NominateVirginPenalty extends Effect<Execution> {
     }
 
     protected applyCooperativelyImpl(
-        context: InteractionContext<Execution>,
-        next: NextFunction<InteractionContext<Execution>>
-    ): InteractionContext<Execution> {
-        const execution = context.interaction.target as Execution;
+        context: InteractionContext<IExecution>,
+        next: NextFunction<InteractionContext<IExecution>>
+    ): InteractionContext<IExecution> {
+        const execution = context.interaction.target as IExecution;
         const originalAddNomination = execution.addNomination.bind(execution);
 
         const newAddNomination = async (
@@ -124,7 +124,7 @@ export class VirginAbility extends Ability<
     }
 
     protected addPenaltyToExecution(
-        execution: Execution,
+        execution: IExecution,
         virginPlayer: VirginPlayer
     ) {
         if (this.penalty === undefined) {

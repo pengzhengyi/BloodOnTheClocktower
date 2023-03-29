@@ -1,4 +1,4 @@
-import type { Execution } from './voting/execution';
+import type { IExecution } from './voting/execution';
 import type { IGame } from './game';
 import type { IPlayer } from './player';
 import type {
@@ -170,7 +170,7 @@ export interface RequireReason {
 }
 
 export interface RequireExecution {
-    execution: Execution;
+    execution: IExecution;
 }
 
 export interface RequireInfoType {

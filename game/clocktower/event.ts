@@ -1,6 +1,6 @@
 import type { Death } from '../death';
-import type { Execution } from '../voting/execution';
+import type { IExecution } from '../voting/execution';
 import type { IExile } from '../voting/exile';
 import type { Phase } from '../phase';
 
-export type Event = Execution | IExile | Phase | Death;
+export type Event = IExecution | IExile | Phase | Death;

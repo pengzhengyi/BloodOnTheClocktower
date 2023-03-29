@@ -1,5 +1,5 @@
 import { Effect, type InteractionContext } from '../effect/effect';
-import type { Execution } from '../voting/execution';
+import type { IExecution } from '../voting/execution';
 import type { IGame } from '../game';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
@@ -17,7 +17,7 @@ import {
     AbilitySuccessUseWhenHasEffect,
 } from './status';
 
-export class SaintEndsGamePenalty extends Effect<Execution> {
+export class SaintEndsGamePenalty extends Effect<IExecution> {
     static readonly description =
         'The Saint ends the game if they are executed.';
 
@@ -28,7 +28,7 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
         super();
     }
 
-    isApplicable(context: InteractionContext<Execution>): boolean {
+    isApplicable(context: InteractionContext<IExecution>): boolean {
         return (
             super.isApplicable(context) &&
             this.isGetProperty(context, 'execute')
@@ -36,13 +36,16 @@ export class SaintEndsGamePenalty extends Effect<Execution> {
     }
 
     protected applyCooperativelyImpl(
-        context: InteractionContext<Execution>,
-        next: NextFunction<InteractionContext<Execution>>
-    ): InteractionContext<Execution> {
-        const execution = context.interaction.target as Execution;
+        context: InteractionContext<IExecution>,
+        next: NextFunction<InteractionContext<IExecution>>
+    ): InteractionContext<IExecution> {
+        const execution = context.interaction.target as IExecution;
         const originalExecute = execution.execute.bind(execution);
 
-        const newExecute: Execution['execute'] = async (player, deadReason) => {
+        const newExecute: IExecution['execute'] = async (
+            player,
+            deadReason
+        ) => {
             const death = await originalExecute(player, deadReason);
 
             if (death !== undefined && death.isFor(this.saintPlayer)) {
@@ -110,7 +113,7 @@ class BaseSaintAbility extends Ability<
         throw new Error('Method not implemented.');
     }
 
-    protected addPenaltyToExecution(execution: Execution) {
+    protected addPenaltyToExecution(execution: IExecution) {
         execution.effects.add(this.penalty, BasicGamePhaseKind.Other);
     }
 

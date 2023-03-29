@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
-import type { Execution } from '~/game/voting/execution';
+import type { IExecution } from '~/game/voting/execution';
 
 export function mockExecution() {
-    return mock<Execution>();
+    return mock<IExecution>();
 }

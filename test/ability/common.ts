@@ -62,6 +62,7 @@ import type {
     SlayerAbility,
     SlayerAbilityUseResult,
 } from '~/game/ability/slayer';
+import type { IExecution } from '~/game/voting/execution';
 import { Execution } from '~/game/voting/execution';
 import type { ButlerAbility } from '~/game/ability/butler';
 import { DrunkAbility } from '~/game/ability/drunk';
@@ -332,7 +333,7 @@ export async function mockSpyRegisterAs<T>(
 export async function expectAfterNominateVirgin(
     nominator: IPlayer,
     virginPlayer: IPlayer,
-    execution?: Execution,
+    execution?: IExecution,
     ability?: VirginAbility,
     context?: VirginAbilityUseContext,
     expectDead = true,
@@ -495,11 +496,13 @@ export async function expectAfterPoisonerPoison(
 }
 
 export async function expectAfterExecute(
-    execution: Execution,
+    execution: IExecution,
     numAlivePlayer: number,
     expectPlayerToBeDead?: IPlayer
 ): Promise<Death | undefined> {
-    const toExecute = await execution.setPlayerAboutToDie(numAlivePlayer);
+    const toExecute = await execution.setPlayerAboutToDieForExecution(
+        numAlivePlayer
+    );
     if (expectPlayerToBeDead === undefined) {
         expect(toExecute).toBeUndefined();
     } else {
@@ -566,7 +569,7 @@ export async function expectScarletWomanBecomeDemonAfterDemonDeath(
 }
 
 export async function expectAfterExecuteSaint(
-    execution: Execution,
+    execution: IExecution,
     saintPlayer: IPlayer,
     expectGameEnd = true,
     ability?: SaintAbility,

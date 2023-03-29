@@ -2,7 +2,7 @@ import type { Death } from '../death';
 import { EventNotExistInDate } from '../exception/event-not-exist-in-date';
 import { PastMomentRewrite } from '../exception/past-moment-rewrite';
 import { RecordUnknownEventInDiary } from '../exception/record-unknown-event-in-diary';
-import type { Execution } from '../voting/execution';
+import type { IExecution } from '../voting/execution';
 import type { IExile } from '../voting/exile';
 import { moment, type Moment } from '../../utils/moment';
 import { Phase } from '../phase';
@@ -28,7 +28,7 @@ type MomentQuery =
  */
 export interface IDiary {
     // fundamental properties
-    readonly execution: IToll<Execution> | undefined;
+    readonly execution: IToll<IExecution> | undefined;
     readonly exiles: Array<IToll<IExile>>;
     readonly deaths: Map<IPlayer, IToll<Death>>;
     readonly phaseToMoment: Map<Phase, IToll<Phase>>;
@@ -66,7 +66,7 @@ abstract class AbstractDiary implements IDiary {
 
     protected declare recordTollForPhase: RecordTollForPhase;
 
-    get execution(): IToll<Execution> | undefined {
+    get execution(): IToll<IExecution> | undefined {
         return this.recordTollForExecution.execution;
     }
 

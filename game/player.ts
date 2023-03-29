@@ -21,7 +21,7 @@ import {
     Traveller,
 } from './character/character-type';
 import { DeadPlayerCannotNominate } from './exception/dead-player-cannot-nominate';
-import type { Execution } from './voting/execution';
+import type { IExecution } from './voting/execution';
 import { DrunkReason } from './drunk-reason';
 import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';
@@ -113,7 +113,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     removePoison(reason: IPoisonedReason): Promise<boolean>;
     nominate(
         nominated: IPlayer,
-        execution: Execution
+        execution: IExecution
     ): Promise<INomination | undefined>;
     collectVote(forExile: boolean): Promise<boolean>;
     revokeVoteToken(reason?: string): Promise<boolean>;
@@ -335,7 +335,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     get canNominate() {
-        return this.alive;
+        return Promise.resolve(this.alive);
     }
 
     get canVote(): Promise<boolean> {
@@ -540,7 +540,7 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
 
     async nominate(
         nominated: IPlayer,
-        execution: Execution
+        execution: IExecution
     ): Promise<INomination | undefined> {
         if (!(await this.canNominate)) {
             const error = new DeadPlayerCannotNominate(this);

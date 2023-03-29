@@ -146,7 +146,7 @@ describe('Test basic functionalities', () => {
             ]
         );
 
-        await execution.setPlayerAboutToDie(10 - 3);
+        await execution.setPlayerAboutToDieForExecution(10 - 3);
         expect(execution.toExecute).toEqual(players[7]);
         expect(await execution.execute()).toBeDefined();
         expect(await players[7].dead).toBeDefined();
@@ -188,9 +188,9 @@ describe('Test Execution Edge Cases', () => {
             [new Map(players.map((player) => [player, true]))]
         );
 
-        expect(await execution.setPlayerAboutToDie(players.length)).toBe(
-            players[1]
-        );
+        expect(
+            await execution.setPlayerAboutToDieForExecution(players.length)
+        ).toBe(players[1]);
         expect(await execution.execute()).toBeDefined();
         expect(execution.executed).toBe(players[1]);
 

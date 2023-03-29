@@ -2,10 +2,12 @@
 import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from '../dead-reason';
+import type { IEffectTarget } from '../effect/effect-target';
 import { EffectTarget } from '../effect/effect-target';
 import type { INomination } from '../nomination';
 import { Nomination } from '../nomination';
 import { type IPlayer, Player } from '../player';
+import type { TJSON } from '../types';
 import { type Predicate } from '../types';
 import type { Death } from '../death';
 import { AttemptMoreThanOneExecution } from '../exception/attempt-more-than-one-execution';
@@ -14,12 +16,52 @@ import { NominatedNominatedBefore } from '../exception/nominated-nominated-befor
 import { NominatorNominatedBefore } from '../exception/nominator-nominated-before';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
+export interface IExecution extends IEffectTarget<IExecution> {
+    readonly nominations: Array<INomination>;
+
+    readonly toExecute: IPlayer | undefined;
+
+    readonly executed: IPlayer | undefined;
+
+    /**
+     * {@link `glossary["About to die"]`}
+     * @return The player who has enough votes to be executed and more votes than any other player today.
+     *
+     * @param numAlivePlayer Number of alive players in game.
+     */
+    getPlayerAboutToDie(numAlivePlayer: number): Promise<IPlayer | undefined>;
+
+    /**
+     * Set the player about to die as the one to be executed.
+     *
+     * @param numAlivePlayer Number of alive players in game.
+     */
+    setPlayerAboutToDieForExecution(
+        numAlivePlayer: number
+    ): Promise<IPlayer | undefined>;
+
+    /**
+     * Execute the player about to die by default or when another player is provided as alternative, execute that player.
+     *
+     * @param player A player to be executed. If provided, this player will be executed immediately regardless whether another player is set to be executed. When not provided, the execution will carry out as normal.
+     * @returns A death describing the execution effect if someone is executed, undefined when no one is executed.
+     */
+    execute(
+        playerToExecuteInstead?: IPlayer,
+        deadReason?: DeadReason
+    ): Promise<Death | undefined>;
+
+    addNomination(nomination: INomination): Promise<boolean>;
+
+    toJSON(): TJSON;
+}
+
 /**
  * {@link `glossary["Execution"]`}
  * The group decision to kill a player other than a Traveller during the day. There is a maximum of one execution per day, but there may be none. A nominated player is executed if they got votes equal to at least half the number of alive players, and more votes than any other nominated player.
  */
 @Exclude()
-export class Execution extends EffectTarget<Execution> {
+export class Execution extends EffectTarget<IExecution> implements IExecution {
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
         keyof ProxyHandler<Execution>
     > = ['get'];
@@ -69,41 +111,6 @@ export class Execution extends EffectTarget<Execution> {
     }
 
     /**
-     * Set the player about to die as the one to be executed.
-     *
-     * @param numAlivePlayer Number of alive players in game.
-     */
-    async setPlayerAboutToDie(
-        numAlivePlayer: number
-    ): Promise<IPlayer | undefined> {
-        const playerAboutToDie = await this.getPlayerAboutToDie(numAlivePlayer);
-        this._toExecute = playerAboutToDie;
-        return playerAboutToDie;
-    }
-
-    /**
-     * Execute the player about to die or another player when provided as replacement.
-     *
-     * @param player A player to be executed. If provided, this player will be executed immediately regardless whether another player is set to be executed. When not provided, the execution will carry out as intended.
-     * @returns Whether a player has been executed.
-     */
-    async execute(
-        player?: IPlayer,
-        deadReason: DeadReason = DeadReason.Executed
-    ): Promise<Death | undefined> {
-        if (!this.willExecute(player)) {
-            return;
-        }
-
-        player ??= this.toExecute;
-        if (player === undefined) {
-            return;
-        }
-
-        return await this.tryExecute(player, deadReason);
-    }
-
-    /**
      * {@link `glossary["About to die"]`}
      * @return The player who has enough votes to be executed and more votes than any other player today.
      *
@@ -147,14 +154,39 @@ export class Execution extends EffectTarget<Execution> {
         return playerAboutToDie;
     }
 
-    getPastNomination(
-        predicate: Predicate<INomination>
-    ): INomination | undefined {
-        return this.nominations.find(predicate);
+    /**
+     * Set the player about to die as the one to be executed.
+     *
+     * @param numAlivePlayer Number of alive players in game.
+     */
+    async setPlayerAboutToDieForExecution(
+        numAlivePlayer: number
+    ): Promise<IPlayer | undefined> {
+        const playerAboutToDie = await this.getPlayerAboutToDie(numAlivePlayer);
+        this._toExecute = playerAboutToDie;
+        return playerAboutToDie;
     }
 
-    toJSON() {
-        return instanceToPlain(this);
+    /**
+     * Execute the player about to die or another player when provided as replacement.
+     *
+     * @param playerToExecuteInstead A player to be executed. If provided, this player will be executed immediately regardless whether another player is set to be executed. When not provided, the execution will carry out as intended.
+     * @returns Whether a player has been executed.
+     */
+    async execute(
+        playerToExecuteInstead?: IPlayer,
+        deadReason: DeadReason = DeadReason.Executed
+    ): Promise<Death | undefined> {
+        if (!this.willExecute(playerToExecuteInstead)) {
+            return;
+        }
+
+        playerToExecuteInstead ??= this.toExecute;
+        if (playerToExecuteInstead === undefined) {
+            return;
+        }
+
+        return await this.tryExecute(playerToExecuteInstead, deadReason);
     }
 
     async addNomination(nomination: INomination): Promise<boolean> {
@@ -173,6 +205,10 @@ export class Execution extends EffectTarget<Execution> {
         }
 
         return false;
+    }
+
+    toJSON() {
+        return instanceToPlain(this);
     }
 
     protected willExecute(player?: IPlayer): boolean {
@@ -216,11 +252,17 @@ export class Execution extends EffectTarget<Execution> {
         return `Confirm player ${player} will be executed immediately?`;
     }
 
+    protected findPastNomination(
+        predicate: Predicate<INomination>
+    ): INomination | undefined {
+        return this.nominations.find(predicate);
+    }
+
     private async checkNominatorNotNominatedBefore(
         nomination: INomination
     ): Promise<boolean> {
         if (this.pastNominators.has(nomination.nominator)) {
-            const pastNomination = this.getPastNomination((pastNomination) =>
+            const pastNomination = this.findPastNomination((pastNomination) =>
                 pastNomination.nominator.equals(nomination.nominator)
             )!;
             const error = new NominatorNominatedBefore(
@@ -239,7 +281,7 @@ export class Execution extends EffectTarget<Execution> {
         nomination: INomination
     ): Promise<boolean> {
         if (this.pastNominateds.has(nomination.nominated)) {
-            const pastNomination = this.getPastNomination((pastNomination) =>
+            const pastNomination = this.findPastNomination((pastNomination) =>
                 pastNomination.nominated.equals(nomination.nominated)
             )!;
             const error = new NominatedNominatedBefore(
@@ -253,4 +295,8 @@ export class Execution extends EffectTarget<Execution> {
 
         return true;
     }
+}
+
+export function isExecution(value: unknown): value is IExecution {
+    return value instanceof Execution;
 }
