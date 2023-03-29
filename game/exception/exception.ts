@@ -59,23 +59,18 @@ export class AggregateError<E extends Error = BaseError> extends Error {
 
 export class GameError extends BaseError {}
 
-// eslint-disable-next-line no-use-before-define
-export type RecoveryAction<TError extends RecoverableGameError, TResult> = (
-    error: TError
-) => Promise<TResult>;
-
 export class RecoverableGameError extends GameError {
     static async catch<TError extends RecoverableGameError, TResult>(
         this: StaticThis<TError>,
         action: AsyncFactory<TResult>,
-        recovery: RecoveryAction<TError, TResult>
+        onErrorResolvedCallback: AnyTransform<TError, TResult>
     ): Promise<TResult> {
         try {
             return await action();
         } catch (error) {
             if (error instanceof this) {
                 await error.resolve();
-                return await recovery(error);
+                return await onErrorResolvedCallback(error);
             }
 
             throw error;

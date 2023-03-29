@@ -1,11 +1,9 @@
 /* eslint-disable no-dupe-class-members */
 import { Deque } from 'js-sdsl';
-import {
-    type RecoverableGameError,
-    type RecoveryAction,
-} from './exception/exception';
+import { type RecoverableGameError } from './exception/exception';
 import type {
     AnyPredicate,
+    AnyTransform,
     AsyncPredicate,
     AsyncReducer,
     Factory,
@@ -441,7 +439,7 @@ export class Generator<T> implements Iterable<T> {
     >(
         errorType: StaticThis<TError> & TErrorClassType,
         iterable: Iterable<T | TError>,
-        recovery: RecoveryAction<TError, T>
+        onErrorResolvedCallback: AnyTransform<TError, T>
     ): Iterable<Promise<T>> {
         const toPromise = (value: T | TError) =>
             value instanceof Error
@@ -450,7 +448,7 @@ export class Generator<T> implements Iterable<T> {
         const promises = this.toPromise(toPromise, iterable) as Iterable<
             Promise<T>
         >;
-        return this.catchAsync(errorType, promises, recovery);
+        return this.catchAsync(errorType, promises, onErrorResolvedCallback);
     }
 
     static catchAsync<
@@ -460,10 +458,14 @@ export class Generator<T> implements Iterable<T> {
     >(
         errorType: StaticThis<TError> & TErrorClassType,
         iterable: Iterable<Promise<T>>,
-        recovery: RecoveryAction<TError, T>
+        onErrorResolvedCallback: AnyTransform<TError, T>
     ): Iterable<Promise<T>> {
         return this.map(
-            (action) => errorType.catch<TError, T>(() => action, recovery),
+            (action) =>
+                errorType.catch<TError, T>(
+                    () => action,
+                    onErrorResolvedCallback
+                ),
             iterable
         );
     }
@@ -1156,10 +1158,10 @@ export class Generator<T> implements Iterable<T> {
     >(
         this: Generator<TResult | TError>,
         errorType: StaticThis<TError> & TErrorClassType,
-        recovery: RecoveryAction<TError, TResult>
+        onErrorResolvedCallback: AnyTransform<TError, TResult>
     ) {
         return this.become((iterable) =>
-            Generator.catch(errorType, iterable, recovery)
+            Generator.catch(errorType, iterable, onErrorResolvedCallback)
         );
     }
 
@@ -1170,10 +1172,10 @@ export class Generator<T> implements Iterable<T> {
     >(
         this: Generator<Promise<TResult>>,
         errorType: StaticThis<TError> & TErrorClassType,
-        recovery: RecoveryAction<TError, TResult>
+        onErrorResolvedCallback: AnyTransform<TError, TResult>
     ) {
         return this.become((iterable) =>
-            Generator.catchAsync(errorType, iterable, recovery)
+            Generator.catchAsync(errorType, iterable, onErrorResolvedCallback)
         );
     }
 
