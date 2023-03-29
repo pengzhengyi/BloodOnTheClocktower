@@ -29,7 +29,7 @@ import { PlayerHasUnclearAlignment } from './exception/player-has-unclear-alignm
 import { ReassignCharacterToPlayer } from './exception/reassign-character-to-player';
 import type { IAbilities } from './ability/abilities';
 import { Abilities } from './ability/abilities';
-import type { CharacterAssignmentResult } from './types';
+import type { CharacterAssignmentResult, TJSON } from './types';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IPlayer extends IEffectTarget<IPlayer> {
@@ -141,7 +141,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
         key: K
     ): V;
 
-    toJSON(): Record<string, any>;
+    toJSON(): TJSON;
     valueOf(): string;
     equals(player: IPlayer): boolean;
     toString(): string;

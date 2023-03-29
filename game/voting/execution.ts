@@ -1,12 +1,10 @@
 /* eslint-disable no-use-before-define */
 import '@abraham/reflection';
-import { Exclude, Expose, instanceToPlain, Type } from 'class-transformer';
 import { DeadReason } from '../dead-reason';
 import type { IEffectTarget } from '../effect/effect-target';
 import { EffectTarget } from '../effect/effect-target';
 import type { INomination } from '../nomination';
-import { Nomination } from '../nomination';
-import { type IPlayer, Player } from '../player';
+import { type IPlayer } from '../player';
 import type { TJSON } from '../types';
 import { type Predicate } from '../types';
 import type { Death } from '../death';
@@ -60,7 +58,6 @@ export interface IExecution extends IEffectTarget<IExecution> {
  * {@link `glossary["Execution"]`}
  * The group decision to kill a player other than a Traveller during the day. There is a maximum of one execution per day, but there may be none. A nominated player is executed if they got votes equal to at least half the number of alive players, and more votes than any other nominated player.
  */
-@Exclude()
 export class Execution extends EffectTarget<IExecution> implements IExecution {
     protected static defaultEnabledProxyHandlerPropertyNames: Array<
         keyof ProxyHandler<Execution>
@@ -79,18 +76,12 @@ export class Execution extends EffectTarget<IExecution> implements IExecution {
         return execution.getProxy();
     }
 
-    @Expose({ toPlainOnly: true })
-    @Type(() => Nomination)
     readonly nominations: Array<INomination> = [];
 
-    @Expose({ toPlainOnly: true })
-    @Type(() => Player)
     get toExecute(): IPlayer | undefined {
         return this._toExecute;
     }
 
-    @Expose({ toPlainOnly: true })
-    @Type(() => Player)
     get executed(): IPlayer | undefined {
         return this._executed;
     }
@@ -207,8 +198,14 @@ export class Execution extends EffectTarget<IExecution> implements IExecution {
         return false;
     }
 
-    toJSON() {
-        return instanceToPlain(this);
+    toJSON(): TJSON {
+        return {
+            nominations: this.nominations.map((nomination) =>
+                nomination.toJSON()
+            ),
+            toExecute: this.toExecute?.toJSON() ?? null,
+            executed: this.executed?.toJSON() ?? null,
+        };
     }
 
     protected willExecute(player?: IPlayer): boolean {
