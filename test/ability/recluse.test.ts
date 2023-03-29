@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
     createInfoProvideContextFromPlayerDescriptions,
     createUndertakerInfoProviderContext,
-} from '../info-provider.test';
+} from '../info/info-provider.test';
 import {
     mockRecluseRegisterAs,
     expectAfterSlayerKill,

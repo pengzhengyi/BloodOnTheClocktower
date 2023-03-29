@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { createInfoProvideContextFromPlayerDescriptions } from '../info-provider.test';
+import { createInfoProvideContextFromPlayerDescriptions } from '../info/info-provider.test';
 import {
     expectCharacterGetInformation,
     expectScarletWomanBecomeDemonAfterDemonDeath,

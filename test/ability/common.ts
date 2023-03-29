@@ -1,4 +1,4 @@
-import { createInfoProvideContext } from '../info-provider.test';
+import { createInfoProvideContext } from '../info/info-provider.test';
 import type {
     AbilitySetupContext,
     AbilityUseContext,

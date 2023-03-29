@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
     createInfoProvideContext,
     createSeatingAndPlayersFromDescriptions,
-} from '../info-provider.test';
+} from '../info/info-provider.test';
 import { playerFromDescription } from '../utils';
 import {
     expectAfterNominateVirgin,

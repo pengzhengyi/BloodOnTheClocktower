@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { playerFromDescription } from './utils';
+import { playerFromDescription } from '../utils';
 import { storytellerConfirmMock } from '~/__mocks__/game-ui';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
