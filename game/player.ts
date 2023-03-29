@@ -29,6 +29,8 @@ import { ReassignCharacterToPlayer } from './exception/reassign-character-to-pla
 import type { IAbilities } from './ability/abilities';
 import { Abilities } from './ability/abilities';
 import type { CharacterAssignmentResult, TJSON } from './types';
+import { VoteKind } from './voting/vote-kind';
+import { UnsupportedVoteKind } from './exception/unsupported-vote-kind';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IPlayer extends IEffectTarget<IPlayer> {
@@ -111,7 +113,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     setPoison(reason: IPoisonedReason): Promise<boolean>;
     removePoison(reason: IPoisonedReason): Promise<boolean>;
     nominate(nominated: IPlayer): Promise<INomination | undefined>;
-    collectVote(forExile: boolean): Promise<boolean>;
+    collectVote(voteKind: VoteKind): Promise<boolean>;
     revokeVoteToken(reason?: string): Promise<boolean>;
 
     storytellerGet(key: '_isDemon'): boolean;
@@ -547,11 +549,10 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
         return nomination;
     }
 
-    async collectVote(forExile: boolean): Promise<boolean> {
-        const shouldCheckHandRaised =
-            (forExile && (await this.canExile)) || (await this.canVote);
+    async collectVote(voteKind: VoteKind): Promise<boolean> {
+        const canRaiseHand = await this.canRaiseHandForVote(voteKind);
         if (
-            shouldCheckHandRaised &&
+            canRaiseHand &&
             (await InteractionEnvironment.current.gameUI.hasRaisedHandForVote(
                 this
             ))
@@ -662,6 +663,19 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
                 this,
                 this._character,
                 newCharacter
+            );
+        }
+    }
+
+    protected canRaiseHandForVote(voteKind: VoteKind): Promise<boolean> {
+        if (voteKind === VoteKind.ForExecution) {
+            return this.canVote;
+        } else if (voteKind === VoteKind.ForExile) {
+            return this.canExile;
+        } else {
+            throw new UnsupportedVoteKind(
+                voteKind,
+                'Not sure how to check whether player can vote for this vote kind'
             );
         }
     }

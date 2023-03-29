@@ -2,6 +2,7 @@ import { clockwise } from '../common';
 import { type IPlayer } from '../player';
 import type { TJSON, PlayerOrdering } from '../types';
 import { UnsupportedOperationForVote } from '../exception/unsupported-operation-for-vote';
+import { VoteKind } from './vote-kind';
 
 /**
  * When a player nominates another player, a Vote is created and is at the NotVoted state. When starting to collect votes, the Vote is at the Voting state. When the vote is tallied, the Vote is at the Voted state.
@@ -24,6 +25,8 @@ export interface IVote {
     readonly nominated: IPlayer;
 
     readonly hasVoted: boolean;
+
+    readonly kind: VoteKind;
 
     invalidate(reason?: string): void;
 
@@ -64,6 +67,8 @@ export class Vote implements IVote {
     }
 
     nominated: IPlayer;
+
+    readonly kind: VoteKind = VoteKind.ForExecution;
 
     get hasVoted(): boolean {
         return this.voteState.stateName === VoteStateName.Voted;
@@ -223,7 +228,7 @@ class Voting extends BaseVoteState {
 
     async *collectVotes(players: Iterable<IPlayer>): AsyncGenerator<IPlayer> {
         for (const player of players) {
-            if (await player.collectVote(this.vote.forExile)) {
+            if (await player.collectVote(this.vote.kind)) {
                 this.votes.push(player);
                 yield player;
             }

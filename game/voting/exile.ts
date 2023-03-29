@@ -1,8 +1,8 @@
 import { ExileNonTraveller } from '../exception/exile-non-traveller';
 import type { INomination } from '../nomination';
 import { Nomination } from '../nomination';
+import { ExileVote } from './exile-vote';
 import type { IVote } from './vote';
-import { Vote } from './vote';
 
 export interface IExile extends INomination {
     validate(): Promise<void>;
@@ -16,7 +16,7 @@ export class Exile extends Nomination implements IExile {
     }
 
     protected createVote(): IVote {
-        return new Vote(this.nominated, true);
+        return new ExileVote(this.nominated, true);
     }
 }
 
