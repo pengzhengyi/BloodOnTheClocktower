@@ -31,6 +31,9 @@ import { Abilities } from './ability/abilities';
 import type { CharacterAssignmentResult, TJSON } from './types';
 import { VoteKind } from './voting/vote-kind';
 import { UnsupportedVoteKind } from './exception/unsupported-vote-kind';
+import type { IExile } from './voting/exile';
+import { Exile } from './voting/exile';
+import { PlayerCannotExile } from './exception/player-cannot-exile';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IPlayer extends IEffectTarget<IPlayer> {
@@ -113,6 +116,7 @@ export interface IPlayer extends IEffectTarget<IPlayer> {
     setPoison(reason: IPoisonedReason): Promise<boolean>;
     removePoison(reason: IPoisonedReason): Promise<boolean>;
     nominate(nominated: IPlayer): Promise<INomination | undefined>;
+    exile(traveller: IPlayer): Promise<IExile | undefined>;
     collectVote(voteKind: VoteKind): Promise<boolean>;
     revokeVoteToken(reason?: string): Promise<boolean>;
 
@@ -547,6 +551,18 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
                     : undefined
         );
         return nomination;
+    }
+
+    async exile(traveller: IPlayer): Promise<IExile | undefined> {
+        const exile = await PlayerCannotExile.ternary(
+            async () => (await this.canExile) && (await traveller.isTraveller),
+            () => new Exile(this, traveller),
+            () => new PlayerCannotExile(this),
+            (error) =>
+                error.forceAllowExile ? new Exile(this, traveller) : undefined
+        );
+
+        return exile;
     }
 
     async collectVote(voteKind: VoteKind): Promise<boolean> {

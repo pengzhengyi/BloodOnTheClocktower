@@ -1,8 +1,14 @@
 import { faker } from '@faker-js/faker';
 import { playerFromDescription } from './utils';
-import { mockPlayer, mockDeadPlayer } from '~/__mocks__/player';
+import {
+    mockPlayer,
+    mockDeadPlayer,
+    createBasicPlayer,
+} from '~/__mocks__/player';
 import { mockExecution } from '~/__mocks__/execution';
-import { Washerwoman } from '~/__mocks__/character';
+import { Imp, Scapegoat, Washerwoman } from '~/__mocks__/character';
+import { storytellerHandleMock } from '~/__mocks__/game-ui';
+import { PlayerCannotExile } from '~/game/exception/player-cannot-exile';
 
 describe('test Player serialization', () => {
     test.concurrent('convert to object', async () => {
@@ -34,5 +40,23 @@ describe('test Player Edge Cases', () => {
         }
 
         expect(nomination).toBeUndefined();
+    });
+
+    test('Can only exile travellers.', async () => {
+        const nominator = await createBasicPlayer();
+        const traveller = await createBasicPlayer(undefined, Scapegoat);
+
+        const exile = await nominator.exile(traveller);
+        expect(exile).toBeDefined();
+
+        const nonTraveller = await createBasicPlayer(undefined, Imp);
+
+        storytellerHandleMock.mockImplementation((error) => {
+            expect(error).toBeInstanceOf(PlayerCannotExile);
+            return Promise.resolve(true);
+        });
+        const notApprovedExile = await nominator.exile(nonTraveller);
+        storytellerHandleMock.mockReset();
+        expect(notApprovedExile).toBeUndefined();
     });
 });
