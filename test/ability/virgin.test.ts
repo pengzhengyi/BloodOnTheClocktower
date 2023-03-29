@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { playerFromDescription } from '../utils';
 import { expectAfterNominateVirgin } from './common';
 import { DeadReason } from '~/game/dead-reason';
-import { DeadPlayerCannotNominate } from '~/game/exception/dead-player-cannot-nominate';
+import { PlayerCannotNominate } from '~/game/exception/player-cannot-nominate';
 import { storytellerHandleMock } from '~/__mocks__/game-ui';
 import type { IPlayer } from '~/game/player';
 
@@ -58,7 +58,7 @@ describe('test VirginAbility', () => {
         expect(await librarianPlayer.dead).toBeTrue();
 
         storytellerHandleMock.mockImplementation((error) => {
-            expect(error).toBeInstanceOf(DeadPlayerCannotNominate);
+            expect(error).toBeInstanceOf(PlayerCannotNominate);
             return Promise.resolve(true);
         });
 

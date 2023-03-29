@@ -1,12 +1,12 @@
 import type { IPlayer } from '../player';
 import { RecoverableGameError } from './exception';
 
-export class DeadPlayerCannotNominate extends RecoverableGameError {
-    static description = 'Dead player cannot nominate';
+export class PlayerCannotNominate extends RecoverableGameError {
+    static description = 'Player is not eligible to nominate';
 
     forceAllowNomination = false;
 
     constructor(readonly player: IPlayer) {
-        super(DeadPlayerCannotNominate.description);
+        super(PlayerCannotNominate.description);
     }
 }

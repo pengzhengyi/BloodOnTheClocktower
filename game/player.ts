@@ -20,7 +20,7 @@ import {
     Townsfolk,
     Traveller,
 } from './character/character-type';
-import { DeadPlayerCannotNominate } from './exception/dead-player-cannot-nominate';
+import { PlayerCannotNominate } from './exception/player-cannot-nominate';
 import { DrunkReason } from './drunk-reason';
 import { Generator } from './collections';
 import type { IPoisonedReason } from './poisoned-reason';
@@ -537,10 +537,10 @@ export class Player extends EffectTarget<IPlayer> implements IPlayer {
     }
 
     async nominate(nominated: IPlayer): Promise<INomination | undefined> {
-        const nomination = await DeadPlayerCannotNominate.ternary(
+        const nomination = await PlayerCannotNominate.ternary(
             () => this.canNominate,
             () => new Nomination(this, nominated),
-            () => new DeadPlayerCannotNominate(this),
+            () => new PlayerCannotNominate(this),
             (error) =>
                 error.forceAllowNomination
                     ? new Nomination(this, nominated)
