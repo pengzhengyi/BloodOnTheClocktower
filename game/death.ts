@@ -1,5 +1,5 @@
 import type { DeadReason } from './dead-reason';
-import type { IPlayer } from './player';
+import type { IPlayer } from './player/player';
 
 export class Death {
     readonly player: IPlayer;

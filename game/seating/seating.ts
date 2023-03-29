@@ -1,6 +1,6 @@
 import { Generator } from '../collections';
 import { clockwise, counterclockwise } from '../common';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { type AnyPredicate, Direction, TAUTOLOGY } from '../types';
 import { NumberOfSeatNotPositive } from '../exception/number-of-seat-not-positive';
 import { UnexpectedEmptySeat } from '../exception/unexpected-empty-seat';

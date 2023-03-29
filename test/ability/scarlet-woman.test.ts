@@ -21,7 +21,7 @@ import {
     mockStorytellerChooseMatchingOne,
     storytellerChooseOneMock,
 } from '~/__mocks__/game-ui';
-import { type IPlayer } from '~/game/player';
+import { type IPlayer } from '~/game/player/player';
 import {
     ScarletWoman,
     Imp,

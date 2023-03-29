@@ -19,7 +19,7 @@ import { mockClocktowerWithIsNonfirstNight } from '~/__mocks__/information';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { createBasicStoryTeller } from '~/__mocks__/storyteller';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { Monk } from '~/__mocks__/character';
 
 describe('test MonkProtectAbility', () => {

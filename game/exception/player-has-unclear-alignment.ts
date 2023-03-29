@@ -1,5 +1,5 @@
 import type { Alignment } from '../alignment';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class PlayerHasUnclearAlignment extends RecoverableGameError {

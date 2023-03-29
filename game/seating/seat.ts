@@ -1,4 +1,4 @@
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface SitResult {

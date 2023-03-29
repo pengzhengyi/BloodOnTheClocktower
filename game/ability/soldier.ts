@@ -1,7 +1,7 @@
 import type { InteractionContext } from '../effect/effect';
 import { SafeFromDemonEffect } from '../effect/safe-from-demon';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
-import type { IPlayer as SoldierPlayer } from '../player';
+import type { IPlayer as SoldierPlayer } from '../player/player';
 import {
     Ability,
     type AbilityUseContext,

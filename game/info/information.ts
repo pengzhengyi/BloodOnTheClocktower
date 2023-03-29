@@ -7,7 +7,7 @@ import type {
     CharacterType,
 } from '../character/character-type';
 import type { Generator } from '../collections';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { Info } from './info';
 
 /**

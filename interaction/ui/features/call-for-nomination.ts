@@ -1,6 +1,6 @@
 import type { ICallForNominationOptions } from './options/interaction-options';
 
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 export interface IProposedNomination {
     nominator: IPlayer;

@@ -39,7 +39,7 @@ import {
     Undertaker,
     Drunk,
 } from '~/__mocks__/character';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 describe('test SpyAbility', () => {
     /**

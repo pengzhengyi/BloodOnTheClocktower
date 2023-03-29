@@ -6,7 +6,7 @@ import {
 import { InfoType } from '../info-type';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
-import { Players } from '~/game/players';
+import { Players } from '~/game/player/players';
 import { Seating } from '~/game/seating/seating';
 
 export interface ChefInformation {

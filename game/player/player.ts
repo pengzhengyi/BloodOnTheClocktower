@@ -2,14 +2,13 @@
 import '@abraham/reflection';
 import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
-import { Alignment } from './alignment';
-import type { CharacterToken } from './character/character';
-import { DeadReason } from './dead-reason';
-import { Death } from './death';
-import { EffectTarget, type IEffectTarget } from './effect/effect-target';
-import type { INomination } from './nomination';
-import { Nomination } from './nomination';
-import { type IPlayerState, PlayerState, State } from './player-state';
+import { Alignment } from '../alignment';
+import type { CharacterToken } from '../character/character';
+import { DeadReason } from '../dead-reason';
+import { Death } from '../death';
+import { EffectTarget, type IEffectTarget } from '../effect/effect-target';
+import type { INomination } from '../nomination';
+import { Nomination } from '../nomination';
 
 import {
     type CharacterType,
@@ -19,21 +18,22 @@ import {
     Outsider,
     Townsfolk,
     Traveller,
-} from './character/character-type';
-import { PlayerCannotNominate } from './exception/player-cannot-nominate';
-import { DrunkReason } from './drunk-reason';
-import { Generator } from './collections';
-import type { IPoisonedReason } from './poisoned-reason';
-import { PlayerHasUnclearAlignment } from './exception/player-has-unclear-alignment';
-import { ReassignCharacterToPlayer } from './exception/reassign-character-to-player';
-import type { IAbilities } from './ability/abilities';
-import { Abilities } from './ability/abilities';
-import type { CharacterAssignmentResult, TJSON } from './types';
-import { VoteKind } from './voting/vote-kind';
-import { UnsupportedVoteKind } from './exception/unsupported-vote-kind';
-import type { IExile } from './voting/exile';
-import { Exile } from './voting/exile';
-import { PlayerCannotExile } from './exception/player-cannot-exile';
+} from '../character/character-type';
+import { PlayerCannotNominate } from '../exception/player-cannot-nominate';
+import { DrunkReason } from '../drunk-reason';
+import { Generator } from '../collections';
+import type { IPoisonedReason } from '../poisoned-reason';
+import { PlayerHasUnclearAlignment } from '../exception/player-has-unclear-alignment';
+import { ReassignCharacterToPlayer } from '../exception/reassign-character-to-player';
+import type { IAbilities } from '../ability/abilities';
+import { Abilities } from '../ability/abilities';
+import type { CharacterAssignmentResult, TJSON } from '../types';
+import { VoteKind } from '../voting/vote-kind';
+import { UnsupportedVoteKind } from '../exception/unsupported-vote-kind';
+import type { IExile } from '../voting/exile';
+import { Exile } from '../voting/exile';
+import { PlayerCannotExile } from '../exception/player-cannot-exile';
+import { type IPlayerState, PlayerState, State } from './player-state';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 
 export interface IPlayer extends IEffectTarget<IPlayer> {

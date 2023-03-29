@@ -7,7 +7,7 @@ import {
     RedHerringEffect,
     GetFortuneTellerInformationAbility,
 } from '~/game/ability/fortuneteller';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { mockAbilitySetupContext } from '~/__mocks__/ability';
 import {
     storytellerChooseOneMock,

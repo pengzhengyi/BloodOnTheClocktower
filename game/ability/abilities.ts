@@ -1,7 +1,7 @@
 import { Generator } from '../collections';
 import type { IGameEnvironment } from '../environment';
 import type { IGame } from '../game';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import type {
     AbilitySetupContext,
     AbilityUseContext,

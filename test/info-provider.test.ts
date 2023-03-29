@@ -5,10 +5,10 @@ import { createBasicPlayer } from '~/__mocks__/player';
 import { mockInfoProvideContext } from '~/__mocks__/information';
 import { Minion, Outsider, Townsfolk } from '~/game/character/character-type';
 
-import { Players } from '~/game/players';
+import { Players } from '~/game/player/players';
 import type { AsyncPredicate } from '~/game/types';
 import { DeadReason } from '~/game/dead-reason';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { type ISeating } from '~/game/seating/seating';
 import type {
     TrueInformation,

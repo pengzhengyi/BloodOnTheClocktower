@@ -1,6 +1,6 @@
 import { DeadReason } from '~/game/dead-reason';
 import { DrunkReason } from '~/game/drunk-reason';
-import { PlayerState, State } from '~/game/player-state';
+import { PlayerState, State } from '~/game/player/player-state';
 
 describe('Test basic functionalities', () => {
     test.concurrent('get and set player state', () => {

@@ -10,7 +10,7 @@ import {
     mockPlayer,
     setPlayerDead,
 } from '~/__mocks__/player';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { Generator } from '~/game/collections';
 import { AttemptMoreThanOneExecution } from '~/game/exception/attempt-more-than-one-execution';
 

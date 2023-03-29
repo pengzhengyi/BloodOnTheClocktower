@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { Generator } from '~/game/collections';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import type { Predicate } from '~/game/types';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 import type { IPlayerChooseFrom } from '~/interaction/ui/features/choose';

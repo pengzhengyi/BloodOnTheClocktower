@@ -1,7 +1,7 @@
 import { collectVotesForNomination as collectVotesForExile } from './execution.test';
 import { Exile } from '~/game/voting/exile';
 import { ExileNonTraveller } from '~/game/exception/exile-non-traveller';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { createBasicPlayer, setPlayerDead } from '~/__mocks__/player';
 import { Scapegoat, Washerwoman } from '~/__mocks__/character';
 

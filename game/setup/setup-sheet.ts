@@ -1,11 +1,11 @@
 import type { IEdition } from '../edition/edition';
 import { Grimoire } from '../grimoire';
-import { type IPlayers, Players } from '../players';
+import { type IPlayers, Players } from '../player/players';
 import type { NumberOfCharacters } from '../script-tool';
 import { Seating } from '../seating/seating';
 import { TownSquare, type ITownSquare } from '../town-square';
 import { Clocktower } from '../clocktower/clocktower';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import {
     type ISeatAssignment,
     SeatAssignment,

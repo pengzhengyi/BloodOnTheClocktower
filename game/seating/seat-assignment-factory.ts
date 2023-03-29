@@ -1,5 +1,5 @@
 import { Singleton } from '../common';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import {
     AssignEmptySeats,
     AssignNotSatPlayers,

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { playerFromDescription } from './utils';
+import { playerFromDescription } from '../utils';
 import { mockPlayer, createBasicPlayer } from '~/__mocks__/player';
 import { mockExecution } from '~/__mocks__/execution';
 import { Imp, Scapegoat, Washerwoman } from '~/__mocks__/character';

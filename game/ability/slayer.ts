@@ -1,7 +1,7 @@
 import { DeadReason } from '../dead-reason';
 import type { Death } from '../death';
 import { SlayerNotChoosePlayerToKill } from '../exception/slayer-not-choose-player-to-kill';
-import type { IPlayer, IPlayer as SlayerPlayer } from '../player';
+import type { IPlayer, IPlayer as SlayerPlayer } from '../player/player';
 import {
     Ability,
     type AbilityUseContext,

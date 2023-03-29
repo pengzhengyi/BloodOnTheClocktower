@@ -11,7 +11,7 @@ import { mockAbilitySetupContext } from '~/__mocks__/ability';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
 import { Poisoner, Drunk, Soldier } from '~/__mocks__/character';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 describe('test SoldierAbility', () => {
     let _ability: SoldierAbility;

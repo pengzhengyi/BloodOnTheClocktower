@@ -1,5 +1,5 @@
 import type { INomination } from '../nomination';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class NominatedNominatedBefore extends RecoverableGameError {

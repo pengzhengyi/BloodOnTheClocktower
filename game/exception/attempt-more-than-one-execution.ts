@@ -1,5 +1,5 @@
 import type { IExecution } from '../voting/execution';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class AttemptMoreThanOneExecution extends RecoverableGameError {

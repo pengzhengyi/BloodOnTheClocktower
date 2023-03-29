@@ -4,7 +4,7 @@ import { DeadReason } from '../dead-reason';
 import type { IEffectTarget } from '../effect/effect-target';
 import { EffectTarget } from '../effect/effect-target';
 import type { INomination } from '../nomination';
-import { type IPlayer } from '../player';
+import { type IPlayer } from '../player/player';
 import type { TJSON } from '../types';
 import { TAUTOLOGY, type Predicate } from '../types';
 import type { Death } from '../death';

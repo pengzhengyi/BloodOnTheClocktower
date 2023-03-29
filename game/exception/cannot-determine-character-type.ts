@@ -1,5 +1,5 @@
 import type { ICharacter } from '../character/character';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class CannotDetermineCharacterType extends RecoverableGameError {

@@ -1,7 +1,7 @@
 import type { IProposedNominations } from '../call-for-nomination';
 import type { ICallForNominationOptions } from '../options/interaction-options';
 import type { IInteractionChannel } from './interaction-channel';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 export type ICallForNominationChannel<TOptions = RequestInit> = Required<
     Pick<

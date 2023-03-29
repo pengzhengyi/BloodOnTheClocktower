@@ -6,7 +6,7 @@ import {
 } from '../information';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator } from '~/game/collections';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { type CharacterType } from '~/game/character/character-type';
 import type { MinionPlayer } from '~/game/types';
 

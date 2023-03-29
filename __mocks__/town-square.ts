@@ -1,7 +1,7 @@
 import { mockClocktower } from './clocktower';
 import { createSeatingAndAssignPlayers } from './seating';
 import type { IClocktower } from '~/game/clocktower/clocktower';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';
 import { type ITownSquare, TownSquare } from '~/game/town-square';
 

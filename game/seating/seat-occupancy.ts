@@ -1,4 +1,4 @@
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import type { ISeat } from './seat';
 
 export interface ISeatOccupancy {

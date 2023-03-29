@@ -1,6 +1,6 @@
 import { Alignment } from '~/game/alignment';
 import { GameEnvironment } from '~/game/environment';
-import { Player } from '~/game/player';
+import { Player } from '~/game/player/player';
 
 const regex = /(.*) is\s?(?:the|a|an)?\s(evil|good|)\s?(.*)/i;
 

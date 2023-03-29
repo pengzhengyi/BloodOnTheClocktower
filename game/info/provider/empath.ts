@@ -7,7 +7,7 @@ import {
 import { InfoType } from '../info-type';
 import { type InfoProvideContext, InformationProvider } from './provider';
 import { Generator, type LazyMap } from '~/game/collections';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { Seating } from '~/game/seating/seating';
 
 /**

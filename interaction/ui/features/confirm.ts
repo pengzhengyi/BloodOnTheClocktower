@@ -1,5 +1,5 @@
 import type { IConfirmOptions } from './options/interaction-options';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 export interface IConfirmFrom {
     player: IPlayer;

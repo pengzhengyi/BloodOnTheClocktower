@@ -17,9 +17,9 @@ import {
     Spy,
 } from './character';
 import type { ICharacterSheet } from '~/game/character/character-sheet';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import type { IClocktower } from '~/game/clocktower/clocktower';
-import type { IPlayers } from '~/game/players';
+import type { IPlayers } from '~/game/player/players';
 import type { ISeating } from '~/game/seating/seating';
 import type { IStoryTeller } from '~/game/storyteller';
 import type { TravellerSheet } from '~/game/traveller-sheet';

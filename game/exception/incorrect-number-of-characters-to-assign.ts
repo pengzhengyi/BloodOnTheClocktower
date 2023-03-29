@@ -1,5 +1,5 @@
 import type { CharacterToken } from '../character/character';
-import type { IPlayers } from '../players';
+import type { IPlayers } from '../player/players';
 import { RecoverableGameError } from './exception';
 
 export class IncorrectNumberOfCharactersToAssign extends RecoverableGameError {

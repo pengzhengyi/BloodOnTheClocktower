@@ -7,8 +7,8 @@ import type {
 } from '../types';
 import type { ICharacterSheet } from '../character/character-sheet';
 import type { INightSheet } from '../night-sheet';
-import type { IPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import type { Info } from '../info/info';
 import type { InfoProvideContext } from '../info/provider/provider';
 import type {

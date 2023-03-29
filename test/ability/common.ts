@@ -29,7 +29,7 @@ import type {
     InformationRequestContext,
     IInformationRequester,
 } from '~/game/info/requester/requester';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import type {
     AsyncFactory,
     DemonPlayer,
@@ -78,7 +78,7 @@ import {
     SaintAbility,
     type SaintAbilityUseContext,
 } from '~/game/ability/saint';
-import { type IPlayers, Players } from '~/game/players';
+import { type IPlayers, Players } from '~/game/player/players';
 import { SpyAbility } from '~/game/ability/spy';
 import {
     VirginAbility,

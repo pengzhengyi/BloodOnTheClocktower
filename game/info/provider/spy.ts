@@ -16,7 +16,7 @@ import {
 import { Generator, type LazyMap } from '~/game/collections';
 import type { IGrimoire } from '~/game/grimoire';
 import type { IStoryTeller } from '~/game/storyteller';
-import type { IPlayer as SpyPlayer } from '~/game/player';
+import type { IPlayer as SpyPlayer } from '~/game/player/player';
 
 export interface SpyInformation {
     grimoire: IGrimoire;

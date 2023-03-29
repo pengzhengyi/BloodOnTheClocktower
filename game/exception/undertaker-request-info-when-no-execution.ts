@@ -1,5 +1,5 @@
 import type { GetInfoAbilityUseContext } from '../ability/ability';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class UndertakerRequestInfoWhenNoExecution extends RecoverableGameError {

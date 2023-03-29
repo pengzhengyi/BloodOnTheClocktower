@@ -1,8 +1,8 @@
 import { createBasicPlayer, createBasicPlayers } from './player';
 import type { CharacterToken } from '~/game/character/character';
 import type { AsyncFactory } from '~/game/types';
-import type { IPlayer } from '~/game/player';
-import { Players, type IPlayers } from '~/game/players';
+import type { IPlayer } from '~/game/player/player';
+import { Players, type IPlayers } from '~/game/player/players';
 
 export async function mockPlayers(
     characters: Array<CharacterToken>

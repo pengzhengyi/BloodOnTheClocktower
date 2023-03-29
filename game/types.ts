@@ -1,6 +1,6 @@
 import type { IExecution } from './voting/execution';
 import type { IGame } from './game';
-import type { IPlayer } from './player';
+import type { IPlayer } from './player/player';
 import type {
     Minion,
     Demon,
@@ -14,7 +14,7 @@ import type { InfoType } from './info/info-type';
 import type { ICharacterSheet } from './character/character-sheet';
 import type { NumberOfCharacters } from './script-tool';
 import type { CharacterId } from './character/character-id';
-import type { IPlayers } from './players';
+import type { IPlayers } from './player/players';
 import type { IAbilities } from './ability/abilities';
 
 export type NoParamConstructor<T> = { new (): T };

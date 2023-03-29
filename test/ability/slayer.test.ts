@@ -3,7 +3,7 @@ import { playerFromDescription } from '../utils';
 import { expectAfterSlayerKill, mockRecluseRegisterAs } from './common';
 import { SlayerAbility } from '~/game/ability/slayer';
 import { createBasicPlayer } from '~/__mocks__/player';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { Imp, Slayer } from '~/__mocks__/character';
 
 describe('test SlayerAbility', () => {

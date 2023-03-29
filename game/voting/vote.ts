@@ -1,5 +1,5 @@
 import { clockwise } from '../common';
-import { type IPlayer } from '../player';
+import { type IPlayer } from '../player/player';
 import type { TJSON, PlayerOrdering } from '../types';
 import { UnsupportedOperationForVote } from '../exception/unsupported-operation-for-vote';
 import { VoteKind } from './vote-kind';

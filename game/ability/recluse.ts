@@ -7,7 +7,7 @@ import {
     RegisterAsEvilAlignmentEffect,
 } from '../effect/register-as';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
-import type { IPlayer as ReclusePlayer } from '../player';
+import type { IPlayer as ReclusePlayer } from '../player/player';
 import {
     Ability,
     type AbilityUseContext,

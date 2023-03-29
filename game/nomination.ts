@@ -1,7 +1,7 @@
 import '@abraham/reflection';
 import type { IVote } from './voting/vote';
 import { Vote } from './voting/vote';
-import type { IPlayer } from './player';
+import type { IPlayer } from './player/player';
 import type { TJSON } from './types';
 
 export enum NominationState {

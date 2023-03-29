@@ -9,7 +9,7 @@ import {
 } from '../info/requester/fortuneteller';
 import type { NextFunction } from '../proxy/middleware';
 import type { INightSheet } from '../night-sheet';
-import type { IPlayer, IPlayer as FortuneTellerPlayer } from '../player';
+import type { IPlayer, IPlayer as FortuneTellerPlayer } from '../player/player';
 import { CharacterNightEffect } from '../effect/character';
 import type { CharacterId } from '../character/character-id';
 import { CharacterIds } from '../character/character-id';

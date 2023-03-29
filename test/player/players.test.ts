@@ -3,7 +3,7 @@ import { randomChoice } from '~/game/common';
 import { Alignment } from '~/game/alignment';
 import { Generator } from '~/game/collections';
 import { IncorrectNumberOfCharactersToAssign } from '~/game/exception/incorrect-number-of-characters-to-assign';
-import { Players } from '~/game/players';
+import { Players } from '~/game/player/players';
 import type {
     CharacterToken,
     TravellerCharacterToken,

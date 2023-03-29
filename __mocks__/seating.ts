@@ -1,4 +1,4 @@
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { SeatAssignment } from '~/game/seating/seat-assignment';
 import { SeatAssignmentFromMode } from '~/game/seating/seat-assignment-factory';
 import { SeatAssignmentMode } from '~/game/seating/seat-assignment-mode';

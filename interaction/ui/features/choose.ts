@@ -1,6 +1,6 @@
 import type { IChooseOptions } from './options/interaction-options';
 import type { IChooseFromOptions, IChosen } from './types';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 export interface IPlayerChooseFrom<T> extends IChooseFromOptions<T> {
     player: IPlayer;

@@ -1,5 +1,5 @@
 import type { AbilityUseContext } from '../ability/ability';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class SlayerNotChoosePlayerToKill extends RecoverableGameError {

@@ -1,5 +1,5 @@
 import { Generator } from '../collections';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import type { ISeat, SitResult } from './seat';
 import type { ISeating } from './seating';
 

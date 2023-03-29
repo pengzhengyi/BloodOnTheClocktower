@@ -1,5 +1,5 @@
 import { Death } from '../death';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import type { IToll } from './toll';
 import type { IRecordTollCommand } from './toll-recorder';
 

@@ -3,8 +3,8 @@ import { Effect, type InteractionContext } from '../effect/effect';
 import type { NextFunction } from '../proxy/middleware';
 import { CharacterNightEffect } from '../effect/character';
 import type { DeadReason } from '../dead-reason';
-import type { IPlayer, IPlayer as ScarletWomanPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer, IPlayer as ScarletWomanPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import type { INonBlockingSubscriber } from '../event-notification/types';
 import {
     ChangeType,

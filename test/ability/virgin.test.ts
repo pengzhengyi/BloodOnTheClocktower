@@ -4,7 +4,7 @@ import { expectAfterNominateVirgin } from './common';
 import { DeadReason } from '~/game/dead-reason';
 import { PlayerCannotNominate } from '~/game/exception/player-cannot-nominate';
 import { storytellerHandleMock } from '~/__mocks__/game-ui';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 describe('test VirginAbility', () => {
     let virginPlayer: IPlayer;

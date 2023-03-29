@@ -5,7 +5,7 @@ import { MayorAbility } from '~/game/ability/mayor';
 import { mockMayorAbilitySetupContext } from '~/__mocks__/ability';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { getTroubleBrewingNightSheet } from '~/__mocks__/night-sheet';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import { Mayor } from '~/__mocks__/character';
 
 describe('test MayorAbility', () => {

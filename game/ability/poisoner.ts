@@ -8,8 +8,8 @@ import type {
 import { PoisonerNotChoosePlayerToPoison } from '../exception/poisoner-not-choose-player-to-poison';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
 import { Phase } from '../phase';
-import type { IPlayer, IPlayer as PoisonerPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer, IPlayer as PoisonerPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import type { IPoisonedReason } from '../poisoned-reason';
 import type { IGamePhaseNotification } from '../event-notification/notification/game-phase';
 import type { CharacterId } from '../character/character-id';

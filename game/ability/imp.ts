@@ -1,10 +1,10 @@
 import { DeadReason } from '../dead-reason';
 import { CharacterNightEffect } from '../effect/character';
 import { Effect, type InteractionContext } from '../effect/effect';
-import type { IPlayers } from '../players';
+import type { IPlayers } from '../player/players';
 import type { NextFunction } from '../proxy/middleware';
 import type { AnyFactory, MinionPlayer } from '../types';
-import type { IPlayer, IPlayer as ImpPlayer } from '../player';
+import type { IPlayer, IPlayer as ImpPlayer } from '../player/player';
 import { ImpNotChoosePlayerToKill } from '../exception/imp-not-choose-player-to-kill';
 import type { Death } from '../death';
 import { BasicGamePhaseKind } from '../game-phase-kind';

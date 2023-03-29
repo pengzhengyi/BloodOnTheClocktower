@@ -8,7 +8,7 @@ import { mockGamePhaseTemporarily } from '~/__mocks__/effects';
 import { hasRaisedHandForVoteMock } from '~/__mocks__/game-ui';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { Butler, Virgin } from '~/__mocks__/character';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 describe('test ButlerAbility', () => {
     let butlerPlayer: IPlayer;

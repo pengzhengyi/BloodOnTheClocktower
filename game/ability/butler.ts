@@ -2,8 +2,8 @@ import { Effect, type InteractionContext } from '../effect/effect';
 import { ButlerNotChooseMasterToFollow } from '../exception/butler-not-choose-master-to-follow';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
-import type { IPlayer, IPlayer as ButlerPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer, IPlayer as ButlerPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import {
     Ability,
     type AbilityUseContext,

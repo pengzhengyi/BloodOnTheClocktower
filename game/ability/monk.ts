@@ -1,7 +1,7 @@
 import { MonkNotChoosePlayerToProtect } from '../exception/monk-not-choose-player-to-protect';
 import { BasicGamePhaseKind } from '../game-phase-kind';
-import type { IPlayer, IPlayer as MonkPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer, IPlayer as MonkPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import { SafeFromDemonEffect } from '../effect/safe-from-demon';
 import { CharacterNightEffect } from '../effect/character';
 import type { CharacterId } from '../character/character-id';

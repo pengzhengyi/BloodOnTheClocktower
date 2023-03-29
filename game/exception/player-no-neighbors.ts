@@ -1,4 +1,4 @@
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import type { ISeating } from '../seating/seating';
 import { RecoverableGameError } from './exception';
 

@@ -6,7 +6,7 @@ import type { IExecution } from '../voting/execution';
 import type { IExile } from '../voting/exile';
 import { moment, type Moment } from '../../utils/moment';
 import { Phase } from '../phase';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { type IToll, Toll } from './toll';
 import type { Event as ClocktowerEvent } from './event';
 import type { ITollRecorder } from './toll-recorder';

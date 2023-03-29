@@ -1,6 +1,6 @@
 import { Generator } from './collections';
-import { type IPlayer, type IPlayerInfo, Player } from './player';
-import type { IPlayers } from './players';
+import { type IPlayer, type IPlayerInfo, Player } from './player/player';
+import type { IPlayers } from './player/players';
 import { iterableToString } from '~/utils/common';
 
 export interface IGrimoire {

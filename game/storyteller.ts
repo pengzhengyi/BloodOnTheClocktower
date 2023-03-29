@@ -5,7 +5,7 @@ import type {
     InfoRequestContext,
     InformationRequestContext,
 } from './info/requester/requester';
-import type { IPlayer } from './player';
+import type { IPlayer } from './player/player';
 import { GameEnvironment } from './environment';
 import { InteractionEnvironment } from '~/interaction/environment/environment';
 

@@ -1,8 +1,8 @@
-import type { Alignment } from './alignment';
+import type { Alignment } from '../alignment';
 import type {
     CharacterToken,
     TravellerCharacterToken,
-} from './character/character';
+} from '../character/character';
 import {
     type CharacterType,
     Demon,
@@ -10,12 +10,12 @@ import {
     Minion,
     Outsider,
     Townsfolk,
-} from './character/character-type';
-import { Generator } from './collections';
-import type { InteractionInitiator } from './effect/effect';
-import { IncorrectNumberOfCharactersToAssign } from './exception/incorrect-number-of-characters-to-assign';
+} from '../character/character-type';
+import { Generator } from '../collections';
+import type { InteractionInitiator } from '../effect/effect';
+import { IncorrectNumberOfCharactersToAssign } from '../exception/incorrect-number-of-characters-to-assign';
+import type { CharacterAssignmentResult } from '../types';
 import type { IPlayer } from './player';
-import type { CharacterAssignmentResult } from './types';
 import { iterableToString } from '~/utils/common';
 
 /**

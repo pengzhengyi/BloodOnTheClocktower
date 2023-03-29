@@ -1,6 +1,6 @@
 import '@abraham/reflection';
 import { Expose, Exclude, instanceToPlain } from 'class-transformer';
-import { Generator, LazyMap } from './collections';
+import { Generator, LazyMap } from '../collections';
 
 export enum State {
     None = 0,

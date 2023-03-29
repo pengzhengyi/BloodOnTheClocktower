@@ -1,5 +1,5 @@
 import type { CharacterToken } from '../character/character';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import type { NextFunction } from '../proxy/middleware';
 import { Effect, type InteractionContext } from './effect';
 

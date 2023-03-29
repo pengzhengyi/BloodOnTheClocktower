@@ -4,7 +4,7 @@ import type { IGame } from '../game';
 import { BasicGamePhaseKind } from '../game-phase-kind';
 import type { NextFunction } from '../proxy/middleware';
 import type { RequireExecution } from '../types';
-import type { IPlayer as SaintPlayer } from '../player';
+import type { IPlayer as SaintPlayer } from '../player/player';
 import type { AbilitySetupContext } from './ability';
 import {
     type AbilityUseContext,

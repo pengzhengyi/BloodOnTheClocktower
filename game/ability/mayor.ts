@@ -4,8 +4,8 @@ import { Effect, type InteractionContext } from '../effect/effect';
 import { BasicGamePhaseKind, CompositeGamePhaseKind } from '../game-phase-kind';
 import type { IGame } from '../game';
 import type { NextFunction } from '../proxy/middleware';
-import type { IPlayer, IPlayer as MayorPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer, IPlayer as MayorPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import { Generator } from '../collections';
 import {
     Ability,

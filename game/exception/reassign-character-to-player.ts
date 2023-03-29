@@ -1,5 +1,5 @@
 import type { CharacterToken } from '../character/character';
-import type { IPlayer } from '../player';
+import type { IPlayer } from '../player/player';
 import { RecoverableGameError } from './exception';
 
 export class ReassignCharacterToPlayer extends RecoverableGameError {

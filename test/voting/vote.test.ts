@@ -9,7 +9,7 @@ import {
     setPlayerDead,
 } from '~/__mocks__/player';
 
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 import type { IVote } from '~/game/voting/vote';
 import { Vote } from '~/game/voting/vote';
 

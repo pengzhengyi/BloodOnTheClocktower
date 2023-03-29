@@ -6,8 +6,8 @@ import type { ICharacterSheet } from '../character/character-sheet';
 import { Generator } from '../collections';
 import { DrunkReason } from '../drunk-reason';
 import { CompositeGamePhaseKind } from '../game-phase-kind';
-import type { IPlayer } from '../player';
-import type { IPlayers } from '../players';
+import type { IPlayer } from '../player/player';
+import type { IPlayers } from '../player/players';
 import { ThinkAsCharacterEffect } from '../effect/think-as';
 import {
     Ability,

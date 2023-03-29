@@ -8,7 +8,7 @@ import { mockClocktowerForUndertaker } from '~/__mocks__/information';
 import { createBasicPlayer } from '~/__mocks__/player';
 import { DeadReason } from '~/game/dead-reason';
 import { Undertaker, Spy, Butler } from '~/__mocks__/character';
-import type { IPlayer } from '~/game/player';
+import type { IPlayer } from '~/game/player/player';
 
 describe('test GetUndertakerInformationAbility', () => {
     let ability: GetUndertakerInformationAbility;

@@ -1,5 +1,5 @@
 import type { IEvent } from '../types';
-import { type IPlayer } from '~/game/player';
+import { type IPlayer } from '~/game/player/player';
 import { type CharacterType, Demon } from '~/game/character/character-type';
 import { PlayerCharacterTypeBecomeUndefined } from '~/game/exception/player-character-type-become-undefined';
 

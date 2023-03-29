@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import { Alignment } from './alignment';
-import { type IPlayer } from './player';
-import type { IPlayers } from './players';
+import { type IPlayer } from './player/player';
+import type { IPlayers } from './player/players';
 import type { IEdition } from './edition/edition';
 import { EffectTarget, type IEffectTarget } from './effect/effect-target';
 import type { IStoryTeller } from './storyteller';
