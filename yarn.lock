@@ -4244,9 +4244,9 @@ bootstrap@^4.6.1:
   integrity sha512-0dj+VgI9Ecom+rvvpNZ4MUZJz8dcX7WCX+eTID9+/8HgOkv3dsRzi8BGeZJCQU6flWQVYxwTQnEZFrmJSEO7og==
 
 bootstrap@^5.0.0:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.3.tgz#54739f4414de121b9785c5da3c87b37ff008322b"
-  integrity sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.0.tgz#0718a7cc29040ee8dbf1bd652b896f3436a87c29"
+  integrity sha512-UnBV3E3v4STVNQdms6jSGO2CvOkjUMdDAVR2V5N4uCMdaIkaQjbcEAMqRimDHIs4uqBYzDAKCQwCB+97tJgHQw==
 
 boxen@^5.1.2:
   version "5.1.2"
