@@ -33,7 +33,7 @@ repos:
 
   # Remove unused imports
   - repo: https://github.com/myint/autoflake
-    rev: v2.0.2
+    rev: v2.2.0
     hooks:
       - id: autoflake
         stages: [commit]
@@ -47,7 +47,7 @@ repos:
 
   # Autoformats python code to a single standard
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.7.0
     hooks:
       - id: black
         stages: [commit]
@@ -62,7 +62,7 @@ repos:
 
   # Markdown linter, see markdownlint.yaml for configuration
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.33.0
+    rev: v0.35.0
     hooks:
       - id: markdownlint
         stages: [commit]
@@ -80,7 +80,7 @@ repos:
   # Push hooks (runs on push because developers may commit incomplete changes)
   # Python files linter, see .pylintrc for configuration
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.17.1
+    rev: v3.0.0a6
     hooks:
       - id: pylint
         stages: [push]
