@@ -1,10 +1,15 @@
-import type { ActorType } from './actor-type';
+import type { IActorInfo } from './actor-info';
+import type { IActorRoles } from './actor-roles';
 
 /**
- * Actor represents a participant in a game session.
+ * Actor represents roles that are eligible to perform activities.
  *
- * For example, player and storyteller are both types of actor.
+ * They are the initiators of various activities like user-based interactions.
+ *
+ * A key difference between actor and game participant is that the former is a role that is eligible to initiate activities, while the latter is a role engaging in game activities.
  */
 export interface IActor {
-    readonly type: ActorType;
+    readonly info: IActorInfo;
+
+    readonly roles: IActorRoles;
 }
