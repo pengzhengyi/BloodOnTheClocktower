@@ -1,4 +1,4 @@
-import type { IStatus } from '../common/utils/status';
+import type { IStatus } from '../../common/utils/status';
 import type { IGameParticipant } from './game-participant';
 import type { GameParticipantModificationType } from './game-participant-modification-type';
 
