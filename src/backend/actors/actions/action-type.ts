@@ -1,4 +1,4 @@
-export enum IActionType {
+export enum ActionType {
     AdminLogin = 'admin login',
     AdminLogout = 'admin logout',
     UserLogin = 'user login',

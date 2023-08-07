@@ -15,8 +15,6 @@ export enum ActorRoleType {
     User = 'user',
     Admin = 'admin',
 
-    Developer = 'developer',
-
     GameSessionHost = 'game session host',
     GameSessionGuest = 'game session guest',
 }
