@@ -6,10 +6,16 @@
  * An actor can assume multiple roles. For example, an actor can be both a User, a Game Session Host and a Developer.
  */
 export enum ActorRoleType {
-    Default = 'default',
+    /**
+     * The initial status of an actor before it is authenticated as an admin or become an anonymous user.
+     */
+    Unset = 'unset',
+
+    AnonymousUser = 'anonymous user',
     User = 'user',
-    Developer = 'developer',
     Admin = 'admin',
+
+    Developer = 'developer',
 
     GameSessionHost = 'game session host',
     GameSessionGuest = 'game session guest',

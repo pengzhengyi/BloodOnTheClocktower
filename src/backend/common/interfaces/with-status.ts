@@ -5,7 +5,7 @@
  *
  * When the operation is unsuccessful, the `ok` property is `false`. The `error` may optionally be set to an `Error` object that describes the reason for the failure. `reason` may also optionally be set to a string that describes the failure.
  */
-export interface IStatus {
+export interface WithStatus {
     readonly ok: boolean;
 
     readonly reason?: string;
