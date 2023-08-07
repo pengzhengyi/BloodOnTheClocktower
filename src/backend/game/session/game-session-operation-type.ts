@@ -5,4 +5,6 @@ export enum GameSessionOperationType {
     Find = 'find',
     Create = 'create',
     End = 'end',
+
+    CreateGame = 'create game',
 }

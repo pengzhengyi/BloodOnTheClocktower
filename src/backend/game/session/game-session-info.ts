@@ -1,14 +1,7 @@
-import type { Duration, Moment } from '../../common/utils/moment';
+import type { ITimeEvent } from '../../common/interfaces/time-event';
+import type { WithId } from '../../common/interfaces/with-id';
 
 /**
  * Basic information of a game session.
  */
-export interface IGameSessionInfo {
-    readonly id: string;
-
-    readonly createdAt: Moment;
-    closedAt?: Moment;
-    readonly isAlive: boolean;
-    readonly isClosed: boolean;
-    readonly aliveFor: Duration;
-}
+export interface IGameSessionInfo extends WithId, ITimeEvent {}
