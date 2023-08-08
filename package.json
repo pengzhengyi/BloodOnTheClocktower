@@ -61,6 +61,6 @@
         "stylelint-config-standard": "^34.0.0",
         "ts-jest": "^29.0.0",
         "vue-jest": "^3.0.4",
-        "yarn-audit-fix": "^9.3.12"
+        "yarn-audit-fix": "^10.0.0"
     }
 }
