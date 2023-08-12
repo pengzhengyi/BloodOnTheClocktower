@@ -16,13 +16,18 @@ export abstract class PlainCustomEditionIdProvider
 }
 
 abstract class CustomEditionIdFormatter {
+    protected static prefix = 'custom-edition';
+
     static format(customName: string, id?: string): string {
         const customId: string = id ?? uuid();
 
-        return `custom-${customName}-${customId}`;
+        return `${CustomEditionIdFormatter.prefix}-${customName}-${customId}`;
     }
 
     static validate(id: EditionId): boolean {
-        return id.startsWith('custom-') && validate(id.slice(-36));
+        return (
+            id.startsWith(CustomEditionIdFormatter.prefix) &&
+            validate(id.slice(-36))
+        );
     }
 }

@@ -1,3 +1,4 @@
+import type { CharacterId } from '../../characters/id/character-id';
 import type { RequiredEditionDefinitionKeyNames } from './definition-keynames';
 
 /**
@@ -9,7 +10,7 @@ import type { RequiredEditionDefinitionKeyNames } from './definition-keynames';
 export interface IEditionDefinition {
     [RequiredEditionDefinitionKeyNames.NAME]: string;
 
-    [RequiredEditionDefinitionKeyNames.CHARACTERS]: string[];
+    [RequiredEditionDefinitionKeyNames.CHARACTERS]: CharacterId[];
 
     customProperties?: Record<string, unknown>;
 }
