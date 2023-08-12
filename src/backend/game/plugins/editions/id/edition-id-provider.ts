@@ -1,7 +1,6 @@
-import type { EditionId } from './edition-id';
+import type { ICustomEditionIdProvider } from './custom-edition-id-provider';
+import type { IOfficialEditionIdProvider } from './official-edition-id-provider';
 
-export interface IEditionIdProvider {
-    getOfficialEditionIds(): Promise<Set<EditionId>>;
-
-    isOfficialEditionId(id: EditionId): Promise<boolean>;
-}
+export interface IEditionIdProvider
+    extends IOfficialEditionIdProvider,
+        ICustomEditionIdProvider {}

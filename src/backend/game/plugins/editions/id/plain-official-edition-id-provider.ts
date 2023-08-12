@@ -1,4 +1,4 @@
-import type { IEditionIdProvider } from './edition-id-provider';
+import type { IOfficialEditionIdProvider } from './official-edition-id-provider';
 
 export enum EDITIONS {
     TroubleBrewing = 'troublebrewing',
@@ -7,7 +7,9 @@ export enum EDITIONS {
     ExperimentalCharacters = 'experimentalcharacters',
 }
 
-export abstract class SimpleEditionIdProvider implements IEditionIdProvider {
+export abstract class PlainOfficialEditionIdProvider
+    implements IOfficialEditionIdProvider
+{
     getOfficialEditionIds(): Promise<Set<string>> {
         const editionIds = new Set<string>(Object.values(EDITIONS));
 
