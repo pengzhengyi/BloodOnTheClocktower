@@ -16,6 +16,7 @@ module.exports = {
     '<rootDir>/pages/**/*.vue',
     '<rootDir>/game/**/*.ts',
   ],
+  testMatch: ['**/test/backend/**/*.test.[jt]s?(x)'],
   testEnvironment: 'jsdom',
   testTimeout: 10000,
   setupFiles: ['<rootDir>/__mocks__/setup.ts'],
