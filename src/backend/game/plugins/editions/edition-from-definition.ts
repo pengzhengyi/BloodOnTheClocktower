@@ -1,4 +1,3 @@
-import type { CharacterId } from '../characters/id/character-id';
 import { RequiredEditionDefinitionKeyNames } from './definition/definition-keynames';
 import type { IEditionDefinition } from './definition/edition-definition';
 import type { IEdition } from './edition';
@@ -11,10 +10,6 @@ export class EditionFromDefinition implements IEdition {
 
     get name(): string {
         return this.definition[RequiredEditionDefinitionKeyNames.NAME];
-    }
-
-    get characters(): CharacterId[] {
-        return this.definition[RequiredEditionDefinitionKeyNames.CHARACTERS];
     }
 
     constructor(id: EditionId, definition: IEditionDefinition) {
