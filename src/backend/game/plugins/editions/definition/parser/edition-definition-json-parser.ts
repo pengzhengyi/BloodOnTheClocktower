@@ -1,11 +1,11 @@
 import type { ObjectSchema, ValidationError } from 'yup';
 import { object, string, array } from 'yup';
-import type { TJSON } from '../../../../common/types/json';
-import type { IEditionDefinition } from './edition-definition';
+import type { TJSON } from '../../../../../common/types/json';
+import type { IEditionDefinition } from '../edition-definition';
 import { IncorrectFormatParseEditionDefinitionException } from './edition-definition-parse-exception';
 import type { IEditionDefinitionParser } from './edition-definition-parser';
-import { RequiredEditionDefinitionKeyNames } from './definition-keynames';
-import { CharacterTypeKeyNames } from './definition-characters-character-type-keynames';
+import { RequiredEditionDefinitionKeyNames } from '../definition-keynames';
+import { CharacterTypeKeyNames } from '../definition-characters-character-type-keynames';
 
 export abstract class EditionDefinitionJsonParser
     implements IEditionDefinitionParser<TJSON>
