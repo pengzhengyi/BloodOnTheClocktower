@@ -10,8 +10,9 @@ export abstract class PlainCustomEditionIdProvider
         return Promise.resolve(editionId);
     }
 
-    isCustomEditionId(id: EditionId): boolean {
-        return CustomEditionIdFormatter.validate(id);
+    isCustomEditionId(id: EditionId): Promise<boolean> {
+        const isCustomEditionId = CustomEditionIdFormatter.validate(id);
+        return Promise.resolve(isCustomEditionId);
     }
 }
 
