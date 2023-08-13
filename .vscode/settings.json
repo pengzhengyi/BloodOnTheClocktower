@@ -64,6 +64,7 @@
         "pytest",
         "Ravenkeeper",
         "scripttool",
+        "stackframe",
         "stylelint",
         "toolsai",
         "townsfolks",
