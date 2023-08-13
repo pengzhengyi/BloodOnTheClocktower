@@ -1,6 +1,6 @@
 import type { IEditionDefinition } from '../definition/edition-definition';
 import type { IEdition } from '../edition';
-import { EditionFromDefinition } from '../edition-from-definition';
+import { EditionFromDefinition } from './edition-from-definition';
 import type { ICustomEditionIdProvider } from '../id/custom-edition-id-provider';
 import type { IEditionFactory } from './edition-factory';
 
