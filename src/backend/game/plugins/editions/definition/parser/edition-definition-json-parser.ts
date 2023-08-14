@@ -10,7 +10,7 @@ import type { IEditionDefinitionParser } from './edition-definition-parser';
 export abstract class EditionDefinitionJsonParser
     implements IEditionDefinitionParser<TJSON>
 {
-    protected editionDefinitionSchema: ObjectSchema<IEditionDefinition> =
+    protected static editionDefinitionSchema: ObjectSchema<IEditionDefinition> =
         object({
             [RequiredEditionDefinitionKeyNames.NAME]: string().required(),
             [RequiredEditionDefinitionKeyNames.CHARACTERS]: object({
@@ -37,7 +37,9 @@ export abstract class EditionDefinitionJsonParser
         });
 
     parse(input: TJSON): Promise<IEditionDefinition> {
-        return this.editionDefinitionSchema.validate(input);
+        return EditionDefinitionJsonParser.editionDefinitionSchema.validate(
+            input
+        );
         // TODO .catch(this.adaptValidationErrors);
     }
 

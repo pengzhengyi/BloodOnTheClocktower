@@ -1,8 +1,9 @@
 import { fromError, type StackFrame } from 'stacktrace-js';
 import type { AsyncPredicate, Predicate } from '../types/predicate';
 import type { AnyTransform } from '../types/transform';
-import type { StaticThis } from '../types/constructor';
+import type { StaticThis, ClassType } from '../types/constructor';
 import type { AsyncFactory, AnyFactory } from '../types/factory';
+import type { ExtractAllButFirst } from '../types/utils';
 
 /**
  * Base class for all exceptions.
@@ -192,4 +193,39 @@ export abstract class RecoverableException extends Exception {
      * @returns Whether this exception is successfully handled.
      */
     protected abstract handle(): Promise<boolean>;
+}
+
+export abstract class RecoverableExceptionWithErrorHandler extends RecoverableException {
+    protected errorHandler: AnyTransform<Error, boolean>;
+
+    constructor(
+        errorHandler: AnyTransform<Error, boolean>,
+        ...args: ConstructorParameters<typeof Error>
+    ) {
+        super(...args);
+
+        this.errorHandler = errorHandler;
+    }
+
+    protected async handle(): Promise<boolean> {
+        const result = await this.errorHandler(this);
+        return result;
+    }
+}
+
+/**
+ * Assume the first parameter of the constructor is an error handler, create a factory that creates an instance of the specified error class with the provided error handler.
+ *
+ * In other words, it curries the constructor of the specified error class with the provided error handler.
+ *
+ * @param ClassConstructor A class that extends `RecoverableExceptionWithErrorHandler`. Its constructor must have an error handler as the first parameter.
+ * @param errorHandler An error handler that will always be passed to initialize instance of the specified error class.
+ * @returns A factory that creates an instance of the specified error class with the provided error handler.
+ */
+export function createRecoverableExceptionWithErrorHandlerFactory<
+    TError extends RecoverableExceptionWithErrorHandler,
+    TClass extends ClassType<TError>
+>(ClassConstructor: TClass, errorHandler: AnyTransform<TError, boolean>) {
+    return (...args: ExtractAllButFirst<ConstructorParameters<TClass>>) =>
+        new ClassConstructor(errorHandler, ...args);
 }

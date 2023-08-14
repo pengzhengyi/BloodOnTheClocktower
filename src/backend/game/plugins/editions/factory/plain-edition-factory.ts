@@ -1,7 +1,7 @@
 import type { IEditionDefinition } from '../definition/edition-definition';
 import type { IEdition } from '../edition';
-import { EditionFromDefinition } from './edition-from-definition';
 import type { ICustomEditionIdProvider } from '../id/custom-edition-id-provider';
+import { EditionFromDefinition } from './edition-from-definition';
 import type { IEditionFactory } from './edition-factory';
 
 export class PlainEditionFactory implements IEditionFactory {
