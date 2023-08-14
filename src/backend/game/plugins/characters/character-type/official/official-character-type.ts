@@ -24,4 +24,8 @@ export abstract class OfficialCharacterType implements ICharacterType {
     get acceptableNicknames(): Set<string> {
         return new Set([this.id, this.name, this.name.toLowerCase()]);
     }
+
+    isCharacterType(characterTypeName: string): boolean {
+        return this.acceptableNicknames.has(characterTypeName);
+    }
 }
