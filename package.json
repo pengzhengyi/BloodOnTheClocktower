@@ -54,7 +54,7 @@
         "jest-environment-jsdom": "^29.6.2",
         "lint-staged": "^13.2.3",
         "postcss-html": "^1.5.0",
-        "prettier": "^3.0.1",
+        "prettier": "^3.0.2",
         "stylelint": "^15.10.2",
         "stylelint-config-prettier": "^9.0.4",
         "stylelint-config-recommended-vue": "^1.1.0",
